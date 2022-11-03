@@ -1,0 +1,31 @@
+package checkmate.notification.domain.factory;
+
+import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationReceiver;
+import checkmate.notification.domain.NotificationType;
+import checkmate.notification.domain.factory.dto.KickOutNotificationDto;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class KickOutNotificationFactory extends NotificationFactory<KickOutNotificationDto> {
+
+    @Override
+    public Notification generate(KickOutNotificationDto dto) {
+        Notification notification = Notification.builder()
+                .userId(dto.getUserId())
+                .title("목표 퇴출 알림")
+                .body(dto.getGoalTitle() + " 목표에서 퇴출되었습니다.")
+                .build();
+        notification.addAttribute("teamMateId", dto.getTeamMateId());
+        notification.setUpReceivers(List.of(new NotificationReceiver(dto.getUserId())));
+        notification.setNotificationType(getType());
+        return notification;
+    }
+
+    @Override
+    public NotificationType getType() {
+        return NotificationType.EXPULSION_GOAL;
+    }
+}

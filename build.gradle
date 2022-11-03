@@ -2,21 +2,111 @@ plugins {
 	id 'org.springframework.boot' version '2.7.5'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'java'
+	id "io.franzbecker.gradle-lombok" version "3.0.0"
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.checkyourgoal'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
+configurations {
+	asciidoctorExtensions
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation("io.netty:netty-resolver-dns-native-macos:4.1.79.Final:osx-aarch_64")
+
+
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
+
+	//querydsl
+	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+	implementation 'com.querydsl:querydsl-jpa'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+
+	//rest docs
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
+	testImplementation 'io.rest-assured:rest-assured'
+
+	//token
+	implementation 'com.auth0:java-jwt:3.18.3'
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+	//naver object storage
+	implementation 'com.amazonaws:aws-java-sdk:1.11.238'
+
+	//firebase
+	implementation 'com.google.firebase:firebase-admin:6.8.1'
+
+	//AWS cloud watch
+	implementation 'ca.pjer:logback-awslogs-appender:1.6.0'
+
+	//Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation (group: 'it.ozimov', name: 'embedded-redis', version: '0.7.3') {
+		exclude group: 'org.slf4j', module: 'slf4j-simple'
+	}
+
+	//Lombok & Mapstruct
+	implementation 'org.projectlombok:lombok'
+	implementation 'org.mapstruct:mapstruct:1.5.1.Final'
+	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.1.Final'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	//mock S3
+	implementation('io.findify:s3mock_2.13:0.2.6')
 }
 
-tasks.named('test') {
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+test {
+	outputs.dir snippetsDir
 	useJUnitPlatform()
+}
+
+asciidoctor {
+	configurations 'asciidoctorExtensions'
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
+bootJar {
+	dependsOn asciidoctor
+	copy {
+		from file("build/docs/asciidoc")
+		into file("src/main/resources/static/docs")
+	}
+}
+
+clean {
+	delete file('src/main/generated') // 인텔리제이 Annotation processor 생성물 생성 위치
 }

@@ -1,0 +1,131 @@
+package checkmate.goal.domain;
+
+import checkmate.TestEntityFactory;
+import checkmate.common.util.WeekDayConverter;
+import checkmate.exception.ExceedGoalLimitException;
+import checkmate.exception.UnInviteableGoalException;
+import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class TeamMateTest {
+    @Test
+    void 진행률_0_계산_테스트() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        goal.addTeamMate(teamMate);
+
+        //when
+        double progress = teamMate.calcProgressPercent();
+
+        //then
+        assertThat(progress).isEqualTo(0);
+    }
+
+    @Test
+    void 초대_수락시_진행중인_목표개수_검사_테스트() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        goal.addTeamMate(teamMate);
+
+        //when then
+        assertThrows(ExceedGoalLimitException.class,
+                () -> teamMate.applyInviteAgree(11));
+    }
+
+    @Test
+    void 업로드_가능_테스트() throws Exception{
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        goal.addTeamMate(teamMate);
+
+        Uploadable uploadable = teamMate.getUploadable();
+        assertThat(uploadable.isUploadable()).isTrue();
+        assertThat(uploadable.isUploaded()).isFalse();
+        assertThat(uploadable.isWorkingDay()).isTrue();
+        assertThat(uploadable.isTimeOver()).isFalse();
+
+        teamMate.updateUploadedDate();
+        uploadable = teamMate.getUploadable();
+        assertThat(uploadable.isUploadable()).isFalse();
+        assertThat(uploadable.isUploaded()).isTrue();
+    }
+
+    @Test
+    void 인증시간초과_업로드_불가능_테스트() throws Exception{
+        Goal goal = Goal.builder()
+                .category(GoalCategory.학습)
+                .title("자바의 정석 스터디")
+                .startDate(LocalDate.of(2021, 12, 20))
+                .endDate(LocalDate.of(2021, 12, 31))
+                .appointmentTime(LocalTime.MIN)
+                .weekDays("월화수목금토일")
+                .build();
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        goal.addTeamMate(teamMate);
+
+        assertThat(teamMate.getUploadable().isTimeOver()).isTrue();
+    }
+
+    @Test
+    void 인증요일아니라_업로드_불가능_테스트() throws Exception{
+        //given
+        Goal goal = Goal.builder()
+                .category(GoalCategory.학습)
+                .title("자바의 정석 스터디")
+                .startDate(LocalDate.now().minusDays(10))
+                .endDate(LocalDate.now().plusDays(20))
+                .weekDays(WeekDayConverter.convertEngToKor(LocalDate.now().plusDays(1)))
+                .build();
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        goal.addTeamMate(teamMate);
+        assertThat(teamMate.getUploadable().isWorkingDay()).isFalse();
+    }
+
+    @Test
+    void 초대응답_수락_테스트() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        goal.addTeamMate(teamMate);
+
+        int before = teamMate.getWorkingDays();
+
+        //when
+        teamMate.applyInviteAgree(0);
+        int after = teamMate.getWorkingDays();
+
+        //then
+        assertThat(after).isGreaterThan(before);
+        assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.ONGOING);
+    }
+
+    @Test
+    void 초대응답_거절_테스트() throws Exception{
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        goal.addTeamMate(teamMate);
+        teamMate.applyInviteReject();
+
+        assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.REJECT);
+    }
+
+    @Test
+    void 기간만료된_초대응답_테스트() throws Exception{
+        Goal goal = Goal.builder()
+                .weekDays("월화수목금토일")
+                .startDate(LocalDate.now().minusDays(2))
+                .endDate(LocalDate.now().plusDays(1))
+                .build();
+        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        teamMate.setGoal(goal);
+
+        assertThrows(UnInviteableGoalException.class, () -> teamMate.applyInviteAgree(0));
+    }
+}

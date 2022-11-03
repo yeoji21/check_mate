@@ -1,0 +1,30 @@
+package checkmate.goal.application.dto.response;
+
+import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.WeekDays;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.Builder;
+import lombok.Getter;
+
+
+@Getter
+public class TodayGoalInfo {
+    private long id;
+    private GoalCategory category;
+    private String title;
+    private String weekDays;
+    private boolean checked;
+
+    @QueryProjection @Builder
+    public TodayGoalInfo(long id,
+                         GoalCategory category,
+                         String title,
+                         WeekDays weekDays,
+                         boolean checked) {
+        this.id = id;
+        this.category = category;
+        this.title = title;
+        this.weekDays = weekDays.getKorWeekDay();
+        this.checked = checked;
+    }
+}

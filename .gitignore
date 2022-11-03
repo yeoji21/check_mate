@@ -204,3 +204,5 @@ gradle-app.setting
 /src/main/resources/application-dev.yml
 /src/main/resources/logback-spring.xml
 /src/test/resources/application.yml
+/src/main/resources/static/docs/
+/src/main/resources/application-production.yml
