@@ -7,10 +7,9 @@ import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
-import checkmate.goal.application.dto.response.GoalCreateResult;
+import checkmate.goal.domain.*;
 import checkmate.goal.domain.service.GoalFactory;
 import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
-import checkmate.goal.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,11 +31,11 @@ public class GoalCommandService {
     private final GoalCommandMapper mapper;
 
     @Transactional
-    public GoalCreateResult create(GoalCreateCommand command) {
+    public long create(GoalCreateCommand command) {
         int ongoingGoalCount = goalRepository.countOngoingGoals(command.getUserId());
         Goal goal = GoalFactory.createGoal(command, ongoingGoalCount);
         goalRepository.save(goal);
-        return mapper.toGoalCreateResult(goal.getId());
+        return goal.getId();
     }
 
     @Transactional

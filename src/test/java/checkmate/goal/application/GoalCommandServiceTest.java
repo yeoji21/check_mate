@@ -5,7 +5,6 @@ import checkmate.common.cache.CacheTemplate;
 import checkmate.exception.ExceedGoalLimitException;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
-import checkmate.goal.application.dto.response.GoalCreateResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
@@ -125,10 +124,10 @@ public class GoalCommandServiceTest {
         }).when(goalRepository).save(any(Goal.class));
 
         //when
-        GoalCreateResult result = goalCommandService.create(command);
+        long goalId = goalCommandService.create(command);
 
         //then
-        assertThat(result.getGoalId()).isGreaterThan(0L);
+        assertThat(goalId).isGreaterThan(0L);
     }
 
     @Test

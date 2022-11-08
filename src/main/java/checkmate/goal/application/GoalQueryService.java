@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -21,8 +19,8 @@ public class GoalQueryService {
     }
 
     @Transactional(readOnly = true)
-    public List<GoalSimpleInfo> findOngoingSimpleInfo(long userId) {
-        return goalQueryDao.findOngoingSimpleInfo(userId);
+    public GoalSimpleInfoResult findOngoingSimpleInfo(long userId) {
+        return new GoalSimpleInfoResult(goalQueryDao.findOngoingSimpleInfo(userId));
     }
 
     @Transactional(readOnly = true)
@@ -31,13 +29,13 @@ public class GoalQueryService {
     }
 
     @Transactional(readOnly = true)
-    public List<TodayGoalInfo> findTodayGoalInfo(long userId) {
-        return goalQueryDao.findTodayGoalInfo(userId);
+    public TodayGoalInfoResult findTodayGoalInfo(long userId) {
+        return new TodayGoalInfoResult(goalQueryDao.findTodayGoalInfo(userId));
     }
 
     @Transactional(readOnly = true)
-    public List<GoalHistoryInfo> findHistoryGoalInfo(long userId) {
-        return goalQueryDao.findHistoryGoalInfo(userId);
+    public GoalHistoryInfoResult findHistoryGoalInfo(long userId) {
+        return new GoalHistoryInfoResult(goalQueryDao.findHistoryGoalInfo(userId));
     }
 
 }

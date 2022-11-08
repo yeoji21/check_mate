@@ -11,7 +11,6 @@ import checkmate.goal.presentation.dto.GoalDtoMapper;
 import checkmate.goal.presentation.dto.request.GoalCreateDto;
 import checkmate.goal.presentation.dto.request.GoalModifyDto;
 import checkmate.goal.presentation.dto.request.LikeCountCreateDto;
-import checkmate.goal.presentation.dto.response.GoalListQueryResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,7 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -41,8 +39,8 @@ public class GoalController {
                     key = "{#details.userId, T(java.time.LocalDate).now()}")
     })
     @PostMapping("/goal")
-    public GoalCreateResult goalSave(@RequestBody @Valid GoalCreateDto dto,
-                                     @AuthenticationPrincipal JwtUserDetails details) {
+    public long save(@RequestBody @Valid GoalCreateDto dto,
+                                 @AuthenticationPrincipal JwtUserDetails details) {
         return goalCommandService.create(mapper.toCreateCommand(dto, details.getUserId()));
     }
 
@@ -75,28 +73,25 @@ public class GoalController {
 
     @Cacheable(value = RedisKey.ONGOING_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
     @GetMapping("/goal/ongoing")
-    public GoalListQueryResponse<GoalSimpleInfo> ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
-        List<GoalSimpleInfo> ongoingGoals = goalQueryService.findOngoingSimpleInfo(details.getUserId());
-        return new GoalListQueryResponse<>(ongoingGoals);
+    public GoalSimpleInfoResult ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
+        return goalQueryService.findOngoingSimpleInfo(details.getUserId());
     }
 
     @Cacheable(value = RedisKey.TODAY_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
     @GetMapping("/goal/today")
-    public GoalListQueryResponse<TodayGoalInfo> todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
-        List<TodayGoalInfo> todayGoalInfoList = goalQueryService.findTodayGoalInfo(details.getUserId());
-        return new GoalListQueryResponse<>(todayGoalInfoList);
+    public TodayGoalInfoResult todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
+        return goalQueryService.findTodayGoalInfo(details.getUserId());
     }
 
     @Cacheable(value = RedisKey.HISTORY_GOALS, key = "{#details.userId}")
     @GetMapping("/goal/history")
-    public GoalListQueryResponse<GoalHistoryInfo> successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
-        List<GoalHistoryInfo> goalHistoryInfoList = goalQueryService.findHistoryGoalInfo(details.getUserId());
-        return new GoalListQueryResponse<>(goalHistoryInfoList);
+    public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
+        return goalQueryService.findHistoryGoalInfo(details.getUserId());
     }
 
     @GetMapping("/goal/view/{goalId}")
-    public GoalDetailViewResult goalDetailViewFind(@PathVariable long goalId,
-                                                   @AuthenticationPrincipal JwtUserDetails details) {
+    public GoalViewResult goalDetailViewFind(@PathVariable long goalId,
+                                             @AuthenticationPrincipal JwtUserDetails details) {
         return goalFacadeService.goalDetailView(goalId, details.getUserId());
     }
 
