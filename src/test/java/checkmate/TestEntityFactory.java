@@ -42,6 +42,7 @@ public class TestEntityFactory {
     public static TeamMate teamMate(Long teamMateId, long userId) {
         TeamMate teamMate = new TeamMate(userId);
         ReflectionTestUtils.setField(teamMate, "id", teamMateId);
+
         teamMate.changeToOngoingStatus(0);
         return teamMate;
     }

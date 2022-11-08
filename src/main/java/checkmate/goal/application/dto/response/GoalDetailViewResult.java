@@ -7,10 +7,17 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
-@AllArgsConstructor
 public class GoalDetailViewResult {
     private GoalDetailResponse goalDetailResponse;
     private TeamMateCalendarResponse teamMateCalendarResponse;
     private double progress;
+
+    @Builder
+    public GoalDetailViewResult(GoalDetailResponse goalDetailResponse,
+                                TeamMateCalendarResponse teamMateCalendarResponse,
+                                double progress) {
+        this.goalDetailResponse = goalDetailResponse;
+        this.teamMateCalendarResponse = teamMateCalendarResponse;
+        this.progress = progress;
+    }
 }

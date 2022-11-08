@@ -3,15 +3,13 @@ package checkmate.goal.infrastructure.goal;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.common.util.WeekDayConverter;
-import checkmate.goal.application.dto.response.GoalDetailInfo;
-import checkmate.goal.application.dto.response.GoalHistoryInfo;
-import checkmate.goal.application.dto.response.GoalPeriodInfo;
-import checkmate.goal.application.dto.response.TodayGoalInfo;
+import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
 import checkmate.user.domain.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -22,6 +20,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 class GoalQueryDaoTest extends RepositoryTest {
+    @Test @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
+    void findOngoingSimpleInfo() throws Exception{
+        //given
+        User user = TestEntityFactory.user(null, "user");
+        em.persist(user);
+
+        Goal goal1 = TestEntityFactory.goal(null, "goal1");
+        Goal goal2 = TestEntityFactory.goal(null, "goal2");
+        Goal goal3 = TestEntityFactory.goal(null, "goal3");
+
+        em.persist(goal1);
+        em.persist(goal2);
+        em.persist(goal3);
+
+        goal1.addTeamMate(TestEntityFactory.teamMate(null, user.getId()));
+        goal2.addTeamMate(TestEntityFactory.teamMate(null, user.getId()));
+        goal3.addTeamMate(TestEntityFactory.teamMate(null, user.getId()));
+
+        //when
+        List<GoalSimpleInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
+
+        //then
+        assertThat(ongoingGoals.size()).isEqualTo(3);
+        for (int i = 0; i < ongoingGoals.size(); i++) {
+            GoalSimpleInfo info = ongoingGoals.get(i);
+            assertThat(info.id()).isGreaterThan(0L);
+            assertThat(info.title()).isEqualTo("goal" + (i + 1));
+            assertThat(info.category()).isNotNull();
+            assertThat(info.weekDays()).isNotBlank();
+        }
+    }
 
     @Test
     void 목표_캘린더_조회() throws Exception{
@@ -69,7 +98,7 @@ class GoalQueryDaoTest extends RepositoryTest {
                 .execute();
 
         //when
-        List<GoalHistoryInfo> historyGoalList = goalQueryDao.findHistoryGoalList(tester1.getId());
+        List<GoalHistoryInfo> historyGoalList = goalQueryDao.findHistoryGoalInfo(tester1.getId());
 
         //then
         assertThat(historyGoalList.size()).isEqualTo(1);
@@ -87,7 +116,7 @@ class GoalQueryDaoTest extends RepositoryTest {
         setTodayStartGoal(tester);
 
         //when
-        List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfoDtoList(tester.getId());
+        List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(tester.getId());
         todayGoals.forEach(g -> System.out.println(g.getTitle()));
 
         //then

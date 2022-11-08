@@ -27,7 +27,7 @@ import static checkmate.user.domain.QUser.user;
 public class GoalQueryDao{
     private final JPAQueryFactory queryFactory;
 
-    public List<TodayGoalInfo> findTodayGoalInfoDtoList(Long userId) {
+    public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
         int num = WeekDayConverter.localDateToValue(LocalDate.now());
 
         return queryFactory
@@ -45,7 +45,7 @@ public class GoalQueryDao{
                 .fetch();
     }
 
-    public List<GoalHistoryInfo> findHistoryGoalList(long userId) {
+    public List<GoalHistoryInfo> findHistoryGoalInfo(long userId) {
         List<Goal> historyGoals =
                 queryFactory.select(goal)
                         .from(teamMate)
@@ -120,5 +120,14 @@ public class GoalQueryDao{
                         .where(goal.id.eq(goalId))
                         .fetchOne()
         );
+    }
+
+    public List<GoalSimpleInfo> findOngoingSimpleInfo(long userId) {
+        return queryFactory.select(new QGoalSimpleInfo(goal.id, goal.category, goal.title, goal.weekDays.weekDays.stringValue()))
+                .from(teamMate)
+                .join(teamMate.goal, goal)
+                .where(teamMate.userId.eq(userId),
+                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                .fetch();
     }
 }

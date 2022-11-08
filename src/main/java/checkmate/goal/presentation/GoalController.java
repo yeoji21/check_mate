@@ -76,8 +76,8 @@ public class GoalController {
     @Cacheable(value = RedisKey.ONGOING_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
     @GetMapping("/goal/ongoing")
     public GoalListQueryResponse<GoalSimpleInfo> ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
-        List<GoalSimpleInfo> goalSimpleInfoList = goalQueryService.findOngoingSimpleInfo(details.getUserId());
-        return new GoalListQueryResponse<>(goalSimpleInfoList);
+        List<GoalSimpleInfo> ongoingGoals = goalQueryService.findOngoingSimpleInfo(details.getUserId());
+        return new GoalListQueryResponse<>(ongoingGoals);
     }
 
     @Cacheable(value = RedisKey.TODAY_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")

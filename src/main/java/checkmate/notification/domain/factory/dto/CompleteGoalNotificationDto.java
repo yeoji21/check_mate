@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class GoalCompleteNotificationDto {
+public class CompleteGoalNotificationDto {
     private long userId;
     private long goalId;
     private String goalTitle;

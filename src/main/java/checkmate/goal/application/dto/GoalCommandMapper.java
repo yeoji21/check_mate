@@ -6,7 +6,7 @@ import checkmate.goal.application.dto.response.GoalCreateResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalModifyRequest;
 import checkmate.goal.domain.TeamMate;
-import checkmate.notification.domain.factory.dto.GoalCompleteNotificationDto;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -23,12 +23,12 @@ public interface GoalCommandMapper {
 
     GoalModifyRequest toGoalModifyRequest(GoalModifyCommand command);
 
-    List<GoalCompleteNotificationDto> toGoalCompleteNotificationDtos(List<TeamMate> teamMates);
+    List<CompleteGoalNotificationDto> toGoalCompleteNotificationDtos(List<TeamMate> teamMates);
 
     @Mappings({
             @Mapping(source = "teamMate.userId", target = "userId"),
             @Mapping(source = "teamMate.goal.id", target = "goalId"),
             @Mapping(source = "teamMate.goal.title", target = "goalTitle")
     })
-    GoalCompleteNotificationDto toGoalCompleteNotificationDto(TeamMate teamMate);
+    CompleteGoalNotificationDto toGoalCompleteNotificationDto(TeamMate teamMate);
 }

@@ -6,8 +6,8 @@ import checkmate.goal.domain.TeamMate;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.*;
-import checkmate.notification.domain.factory.GoalCompleteNotificationFactory;
-import checkmate.notification.domain.factory.dto.GoalCompleteNotificationDto;
+import checkmate.notification.domain.factory.CompleteGoalNotificationFactory;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.user.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -74,8 +74,8 @@ class NotificationQueryServiceTest {
     }
 
     private List<Notification> getGoalCompleteNotifications() {
-        GoalCompleteNotificationFactory factory = new GoalCompleteNotificationFactory();
-        GoalCompleteNotificationDto dto = GoalCompleteNotificationDto.builder()
+        CompleteGoalNotificationFactory factory = new CompleteGoalNotificationFactory();
+        CompleteGoalNotificationDto dto = CompleteGoalNotificationDto.builder()
                 .userId(teamMate.getUserId())
                 .goalTitle(teamMate.getGoal().getTitle())
                 .goalId(teamMate.getGoal().getId())

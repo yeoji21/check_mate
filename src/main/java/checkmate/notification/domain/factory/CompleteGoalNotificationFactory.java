@@ -3,7 +3,7 @@ package checkmate.notification.domain.factory;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
-import checkmate.notification.domain.factory.dto.GoalCompleteNotificationDto;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,9 +11,9 @@ import java.util.List;
 import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 
 @Component
-public class GoalCompleteNotificationFactory extends NotificationFactory<GoalCompleteNotificationDto> {
+public class CompleteGoalNotificationFactory extends NotificationFactory<CompleteGoalNotificationDto> {
     @Override
-    public Notification generate(GoalCompleteNotificationDto dto) {
+    public Notification generate(CompleteGoalNotificationDto dto) {
         Notification notification = Notification.builder()
                 .userId(dto.getUserId())
                 .title("목표 수행 완료")

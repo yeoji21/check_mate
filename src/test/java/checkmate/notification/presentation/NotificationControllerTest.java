@@ -11,8 +11,8 @@ import checkmate.notification.application.dto.response.NotificationDetailsResult
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
-import checkmate.notification.domain.factory.GoalCompleteNotificationFactory;
-import checkmate.notification.domain.factory.dto.GoalCompleteNotificationDto;
+import checkmate.notification.domain.factory.CompleteGoalNotificationFactory;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.notification.presentation.dto.response.NotificationInfosResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -129,13 +129,13 @@ class NotificationControllerTest extends ControllerTest {
         Goal testGoal = TestEntityFactory.goal(1L, "testGoal");
         testGoal.addTeamMate(teamMate);
 
-        GoalCompleteNotificationDto dto = GoalCompleteNotificationDto.builder()
+        CompleteGoalNotificationDto dto = CompleteGoalNotificationDto.builder()
                 .userId(teamMate.getUserId())
                 .goalTitle(teamMate.getGoal().getTitle())
                 .goalId(teamMate.getGoal().getId())
                 .build();
 
-        Notification notification = new GoalCompleteNotificationFactory().generate(dto);
+        Notification notification = new CompleteGoalNotificationFactory().generate(dto);
         return List.of(toNotificationInfo(notification), toNotificationInfo(notification));
     }
 

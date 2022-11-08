@@ -144,10 +144,10 @@ public class GoalControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 유저의_진행중인_목표_조회_테스트() throws Exception{
-        List<GoalSimpleInfo> goalSimpleInfoList = List.of(simpleGoalInfoResponseDto(goal), simpleGoalInfoResponseDto(goal));
+        List<GoalSimpleInfo> ongoingGoals = List.of(simpleGoalInfo(goal), simpleGoalInfo(goal));
 
-        when(goalQueryService.findOngoingSimpleInfo(any(Long.class))).thenReturn(goalSimpleInfoList);
-        GoalListQueryResponse<GoalSimpleInfo> response = new GoalListQueryResponse<>(goalSimpleInfoList);
+        when(goalQueryService.findOngoingSimpleInfo(any(Long.class))).thenReturn(ongoingGoals);
+        GoalListQueryResponse<GoalSimpleInfo> response = new GoalListQueryResponse<>(ongoingGoals);
 
         mockMvc.perform(get("/goal/ongoing")
                         .contentType(APPLICATION_JSON))
@@ -256,7 +256,7 @@ public class GoalControllerTest extends ControllerTest {
         );
     }
 
-    private GoalSimpleInfo simpleGoalInfoResponseDto(Goal goal) {
+    private GoalSimpleInfo simpleGoalInfo(Goal goal) {
         return GoalSimpleInfo.builder()
                 .id(goal.getId())
                 .category(goal.getCategory())

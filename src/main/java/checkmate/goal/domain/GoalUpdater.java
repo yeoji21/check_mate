@@ -17,8 +17,9 @@ public class GoalUpdater {
         if (request.getEndDate() != null)
             goal.extendEndDate(request.getEndDate());
 
-        if (request.isTimeReset()) goal.updateAppointmentTime(null);
-        else {
+        if (request.isTimeReset()) {
+            goal.updateAppointmentTime(null);
+        } else {
             if (request.getAppointmentTime() != null)
                 goal.updateAppointmentTime(request.getAppointmentTime());
         }

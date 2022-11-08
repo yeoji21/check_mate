@@ -21,12 +21,13 @@ class TeamMateInviteServiceTest {
     void 이미_목표에_속한_유저_초대_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
+        User user = TestEntityFactory.user(1L, "user");
         TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         goal.addTeamMate(teamMate);
 
         //when / then
         assertThrows(UserAlreadyInGoalException.class,
-                () -> teamMateInviteService.invite(goal, Optional.of(teamMate), 1L));
+                () -> teamMateInviteService.invite(goal, Optional.of(teamMate), user));
     }
 
     @Test
@@ -39,7 +40,7 @@ class TeamMateInviteServiceTest {
         goal.addTeamMate(teamMate);
 
         //when
-        teamMateInviteService.invite(goal, Optional.of(teamMate), 1L);
+        teamMateInviteService.invite(goal, Optional.of(teamMate), invitee);
 
         //then
         assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.WAITING);

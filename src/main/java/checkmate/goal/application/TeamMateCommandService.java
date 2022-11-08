@@ -49,12 +49,12 @@ public class TeamMateCommandService {
     @Transactional
     public void inviteTeamMate(TeamMateInviteCommand command) {
         Goal goal = findGoal(command.getGoalId());
-        Long inviteeUserId = findUser(command.getInviteeNickname()).getId();
-        Optional<TeamMate> teamMate = teamMateRepository.findTeamMate(goal.getId(), inviteeUserId);
-        inviteService.invite(goal, teamMate, inviteeUserId);
+        User invitee = findUser(command.getInviteeNickname());
+        Optional<TeamMate> teamMate = teamMateRepository.findTeamMate(goal.getId(), invitee.getId());
+        inviteService.invite(goal, teamMate, invitee);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
-                getInviteGoalNotificationDto(command, inviteeUserId)));
+                getInviteGoalNotificationDto(command, invitee.getId())));
     }
 
     // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리하는 메소드

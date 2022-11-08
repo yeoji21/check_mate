@@ -78,7 +78,7 @@ public class TeamMateCommandServiceTest {
         doAnswer(invocation -> {
             ReflectionTestUtils.setField(inviteeTeamMate, "teamMateStatus", TeamMateStatus.WAITING);
             return inviteeTeamMate;
-        }).when(teamMateInviteService).invite(any(Goal.class), any(Optional.class), any(Long.class));
+        }).when(teamMateInviteService).invite(any(Goal.class), any(Optional.class), any(User.class));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
 
         //when

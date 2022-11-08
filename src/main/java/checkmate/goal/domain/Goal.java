@@ -3,6 +3,7 @@ package checkmate.goal.domain;
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.post.domain.Post;
+import checkmate.user.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -103,9 +104,10 @@ public class Goal extends BaseTimeEntity {
         this.appointmentTime = appointmentTime;
     }
 
-    public void includeNewTeamMate(long userId) {
+    // TODO: 2022/11/09 addTeamMate와 join 두 가지 메소드 통일
+    public void join(User user) {
         if(!isInviteable()) throw new UnInviteableGoalException();
-        addTeamMate(new TeamMate(userId));
+        addTeamMate(new TeamMate(user.getId()));
     }
 
     public String getCalendar() {

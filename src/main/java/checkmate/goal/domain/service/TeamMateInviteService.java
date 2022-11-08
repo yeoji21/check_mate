@@ -2,6 +2,7 @@ package checkmate.goal.domain.service;
 
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
+import checkmate.user.domain.User;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -10,10 +11,10 @@ import java.util.Optional;
 public class TeamMateInviteService {
     public void invite(Goal goal,
                        Optional<TeamMate> teamMate,
-                       long userId) {
+                       User user) {
         teamMate.ifPresentOrElse(
                 TeamMate::changeToWaitingStatus,
-                () -> goal.includeNewTeamMate(userId)
+                () -> goal.join(user)
         );
     }
 
