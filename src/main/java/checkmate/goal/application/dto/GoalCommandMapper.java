@@ -2,7 +2,6 @@ package checkmate.goal.application.dto;
 
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
-import checkmate.goal.application.dto.response.GoalCreateResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalModifyRequest;
 import checkmate.goal.domain.TeamMate;
@@ -18,8 +17,6 @@ import java.util.List;
 public interface GoalCommandMapper {
     GoalCommandMapper INSTANCE = Mappers.getMapper(GoalCommandMapper.class);
     Goal toGoal(GoalCreateCommand command);
-
-    GoalCreateResult toGoalCreateResult(Long goalId);
 
     GoalModifyRequest toGoalModifyRequest(GoalModifyCommand command);
 

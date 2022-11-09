@@ -2,7 +2,7 @@ package checkmate.goal.infrastructure.mate;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.goal.application.dto.response.TeamMateCalendarInfo;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.post.domain.Post;
@@ -26,12 +26,12 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         em.persist(post);
 
         //when
-        TeamMateCalendarInfo info = teamMateQueryDao.getTeamMateCalendar(teamMate.getId())
+        TeamMateScheduleInfo info = teamMateQueryDao.getTeamMateCalendar(teamMate.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(info.getStartDate()).isEqualTo(goal.getStartDate());
-        assertThat(info.getGoalCalendar()).isEqualTo(goal.getCalendar());
-        assertThat(info.getTeamMateCalendar().length()).isEqualTo(info.getGoalCalendar().length());
+        assertThat(info.getGoalSchedule()).isEqualTo(goal.getSchedule());
+        assertThat(info.getTeamMateSchedule().length()).isEqualTo(info.getGoalSchedule().length());
     }
 }

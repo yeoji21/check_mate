@@ -9,6 +9,8 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Getter
@@ -77,6 +79,12 @@ public class TeamMate extends BaseTimeEntity {
     public void changeToOngoingStatus(int ongoingGoalCount) {
         if(ongoingGoalCount >= 10) throw new ExceedGoalLimitException();
         this.teamMateStatus = TeamMateStatus.ONGOING;
+    }
+
+    public String getSchedule(List<LocalDate> uploadedDates) {
+        return goal.getPeriod().fromStartToEndDate()
+                .map(date -> uploadedDates.contains(date) ? "1" : "0")
+                .collect(Collectors.joining());
     }
 
     public void changeToWaitingStatus() {

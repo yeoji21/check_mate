@@ -112,10 +112,10 @@ public class GoalQueryDao{
                 .fetch();
     }
 
-    public Optional<GoalPeriodInfo> findGoalPeriodInfo(long goalId) {
+    public Optional<GoalScheduleInfo> findGoalPeriodInfo(long goalId) {
         return Optional.ofNullable(
                 queryFactory
-                        .select(new QGoalPeriodInfo(goal))
+                        .select(new QGoalScheduleInfo(goal.period.startDate, goal.period.endDate, goal.weekDays.weekDays))
                         .from(goal)
                         .where(goal.id.eq(goalId))
                         .fetchOne()

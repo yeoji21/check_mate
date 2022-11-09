@@ -52,20 +52,20 @@ class GoalQueryDaoTest extends RepositoryTest {
         }
     }
 
-    @Test
-    void 목표_캘린더_조회() throws Exception{
+    @Test @DisplayName("목표 진행 스케쥴 조회")
+    void findGoalPeriodInfo() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
 
         //when
-        GoalPeriodInfo goalPeriodInfo = goalQueryDao.findGoalPeriodInfo(goal.getId())
+        GoalScheduleInfo goalScheduleInfo = goalQueryDao.findGoalPeriodInfo(goal.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
-        assertThat(goalPeriodInfo.getStartDate()).isEqualTo(goal.getStartDate());
-        assertThat(goalPeriodInfo.getEndDate()).isEqualTo(goal.getEndDate());
-        assertThat(goalPeriodInfo.getGoalCalendar()).isEqualTo(goal.getCalendar());
+        assertThat(goalScheduleInfo.getStartDate()).isEqualTo(goal.getStartDate());
+        assertThat(goalScheduleInfo.getEndDate()).isEqualTo(goal.getEndDate());
+        assertThat(goalScheduleInfo.getSchedule()).isEqualTo(goal.getSchedule());
     }
 
     @Test

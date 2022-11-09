@@ -24,7 +24,7 @@ public class GoalQueryService {
     }
 
     @Transactional(readOnly = true)
-    public GoalPeriodInfo findGoalPeriodInfo(long goalId) {
+    public GoalScheduleInfo findGoalPeriodInfo(long goalId) {
         return goalQueryDao.findGoalPeriodInfo(goalId).orElseThrow(IllegalArgumentException::new);
     }
 

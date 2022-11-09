@@ -3,7 +3,7 @@ package checkmate.goal.application;
 import checkmate.exception.TeamMateNotFoundException;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalViewResult;
-import checkmate.goal.application.dto.response.TeamMateCalendarInfo;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.TeamMateInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class GoalFacadeService {
         GoalDetailInfo goalDetailInfo = goalQueryService.findGoalDetail(goalId, userId);
         long teamMateId = getTeamMateId(userId, goalDetailInfo.getTeamMates());
         double progress = teamMateQueryService.getProgressPercent(teamMateId);
-        TeamMateCalendarInfo calenderInfo = teamMateQueryService.getCalenderInfo(teamMateId);
+        TeamMateScheduleInfo calenderInfo = teamMateQueryService.getCalenderInfo(teamMateId);
 
         return new GoalViewResult(goalDetailInfo, calenderInfo, progress);
     }

@@ -1,7 +1,7 @@
 package checkmate.goal.application;
 
 import checkmate.exception.TeamMateNotFoundException;
-import checkmate.goal.application.dto.response.TeamMateCalendarInfo;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
@@ -16,7 +16,7 @@ public class TeamMateQueryService {
     private final TeamMateRepository teamMateRepository;
 
     @Transactional(readOnly = true)
-    public TeamMateCalendarInfo getCalenderInfo(long teamMateId) {
+    public TeamMateScheduleInfo getCalenderInfo(long teamMateId) {
         return teamMateQueryDao.getTeamMateCalendar(teamMateId)
                 .orElseThrow(IllegalArgumentException::new);
     }

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @EqualsAndHashCode(of = "id")
@@ -110,8 +111,10 @@ public class Goal extends BaseTimeEntity {
         addTeamMate(new TeamMate(user.getId()));
     }
 
-    public String getCalendar() {
-        return weekDays.getWorkingDays(period.fromStartToEndDate());
+    public String getSchedule() {
+        return period.fromStartToEndDate()
+                .map(date -> weekDays.isWorkingDay(date) ? "1" : "0")
+                .collect(Collectors.joining());
     }
 
     public int progressedWorkingDaysCount() {

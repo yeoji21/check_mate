@@ -77,14 +77,14 @@ public class GoalControllerTest extends ControllerTest {
     @Test
     void 목표의_전체_인증일_조회() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        GoalPeriodInfo goalPeriodInfo = goalPeriodResponseDto(goal);
-        given(goalQueryService.findGoalPeriodInfo(any(Long.class))).willReturn(goalPeriodInfo);
+        GoalScheduleInfo goalScheduleInfo = goalPeriodResponseDto(goal);
+        given(goalQueryService.findGoalPeriodInfo(any(Long.class))).willReturn(goalScheduleInfo);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}/period", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(goalPeriodInfo)))
+                .andExpect(content().json(objectMapper.writeValueAsString(goalScheduleInfo)))
                 .andDo(document("goal-period",
                         pathParameters(parameterWithName("goalId").description("goalId"))
                 ));
@@ -252,9 +252,9 @@ public class GoalControllerTest extends ControllerTest {
                 .build();
     }
 
-    private GoalPeriodInfo goalPeriodResponseDto(Goal goal) {
-        return GoalPeriodInfo.builder()
-                .goalCalendar(goal.getCalendar())
+    private GoalScheduleInfo goalPeriodResponseDto(Goal goal) {
+        return GoalScheduleInfo.builder()
+                .weekDays(goal.getWeekDays().getIntValue())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .build();

@@ -1,7 +1,7 @@
 package checkmate.goal.infrastructure;
 
-import checkmate.goal.application.dto.response.QTeamMateCalendarInfo;
-import checkmate.goal.application.dto.response.TeamMateCalendarInfo;
+import checkmate.goal.application.dto.response.QTeamMateScheduleInfo;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,7 +19,7 @@ import static com.querydsl.core.group.GroupBy.list;
 public class TeamMateQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    public Optional<TeamMateCalendarInfo> getTeamMateCalendar(long teamMateId) {
+    public Optional<TeamMateScheduleInfo> getTeamMateCalendar(long teamMateId) {
         return Optional.ofNullable(
                 queryFactory
                         .from(teamMate)
@@ -28,7 +28,8 @@ public class TeamMateQueryDao {
                         .where(teamMate.id.eq(teamMateId))
                         .transform(
                                 groupBy(teamMate.id).as(
-                                        new QTeamMateCalendarInfo(goal, list(post.uploadedDate))
+                                        new QTeamMateScheduleInfo(goal.period.startDate, goal.period.endDate,
+                                                goal.weekDays.weekDays, list(post.uploadedDate))
                                 )
                         ).get(teamMateId));
     }

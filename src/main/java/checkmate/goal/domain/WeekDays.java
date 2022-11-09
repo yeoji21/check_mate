@@ -12,7 +12,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 // TODO: 2022/07/22 이건 어떻게 처리할지 좀 더 고민 -> 후순위
@@ -26,6 +25,10 @@ public class WeekDays implements Serializable {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
             throw new InvalidWeekDaysException();
         this.weekDays = korWeekDaysToValue(korWeekDays);
+    }
+
+    public WeekDays(int weekDays) {
+        this.weekDays = weekDays;
     }
 
     public String getKorWeekDay() {
@@ -44,12 +47,8 @@ public class WeekDays implements Serializable {
         return (int) dateStream.filter(this::isWorkingDay).count();
     }
 
-    String getWorkingDays(Stream<LocalDate> dateStream) {
-        return dateStream.map(date -> isWorkingDay(date) ? "1" : "0").collect(Collectors.joining());
-    }
-
     private int korWeekDaysToValue(String korWeekDays) {
-        List<String> weekDayList = Arrays.stream(korWeekDays.split("")).collect(Collectors.toList());
+        List<String> weekDayList = Arrays.stream(korWeekDays.split("")).toList();
         return weekDayList.stream()
                 .mapToInt(weekDay -> WeekDayConverter.valueOf(WeekDayConverter.convertKorToEng(weekDay)).getValue())
                 .sum();

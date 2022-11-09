@@ -4,7 +4,7 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
-import checkmate.goal.application.dto.response.TeamMateCalendarInfo;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
@@ -49,7 +49,7 @@ public class TeamMateController {
     }
 
     @GetMapping("/mate/{teamMateId}/calendar")
-    public TeamMateCalendarInfo teamMateGoalCalender(@PathVariable long teamMateId) {
+    public TeamMateScheduleInfo teamMateGoalCalender(@PathVariable long teamMateId) {
         return teamMateQueryService.getCalenderInfo(teamMateId);
     }
 

@@ -3,7 +3,7 @@ package checkmate.goal.presentation;
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.response.TeamMateCalendarInfo;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
@@ -14,6 +14,7 @@ import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -83,10 +84,11 @@ class TeamMateControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 팀원의_목표_수행_캘린더_조회() throws Exception{
-        TeamMateCalendarInfo calendarInfo = TeamMateCalendarInfo.builder()
+        TeamMateScheduleInfo calendarInfo = TeamMateScheduleInfo.builder()
                 .startDate(LocalDate.now())
-                .goalCalendar("0111000011100001")
-                .teamMateCalendar("0100000000000000")
+                .endDate(LocalDate.now().plusDays(10))
+                .weekDays(1111111)
+                .uploadedDates(List.of(LocalDate.now()))
                 .build();
 
         given(teamMateQueryService.getCalenderInfo(1L)).willReturn(calendarInfo);
@@ -98,15 +100,16 @@ class TeamMateControllerTest extends ControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(calendarInfo)))
                 .andDo(document("teamMate-calendar",
                         pathParameters(parameterWithName("teamMateId").description("teamMateId")),
-                        getTeamMateCalendarResponseFieldsSnippet()
+                        teamMateCalendarResponseFieldsSnippet()
                 ));
     }
 
-    private ResponseFieldsSnippet getTeamMateCalendarResponseFieldsSnippet() {
+    private ResponseFieldsSnippet teamMateCalendarResponseFieldsSnippet() {
         return responseFields(
-                fieldWithPath("startDate").description("목표 수행 시작일"),
-                fieldWithPath("goalCalendar").description("목표 수행 기간"),
-                fieldWithPath("teamMateCalendar").description("팀원의 목표 수행 기간")
+                fieldWithPath("startDate").type(JsonFieldType.STRING).description("목표 수행 시작일"),
+                fieldWithPath("endDate").type(JsonFieldType.STRING).description("목표 수행 종료일"),
+                fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
+                fieldWithPath("teamMateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정")
         );
     }
 

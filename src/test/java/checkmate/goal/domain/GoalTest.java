@@ -30,6 +30,18 @@ class GoalTest {
     }
 
     @Test
+    void test() throws Exception{
+        //given
+
+        //when
+        String calendar = goal.getSchedule();
+        System.out.println(calendar);
+
+        //then
+
+    }
+
+    @Test
     void TeamMates_일급_컬렉션_테스트() throws Exception{
         //given
         User user1 = TestEntityFactory.user(1L, "user1");
@@ -85,7 +97,7 @@ class GoalTest {
     void 땡땡이_최대치_조회_테스트() throws Exception{
         int hookyDayLimit = goal.getHookyDayLimit();
         assertThat(hookyDayLimit).isEqualTo(5);
-        assertThat(hookyDayLimit).isLessThan(goal.getCalendar().length());
+        assertThat(hookyDayLimit).isLessThan(goal.getSchedule().length());
     }
 
     private GoalModifyRequest toGoalModifyDto(GoalModifyCommand goalModifyCommand){
@@ -109,10 +121,10 @@ class GoalTest {
         //when
         GoalModifyCommand command = dtoMapper.toModifyCommand(dto, 1L, 2L);
 
-        int beforePeriodLength = goal.getCalendar().length();
+        int beforePeriodLength = goal.getSchedule().length();
         GoalUpdater goalUpdater = new GoalUpdater(toGoalModifyDto(command));
         goalUpdater.update(goal);
-        int afterPeriodLength = goal.getCalendar().length();
+        int afterPeriodLength = goal.getSchedule().length();
 
         //then
         assertThat(goal.getEndDate()).isAfter(endDate);

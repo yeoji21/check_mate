@@ -67,7 +67,7 @@ public class GoalController {
 
     @Cacheable(value = RedisKey.GOAL_PERIOD, key = "{#goalId}")
     @GetMapping("/goal/{goalId}/period")
-    public GoalPeriodInfo goalPeriodFind(@PathVariable long goalId) {
+    public GoalScheduleInfo goalPeriodFind(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
