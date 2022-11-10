@@ -27,6 +27,7 @@ import static checkmate.user.domain.QUser.user;
 public class GoalQueryDao{
     private final JPAQueryFactory queryFactory;
 
+    // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
         int num = WeekDayConverter.localDateToValue(LocalDate.now());
 
@@ -45,7 +46,29 @@ public class GoalQueryDao{
                 .fetch();
     }
 
+    /*
+    목표 상세 정보 조회
+    selector : 조회를 요청한 TeamMate
+     */
+    public Optional<GoalDetailInfo> findDetailInfo(long goalId, long userId) {
+        Optional<GoalDetailInfo> goalDetailInfo = Optional.ofNullable(
+                queryFactory
+                        .select(new QGoalDetailInfo(goal, teamMate))
+                        .from(teamMate)
+                        .innerJoin(teamMate.goal, goal)
+                        .where(teamMate.userId.eq(userId),
+                                teamMate.goal.id.eq(goalId))
+                        .fetchOne()
+        );
+        goalDetailInfo.ifPresent(info -> info.setTeamMates(findTeamMateInfo(goalId)));
+        return goalDetailInfo;
+    }
+
+    /*
+    유저가 이전에 완수한 목표들의 정보
+     */
     public List<GoalHistoryInfo> findHistoryGoalInfo(long userId) {
+        // 완수한 목표 조회
         List<Goal> historyGoals =
                 queryFactory.select(goal)
                         .from(teamMate)
@@ -55,65 +78,36 @@ public class GoalQueryDao{
                                 goal.goalStatus.eq(GoalStatus.OVER))
                         .fetch();
 
+        // 조회를 요청한 팀원과 다른 팀원들의 닉네임을 가져오기 위한 쿼리
         Map<Long, List<Tuple>> map =
-                queryFactory.select(goal.id, teamMate, user.nickname)
+                queryFactory.select(goal.id, teamMate.userId, teamMate.teamMateProgress.workingDays, user.nickname)
                         .from(teamMate)
                         .innerJoin(user).on(user.id.eq(teamMate.userId))
                         .join(teamMate.goal, goal)
-                        .where(goal.in(historyGoals),
-                                teamMate.teamMateStatus.eq(TeamMateStatus.SUCCESS))
+                        .where(goal.in(historyGoals))
                         .fetch()
                         .stream()
                         .collect(Collectors.groupingBy(t -> t.get(goal.id)));
 
-        return historyGoals.stream()
-                .map(historyGoal ->
-                        new GoalHistoryInfo(
-                                historyGoal,
-                                getSelector(userId, map.get(historyGoal.getId())),
-                                getTeamMateNames(map.get(historyGoal.getId()))
-                        ))
-                .collect(Collectors.toList());
-    }
-
-    private List<String> getTeamMateNames(List<Tuple> tuples) {
-        return tuples.stream()
-                .map(t -> t.get(user.nickname))
-                .collect(Collectors.toList());
-    }
-
-    private TeamMate getSelector(long userId, List<Tuple> tuples) {
-        return tuples
+        return historyGoals
                 .stream()
-                .filter(t -> t.get(teamMate).getUserId().equals(userId))
-                .map(t -> t.get(teamMate))
-                .findFirst().orElseThrow();
-    }
-
-    public Optional<GoalDetailInfo> findDetailInfo(long goalId, long userId) {
-        TeamMate selector = queryFactory
-                .select(teamMate)
-                .from(teamMate)
-                .join(teamMate.goal, goal).fetchJoin()
-                .where(teamMate.userId.eq(userId),
-                        teamMate.goal.id.eq(goalId))
-                .fetchOne();
-
-        return Optional.of(new GoalDetailInfo(selector.getGoal(), selector, findTeamMateInfo(goalId)));
+                .map(hGoal -> GoalHistoryInfo.builder()
+                            .id(hGoal.getId())
+                            .title(hGoal.getTitle())
+                            .category(hGoal.getCategory())
+                            .startDate(hGoal.getStartDate())
+                            .endDate(hGoal.getEndDate())
+                            .weekDays(hGoal.getWeekDays().intValue())
+                            .appointmentTime(hGoal.getAppointmentTime())
+                            .workingDays(getTeamMateWorkingDays(userId, map.get(hGoal.getId())))
+                            .teamMateNames(getTeamMateNames(map.get(hGoal.getId())))
+                            .build())
+                .toList();
     }
 
 
-    public List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
-        return queryFactory
-                .select(new QTeamMateUploadInfo(teamMate, user.nickname))
-                .from(teamMate)
-                .join(user).on(teamMate.userId.eq(user.id))
-                .where(teamMate.goal.id.eq(goalId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
-                .fetch();
-    }
-
-    public Optional<GoalScheduleInfo> findGoalPeriodInfo(long goalId) {
+    // 목표 진행 일정 관련 정보 조회
+    public Optional<GoalScheduleInfo> findGoalScheduleInfo(long goalId) {
         return Optional.ofNullable(
                 queryFactory
                         .select(new QGoalScheduleInfo(goal.period.startDate, goal.period.endDate, goal.weekDays.weekDays))
@@ -123,11 +117,45 @@ public class GoalQueryDao{
         );
     }
 
+    // 진행중인 목표들 정보 조회
     public List<GoalSimpleInfo> findOngoingSimpleInfo(long userId) {
         return queryFactory.select(new QGoalSimpleInfo(goal.id, goal.category, goal.title, goal.weekDays.weekDays.stringValue()))
                 .from(teamMate)
                 .join(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
+                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                .fetch();
+    }
+
+    private int getTeamMateWorkingDays(long userId, List<Tuple> tuples) {
+        return tuples.stream()
+                .filter(t -> t.get(teamMate.userId) == userId)
+                .findAny()
+                .map(t -> t.get(teamMate.teamMateProgress.workingDays))
+                .orElseThrow();
+    }
+
+    private List<String> getTeamMateNames(List<Tuple> tuples) {
+        return tuples.stream()
+                .map(t -> t.get(user.nickname))
+                .toList();
+    }
+
+    private TeamMate getSelector(long userId, List<Tuple> tuples) {
+        return tuples
+                .stream()
+                .filter(t -> t.get(teamMate).getUserId().equals(userId))
+                .map(t -> t.get(teamMate))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
+        return queryFactory
+                .select(new QTeamMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDay, user.nickname))
+                .from(teamMate)
+                .join(user).on(teamMate.userId.eq(user.id))
+                .where(teamMate.goal.id.eq(goalId),
                         teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
                 .fetch();
     }

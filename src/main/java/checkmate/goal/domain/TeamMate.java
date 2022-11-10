@@ -31,18 +31,18 @@ public class TeamMate extends BaseTimeEntity {
     @NotNull @Enumerated(EnumType.STRING)
     private TeamMateStatus teamMateStatus;
     @NotNull @Embedded
-    private ProgressInfo progressInfo;
+    private TeamMateProgress teamMateProgress;
     private LocalDate lastUploadDay;
 
     public TeamMate(long userId) {
         this.userId = userId;
         this.teamMateStatus = TeamMateStatus.WAITING;
-        this.progressInfo = new ProgressInfo();
+        this.teamMateProgress = new TeamMateProgress();
     }
 
     public void setGoal(Goal goal) {
         this.goal = goal;
-        this.progressInfo = new ProgressInfo();
+        this.teamMateProgress = new TeamMateProgress();
     }
 
     public void updateUploadedDate() {
@@ -52,7 +52,7 @@ public class TeamMate extends BaseTimeEntity {
     public void applyInviteAgree(int ongoingGoalCount) {
         if(!goal.isInviteable()) throw new UnInviteableGoalException();
         changeToOngoingStatus(ongoingGoalCount);
-        progressInfo.setInitialProgress(goal.progressedWorkingDaysCount());
+        teamMateProgress.setInitialProgress(goal.progressedWorkingDaysCount());
     }
 
     public void applyInviteReject() {
@@ -60,19 +60,19 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public void plusWorkingDay() {
-        progressInfo.plusWorkingDay();
+        teamMateProgress.plusWorkingDay();
     }
 
     public void minusWorkingDay() {
-        progressInfo.minusWorkingDay();
+        teamMateProgress.minusWorkingDay();
     }
 
     public int getWorkingDays() {
-        return progressInfo.getWorkingDays();
+        return teamMateProgress.getWorkingDays();
     }
 
     public int getHookyDays() {
-        return progressInfo.getHookyDays();
+        return teamMateProgress.getHookyDays();
     }
 
     // TODO: 2022/11/03 이상함
@@ -100,7 +100,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(progressInfo.getWorkingDays(), goal.totalWorkingDaysCount());
+        return ProgressCalculator.calculate(teamMateProgress.getWorkingDays(), goal.totalWorkingDaysCount());
     }
 
     public Uploadable getUploadable() {

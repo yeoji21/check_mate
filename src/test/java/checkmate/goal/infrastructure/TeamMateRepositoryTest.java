@@ -115,7 +115,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
 
         queryFactory.update(teamMate)
                 .where(teamMate.id.in(teamMate1.getId(), teamMate2.getId()))
-                .set(teamMate.progressInfo.hookyDays, 50)
+                .set(teamMate.teamMateProgress.hookyDays, 50)
                 .execute();
 
         //when

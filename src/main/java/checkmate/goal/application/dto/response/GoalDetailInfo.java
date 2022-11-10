@@ -25,6 +25,25 @@ public class GoalDetailInfo {
     private boolean inviteable;
     private Uploadable uploadable;
 
+    @QueryProjection
+    public GoalDetailInfo(Goal goal,
+                          TeamMate selector) {
+        this.id = goal.getId();
+        this.category = goal.getCategory();
+        this.title = goal.getTitle();
+        this.startDate = goal.getStartDate();
+        this.endDate = goal.getEndDate();
+        this.appointmentTime = goal.getAppointmentTime();
+        this.weekDays = goal.getWeekDays().getKorWeekDay();
+        this.goalStatus = goal.getGoalStatus();
+        this.inviteable = goal.isInviteable();
+        this.uploadable = selector.getUploadable();
+    }
+
+    public void setTeamMates(List<TeamMateUploadInfo> teamMates) {
+        this.teamMates = teamMates;
+    }
+
     @QueryProjection @Builder
     public GoalDetailInfo(Goal goal,
                           TeamMate selector,

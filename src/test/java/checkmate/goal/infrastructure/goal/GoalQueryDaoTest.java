@@ -4,54 +4,19 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.common.util.WeekDayConverter;
 import checkmate.goal.application.dto.response.*;
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.goal.domain.*;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static checkmate.goal.domain.QTeamMate.teamMate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 class GoalQueryDaoTest extends RepositoryTest {
-    @Test
-    void findTeamMateInfo() throws Exception{
-        //given
-        Goal goal = TestEntityFactory.goal(null, "goal");
-        em.persist(goal);
-        User user1 = TestEntityFactory.user(null, "user1");
-        em.persist(user1);
-        goal.addTeamMate(TestEntityFactory.teamMate(null, user1.getId()));
-        User user2 = TestEntityFactory.user(null, "user2");
-        em.persist(user2);
-        goal.addTeamMate(TestEntityFactory.teamMate(null, user2.getId()));
-        User user3 = TestEntityFactory.user(null, "user3");
-        em.persist(user3);
-        goal.addTeamMate(TestEntityFactory.teamMate(null, user3.getId()));
-
-        em.flush();
-        em.clear();
-
-        //when
-        List<TeamMateUploadInfo> result = goalQueryDao.findTeamMateInfo(goal.getId());
-
-        //then
-        assertThat(result.size()).isEqualTo(3);
-        for (int i = 0; i < result.size(); i++) {
-            TeamMateUploadInfo info = result.get(i);
-            assertThat(info.getNickname()).isEqualTo("user" + (i + 1));
-            assertThat(info.isUploaded()).isFalse();
-            assertThat(info.getId()).isNotNull();
-            assertThat(info.getUserId()).isNotNull();
-        }
-    }
-
     @Test @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
     void findOngoingSimpleInfo() throws Exception{
         //given
@@ -85,13 +50,13 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     @Test @DisplayName("목표 진행 스케쥴 조회")
-    void findGoalPeriodInfo() throws Exception{
+    void findGoalScheduleInfo() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
 
         //when
-        GoalScheduleInfo goalScheduleInfo = goalQueryDao.findGoalPeriodInfo(goal.getId())
+        GoalScheduleInfo goalScheduleInfo = goalQueryDao.findGoalScheduleInfo(goal.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
@@ -104,11 +69,8 @@ class GoalQueryDaoTest extends RepositoryTest {
     void 성공한_목표_목록_조회() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
+        ReflectionTestUtils.setField(goal, "goalStatus", GoalStatus.OVER);
         em.persist(goal);
-
-        em.createQuery("update Goal g set g.goalStatus = 'OVER' where g.id =:goalId")
-                .setParameter("goalId", goal.getId())
-                .executeUpdate();
 
         User tester1 = TestEntityFactory.user(null, "tester1");
         em.persist(tester1);
@@ -116,18 +78,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(tester2);
 
         TeamMate teamMate1 = TestEntityFactory.teamMate(null, tester1.getId());
+        ReflectionTestUtils.setField(teamMate1, "teamMateStatus", TeamMateStatus.SUCCESS);
         goal.addTeamMate(teamMate1);
 
         TeamMate teamMate2 = TestEntityFactory.teamMate(null, tester2.getId());
+        ReflectionTestUtils.setField(teamMate2, "teamMateStatus", TeamMateStatus.SUCCESS);
         goal.addTeamMate(teamMate2);
 
         em.flush();
         em.clear();
-
-        queryFactory.update(teamMate)
-                .set(teamMate.teamMateStatus, TeamMateStatus.SUCCESS)
-                .where(teamMate.id.in(teamMate1.getId(), teamMate2.getId()))
-                .execute();
 
         //when
         List<GoalHistoryInfo> historyGoalList = goalQueryDao.findHistoryGoalInfo(tester1.getId());
@@ -138,8 +97,8 @@ class GoalQueryDaoTest extends RepositoryTest {
         assertThat(historyGoalList.get(0).getTeamMateNames().get(0)).isNotEqualTo(historyGoalList.get(0).getTeamMateNames().get(1));
     }
 
-    @Test
-    void findTodayGoalInfoDtoList() throws Exception{
+    @Test @DisplayName("오늘 진행할 목표 정보")
+    void findTodayGoalInfo() throws Exception{
         //given
         User tester = TestEntityFactory.user(null, "todayGoalFindTester");
         em.persist(tester);
@@ -149,14 +108,13 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //when
         List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(tester.getId());
-        todayGoals.forEach(g -> System.out.println(g.getTitle()));
 
         //then
         assertThat(todayGoals.size()).isEqualTo(1);
         assertThat(todayGoals.get(0).getWeekDays()).contains(WeekDayConverter.convertEngToKor(LocalDate.now()));
     }
 
-    @Test
+    @Test @DisplayName("목표 상세 정보 조회")
     void findDetailInfo() throws Exception{
         //given
         User user1 = TestEntityFactory.user(null, "tester1");
@@ -176,13 +134,22 @@ class GoalQueryDaoTest extends RepositoryTest {
         goal.addTeamMate(teamMate2);
         goal.addTeamMate(teamMate3);
 
+        em.flush();
+        em.clear();
+
         //when
         GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId(), user1.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(info.getTitle()).isEqualTo(goal.getTitle());
-        info.getTeamMates().forEach(tm -> assertThat(tm.getNickname()).isNotNull());
+        for (int i = 0; i < info.getTeamMates().size(); i++) {
+            TeamMateUploadInfo tm = info.getTeamMates().get(i);
+            assertThat(tm.getNickname()).isEqualTo("tester" + (i + 1));
+            assertThat(tm.isUploaded()).isFalse();
+            assertThat(tm.getId()).isNotNull();
+            assertThat(tm.getUserId()).isNotNull();
+        }
         assertThat(info.getTeamMates().size()).isEqualTo(3);
         assertThat(info.isInviteable()).isTrue();
     }

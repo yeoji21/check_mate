@@ -1,12 +1,10 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
-import com.querydsl.core.annotations.QueryProjection;
+import checkmate.goal.domain.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -30,8 +28,8 @@ public class GoalHistoryInfo {
                            LocalDate startDate,
                            LocalDate endDate,
                            LocalTime appointmentTime,
-                           String weekDays,
-                           double achievementRate,
+                           int weekDays,
+                           int workingDays,
                            List<String> teamMateNames) {
         this.id = id;
         this.category = category;
@@ -39,21 +37,22 @@ public class GoalHistoryInfo {
         this.startDate = startDate;
         this.endDate = endDate;
         this.appointmentTime = appointmentTime;
-        this.weekDays = weekDays;
-        this.achievementRate = achievementRate;
-        this.teamMateNames = teamMateNames;
-    }
-
-    @QueryProjection @Builder
-    public GoalHistoryInfo(Goal goal, TeamMate selector, List<String> teamMateNames) {
-        this.id = goal.getId();
-        this.category = goal.getCategory();
-        this.title = goal.getTitle();
-        this.startDate = goal.getStartDate();
-        this.endDate = goal.getEndDate();
-        this.appointmentTime = goal.getAppointmentTime();
-        this.weekDays = goal.getWeekDays().getKorWeekDay();
-        this.achievementRate = selector.calcProgressPercent();
+        this.weekDays = new WeekDays(weekDays).getKorWeekDay();
+        Goal goal = Goal.builder()
+                .weekDays(this.weekDays)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+        TeamMate teamMate = new TeamMate(0);
+        goal.addTeamMate(teamMate);
+        try {
+            Field field = TeamMateProgress.class.getDeclaredField("workingDays");
+            field.setAccessible(true);
+            field.setInt(teamMate.getTeamMateProgress(), workingDays);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalArgumentException(e);
+        }
+        this.achievementRate = teamMate.calcProgressPercent();
         this.teamMateNames = teamMateNames;
     }
 }

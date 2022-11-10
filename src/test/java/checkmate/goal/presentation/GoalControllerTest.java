@@ -205,11 +205,12 @@ public class GoalControllerTest extends ControllerTest {
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
-                .achievementRate(teamMate.calcProgressPercent())
+                .workingDays(10)
+//                .achievementRate(teamMate.calcProgressPercent())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .appointmentTime(goal.getAppointmentTime())
-                .weekDays(goal.getWeekDays().getKorWeekDay())
+                .weekDays(goal.getWeekDays().intValue())
                 .teamMateNames(getTeamMateNicknameList(goal))
                 .build();
     }
@@ -248,13 +249,13 @@ public class GoalControllerTest extends ControllerTest {
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
-                .weekDays(goal.getWeekDays().getKorWeekDay())
+                .weekDays(goal.getWeekDays().toString())
                 .build();
     }
 
     private GoalScheduleInfo goalPeriodResponseDto(Goal goal) {
         return GoalScheduleInfo.builder()
-                .weekDays(goal.getWeekDays().getIntValue())
+                .weekDays(goal.getWeekDays().intValue())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .build();
@@ -309,10 +310,6 @@ public class GoalControllerTest extends ControllerTest {
         TeamMate selector = TestEntityFactory.teamMate(1L, 1L);
         goal.addTeamMate(selector);
         goal.addTeamMate(TestEntityFactory.teamMate(2L, 2L));
-        return getGoalDetailResponseDto(goal, selector);
-    }
-
-    private GoalDetailInfo getGoalDetailResponseDto(Goal goal, TeamMate selector) {
         return GoalDetailInfo.builder()
                 .goal(goal)
                 .selector(selector)
@@ -321,9 +318,12 @@ public class GoalControllerTest extends ControllerTest {
     }
 
     private List<TeamMateUploadInfo> getTeamMateResponseList(Goal goal) {
-        return goal.getTeam().stream()
+        return goal.getTeam()
+                .stream()
                 .map(tm -> TeamMateUploadInfo.builder()
-                        .teamMate(tm)
+                        .teamMateId(tm.getId())
+                        .userId(tm.getUserId())
+                        .lastUploadDay(LocalDate.now().minusDays(1))
                         .nickname("tester")
                         .build())
                 .collect(Collectors.toList());

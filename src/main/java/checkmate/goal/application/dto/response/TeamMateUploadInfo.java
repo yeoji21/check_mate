@@ -17,18 +17,11 @@ public class TeamMateUploadInfo {
     private String nickname;
     private boolean uploaded;
 
-    // TODO: 2022/11/03 필요한 필드만
     @QueryProjection @Builder
-    public TeamMateUploadInfo(TeamMate teamMate, String nickname) {
-        this.id = teamMate.getId();
-        this.userId = teamMate.getUserId();
-        // TODO: 2022/11/10 N + 1 발생
-        this.uploaded = teamMate.getUploadable().isUploaded();
-        this.nickname = nickname;
-    }
-
-    @QueryProjection @Builder
-    public TeamMateUploadInfo(long teamMateId, long userId, LocalDate lastUploadDay, String nickname) {
+    public TeamMateUploadInfo(long teamMateId,
+                              long userId,
+                              LocalDate lastUploadDay,
+                              String nickname) {
         this.id = teamMateId;
         this.userId = userId;
         TeamMate teamMate = new TeamMate(userId);

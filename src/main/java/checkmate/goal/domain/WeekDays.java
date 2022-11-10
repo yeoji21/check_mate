@@ -35,7 +35,7 @@ public class WeekDays implements Serializable {
         return WeekDayConverter.valueToKorWeekDay(weekDays);
     }
 
-    public int getIntValue() {
+    public int intValue() {
         return weekDays;
     }
 
@@ -52,5 +52,10 @@ public class WeekDays implements Serializable {
         return weekDayList.stream()
                 .mapToInt(weekDay -> WeekDayConverter.valueOf(WeekDayConverter.convertKorToEng(weekDay)).getValue())
                 .sum();
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(weekDays);
     }
 }

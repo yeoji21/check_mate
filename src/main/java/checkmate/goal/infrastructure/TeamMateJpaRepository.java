@@ -71,7 +71,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
         queryFactory.update(teamMate)
                 .where(teamMate.in(yesterDayTMs))
-                .set(teamMate.progressInfo.hookyDays, teamMate.progressInfo.hookyDays.add(1))
+                .set(teamMate.teamMateProgress.hookyDays, teamMate.teamMateProgress.hookyDays.add(1))
                 .execute();
 
         return yesterDayTMs;

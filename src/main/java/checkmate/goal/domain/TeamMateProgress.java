@@ -9,7 +9,7 @@ import javax.persistence.Embeddable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class ProgressInfo {
+public class TeamMateProgress {
     private int workingDays;
     private int hookyDays;
 

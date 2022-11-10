@@ -21,10 +21,10 @@ class WeekDaysTest {
 
     @Test
     void create() throws Exception{
-        assertThat(new WeekDays("월수금").getIntValue()).isEqualTo(1010100);
-        assertThat(new WeekDays("월화수목금토일").getIntValue()).isEqualTo(1111111);
-        assertThat(new WeekDays("토일").getIntValue()).isEqualTo(11);
-        assertThat(new WeekDays("화목토").getIntValue()).isEqualTo(101010);
+        assertThat(new WeekDays("월수금").intValue()).isEqualTo(1010100);
+        assertThat(new WeekDays("월화수목금토일").intValue()).isEqualTo(1111111);
+        assertThat(new WeekDays("토일").intValue()).isEqualTo(11);
+        assertThat(new WeekDays("화목토").intValue()).isEqualTo(101010);
     }
 
     private Matcher getMatcher(String days) {
