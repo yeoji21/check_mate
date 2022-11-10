@@ -102,9 +102,10 @@ public class GoalQueryDao{
         return Optional.of(new GoalDetailInfo(selector.getGoal(), selector, findTeamMateInfo(goalId)));
     }
 
-    private List<TeamMateInfo> findTeamMateInfo(long goalId) {
+
+    public List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
         return queryFactory
-                .select(new QTeamMateInfo(teamMate, user.nickname))
+                .select(new QTeamMateUploadInfo(teamMate, user.nickname))
                 .from(teamMate)
                 .join(user).on(teamMate.userId.eq(user.id))
                 .where(teamMate.goal.id.eq(goalId),

@@ -320,9 +320,9 @@ public class GoalControllerTest extends ControllerTest {
                 .build();
     }
 
-    private List<TeamMateInfo> getTeamMateResponseList(Goal goal) {
+    private List<TeamMateUploadInfo> getTeamMateResponseList(Goal goal) {
         return goal.getTeam().stream()
-                .map(tm -> TeamMateInfo.builder()
+                .map(tm -> TeamMateUploadInfo.builder()
                         .teamMate(tm)
                         .nickname("tester")
                         .build())

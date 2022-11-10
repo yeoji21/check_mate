@@ -111,7 +111,7 @@ public class TeamMate extends BaseTimeEntity {
                 .build();
     }
 
-    private boolean isUploaded() {
+    public boolean isUploaded() {
         return (lastUploadDay != null && lastUploadDay.isEqual(LocalDate.now()));
     }
 }

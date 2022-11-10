@@ -7,7 +7,6 @@ import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.user.domain.UserRepository;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +17,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -101,8 +101,7 @@ class PostCommandServiceTest {
         assertThat(post.getLikes().size()).isEqualTo(0);
     }
 
-    @SneakyThrows
-    private PostUploadCommand getPostRegisterDto() {
+    private PostUploadCommand getPostRegisterDto() throws IOException {
         return new PostUploadCommand(1L,
                 List.of(new MockMultipartFile("originalName", InputStream.nullInputStream())),
                 "posting text");

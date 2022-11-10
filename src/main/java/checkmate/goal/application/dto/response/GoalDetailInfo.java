@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 public class GoalDetailInfo {
     private long id;
-    private List<TeamMateInfo> teamMates;
+    private List<TeamMateUploadInfo> teamMates;
     private GoalCategory category;
     private String title;
     private LocalDate startDate;
@@ -28,7 +28,7 @@ public class GoalDetailInfo {
     @QueryProjection @Builder
     public GoalDetailInfo(Goal goal,
                           TeamMate selector,
-                          List<TeamMateInfo> otherTeamMates) {
+                          List<TeamMateUploadInfo> otherTeamMates) {
         this.id = goal.getId();
         this.category = goal.getCategory();
         this.title = goal.getTitle();

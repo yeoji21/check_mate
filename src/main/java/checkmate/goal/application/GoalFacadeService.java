@@ -4,7 +4,7 @@ import checkmate.exception.TeamMateNotFoundException;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalViewResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.application.dto.response.TeamMateInfo;
+import checkmate.goal.application.dto.response.TeamMateUploadInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class GoalFacadeService {
         return new GoalViewResult(goalDetailInfo, calenderInfo, progress);
     }
 
-    private long getTeamMateId(long userId, List<TeamMateInfo> teamMates) {
+    private long getTeamMateId(long userId, List<TeamMateUploadInfo> teamMates) {
         return teamMates.stream()
                 .filter(tm -> tm.getUserId() == userId)
                 .findAny()

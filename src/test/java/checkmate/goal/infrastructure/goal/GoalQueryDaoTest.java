@@ -20,6 +20,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 class GoalQueryDaoTest extends RepositoryTest {
+    @Test
+    void findTeamMateInfo() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(null, "goal");
+        em.persist(goal);
+        User user1 = TestEntityFactory.user(null, "user1");
+        em.persist(user1);
+        goal.addTeamMate(TestEntityFactory.teamMate(null, user1.getId()));
+        User user2 = TestEntityFactory.user(null, "user2");
+        em.persist(user2);
+        goal.addTeamMate(TestEntityFactory.teamMate(null, user2.getId()));
+        User user3 = TestEntityFactory.user(null, "user3");
+        em.persist(user3);
+        goal.addTeamMate(TestEntityFactory.teamMate(null, user3.getId()));
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<TeamMateUploadInfo> result = goalQueryDao.findTeamMateInfo(goal.getId());
+
+        //then
+        assertThat(result.size()).isEqualTo(3);
+        for (int i = 0; i < result.size(); i++) {
+            TeamMateUploadInfo info = result.get(i);
+            assertThat(info.getNickname()).isEqualTo("user" + (i + 1));
+            assertThat(info.isUploaded()).isFalse();
+            assertThat(info.getId()).isNotNull();
+            assertThat(info.getUserId()).isNotNull();
+        }
+    }
+
     @Test @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
     void findOngoingSimpleInfo() throws Exception{
         //given
