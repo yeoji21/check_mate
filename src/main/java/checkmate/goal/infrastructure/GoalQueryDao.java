@@ -2,7 +2,6 @@ package checkmate.goal.infrastructure;
 
 import checkmate.common.util.WeekDayConverter;
 import checkmate.goal.application.dto.response.*;
-import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalStatus;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
@@ -64,45 +63,36 @@ public class GoalQueryDao{
         return goalDetailInfo;
     }
 
-    /*
-    유저가 이전에 완수한 목표들의 정보
-     */
+    //유저가 이전에 완수한 목표들의 정보
     public List<GoalHistoryInfo> findHistoryGoalInfo(long userId) {
         // 완수한 목표 조회
-        List<Goal> historyGoals =
-                queryFactory.select(goal)
-                        .from(teamMate)
-                        .innerJoin(teamMate.goal, goal)
-                        .where(teamMate.userId.eq(userId),
-                                teamMate.teamMateStatus.eq(TeamMateStatus.SUCCESS),
-                                goal.goalStatus.eq(GoalStatus.OVER))
-                        .fetch();
+        List<GoalHistoryInfo> list = queryFactory.select(
+                        new QGoalHistoryInfo(goal.id, goal.category, goal.title, goal.period.startDate,
+                                goal.period.endDate, goal.appointmentTime, goal.weekDays.weekDays,
+                                teamMate.teamMateProgress.workingDays))
+                .from(teamMate)
+                .innerJoin(teamMate.goal, goal)
+                .where(teamMate.userId.eq(userId),
+                        teamMate.teamMateStatus.eq(TeamMateStatus.SUCCESS),
+                        goal.goalStatus.eq(GoalStatus.OVER))
+                .fetch();
+        List<Long> goalIds = list.stream().map(GoalHistoryInfo::getId).toList();
 
-        // 조회를 요청한 팀원과 다른 팀원들의 닉네임을 가져오기 위한 쿼리
+        // 팀원들의 닉네임을 조회 후 goalID를 기준으로 grouping
         Map<Long, List<Tuple>> map =
-                queryFactory.select(goal.id, teamMate.userId, teamMate.teamMateProgress.workingDays, user.nickname)
+                queryFactory.select(goal.id, user.nickname)
                         .from(teamMate)
                         .innerJoin(user).on(user.id.eq(teamMate.userId))
                         .join(teamMate.goal, goal)
-                        .where(goal.in(historyGoals))
+                        .where(goal.id.in(goalIds))
                         .fetch()
                         .stream()
                         .collect(Collectors.groupingBy(t -> t.get(goal.id)));
-
-        return historyGoals
-                .stream()
-                .map(hGoal -> GoalHistoryInfo.builder()
-                            .id(hGoal.getId())
-                            .title(hGoal.getTitle())
-                            .category(hGoal.getCategory())
-                            .startDate(hGoal.getStartDate())
-                            .endDate(hGoal.getEndDate())
-                            .weekDays(hGoal.getWeekDays().intValue())
-                            .appointmentTime(hGoal.getAppointmentTime())
-                            .workingDays(getTeamMateWorkingDays(userId, map.get(hGoal.getId())))
-                            .teamMateNames(getTeamMateNames(map.get(hGoal.getId())))
-                            .build())
-                .toList();
+        list.forEach(info -> {
+            List<String> nicknames = map.get(info.getId()).stream().map(t -> t.get(user.nickname)).toList();
+            info.setTeamMateNames(nicknames);
+        });
+        return list;
     }
 
 

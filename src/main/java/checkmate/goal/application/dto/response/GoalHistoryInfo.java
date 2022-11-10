@@ -1,6 +1,7 @@
 package checkmate.goal.application.dto.response;
 
 import checkmate.goal.domain.*;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,7 +22,7 @@ public class GoalHistoryInfo {
     private double achievementRate;
     private List<String> teamMateNames;
 
-    @Builder
+    @QueryProjection
     public GoalHistoryInfo(long id,
                            GoalCategory category,
                            String title,
@@ -29,8 +30,7 @@ public class GoalHistoryInfo {
                            LocalDate endDate,
                            LocalTime appointmentTime,
                            int weekDays,
-                           int workingDays,
-                           List<String> teamMateNames) {
+                           int workingDays) {
         this.id = id;
         this.category = category;
         this.title = title;
@@ -53,6 +53,23 @@ public class GoalHistoryInfo {
             throw new IllegalArgumentException(e);
         }
         this.achievementRate = teamMate.calcProgressPercent();
+    }
+
+    public void setTeamMateNames(List<String> teamMateNames) {
+        this.teamMateNames = teamMateNames;
+    }
+
+    @Builder
+    public GoalHistoryInfo(long id,
+                           GoalCategory category,
+                           String title,
+                           LocalDate startDate,
+                           LocalDate endDate,
+                           LocalTime appointmentTime,
+                           int weekDays,
+                           int workingDays,
+                           List<String> teamMateNames) {
+        this(id, category, title, startDate, endDate, appointmentTime, weekDays, workingDays);
         this.teamMateNames = teamMateNames;
     }
 }
