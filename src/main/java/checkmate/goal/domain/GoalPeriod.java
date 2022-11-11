@@ -24,10 +24,10 @@ public class GoalPeriod {
         this.endDate = endDate;
     }
 
-    double getProgressedPercent() {
+    double calcProgressedPercent() {
         return ProgressCalculator.calculate(
                 isUninitiatedGoal() ?
-                        0 : (int) startDate.datesUntil(LocalDate.now()).count(),
+                    0 : (int) startDate.datesUntil(LocalDate.now()).count(),
                 (int)startDate.datesUntil(endDate.plusDays(1)).count()
         );
     }

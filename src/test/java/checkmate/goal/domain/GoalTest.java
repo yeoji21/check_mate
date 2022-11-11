@@ -2,12 +2,12 @@ package checkmate.goal.domain;
 
 import checkmate.TestEntityFactory;
 import checkmate.common.util.WeekDayConverter;
+import checkmate.exception.UnInviteableGoalException;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
 import checkmate.goal.presentation.dto.request.GoalModifyDto;
 import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
-import checkmate.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GoalTest {
@@ -126,12 +127,14 @@ class GoalTest {
 
     @Test
     void 초대가능한_목표인지_확인_테스트() throws Exception{
+        Goal goal = TestEntityFactory.goal(1L, "goal");
         assertThat(goal.isInviteable()).isTrue();
+        assertDoesNotThrow(goal::inviteableCheck);
     }
 
     @Test
     void 초대불가능한_목표_확인_테스트() throws Exception{
-        goal = Goal.builder()
+        Goal goal = Goal.builder()
                 .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(200L))
@@ -140,6 +143,7 @@ class GoalTest {
                 .build();
 
         assertThat(goal.isInviteable()).isFalse();
+        assertThrows(UnInviteableGoalException.class, goal::inviteableCheck);
     }
 
     @Test

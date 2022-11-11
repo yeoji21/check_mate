@@ -32,15 +32,18 @@ public class GoalCommandService {
     private final CacheTemplate cacheTemplate;
     private final GoalCommandMapper mapper;
 
+    // TODO: 2022/11/12 목표 생성 방식 개선 예정
     @Transactional
     public long create(GoalCreateCommand command) {
+        int ongoingGoalCount = goalRepository.countOngoingGoals(command.getUserId());
+
         User user = userRepository.findById(command.getUserId()).orElseThrow(UserNotFoundException::new);
         Goal goal = mapper.toGoal(command);
         goalRepository.save(goal);
 
         // 목표를 생성하는 것 외에 팀원을 추가하는 역할
         TeamMate teamMate = goal.join(user);
-        teamMate.initiateGoal(goalRepository.countOngoingGoals(command.getUserId()));
+        teamMate.initiateGoal(ongoingGoalCount);
         teamMateRepository.save(teamMate);
         return goal.getId();
     }

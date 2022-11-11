@@ -2,9 +2,10 @@ package checkmate.goal.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.common.util.ProgressCalculator;
-import checkmate.exception.ExceedGoalLimitException;
-import checkmate.exception.UnInviteableGoalException;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -40,6 +41,7 @@ public class TeamMate extends BaseTimeEntity {
         this.progress = new TeamMateProgress();
     }
 
+    // TODO: 2022/11/12 setGoal 없이 TeamMate 생성자에서 Goal 주입?
     void setGoal(Goal goal) {
         this.goal = goal;
         this.progress = new TeamMateProgress();
@@ -71,7 +73,7 @@ public class TeamMate extends BaseTimeEntity {
 
     // TODO: 2022/11/03 외부에서 ongoingGoalCount를 받는 게 맞을지
     public void initiateGoal(int ongoingGoalCount) {
-        if(!goal.isInviteable()) throw new UnInviteableGoalException();
+        goal.inviteableCheck();
         changeToOngoingStatus(ongoingGoalCount);
         progress.setInitialProgress(goal.progressedWorkingDaysCount());
     }
@@ -83,7 +85,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public void changeToWaitingStatus() {
-        if(!goal.isInviteable()) throw new UnInviteableGoalException();
+        goal.inviteableCheck();
         status.inviteeStatusCheck();
         status = TeamMateStatus.WAITING;
     }
@@ -105,7 +107,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     private void changeToOngoingStatus(int ongoingGoalCount) {
-        if(ongoingGoalCount >= 10) throw new ExceedGoalLimitException();
+        GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
         this.status = TeamMateStatus.ONGOING;
     }
 }

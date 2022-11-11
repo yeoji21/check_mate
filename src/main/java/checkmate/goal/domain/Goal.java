@@ -98,15 +98,23 @@ public class Goal extends BaseTimeEntity {
     }
 
     // TODO: 2022/11/11 addTeamMate와 join 두 가지 메소드 통일
+    /*
+     User가 Goal에 참여
+     생성된 TeamMate의 status는 waiting이므로 목표 인증을 시작하지 않은 상태
+     */
     public TeamMate join(User user) {
-        if(!isInviteable()) throw new UnInviteableGoalException();
+        inviteableCheck();
         TeamMate teamMate = new TeamMate(user.getId());
         teamMate.setGoal(this);
         return teamMate;
     }
 
     public boolean isInviteable() {
-        return period.getProgressedPercent() <= 25.0;
+        return GoalJoiningPolicy.progressedPercent(period.calcProgressedPercent());
+    }
+
+    public void inviteableCheck() {
+        if (!isInviteable()) throw new UnInviteableGoalException();
     }
 
     public String getSchedule() {

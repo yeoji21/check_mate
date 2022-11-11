@@ -92,14 +92,14 @@ public class GoalControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 개별_목표조회_테스트() throws Exception{
-        GoalDetailInfo response = getGoalInformationResponse();
-        given(goalQueryService.findGoalDetail(any(Long.class), any(Long.class))).willReturn(response);
+        GoalDetailInfo info = getGoalInformationResponse();
+        given(goalQueryService.findGoalDetail(any(Long.class), any(Long.class))).willReturn(info);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andExpect(content().json(objectMapper.writeValueAsString(info)))
                 .andDo(document("find-goalinfo",
                         pathParameters(parameterWithName("goalId").description("goalId")),
                         setGoalInformationResponseFields()));
