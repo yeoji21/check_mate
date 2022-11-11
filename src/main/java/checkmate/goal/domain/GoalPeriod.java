@@ -26,7 +26,8 @@ public class GoalPeriod {
 
     double getProgressedPercent() {
         return ProgressCalculator.calculate(
-                (int)startDate.datesUntil(LocalDate.now()).count(),
+                isUninitiatedGoal() ?
+                        0 : (int) startDate.datesUntil(LocalDate.now()).count(),
                 (int)startDate.datesUntil(endDate.plusDays(1)).count()
         );
     }
@@ -36,10 +37,14 @@ public class GoalPeriod {
     }
 
     Stream<LocalDate> fromStartToToday() {
-        return startDate.datesUntil(LocalDate.now());
+        return isUninitiatedGoal() ?
+                Stream.empty() : startDate.datesUntil(LocalDate.now());
+    }
+    boolean checkDateRange() {
+        return !isUninitiatedGoal() && !endDate.isBefore(LocalDate.now());
     }
 
-    boolean checkDateRange() {
-        return !startDate.isAfter(LocalDate.now()) && !endDate.isBefore(LocalDate.now());
+    private boolean isUninitiatedGoal() {
+        return startDate.isAfter(LocalDate.now());
     }
 }

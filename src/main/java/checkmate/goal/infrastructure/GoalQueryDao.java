@@ -39,7 +39,7 @@ public class GoalQueryDao{
                 .join(teamMate.goal, goal)
                 .on(goal.checkDays.checkDays.divide(num).floor().mod(10).eq(1), goal.goalStatus.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(userId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING),
+                        teamMate.status.eq(TeamMateStatus.ONGOING),
                         goal.period.startDate.loe(LocalDate.now()))
                 .fetch();
     }
@@ -68,11 +68,11 @@ public class GoalQueryDao{
         List<GoalHistoryInfo> list = queryFactory.select(
                         new QGoalHistoryInfo(goal.id, goal.category, goal.title, goal.period.startDate,
                                 goal.period.endDate, goal.appointmentTime, goal.checkDays.checkDays,
-                                teamMate.teamMateProgress.workingDays))
+                                teamMate.progress.workingDays))
                 .from(teamMate)
                 .innerJoin(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.SUCCESS),
+                        teamMate.status.eq(TeamMateStatus.SUCCESS),
                         goal.goalStatus.eq(GoalStatus.OVER))
                 .fetch();
         List<Long> goalIds = list.stream().map(GoalHistoryInfo::getId).toList();
@@ -112,7 +112,7 @@ public class GoalQueryDao{
                 .from(teamMate)
                 .join(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
     }
 
@@ -122,7 +122,7 @@ public class GoalQueryDao{
                 .from(teamMate)
                 .join(user).on(teamMate.userId.eq(user.id))
                 .where(teamMate.goal.id.eq(goalId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
     }
 }

@@ -29,56 +29,51 @@ public class TeamMate extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @NotNull @Enumerated(EnumType.STRING)
-    private TeamMateStatus teamMateStatus;
+    private TeamMateStatus status;
     @NotNull @Embedded
-    private TeamMateProgress teamMateProgress;
+    private TeamMateProgress progress;
     private LocalDate lastUploadDay;
 
     public TeamMate(long userId) {
         this.userId = userId;
-        this.teamMateStatus = TeamMateStatus.WAITING;
-        this.teamMateProgress = new TeamMateProgress();
+        this.status = TeamMateStatus.WAITING;
+        this.progress = new TeamMateProgress();
     }
 
-    public void setGoal(Goal goal) {
+    void setGoal(Goal goal) {
         this.goal = goal;
-        this.teamMateProgress = new TeamMateProgress();
+        this.progress = new TeamMateProgress();
     }
 
     public void updateUploadedDate() {
         lastUploadDay = LocalDate.now();
     }
 
-    public void applyInviteAgree(int ongoingGoalCount) {
-        if(!goal.isInviteable()) throw new UnInviteableGoalException();
-        changeToOngoingStatus(ongoingGoalCount);
-        teamMateProgress.setInitialProgress(goal.progressedWorkingDaysCount());
-    }
-
     public void applyInviteReject() {
-        teamMateStatus = TeamMateStatus.REJECT;
+        status = TeamMateStatus.REJECT;
     }
 
     public void plusWorkingDay() {
-        teamMateProgress.plusWorkingDay();
+        progress.plusWorkingDay();
     }
 
     public void minusWorkingDay() {
-        teamMateProgress.minusWorkingDay();
+        progress.minusWorkingDay();
     }
 
     public int getWorkingDays() {
-        return teamMateProgress.getWorkingDays();
+        return progress.getWorkingDays();
     }
 
     public int getHookyDays() {
-        return teamMateProgress.getHookyDays();
+        return progress.getHookyDays();
     }
 
-    // TODO: 2022/11/03 이상함
-    public void changeToOngoingStatus(int ongoingGoalCount) {
-        if(ongoingGoalCount >= 10) throw new ExceedGoalLimitException();
-        this.teamMateStatus = TeamMateStatus.ONGOING;
+    // TODO: 2022/11/03 외부에서 ongoingGoalCount를 받는 게 맞을지
+    public void initiateGoal(int ongoingGoalCount) {
+        if(!goal.isInviteable()) throw new UnInviteableGoalException();
+        changeToOngoingStatus(ongoingGoalCount);
+        progress.setInitialProgress(goal.progressedWorkingDaysCount());
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
@@ -89,18 +84,12 @@ public class TeamMate extends BaseTimeEntity {
 
     public void changeToWaitingStatus() {
         if(!goal.isInviteable()) throw new UnInviteableGoalException();
-
-        teamMateStatus.inviteeStatusCheck();
-        teamMateStatus = TeamMateStatus.WAITING;
-    }
-
-    public void changeToSuccessStatus() {
-        if(getWorkingDays() == 0) return;
-        teamMateStatus = TeamMateStatus.SUCCESS;
+        status.inviteeStatusCheck();
+        status = TeamMateStatus.WAITING;
     }
 
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(teamMateProgress.getWorkingDays(), goal.totalWorkingDaysCount());
+        return ProgressCalculator.calculate(progress.getWorkingDays(), goal.totalWorkingDaysCount());
     }
 
     public Uploadable getUploadable() {
@@ -113,5 +102,10 @@ public class TeamMate extends BaseTimeEntity {
 
     public boolean isUploaded() {
         return (lastUploadDay != null && lastUploadDay.isEqual(LocalDate.now()));
+    }
+
+    private void changeToOngoingStatus(int ongoingGoalCount) {
+        if(ongoingGoalCount >= 10) throw new ExceedGoalLimitException();
+        this.status = TeamMateStatus.ONGOING;
     }
 }

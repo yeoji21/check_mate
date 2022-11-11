@@ -15,11 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PostTest {
     private Post post;
     private TeamMate teamMate;
-
     @BeforeEach
     void setUp() {
         teamMate = TestEntityFactory.teamMate(1L, 1L);
-        TestEntityFactory.goal(1L, "자바의 정석 스터디").addTeamMate(teamMate);
         post = Post.builder().teamMate(teamMate).text("post body text").build();
     }
 

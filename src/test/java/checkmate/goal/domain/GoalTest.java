@@ -42,25 +42,6 @@ class GoalTest {
     }
 
     @Test
-    void TeamMates_일급_컬렉션_테스트() throws Exception{
-        //given
-        User user1 = TestEntityFactory.user(1L, "user1");
-        TeamMate teamMate1 = TestEntityFactory.teamMate(1L, user1.getId());
-        goal.addTeamMate(teamMate1);
-
-        //when
-        List<TeamMate> teamMates = goal.getTeam();
-
-        //then
-        assertThat(teamMates.size()).isEqualTo(1);
-        assertThat(teamMates.get(0).getUserId()).isEqualTo(user1.getId());
-
-        User user2 = TestEntityFactory.user(2L, "user2");
-        TeamMate teamMate2 = TestEntityFactory.teamMate(2L, user2.getId());
-        assertThrows(UnsupportedOperationException.class, () -> teamMates.add(teamMate2));
-    }
-
-    @Test
     void 테스트용_데이터_체크() throws Exception{
         LocalDate startDate = LocalDate.of(2022, 5, 16);
         LocalDate endDate = LocalDate.of(2022, 5, 31);

@@ -51,8 +51,8 @@ public class TeamMateCommandService {
         Goal goal = findGoal(command.getGoalId());
         User invitee = findUser(command.getInviteeNickname());
         Optional<TeamMate> teamMate = teamMateRepository.findTeamMate(goal.getId(), invitee.getId());
+//        invite(goal, invitee, teamMate);
         inviteService.invite(goal, teamMate, invitee);
-
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
                 getInviteGoalNotificationDto(command, invitee.getId())));
     }
@@ -68,6 +68,7 @@ public class TeamMateCommandService {
                 getInviteReplyNotificationDto(invitee, inviteNotification.getUserId(), command.isAccept())));
         return mapper.toInviteReplyResult(invitee.getGoal().getId());
     }
+
     @Transactional
     public void updateHookyTeamMate() {
         List<TeamMate> hookyTMs = teamMateRepository.updateYesterdayHookyTMs();
@@ -76,6 +77,13 @@ public class TeamMateCommandService {
         eventPublisher.publishEvent(new StaticNotificationCreatedEvent(EXPULSION_GOAL,
                 mapper.toKickOutNotificationDtos(eliminators)));
         cacheTemplate.deleteTMCacheData(eliminators);
+    }
+
+    private void invite(Goal goal, User invitee, Optional<TeamMate> teamMate) {
+        teamMate.ifPresentOrElse(
+                TeamMate::changeToWaitingStatus,
+                () -> teamMateRepository.save(goal.join(invitee))
+        );
     }
 
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {
@@ -99,7 +107,7 @@ public class TeamMateCommandService {
     private void updateForInviteReply(TeamMate invitee, boolean accept) {
         if(accept) {
             int ongoingGoalCount = goalRepository.countOngoingGoals(invitee.getUserId());
-            invitee.applyInviteAgree(ongoingGoalCount);
+            invitee.initiateGoal(ongoingGoalCount);
         }
         else
             invitee.applyInviteReject();

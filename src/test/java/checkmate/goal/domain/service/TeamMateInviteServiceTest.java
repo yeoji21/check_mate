@@ -4,18 +4,26 @@ import checkmate.TestEntityFactory;
 import checkmate.exception.UserAlreadyInGoalException;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
+import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.domain.TeamMateStatus;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
+@ExtendWith(MockitoExtension.class)
 class TeamMateInviteServiceTest {
-    private TeamMateInviteService teamMateInviteService = new TeamMateInviteService();
+    @Mock
+    private TeamMateRepository teamMateRepository;
+    @InjectMocks
+    private TeamMateInviteService teamMateInviteService;
 
     @Test
     void 이미_목표에_속한_유저_초대_테스트() throws Exception{
@@ -43,6 +51,6 @@ class TeamMateInviteServiceTest {
         teamMateInviteService.invite(goal, Optional.of(teamMate), invitee);
 
         //then
-        assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.WAITING);
+        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.WAITING);
     }
 }

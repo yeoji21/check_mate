@@ -18,6 +18,7 @@ import checkmate.notification.domain.factory.InviteGoalNotificationFactory;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -62,7 +63,7 @@ public class TeamMateCommandServiceTest {
         goal.addTeamMate(teamMate);
     }
 
-    @Test
+    @Test @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
     void 팀원_초대_테스트() throws Exception{
         //given
         User inviter = TestEntityFactory.user(1L, "inviter");
@@ -71,12 +72,13 @@ public class TeamMateCommandServiceTest {
 
         TeamMate inviteeTeamMate = TestEntityFactory.teamMate(1L, invitee.getId());
         goal.addTeamMate(inviteeTeamMate);
+        ReflectionTestUtils.setField(inviteeTeamMate, "status", TeamMateStatus.REJECT);
 
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
         given(teamMateRepository.findTeamMate(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeTeamMate));
         doAnswer(invocation -> {
-            ReflectionTestUtils.setField(inviteeTeamMate, "teamMateStatus", TeamMateStatus.WAITING);
+            ReflectionTestUtils.setField(inviteeTeamMate, "status", TeamMateStatus.WAITING);
             return inviteeTeamMate;
         }).when(teamMateInviteService).invite(any(Goal.class), any(Optional.class), any(User.class));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
@@ -85,7 +87,7 @@ public class TeamMateCommandServiceTest {
         teamMateCommandService.inviteTeamMate(dtoMapper.toInviteCommand(dto, 1L));
 
         //then
-        assertThat(inviteeTeamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.WAITING);
+        assertThat(inviteeTeamMate.getStatus()).isEqualTo(TeamMateStatus.WAITING);
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
@@ -115,7 +117,7 @@ public class TeamMateCommandServiceTest {
 
         //then
         assertThat(response.getGoalId()).isNotNull();
-        assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.ONGOING);
+        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
     }
 
     @Test

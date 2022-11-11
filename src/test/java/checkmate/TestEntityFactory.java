@@ -3,6 +3,7 @@ package checkmate;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.TeamMate;
+import checkmate.goal.domain.TeamMateStatus;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
 import checkmate.post.domain.Post;
@@ -42,8 +43,8 @@ public class TestEntityFactory {
     public static TeamMate teamMate(Long teamMateId, long userId) {
         TeamMate teamMate = new TeamMate(userId);
         ReflectionTestUtils.setField(teamMate, "id", teamMateId);
-
-        teamMate.changeToOngoingStatus(0);
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
+//        teamMate.changeToOngoingStatus(0);
         return teamMate;
     }
 

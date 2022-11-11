@@ -36,7 +36,7 @@ class TeamMateTest {
 
         //when then
         assertThrows(ExceedGoalLimitException.class,
-                () -> teamMate.applyInviteAgree(11));
+                () -> teamMate.initiateGoal(11));
     }
 
     @Test
@@ -98,12 +98,12 @@ class TeamMateTest {
         int before = teamMate.getWorkingDays();
 
         //when
-        teamMate.applyInviteAgree(0);
+        teamMate.initiateGoal(0);
         int after = teamMate.getWorkingDays();
 
         //then
         assertThat(after).isGreaterThan(before);
-        assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.ONGOING);
+        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
     }
 
     @Test
@@ -113,7 +113,7 @@ class TeamMateTest {
         goal.addTeamMate(teamMate);
         teamMate.applyInviteReject();
 
-        assertThat(teamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.REJECT);
+        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);
     }
 
     @Test
@@ -124,8 +124,8 @@ class TeamMateTest {
                 .endDate(LocalDate.now().plusDays(1))
                 .build();
         TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        teamMate.setGoal(goal);
+        goal.addTeamMate(teamMate);
 
-        assertThrows(UnInviteableGoalException.class, () -> teamMate.applyInviteAgree(0));
+        assertThrows(UnInviteableGoalException.class, () -> teamMate.initiateGoal(0));
     }
 }

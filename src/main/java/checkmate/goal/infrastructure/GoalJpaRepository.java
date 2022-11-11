@@ -35,7 +35,7 @@ public class GoalJpaRepository implements GoalRepository {
                 .from(teamMate)
                 .join(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING),
+                        teamMate.status.eq(TeamMateStatus.ONGOING),
                         goal.goalStatus.eq(GoalStatus.ONGOING))
                 .fetchOne()
                 .intValue();
@@ -48,7 +48,7 @@ public class GoalJpaRepository implements GoalRepository {
                 .from(teamMate)
                 .join(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING),
+                        teamMate.status.eq(TeamMateStatus.ONGOING),
                         goal.goalStatus.eq(GoalStatus.ONGOING))
                 .fetch();
     }
@@ -59,8 +59,8 @@ public class GoalJpaRepository implements GoalRepository {
                 queryFactory.selectFrom(goal)
                         .join(goal.team.teamMates, teamMate).fetchJoin()
                         .where(goal.id.eq(goalId),
-                                teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING)
-                                        .or(teamMate.teamMateStatus.eq(TeamMateStatus.SUCCESS)))
+                                teamMate.status.eq(TeamMateStatus.ONGOING)
+                                        .or(teamMate.status.eq(TeamMateStatus.SUCCESS)))
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne());
     }
@@ -80,7 +80,7 @@ public class GoalJpaRepository implements GoalRepository {
                 .from(teamMate)
                 .where(teamMate.goal.id.eq(goalId),
                         teamMate.userId.eq(userId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetchFirst();
         return fetchOne != null;
     }

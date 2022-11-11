@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import static checkmate.post.domain.QPost.post;
 @Repository
 public class TeamMateJpaRepository implements TeamMateRepository {
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
     @Override
     public Optional<TeamMate> findTeamMate(long teamMateId) {
@@ -56,7 +58,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
                                 .floor().mod(10)
                                 .eq(1),
                         goal.goalStatus.eq(GoalStatus.ONGOING),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
 
         List<Long> checkedTeamMateIds = queryFactory
@@ -71,7 +73,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
         queryFactory.update(teamMate)
                 .where(teamMate.in(yesterDayTMs))
-                .set(teamMate.teamMateProgress.hookyDays, teamMate.teamMateProgress.hookyDays.add(1))
+                .set(teamMate.progress.hookyDays, teamMate.progress.hookyDays.add(1))
                 .execute();
 
         return yesterDayTMs;
@@ -86,7 +88,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
         queryFactory.update(teamMate)
                 .where(teamMate.in(eliminators))
-                .set(teamMate.teamMateStatus, TeamMateStatus.OUT)
+                .set(teamMate.status, TeamMateStatus.OUT)
                 .execute();
 
         return eliminators;
@@ -98,8 +100,21 @@ public class TeamMateJpaRepository implements TeamMateRepository {
                 .select(teamMate.userId)
                 .from(teamMate)
                 .where(teamMate.goal.id.eq(goalId),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
+    }
+
+    @Override
+    public List<TeamMate> findTeamMates(List<Long> goalIds) {
+        return queryFactory.select(teamMate)
+                .from(teamMate)
+                .where(teamMate.goal.id.in(goalIds))
+                .fetch();
+    }
+
+    @Override
+    public void save(TeamMate teamMate) {
+        entityManager.persist(teamMate);
     }
 
 }

@@ -37,7 +37,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
         TeamMate findTeamMate = teamMateRepository.findTeamMate(teamMate.getId()).orElseThrow(TeamMateNotFoundException::new);
 
         //then
-        assertThat(findTeamMate.getTeamMateStatus()).isEqualTo(TeamMateStatus.ONGOING);
+        assertThat(findTeamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
         assertThat(findTeamMate.getGoal().getId()).isEqualTo(goal.getId());
         assertThat(findTeamMate.getId()).isEqualTo(teamMate.getId());
     }
@@ -115,7 +115,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
 
         queryFactory.update(teamMate)
                 .where(teamMate.id.in(teamMate1.getId(), teamMate2.getId()))
-                .set(teamMate.teamMateProgress.hookyDays, 50)
+                .set(teamMate.progress.hookyDays, 50)
                 .execute();
 
         //when

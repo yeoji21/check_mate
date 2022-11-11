@@ -44,11 +44,14 @@ public class GoalHistoryInfo {
                 .endDate(endDate)
                 .build();
         TeamMate teamMate = new TeamMate(0);
-        goal.addTeamMate(teamMate);
         try {
-            Field field = TeamMateProgress.class.getDeclaredField("workingDays");
-            field.setAccessible(true);
-            field.setInt(teamMate.getTeamMateProgress(), workingDays);
+            Field workingDaysField = TeamMateProgress.class.getDeclaredField("workingDays");
+            workingDaysField.setAccessible(true);
+            workingDaysField.setInt(teamMate.getProgress(), workingDays);
+
+            Field goalField = TeamMate.class.getDeclaredField("goal");
+            goalField.setAccessible(true);
+            goalField.set(teamMate, goal);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new IllegalArgumentException(e);
         }

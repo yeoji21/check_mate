@@ -30,13 +30,13 @@ public class GoalRepositoryTest extends RepositoryTest {
         em.persist(goal3);
 
         TeamMate teamMate1 = TestEntityFactory.teamMate(null, user.getId());
-        ReflectionTestUtils.setField(teamMate1, "teamMateStatus", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
         goal1.addTeamMate(teamMate1);
         TeamMate teamMate2 = TestEntityFactory.teamMate(null, user.getId());
-        ReflectionTestUtils.setField(teamMate2, "teamMateStatus", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
         goal1.addTeamMate(teamMate2);
         TeamMate teamMate3 = TestEntityFactory.teamMate(null, user.getId());
-        ReflectionTestUtils.setField(teamMate3, "teamMateStatus", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
         goal1.addTeamMate(teamMate3);
 
         //when
@@ -88,8 +88,8 @@ public class GoalRepositoryTest extends RepositoryTest {
         em.persist(goal);
 
         TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        teamMate.changeToOngoingStatus(0);
         goal.addTeamMate(teamMate);
+        teamMate.initiateGoal(0);
 
         //when
         List<Goal> ongoingGoalList = goalRepository.findOngoingGoalList(user.getId());

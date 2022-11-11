@@ -37,7 +37,7 @@ public class Goal extends BaseTimeEntity {
     // TODO: 2022/07/22 aggregate 분리 -> 후순위
     @Embedded
     public Team team;
-    @Column(name = "appointment_time", nullable = true)
+    @Column(name = "appointment_time")
     private LocalTime appointmentTime;
 
     @Getter(value = AccessLevel.PRIVATE)
@@ -84,10 +84,6 @@ public class Goal extends BaseTimeEntity {
         else return appointmentTime.isBefore(LocalTime.now());
     }
 
-    public List<TeamMate> getTeam() {
-        return team.getTeamMates();
-    }
-
     void extendEndDate(LocalDate endDate) {
         period = new GoalPeriod(period.getStartDate(), endDate);
     }
@@ -102,9 +98,11 @@ public class Goal extends BaseTimeEntity {
     }
 
     // TODO: 2022/11/11 addTeamMate와 join 두 가지 메소드 통일
-    public void join(User user) {
+    public TeamMate join(User user) {
         if(!isInviteable()) throw new UnInviteableGoalException();
-        addTeamMate(new TeamMate(user.getId()));
+        TeamMate teamMate = new TeamMate(user.getId());
+        teamMate.setGoal(this);
+        return teamMate;
     }
 
     public boolean isInviteable() {

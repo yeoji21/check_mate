@@ -28,8 +28,8 @@ class PostRepositoryTest extends RepositoryTest {
         em.persist(user);
 
         teamMate = TestEntityFactory.teamMate(null, user.getId());
-        teamMate.changeToOngoingStatus(0);
         goal.addTeamMate(teamMate);
+        teamMate.initiateGoal(0);
 
         em.persist(goal);
         em.persist(teamMate);

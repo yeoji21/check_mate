@@ -54,7 +54,7 @@ public class QueryPerformanceTest {
                 .join(teamMate.goal, goal).on(goal.checkDays.checkDays.divide(WeekDayConverter.localDateToValue(LocalDate.now()))
                         .floor().mod(10).eq(1), goal.goalStatus.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(11L),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
         stopWatch.stop();
         //then
@@ -73,7 +73,7 @@ public class QueryPerformanceTest {
                 .from(teamMate)
                 .join(teamMate.goal, goal).on(goal.checkDays.checkDays.in(right), goal.goalStatus.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(11L),
-                        teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
         stopWatch.stop();
 

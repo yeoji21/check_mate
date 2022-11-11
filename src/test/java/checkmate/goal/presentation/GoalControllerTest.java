@@ -19,7 +19,6 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -185,8 +184,8 @@ public class GoalControllerTest extends ControllerTest {
         goal.addTeamMate(teamMate);
 
         List<GoalHistoryInfo> goalHistoryInfoList =
-                List.of(historyGoalInfoResponseDto(goal, teamMate),
-                        historyGoalInfoResponseDto(goal, teamMate));
+                List.of(historyGoalInfoResponseDto(goal, List.of("nickname")),
+                        historyGoalInfoResponseDto(goal, List.of("nickname")));
         GoalHistoryInfoResult result = new GoalHistoryInfoResult(goalHistoryInfoList);
 
         given(goalQueryService.findHistoryGoalInfo(any(Long.class))).willReturn(result);
@@ -200,25 +199,18 @@ public class GoalControllerTest extends ControllerTest {
 
     }
 
-    private GoalHistoryInfo historyGoalInfoResponseDto(Goal goal, TeamMate teamMate) {
+    private GoalHistoryInfo historyGoalInfoResponseDto(Goal goal, List<String> nicknames) {
         return GoalHistoryInfo.builder()
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
                 .workingDays(10)
-//                .achievementRate(teamMate.calcProgressPercent())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .appointmentTime(goal.getAppointmentTime())
                 .weekDays(goal.getCheckDays().intValue())
-                .teamMateNames(getTeamMateNicknameList(goal))
+                .teamMateNames(nicknames)
                 .build();
-    }
-
-    private List<String> getTeamMateNicknameList(Goal goal) {
-        return goal.getTeam().stream()
-                .map(tm -> tm.getGoal().getTitle() + tm.getId())
-                .collect(Collectors.toList());
     }
 
     private ResponseFieldsSnippet historyResponseFieldsSnippet() {
@@ -310,23 +302,18 @@ public class GoalControllerTest extends ControllerTest {
         TeamMate selector = TestEntityFactory.teamMate(1L, 1L);
         goal.addTeamMate(selector);
         goal.addTeamMate(TestEntityFactory.teamMate(2L, 2L));
+        TeamMateUploadInfo teamMateUploadInfo = TeamMateUploadInfo.builder()
+                .teamMateId(selector.getId())
+                .userId(selector.getUserId())
+                .lastUploadDay(LocalDate.now().minusDays(1))
+                .nickname("tester")
+                .build();
+
         return GoalDetailInfo.builder()
                 .goal(goal)
                 .selector(selector)
-                .otherTeamMates(getTeamMateResponseList(goal))
+                .otherTeamMates(List.of(teamMateUploadInfo))
                 .build();
-    }
-
-    private List<TeamMateUploadInfo> getTeamMateResponseList(Goal goal) {
-        return goal.getTeam()
-                .stream()
-                .map(tm -> TeamMateUploadInfo.builder()
-                        .teamMateId(tm.getId())
-                        .userId(tm.getUserId())
-                        .lastUploadDay(LocalDate.now().minusDays(1))
-                        .nickname("tester")
-                        .build())
-                .collect(Collectors.toList());
     }
 
 }

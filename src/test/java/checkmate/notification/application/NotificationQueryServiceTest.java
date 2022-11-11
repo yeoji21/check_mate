@@ -43,10 +43,10 @@ class NotificationQueryServiceTest {
         notificationQueryService = new NotificationQueryService(notificationRepository, notificationQueryDao, mapper);
 
         User user = TestEntityFactory.user(1L, "tester");
-        teamMate = TestEntityFactory.teamMate(1L, user.getId());
-        teamMate.changeToOngoingStatus(0);
         goal = TestEntityFactory.goal(1L, "test goal");
+        teamMate = TestEntityFactory.teamMate(1L, user.getId());
         goal.addTeamMate(teamMate);
+        teamMate.initiateGoal(0);
     }
 
     @Test

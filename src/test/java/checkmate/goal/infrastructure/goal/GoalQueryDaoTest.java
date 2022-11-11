@@ -78,11 +78,11 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(tester2);
 
         TeamMate teamMate1 = TestEntityFactory.teamMate(null, tester1.getId());
-        ReflectionTestUtils.setField(teamMate1, "teamMateStatus", TeamMateStatus.SUCCESS);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.SUCCESS);
         goal.addTeamMate(teamMate1);
 
         TeamMate teamMate2 = TestEntityFactory.teamMate(null, tester2.getId());
-        ReflectionTestUtils.setField(teamMate2, "teamMateStatus", TeamMateStatus.SUCCESS);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.SUCCESS);
         goal.addTeamMate(teamMate2);
 
         em.flush();
@@ -93,7 +93,7 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(historyGoalList.size()).isEqualTo(1);
-        assertThat(historyGoalList.get(0).getTeamMateNames().size()).isEqualTo(goal.getTeam().size());
+        assertThat(historyGoalList.get(0).getTeamMateNames().size()).isEqualTo(2);
         assertThat(historyGoalList.get(0).getTeamMateNames().get(0)).isNotEqualTo(historyGoalList.get(0).getTeamMateNames().get(1));
     }
 
@@ -165,9 +165,8 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(todayStart);
 
         TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        teamMate.changeToOngoingStatus(0);
-
         todayStart.addTeamMate(teamMate);
+        teamMate.initiateGoal(0);
         em.persist(teamMate);
     }
 
@@ -182,9 +181,8 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(futureGoal);
 
         TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        teamMate.changeToOngoingStatus(0);
-
         futureGoal.addTeamMate(teamMate);
+        teamMate.initiateGoal(0);
         em.persist(teamMate);
     }
 }
