@@ -41,13 +41,10 @@ dependencies {
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
+	implementation 'mysql:mysql-connector-java'
 
 	//querydsl
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
-//	implementation 'com.querydsl:querydsl-jpa'
-//	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jpa"
-//	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-//	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 

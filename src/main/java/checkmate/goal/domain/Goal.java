@@ -60,11 +60,6 @@ public class Goal extends BaseTimeEntity {
         team = new Team();
     }
 
-    public void addTeamMate(TeamMate teamMate) {
-        team.add(teamMate);
-        teamMate.setGoal(this);
-    }
-
     public void addCondition(VerificationCondition condition) {
         conditions.add(condition);
         condition.setGoal(this);
@@ -89,10 +84,6 @@ public class Goal extends BaseTimeEntity {
         else return appointmentTime.isBefore(LocalTime.now());
     }
 
-    public boolean isInviteable() {
-        return period.getProgressedPercent() <= 25.0;
-    }
-
     public List<TeamMate> getTeam() {
         return team.getTeamMates();
     }
@@ -105,10 +96,19 @@ public class Goal extends BaseTimeEntity {
         this.appointmentTime = appointmentTime;
     }
 
-    // TODO: 2022/11/09 addTeamMate와 join 두 가지 메소드 통일
+    public void addTeamMate(TeamMate teamMate) {
+        team.add(teamMate);
+        teamMate.setGoal(this);
+    }
+
+    // TODO: 2022/11/11 addTeamMate와 join 두 가지 메소드 통일
     public void join(User user) {
         if(!isInviteable()) throw new UnInviteableGoalException();
         addTeamMate(new TeamMate(user.getId()));
+    }
+
+    public boolean isInviteable() {
+        return period.getProgressedPercent() <= 25.0;
     }
 
     public String getSchedule() {

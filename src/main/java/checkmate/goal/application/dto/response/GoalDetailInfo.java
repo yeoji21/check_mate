@@ -44,20 +44,11 @@ public class GoalDetailInfo {
         this.teamMates = teamMates;
     }
 
-    @QueryProjection @Builder
+    @Builder
     public GoalDetailInfo(Goal goal,
                           TeamMate selector,
                           List<TeamMateUploadInfo> otherTeamMates) {
-        this.id = goal.getId();
-        this.category = goal.getCategory();
-        this.title = goal.getTitle();
-        this.startDate = goal.getStartDate();
-        this.endDate = goal.getEndDate();
-        this.appointmentTime = goal.getAppointmentTime();
-        this.weekDays = goal.getWeekDays().getKorWeekDay();
-        this.goalStatus = goal.getGoalStatus();
-        this.inviteable = goal.isInviteable();
-        this.uploadable = selector.getUploadable();
+        this(goal, selector);
         this.teamMates = otherTeamMates;
     }
 }

@@ -3,7 +3,6 @@ package checkmate.goal.infrastructure;
 import checkmate.common.util.WeekDayConverter;
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.GoalStatus;
-import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -115,29 +114,6 @@ public class GoalQueryDao{
                 .where(teamMate.userId.eq(userId),
                         teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING))
                 .fetch();
-    }
-
-    private int getTeamMateWorkingDays(long userId, List<Tuple> tuples) {
-        return tuples.stream()
-                .filter(t -> t.get(teamMate.userId) == userId)
-                .findAny()
-                .map(t -> t.get(teamMate.teamMateProgress.workingDays))
-                .orElseThrow();
-    }
-
-    private List<String> getTeamMateNames(List<Tuple> tuples) {
-        return tuples.stream()
-                .map(t -> t.get(user.nickname))
-                .toList();
-    }
-
-    private TeamMate getSelector(long userId, List<Tuple> tuples) {
-        return tuples
-                .stream()
-                .filter(t -> t.get(teamMate).getUserId().equals(userId))
-                .map(t -> t.get(teamMate))
-                .findFirst()
-                .orElseThrow();
     }
 
     private List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
