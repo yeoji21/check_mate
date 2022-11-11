@@ -1,5 +1,10 @@
 package checkmate.goal.domain;
 
 public enum GoalCategory {
-    운동, 생활습관, 독서, 학습, 취미생활, 기타
+    EXERCISE, // 운동
+    LIFESTYLE, // 생활습관
+    READING, // 독서
+    LEARNING, // 학습
+    HOBBIES, // 취미 생활
+    ETC //기타
 }

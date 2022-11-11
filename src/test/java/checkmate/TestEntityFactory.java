@@ -16,11 +16,11 @@ public class TestEntityFactory {
 
     public static Goal goal(Long id, String title) {
         Goal goal = Goal.builder()
-                .category(GoalCategory.기타)
+                .category(GoalCategory.ETC)
                 .title(title)
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .build();
         ReflectionTestUtils.setField(goal, "id", id);
         return goal;

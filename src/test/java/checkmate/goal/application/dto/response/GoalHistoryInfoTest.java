@@ -19,7 +19,7 @@ class GoalHistoryInfoTest {
         GoalHistoryInfo info = GoalHistoryInfo.builder()
                 .id(1L)
                 .title("title")
-                .category(GoalCategory.기타)
+                .category(GoalCategory.ETC)
                 .startDate(LocalDate.now().minusDays(9))
                 .endDate(LocalDate.now().plusDays(10))
                 .weekDays(1111111)

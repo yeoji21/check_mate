@@ -60,12 +60,12 @@ class TeamMateTest {
     @Test
     void 인증시간초과_업로드_불가능_테스트() throws Exception{
         Goal goal = Goal.builder()
-                .category(GoalCategory.학습)
+                .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.of(2021, 12, 20))
                 .endDate(LocalDate.of(2021, 12, 31))
                 .appointmentTime(LocalTime.MIN)
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .build();
         TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         goal.addTeamMate(teamMate);
@@ -77,11 +77,11 @@ class TeamMateTest {
     void 인증요일아니라_업로드_불가능_테스트() throws Exception{
         //given
         Goal goal = Goal.builder()
-                .category(GoalCategory.학습)
+                .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(10))
                 .endDate(LocalDate.now().plusDays(20))
-                .weekDays(WeekDayConverter.convertEngToKor(LocalDate.now().plusDays(1)))
+                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().plusDays(1)))
                 .build();
         TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         goal.addTeamMate(teamMate);
@@ -119,7 +119,7 @@ class TeamMateTest {
     @Test
     void 기간만료된_초대응답_테스트() throws Exception{
         Goal goal = Goal.builder()
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .startDate(LocalDate.now().minusDays(2))
                 .endDate(LocalDate.now().plusDays(1))
                 .build();

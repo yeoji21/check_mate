@@ -17,6 +17,6 @@ public class GoalCreateCommand {
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String weekDays;
+    private String checkDays;
     private LocalTime appointmentTime;
 }

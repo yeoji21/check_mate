@@ -653,7 +653,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">$ curl 'http://localhost:8080/goal?_csrf=4d0c23c9-38d7-4056-bcfa-279fb1e53871' -i -X POST \
     -H 'Content-Type: application/json;charset=UTF-8' \
-    -d '{"category":"학습","title":"자바의 정석 스터디","goalMethod":"INSTANT","startDate":"2021-12-20","endDate":"2021-12-31","weekDays":"월수금","appointmentTime":null,"minimumLike":null}'</code></pre>
+    -d '{"category":"학습","title":"자바의 정석 스터디","goalMethod":"INSTANT","startDate":"2021-12-20","endDate":"2021-12-31","goalCheckDays":"월수금","appointmentTime":null,"minimumLike":null}'</code></pre>
 </div>
 </div>
 </div>
@@ -666,7 +666,7 @@ Content-Type: application/json;charset=UTF-8
 Content-Length: 194
 Host: localhost:8080
 
-{"category":"학습","title":"자바의 정석 스터디","goalMethod":"INSTANT","startDate":"2021-12-20","endDate":"2021-12-31","weekDays":"월수금","appointmentTime":null,"minimumLike":null}</code></pre>
+{"category":"학습","title":"자바의 정석 스터디","goalMethod":"INSTANT","startDate":"2021-12-20","endDate":"2021-12-31","goalCheckDays":"월수금","appointmentTime":null,"minimumLike":null}</code></pre>
 </div>
 </div>
 </div>
@@ -684,7 +684,7 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 218
 
-{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","startDate":"2022-07-06","endDate":"2022-08-15","appointmentTime":null,"weekDays":"월화수목금토일","goalStatus":"ONGOING","minimumLike":null}</code></pre>
+{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","startDate":"2022-07-06","endDate":"2022-08-15","appointmentTime":null,"goalCheckDays":"월화수목금토일","goalStatus":"ONGOING","minimumLike":null}</code></pre>
 </div>
 </div>
 </div>
@@ -730,7 +730,7 @@ Content-Length: 218
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증방식</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>weekDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goalCheckDays</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증요일</p></td>
 </tr>
@@ -794,7 +794,7 @@ Content-Length: 218
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증방식</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>weekDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goalCheckDays</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증요일</p></td>
 </tr>
@@ -933,7 +933,7 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 223
 
-{"goals":[{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","weekDays":"월화수목금토일"},{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","weekDays":"월화수목금토일"}]}</code></pre>
+{"goals":[{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","goalCheckDays":"월화수목금토일"},{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","goalCheckDays":"월화수목금토일"}]}</code></pre>
 </div>
 </div>
 </div>
@@ -974,7 +974,7 @@ Content-Length: 223
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증방식</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goals[].weekDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goals[].goalCheckDays</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증요일</p></td>
 </tr>
@@ -1015,7 +1015,7 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 254
 
-{"goals":[{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","weekDays":"월화수목금토일","checked":true},{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","weekDays":"월화수목금토일","checked":false}]}</code></pre>
+{"goals":[{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","goalCheckDays":"월화수목금토일","checked":true},{"id":1,"category":"기타","title":"testGoal","goalMethod":"INSTANT","goalCheckDays":"월화수목금토일","checked":false}]}</code></pre>
 </div>
 </div>
 </div>
@@ -1056,7 +1056,7 @@ Content-Length: 254
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증방식</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goals[].weekDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goals[].goalCheckDays</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증요일</p></td>
 </tr>
@@ -1118,7 +1118,7 @@ Expires: 0
 X-Frame-Options: DENY
 Content-Length: 449
 
-{"id":1,"teamMates":[{"id":1,"userId":1,"nickname":"tester","uploaded":false},{"id":2,"userId":2,"nickname":"tester","uploaded":false}],"category":"기타","title":"testGoal","goalMethod":"INSTANT","startDate":"2022-07-06","endDate":"2022-08-15","appointmentTime":null,"weekDays":"월화수목금토일","goalStatus":"ONGOING","inviteable":true,"minimumLike":null,"uploadable":{"uploadable":true,"uploaded":false,"workingDay":true,"timeOver":false}}</code></pre>
+{"id":1,"teamMates":[{"id":1,"userId":1,"nickname":"tester","uploaded":false},{"id":2,"userId":2,"nickname":"tester","uploaded":false}],"category":"기타","title":"testGoal","goalMethod":"INSTANT","startDate":"2022-07-06","endDate":"2022-08-15","appointmentTime":null,"goalCheckDays":"월화수목금토일","goalStatus":"ONGOING","inviteable":true,"minimumLike":null,"uploadable":{"uploadable":true,"uploaded":false,"workingDay":true,"timeOver":false}}</code></pre>
 </div>
 </div>
 </div>
@@ -1174,7 +1174,7 @@ Content-Length: 449
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증방식</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>weekDays</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>goalCheckDays</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">인증요일</p></td>
 </tr>

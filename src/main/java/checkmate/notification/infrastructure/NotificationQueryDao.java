@@ -22,7 +22,7 @@ public class NotificationQueryDao {
     public NotificationDetailsResult findNotificationDetailResult(long userId, Long cursorId, Pageable pageable) {
         List<NotificationDetails> notificationDetails = queryFactory
                 .select(new QNotificationDetails(notification.id, notification.title, notification.body,
-                        notificationReceiver.checked, notification.createdDate, notification.notificationType.stringValue()))
+                        notificationReceiver.checked, notification.createdDateTime, notification.notificationType.stringValue()))
                 .from(notificationReceiver)
                 .join(notificationReceiver.notification, notification)
                 .where(notificationReceiver.userId.eq(userId), getNotificationIdLt(cursorId))

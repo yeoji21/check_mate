@@ -51,7 +51,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
                 .from(teamMate)
                 .join(teamMate.goal, goal)
                 .where(
-                        goal.weekDays.weekDays
+                        goal.checkDays.checkDays
                                 .divide(WeekDayConverter.localDateToValue(LocalDate.now().minusDays(1)))
                                 .floor().mod(10)
                                 .eq(1),

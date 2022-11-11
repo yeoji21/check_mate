@@ -17,30 +17,30 @@ import java.util.stream.Stream;
 // TODO: 2022/07/22 이건 어떻게 처리할지 좀 더 고민 -> 후순위
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class WeekDays implements Serializable {
-    @Column(name = "week_days", nullable = false)
-    private int weekDays;
+public class GoalCheckDays implements Serializable {
+    @Column(name = "check_days", nullable = false)
+    private int checkDays;
 
-    public WeekDays(String korWeekDays) {
+    public GoalCheckDays(String korWeekDays) {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
             throw new InvalidWeekDaysException();
-        this.weekDays = korWeekDaysToValue(korWeekDays);
+        this.checkDays = korWeekDaysToValue(korWeekDays);
     }
 
-    public WeekDays(int weekDays) {
-        this.weekDays = weekDays;
+    public GoalCheckDays(int checkDays) {
+        this.checkDays = checkDays;
     }
 
     public String getKorWeekDay() {
-        return WeekDayConverter.valueToKorWeekDay(weekDays);
+        return WeekDayConverter.valueToKorWeekDay(checkDays);
     }
 
     public int intValue() {
-        return weekDays;
+        return checkDays;
     }
 
     boolean isWorkingDay(LocalDate date) {
-        return WeekDayConverter.isWorkingDay(weekDays, WeekDayConverter.localDateToValue(date));
+        return WeekDayConverter.isWorkingDay(checkDays, WeekDayConverter.localDateToValue(date));
     }
 
     int calcWorkingDayCount(Stream<LocalDate> dateStream) {
@@ -56,6 +56,6 @@ public class WeekDays implements Serializable {
 
     @Override
     public String toString() {
-        return String.valueOf(weekDays);
+        return String.valueOf(checkDays);
     }
 }

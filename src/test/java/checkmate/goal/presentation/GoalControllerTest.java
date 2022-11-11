@@ -111,10 +111,10 @@ public class GoalControllerTest extends ControllerTest {
     void 목표_생성_테스트() throws Exception {
         //given
         GoalCreateDto request = GoalCreateDto.builder()
-                .category(GoalCategory.학습).title("자바의 정석 스터디")
+                .category(GoalCategory.LEARNING).title("자바의 정석 스터디")
                 .startDate(LocalDate.of(2021,12,20))
                 .endDate(LocalDate.of(2021,12,31))
-                .weekDays("월수금")
+                .checkDays("월수금")
                 .build();
 
         //when
@@ -172,7 +172,7 @@ public class GoalControllerTest extends ControllerTest {
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
-                .weekDays(goal.getWeekDays())
+                .checkDays(goal.getCheckDays())
                 .checked(checked)
                 .build();
     }
@@ -210,7 +210,7 @@ public class GoalControllerTest extends ControllerTest {
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .appointmentTime(goal.getAppointmentTime())
-                .weekDays(goal.getWeekDays().intValue())
+                .weekDays(goal.getCheckDays().intValue())
                 .teamMateNames(getTeamMateNicknameList(goal))
                 .build();
     }
@@ -249,13 +249,13 @@ public class GoalControllerTest extends ControllerTest {
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
-                .weekDays(goal.getWeekDays().toString())
+                .weekDays(goal.getCheckDays().toString())
                 .build();
     }
 
     private GoalScheduleInfo goalPeriodResponseDto(Goal goal) {
         return GoalScheduleInfo.builder()
-                .weekDays(goal.getWeekDays().intValue())
+                .weekDays(goal.getCheckDays().intValue())
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .build();
@@ -267,7 +267,7 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
                 fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
                 fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("weekDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("checkDays").type(JsonFieldType.STRING).description("인증요일"),
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("minimumLike").type(JsonFieldType.NUMBER).description("확인 후 인증의 최소 좋아요 수").optional()
         );
@@ -278,7 +278,7 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("info[].id").description("목표 id").type(JsonFieldType.NUMBER),
                 fieldWithPath("info[].category").type(JsonFieldType.STRING).description("카테고리"),
                 fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("info[].weekDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
                 fieldWithPath("info[].checked").type(JsonFieldType.BOOLEAN).description("오늘 이미 인증을 수행했는지 여부"));
     }
 

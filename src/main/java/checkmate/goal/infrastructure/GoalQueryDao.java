@@ -30,14 +30,14 @@ public class GoalQueryDao{
         int num = WeekDayConverter.localDateToValue(LocalDate.now());
 
         return queryFactory
-                .select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.weekDays,
+                .select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
                             new CaseBuilder()
                                 .when(teamMate.lastUploadDay.eq(LocalDate.now()))
                                 .then(true)
                                 .otherwise(false)))
                 .from(teamMate)
                 .join(teamMate.goal, goal)
-                .on(goal.weekDays.weekDays.divide(num).floor().mod(10).eq(1), goal.goalStatus.eq(GoalStatus.ONGOING))
+                .on(goal.checkDays.checkDays.divide(num).floor().mod(10).eq(1), goal.goalStatus.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(userId),
                         teamMate.teamMateStatus.eq(TeamMateStatus.ONGOING),
                         goal.period.startDate.loe(LocalDate.now()))
@@ -67,7 +67,7 @@ public class GoalQueryDao{
         // 완수한 목표 조회
         List<GoalHistoryInfo> list = queryFactory.select(
                         new QGoalHistoryInfo(goal.id, goal.category, goal.title, goal.period.startDate,
-                                goal.period.endDate, goal.appointmentTime, goal.weekDays.weekDays,
+                                goal.period.endDate, goal.appointmentTime, goal.checkDays.checkDays,
                                 teamMate.teamMateProgress.workingDays))
                 .from(teamMate)
                 .innerJoin(teamMate.goal, goal)
@@ -99,7 +99,7 @@ public class GoalQueryDao{
     public Optional<GoalScheduleInfo> findGoalScheduleInfo(long goalId) {
         return Optional.ofNullable(
                 queryFactory
-                        .select(new QGoalScheduleInfo(goal.period.startDate, goal.period.endDate, goal.weekDays.weekDays))
+                        .select(new QGoalScheduleInfo(goal.period.startDate, goal.period.endDate, goal.checkDays.checkDays))
                         .from(goal)
                         .where(goal.id.eq(goalId))
                         .fetchOne()
@@ -108,7 +108,7 @@ public class GoalQueryDao{
 
     // 진행중인 목표들 정보 조회
     public List<GoalSimpleInfo> findOngoingSimpleInfo(long userId) {
-        return queryFactory.select(new QGoalSimpleInfo(goal.id, goal.category, goal.title, goal.weekDays.weekDays.stringValue()))
+        return queryFactory.select(new QGoalSimpleInfo(goal.id, goal.category, goal.title, goal.checkDays.checkDays.stringValue()))
                 .from(teamMate)
                 .join(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),

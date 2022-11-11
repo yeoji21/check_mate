@@ -61,11 +61,11 @@ public class GoalIntegrationTest {
     @Test
     void 목표저장_통합테스트() throws JsonProcessingException {
         GoalCreateDto request = GoalCreateDto.builder()
-                .category(GoalCategory.학습)
+                .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(20))
                 .endDate(LocalDate.now().plusDays(10))
-                .weekDays("월수금")
+                .checkDays("월수금")
                 .build();
 
         given()

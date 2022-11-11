@@ -12,7 +12,6 @@ public class ProgressCalculator {
     public static double calculate(int progressedCount, int totalCount) {
         BigDecimal progressed = new BigDecimal(progressedCount);
         BigDecimal total = new BigDecimal(totalCount);
-
         if(existZero(progressed, total)) return 0;
         else return getPercentage(progressed, total);
     }

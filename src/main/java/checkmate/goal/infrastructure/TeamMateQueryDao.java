@@ -29,7 +29,7 @@ public class TeamMateQueryDao {
                         .transform(
                                 groupBy(teamMate.id).as(
                                         new QTeamMateScheduleInfo(goal.period.startDate, goal.period.endDate,
-                                                goal.weekDays.weekDays, list(post.uploadedDate))
+                                                goal.checkDays.checkDays, list(post.uploadedDate))
                                 )
                         ).get(teamMateId));
     }

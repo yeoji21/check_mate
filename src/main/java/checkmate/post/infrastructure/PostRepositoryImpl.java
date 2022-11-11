@@ -32,7 +32,7 @@ public class PostRepositoryImpl implements PostRepository {
                 .from(post)
                 .leftJoin(post.images.images, image)
                 .join(post.teamMate, teamMate).fetchJoin()
-                .where(post.teamMate.id.in(teamMateIds), post.createdDate.between(uploadDate.atStartOfDay(), uploadDate.plusDays(1).atStartOfDay()))
+                .where(post.teamMate.id.in(teamMateIds), post.createdDateTime.between(uploadDate.atStartOfDay(), uploadDate.plusDays(1).atStartOfDay()))
                 .transform(GroupBy.groupBy(post).as(list(image)));
     }
 

@@ -31,7 +31,7 @@ public class Goal extends BaseTimeEntity {
     @Embedded @NotNull
     public GoalPeriod period;
     @Embedded @NotNull
-    private WeekDays weekDays;
+    private GoalCheckDays checkDays;
     @Enumerated(EnumType.STRING) @NotNull
     private GoalStatus goalStatus;
     // TODO: 2022/07/22 aggregate 분리 -> 후순위
@@ -49,11 +49,11 @@ public class Goal extends BaseTimeEntity {
                 String title,
                 LocalDate startDate,
                 LocalDate endDate,
-                String weekDays,
+                String checkDays,
                 LocalTime appointmentTime) {
         this.category = category;
         this.title = title;
-        this.weekDays = new WeekDays(weekDays);
+        this.checkDays = new GoalCheckDays(checkDays);
         this.period = new GoalPeriod(startDate, endDate);
         this.appointmentTime = appointmentTime;
         this.goalStatus = GoalStatus.ONGOING;
@@ -76,7 +76,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTodayWorkingDay() {
-        return period.checkDateRange() && weekDays.isWorkingDay(LocalDate.now());
+        return period.checkDateRange() && checkDays.isWorkingDay(LocalDate.now());
     }
 
     public boolean isTimeOver() {
@@ -113,16 +113,16 @@ public class Goal extends BaseTimeEntity {
 
     public String getSchedule() {
         return period.fromStartToEndDate()
-                .map(date -> weekDays.isWorkingDay(date) ? "1" : "0")
+                .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
                 .collect(Collectors.joining());
     }
 
     public int progressedWorkingDaysCount() {
-        return weekDays.calcWorkingDayCount(period.fromStartToToday());
+        return checkDays.calcWorkingDayCount(period.fromStartToToday());
     }
 
     int totalWorkingDaysCount() {
-        return weekDays.calcWorkingDayCount(period.fromStartToEndDate());
+        return checkDays.calcWorkingDayCount(period.fromStartToEndDate());
     }
 
     public LocalDate getStartDate() {

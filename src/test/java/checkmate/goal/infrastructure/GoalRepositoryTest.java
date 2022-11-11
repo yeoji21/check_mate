@@ -104,8 +104,8 @@ public class GoalRepositoryTest extends RepositoryTest {
         //given
         Goal testGoal = Goal.builder()
                 .title("testGoal")
-                .weekDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(2)))
-                .category(GoalCategory.기타)
+                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(2)))
+                .category(GoalCategory.ETC)
                 .startDate(LocalDate.now().minusDays(6))
                 .endDate(LocalDate.now().minusDays(1))
                 .build();
@@ -115,8 +115,8 @@ public class GoalRepositoryTest extends RepositoryTest {
                 .title("testGoal2")
                 .startDate(LocalDate.now().minusDays(6))
                 .endDate(LocalDate.now().minusDays(1))
-                .weekDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(2)))
-                .category(GoalCategory.기타)
+                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(2)))
+                .category(GoalCategory.ETC)
                 .build();
         em.persist(testGoal2);
 
@@ -124,8 +124,8 @@ public class GoalRepositoryTest extends RepositoryTest {
                 .title("하루짜리 목표")
                 .startDate(LocalDate.now().minusDays(1))
                 .endDate(LocalDate.now().minusDays(1))
-                .weekDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(1)))
-                .category(GoalCategory.기타)
+                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(1)))
+                .category(GoalCategory.ETC)
                 .build();
         em.persist(oneDayGoal);
         em.flush();

@@ -37,9 +37,9 @@ public class GoalHistoryInfo {
         this.startDate = startDate;
         this.endDate = endDate;
         this.appointmentTime = appointmentTime;
-        this.weekDays = new WeekDays(weekDays).getKorWeekDay();
+        this.weekDays = new GoalCheckDays(weekDays).getKorWeekDay();
         Goal goal = Goal.builder()
-                .weekDays(this.weekDays)
+                .checkDays(this.weekDays)
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();

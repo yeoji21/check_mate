@@ -34,7 +34,7 @@ public class GoalDetailInfo {
         this.startDate = goal.getStartDate();
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
-        this.weekDays = goal.getWeekDays().getKorWeekDay();
+        this.weekDays = goal.getCheckDays().getKorWeekDay();
         this.goalStatus = goal.getGoalStatus();
         this.inviteable = goal.isInviteable();
         this.uploadable = selector.getUploadable();

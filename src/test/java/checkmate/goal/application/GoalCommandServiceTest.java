@@ -110,11 +110,11 @@ public class GoalCommandServiceTest {
         //given
         GoalCreateCommand command = GoalCreateCommand.builder()
                 .userId(1L)
-                .category(GoalCategory.학습)
+                .category(GoalCategory.LEARNING)
                 .title("testGoal")
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
-                .weekDays("월수금")
+                .checkDays("월수금")
                 .build();
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(0);
         doAnswer((invocation) -> {
@@ -133,11 +133,11 @@ public class GoalCommandServiceTest {
     @Test
     void 목표생성한_유저의_현재목표가_최대치_이상() throws Exception{
         GoalCreateDto goalCreateDto = GoalCreateDto.builder()
-                .category(GoalCategory.학습)
+                .category(GoalCategory.LEARNING)
                 .title("testGoal")
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
-                .weekDays("월수금")
+                .checkDays("월수금")
                 .build();
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(11);
         assertThrows(ExceedGoalLimitException.class,

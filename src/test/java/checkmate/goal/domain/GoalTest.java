@@ -82,11 +82,11 @@ class GoalTest {
     @Test
     void 인증_시간_경과_테스트() throws Exception{
         Goal timeSetGoal = Goal.builder()
-                .category(GoalCategory.기타)
+                .category(GoalCategory.ETC)
                 .title("title")
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .appointmentTime(LocalTime.MIN)
                 .build();
         assertThat(timeSetGoal.getAppointmentTime().isBefore(LocalTime.now())).isTrue();
@@ -151,11 +151,11 @@ class GoalTest {
     @Test
     void 초대불가능한_목표_확인_테스트() throws Exception{
         goal = Goal.builder()
-                .category(GoalCategory.학습)
+                .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(200L))
                 .endDate(LocalDate.now().plusDays(100L))
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .build();
 
         assertThat(goal.isInviteable()).isFalse();

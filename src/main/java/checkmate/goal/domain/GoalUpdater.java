@@ -36,7 +36,7 @@ public class GoalUpdater {
     }
 
     private void modifiedDateCheck(Goal goal) {
-        if(goal.getModifiedDate() != null && goal.getModifiedDate().plusDays(7).toLocalDate().isAfter(LocalDate.now()))
+        if(goal.getModifiedDateTime() != null && goal.getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now()))
             throw new UpdateDurationException();
     }
 }

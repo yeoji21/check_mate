@@ -24,7 +24,7 @@ public class GoalCreateDto {
     @NotNull(message = "endDate is null")
     private LocalDate endDate;
     @NotBlank(message = "weekDays is blank")
-    private String weekDays;
+    private String checkDays;
     private LocalTime appointmentTime;
 
     @Builder
@@ -32,13 +32,13 @@ public class GoalCreateDto {
                          String title,
                          LocalDate startDate,
                          LocalDate endDate,
-                         String weekDays,
+                         String checkDays,
                          LocalTime appointmentTime) {
         this.category = category;
         this.title = title;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.weekDays = weekDays;
+        this.checkDays = checkDays;
         this.appointmentTime = appointmentTime;
     }
 }

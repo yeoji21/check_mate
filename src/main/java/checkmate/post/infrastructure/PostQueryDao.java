@@ -29,8 +29,8 @@ public class PostQueryDao {
                 .leftJoin(post.likes, likes)
                 .where(post.teamMate.goal.id.eq(goalId),
                         post.uploadedDate.eq(date))
-                .orderBy(post.createdDate.desc())
+                .orderBy(post.createdDateTime.desc())
                 .transform(GroupBy.groupBy(post).list(new QPostInfo(post.id, post.teamMate.id, user.nickname,
-                        post.createdDate, list(image.storedName), post.text, list(likes.userId))));
+                        post.createdDateTime, list(image.storedName), post.text, list(likes.userId))));
     }
 }

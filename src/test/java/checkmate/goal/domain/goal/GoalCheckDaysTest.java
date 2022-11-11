@@ -1,6 +1,6 @@
 package checkmate.goal.domain.goal;
 
-import checkmate.goal.domain.WeekDays;
+import checkmate.goal.domain.GoalCheckDays;
 import org.junit.jupiter.api.Test;
 
 import java.util.regex.Matcher;
@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class WeekDaysTest {
+class GoalCheckDaysTest {
     @Test
     void regex() throws Exception{
         assertThat(getMatcher("월하").find()).isTrue();
@@ -21,10 +21,10 @@ class WeekDaysTest {
 
     @Test
     void create() throws Exception{
-        assertThat(new WeekDays("월수금").intValue()).isEqualTo(1010100);
-        assertThat(new WeekDays("월화수목금토일").intValue()).isEqualTo(1111111);
-        assertThat(new WeekDays("토일").intValue()).isEqualTo(11);
-        assertThat(new WeekDays("화목토").intValue()).isEqualTo(101010);
+        assertThat(new GoalCheckDays("월수금").intValue()).isEqualTo(1010100);
+        assertThat(new GoalCheckDays("월화수목금토일").intValue()).isEqualTo(1111111);
+        assertThat(new GoalCheckDays("토일").intValue()).isEqualTo(11);
+        assertThat(new GoalCheckDays("화목토").intValue()).isEqualTo(101010);
     }
 
     private Matcher getMatcher(String days) {

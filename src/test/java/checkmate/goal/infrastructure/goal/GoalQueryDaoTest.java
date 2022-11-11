@@ -111,7 +111,7 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(todayGoals.size()).isEqualTo(1);
-        assertThat(todayGoals.get(0).getWeekDays()).contains(WeekDayConverter.convertEngToKor(LocalDate.now()));
+        assertThat(todayGoals.get(0).getCheckDays()).contains(WeekDayConverter.convertEngToKor(LocalDate.now()));
     }
 
     @Test @DisplayName("목표 상세 정보 조회")
@@ -158,9 +158,9 @@ class GoalQueryDaoTest extends RepositoryTest {
         Goal todayStart = Goal.builder()
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(20))
-                .category(GoalCategory.기타)
+                .category(GoalCategory.ETC)
                 .title("todayGoal")
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .build();
         em.persist(todayStart);
 
@@ -175,9 +175,9 @@ class GoalQueryDaoTest extends RepositoryTest {
         Goal futureGoal = Goal.builder()
                 .startDate(LocalDate.now().plusDays(10))
                 .endDate(LocalDate.now().plusDays(20))
-                .category(GoalCategory.기타)
+                .category(GoalCategory.ETC)
                 .title("futureGoal")
-                .weekDays("월화수목금토일")
+                .checkDays("월화수목금토일")
                 .build();
         em.persist(futureGoal);
 
