@@ -17,7 +17,7 @@ import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
-import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
+import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.InviteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
 import checkmate.user.domain.User;
@@ -83,7 +83,7 @@ public class TeamMateCommandService {
         List<TeamMate> hookyTMs = teamMateRepository.updateYesterdayHookyTMs();
         List<TeamMate> eliminators = teamMateRepository.eliminateOveredTMs(hookyTMs);
 
-        eventPublisher.publishEvent(new StaticNotificationCreatedEvent(EXPULSION_GOAL,
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
                 mapper.toKickOutNotificationDtos(eliminators)));
         cacheTemplate.deleteTMCacheData(eliminators);
     }

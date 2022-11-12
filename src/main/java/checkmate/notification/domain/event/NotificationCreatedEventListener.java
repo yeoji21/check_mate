@@ -1,49 +1,30 @@
 package checkmate.notification.domain.event;
 
-import checkmate.notification.domain.Notification;
-import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.factory.NotificationGenerator;
-import checkmate.notification.domain.push.PushNotificationSender;
+import checkmate.notification.application.NotificationPushService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-// TODO: 2022/11/13 EventListener에 비즈니스 로직이 있어도 될지
-@Slf4j
 @RequiredArgsConstructor
-@Service
+@Component
 public class NotificationCreatedEventListener {
-    private final NotificationRepository repository;
-    private final NotificationGenerator generator;
-    private final PushNotificationSender pushNotificationSender;
+    private final NotificationPushService notificationPushService;
 
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void pushNotification(PushNotificationCreatedEvent event){
-        Notification notification = generator.generate(event.getNotificationType(), event.getCreateDto());
-        repository.save(notification);
-        List<String> tokens = repository.findReceiversFcmToken(notification.getId());
-        pushNotificationSender.send(notification, tokens);
+        notificationPushService.push(event.getNotificationType(), event.getCreateDto());
     }
 
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void staticNotification(StaticNotificationCreatedEvent event) {
-        repository.saveAll(
-                event.getCreateDto()
-                        .stream()
-                        .map(dto -> generator.generate(event.getNotificationType(), dto))
-                        .collect(Collectors.toList())
-        );
+    public void notPushNotification(NotPushNotificationCreatedEvent event) {
+        notificationPushService.notPush(event.getNotificationType(), event.getCreateDto());
     }
 }

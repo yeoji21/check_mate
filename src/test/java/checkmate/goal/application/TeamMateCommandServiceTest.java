@@ -13,7 +13,7 @@ import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
-import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
+import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.InviteGoalNotificationFactory;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
@@ -150,6 +150,6 @@ public class TeamMateCommandServiceTest {
 
         //then
         verify(cacheTemplate).deleteTMCacheData(any(List.class));
-        verify(eventPublisher).publishEvent(any(StaticNotificationCreatedEvent.class));
+        verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
 }

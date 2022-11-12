@@ -8,7 +8,7 @@ import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.*;
 import checkmate.goal.domain.event.GoalCreatedEvent;
-import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
+import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +80,7 @@ public class GoalCommandServiceTest {
         goalCommandService.updateYesterdayOveredGoals();
 
         //then
-        verify(eventPublisher).publishEvent(any(StaticNotificationCreatedEvent.class));
+        verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
         verify(cacheTemplate).deleteTMCacheData(any(List.class));
     }
 

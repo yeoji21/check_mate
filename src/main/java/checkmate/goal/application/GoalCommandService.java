@@ -9,7 +9,7 @@ import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.*;
 import checkmate.goal.domain.event.GoalCreatedEvent;
-import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
+import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -63,7 +63,7 @@ public class GoalCommandService {
                 .filter(tm -> tm.getStatus() == TeamMateStatus.ONGOING)
                 .toList();
 
-        eventPublisher.publishEvent(new StaticNotificationCreatedEvent(COMPLETE_GOAL, mapper.toGoalCompleteNotificationDtos(teamMates)));
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, mapper.toGoalCompleteNotificationDtos(teamMates)));
         cacheTemplate.deleteTMCacheData(teamMates);
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @RequiredArgsConstructor
-public class StaticNotificationCreatedEvent {
+public class NotPushNotificationCreatedEvent {
     private final NotificationType notificationType;
     private final List<? extends NotificationCreateDto> createDto;
 }

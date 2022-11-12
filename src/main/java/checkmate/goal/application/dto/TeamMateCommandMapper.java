@@ -2,9 +2,9 @@ package checkmate.goal.application.dto;
 
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.domain.TeamMate;
+import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
-import checkmate.notification.domain.factory.dto.KickOutNotificationDto;
 import checkmate.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -35,12 +35,12 @@ public interface TeamMateCommandMapper {
     })
     InviteReplyNotificationDto toInviteReplyNotificationDto(TeamMate invitee, String inviteeNickname, long inviterUserId, boolean accept);
 
-    List<KickOutNotificationDto> toKickOutNotificationDtos(List<TeamMate> teamMates);
+    List<ExpulsionGoalNotificationDto> toKickOutNotificationDtos(List<TeamMate> teamMates);
 
     @Mappings({
             @Mapping(source = "teamMate.userId", target = "userId"),
             @Mapping(source = "teamMate.id", target = "teamMateId"),
             @Mapping(source = "teamMate.goal.title", target = "goalTitle")
     })
-    KickOutNotificationDto toKickOutNotificationDto(TeamMate teamMate);
+    ExpulsionGoalNotificationDto toKickOutNotificationDto(TeamMate teamMate);
 }
