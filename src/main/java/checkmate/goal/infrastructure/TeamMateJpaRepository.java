@@ -26,7 +26,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Optional<TeamMate> findTeamMate(long teamMateId) {
+    public Optional<TeamMate> findTeamMateWithGoal(long teamMateId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(teamMate)
@@ -36,7 +36,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
     }
 
     @Override
-    public Optional<TeamMate> findTeamMate(long goalId, long userId) {
+    public Optional<TeamMate> findTeamMateWithGoal(long goalId, long userId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(teamMate)

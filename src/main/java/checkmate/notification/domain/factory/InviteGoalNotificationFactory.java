@@ -13,12 +13,12 @@ public class InviteGoalNotificationFactory extends NotificationFactory<InviteGoa
     @Override
     public Notification generate(InviteGoalNotificationDto dto) {
         Notification notification = Notification.builder()
-                .userId(dto.getInviterUserId())
+                .userId(dto.inviterUserId())
                 .title("팀원 초대")
-                .body(dto.getInviterNickname() + "님이 " + dto.getGoalTitle() + " 목표로 초대했습니다!")
+                .body(dto.inviterNickname() + "님이 " + dto.goalTitle() + " 목표로 초대했습니다!")
                 .build();
-        notification.addAttribute("teamMateId", dto.getInviteeTeamMateId());
-        notification.setUpReceivers(List.of(new NotificationReceiver(dto.getInviteeUserId())));
+        notification.addAttribute("teamMateId", dto.inviteeTeamMateId());
+        notification.setUpReceivers(List.of(new NotificationReceiver(dto.inviteeUserId())));
         notification.setNotificationType(getType());
         return notification;
     }

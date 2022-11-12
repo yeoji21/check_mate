@@ -29,7 +29,7 @@ public class NotificationCreatedEventListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void pushNotification(PushNotificationCreatedEvent event){
-        Notification notification = generator.generate(event.getNotificationType(), event.getCreateCommand());
+        Notification notification = generator.generate(event.getNotificationType(), event.getCreateDto());
         repository.save(notification);
         List<String> tokens = repository.findReceiversFcmToken(notification.getId());
         pushNotificationSender.send(notification, tokens);
@@ -40,9 +40,9 @@ public class NotificationCreatedEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void staticNotification(StaticNotificationCreatedEvent event) {
         repository.saveAll(
-                event.getCreateCommand()
+                event.getCreateDto()
                         .stream()
-                        .map(o -> generator.generate(event.getNotificationType(), o))
+                        .map(dto -> generator.generate(event.getNotificationType(), dto))
                         .collect(Collectors.toList())
         );
     }

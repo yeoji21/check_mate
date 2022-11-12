@@ -13,20 +13,20 @@ public class InviteReplyNotificationFactory extends NotificationFactory<InviteRe
     @Override
     public Notification generate(InviteReplyNotificationDto dto) {
         Notification notification = Notification.builder()
-                .userId(dto.getInviteeUserId())
+                .userId(dto.inviteeUserId())
                 .title("초대 응답")
                 .body(getBody(dto))
                 .build();
-        notification.setUpReceivers(List.of(new NotificationReceiver(dto.getInviterUserId())));
-        notification.addAttribute("goalId", dto.getGoalId());
-        notification.addAttribute("accept", String.valueOf(dto.isAccept()));
+        notification.setUpReceivers(List.of(new NotificationReceiver(dto.inviterUserId())));
+        notification.addAttribute("goalId", dto.goalId());
+        notification.addAttribute("accept", String.valueOf(dto.accept()));
         notification.setNotificationType(getType());
         return notification;
     }
 
     private static String getBody(InviteReplyNotificationDto command) {
-        String body = command.getInviteeNickname() + "님이 " + command.getGoalTitle();
-        body += command.isAccept() ? "목표로 합류했어요!" : "목표로 합류를 거절했어요";
+        String body = command.inviteeNickname() + "님이 " + command.goalTitle();
+        body += command.accept() ? "목표로 합류했어요!" : "목표로 합류를 거절했어요";
         return body;
     }
 

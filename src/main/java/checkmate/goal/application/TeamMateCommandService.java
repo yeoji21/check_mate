@@ -59,7 +59,7 @@ public class TeamMateCommandService {
     public void inviteTeamMate(TeamMateInviteCommand command) {
         Goal goal = findGoal(command.getGoalId());
         User invitee = findUser(command.getInviteeNickname());
-        Optional<TeamMate> teamMate = teamMateRepository.findTeamMate(goal.getId(), invitee.getId());
+        Optional<TeamMate> teamMate = teamMateRepository.findTeamMateWithGoal(goal.getId(), invitee.getId());
 //        invite(goal, invitee, teamMate);
         inviteService.invite(goal, teamMate, invitee);
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
@@ -124,12 +124,12 @@ public class TeamMateCommandService {
 
     private TeamMate findInviteeTeamMate(long goalId, long userId) {
         return teamMateRepository
-                .findTeamMate(goalId, userId)
+                .findTeamMateWithGoal(goalId, userId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
     private TeamMate findTeamMate(long teamMateId) {
-        return teamMateRepository.findTeamMate(teamMateId).orElseThrow(TeamMateNotFoundException::new);
+        return teamMateRepository.findTeamMateWithGoal(teamMateId).orElseThrow(TeamMateNotFoundException::new);
     }
 
     private Goal findGoal(long goalId) {

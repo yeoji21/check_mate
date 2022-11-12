@@ -8,6 +8,8 @@ import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.NotificationGenerator;
 import checkmate.notification.domain.factory.PostUploadNotificationFactory;
+import checkmate.notification.domain.factory.dto.KickOutNotificationDto;
+import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.notification.domain.push.PushNotificationSender;
 import checkmate.user.domain.User;
@@ -41,7 +43,7 @@ class NotificationCreatedEventListenerTest {
         PostUploadNotificationDto command = getNotificationCommand();
         Notification notification = new PostUploadNotificationFactory().generate(command);
 
-        given(generator.generate(any(NotificationType.class), any(Object.class))).willReturn(notification);
+        given(generator.generate(any(NotificationType.class), any(NotificationCreateDto.class))).willReturn(notification);
         doAnswer((invocation -> {
             Notification argument = (Notification) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "id", 1L);
@@ -61,9 +63,9 @@ class NotificationCreatedEventListenerTest {
     @Test
     void 전송하지_않는_알림_테스트() throws Exception{
         //given
-        List<TeamMate> command = new ArrayList<>();
+        List<KickOutNotificationDto> command = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            command.add(TestEntityFactory.teamMate((long) i, i));
+            command.add(new KickOutNotificationDto(i, i, "title"));
         }
 
         StaticNotificationCreatedEvent event = new StaticNotificationCreatedEvent(COMPLETE_GOAL, command);
@@ -80,6 +82,13 @@ class NotificationCreatedEventListenerTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         TeamMate teamMate = TestEntityFactory.teamMate(1L, user.getId());
         goal.addTeamMate(teamMate);
-        return new PostUploadNotificationDto(user, goal, List.of(1L, 2L));
+
+        return PostUploadNotificationDto.builder()
+                .uploaderUserId(user.getId())
+                .uploaderNickname(user.getNickname())
+                .goalId(goal.getId())
+                .goalTitle(goal.getTitle())
+                .teamMateUserIds(List.of(1L, 2L))
+                .build();
     }
 }

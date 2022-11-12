@@ -34,7 +34,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        TeamMate findTeamMate = teamMateRepository.findTeamMate(teamMate.getId()).orElseThrow(TeamMateNotFoundException::new);
+        TeamMate findTeamMate = teamMateRepository.findTeamMateWithGoal(teamMate.getId()).orElseThrow(TeamMateNotFoundException::new);
 
         //then
         assertThat(findTeamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);

@@ -63,8 +63,7 @@ public class GoalCommandService {
                 .filter(tm -> tm.getStatus() == TeamMateStatus.ONGOING)
                 .toList();
 
-        eventPublisher.publishEvent(new StaticNotificationCreatedEvent(COMPLETE_GOAL,
-                mapper.toGoalCompleteNotificationDtos(teamMates)));
+        eventPublisher.publishEvent(new StaticNotificationCreatedEvent(COMPLETE_GOAL, mapper.toGoalCompleteNotificationDtos(teamMates)));
         cacheTemplate.deleteTMCacheData(teamMates);
     }
 

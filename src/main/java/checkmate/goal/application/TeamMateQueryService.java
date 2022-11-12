@@ -28,7 +28,7 @@ public class TeamMateQueryService {
     }
 
     private TeamMate findTeamMate(long teamMateId) {
-        return teamMateRepository.findTeamMate(teamMateId)
+        return teamMateRepository.findTeamMateWithGoal(teamMateId)
                 .orElseThrow(TeamMateNotFoundException::new);
     }
 }

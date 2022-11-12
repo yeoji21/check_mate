@@ -90,7 +90,7 @@ public class TeamMateCommandServiceTest {
 
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
-        given(teamMateRepository.findTeamMate(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeTeamMate));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeTeamMate));
         doAnswer(invocation -> {
             ReflectionTestUtils.setField(inviteeTeamMate, "status", TeamMateStatus.WAITING);
             return inviteeTeamMate;
@@ -122,7 +122,7 @@ public class TeamMateCommandServiceTest {
                 .accept(true)
                 .build();
 
-        given(teamMateRepository.findTeamMate(any(Long.class))).willReturn(Optional.of(this.teamMate));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(this.teamMate));
         given(notificationRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviteNotification));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
 

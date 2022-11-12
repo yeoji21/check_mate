@@ -14,12 +14,12 @@ public class KickOutNotificationFactory extends NotificationFactory<KickOutNotif
     @Override
     public Notification generate(KickOutNotificationDto dto) {
         Notification notification = Notification.builder()
-                .userId(dto.getUserId())
+                .userId(dto.userId())
                 .title("목표 퇴출 알림")
-                .body(dto.getGoalTitle() + " 목표에서 퇴출되었습니다.")
+                .body(dto.goalTitle() + " 목표에서 퇴출되었습니다.")
                 .build();
-        notification.addAttribute("teamMateId", dto.getTeamMateId());
-        notification.setUpReceivers(List.of(new NotificationReceiver(dto.getUserId())));
+        notification.addAttribute("teamMateId", dto.teamMateId());
+        notification.setUpReceivers(List.of(new NotificationReceiver(dto.userId())));
         notification.setNotificationType(getType());
         return notification;
     }

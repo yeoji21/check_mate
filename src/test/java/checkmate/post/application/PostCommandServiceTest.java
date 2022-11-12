@@ -51,7 +51,7 @@ class PostCommandServiceTest {
     void 목표인증_저장_테스트() throws Exception{
         //given
         PostUploadCommand dto = getPostRegisterDto();
-        given(teamMateRepository.findTeamMate(any(Long.class))).willReturn(Optional.ofNullable(teamMate));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(teamMate));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "tester")));
 
         //when
@@ -72,7 +72,7 @@ class PostCommandServiceTest {
         ReflectionTestUtils.setField(post, "id", 1L);
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(teamMateRepository.findTeamMate(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
 
         //when
         postCommandService.like(teamMate.getUserId(), post.getId());
@@ -92,7 +92,7 @@ class PostCommandServiceTest {
         post.addLikes(new Likes(teamMate.getUserId()));
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(teamMateRepository.findTeamMate(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
 
         //when
         postCommandService.unlike(teamMate.getUserId(), post.getId());

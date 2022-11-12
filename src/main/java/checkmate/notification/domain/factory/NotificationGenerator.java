@@ -2,6 +2,7 @@ package checkmate.notification.domain.factory;
 
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
+import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class NotificationGenerator {
         }
     }
 
-    public Notification generate(NotificationType type, Object argument) {
-        return factoryMap.get(type).generate(argument);
+    public Notification generate(NotificationType type, NotificationCreateDto dto) {
+        return factoryMap.get(type).generate(dto);
     }
 }
