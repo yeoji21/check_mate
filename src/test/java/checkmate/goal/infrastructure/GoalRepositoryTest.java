@@ -79,27 +79,6 @@ public class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void findOngoingGoalList() throws Exception{
-        //given
-        User user = TestEntityFactory.user(null, "ongoingTester2");
-        em.persist(user);
-
-        Goal goal = TestEntityFactory.goal(null, "goal");
-        em.persist(goal);
-
-        TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        goal.addTeamMate(teamMate);
-        teamMate.initiateGoal(0);
-
-        //when
-        List<Goal> ongoingGoalList = goalRepository.findOngoingGoalList(user.getId());
-
-        //then
-        assertThat(ongoingGoalList.size()).isEqualTo(1);
-        assertThat(ongoingGoalList.get(0).getTitle()).contains(goal.getTitle());
-    }
-
-    @Test
     void updateYesterdayOveredGoals() throws Exception{
         //given
         Goal testGoal = Goal.builder()

@@ -41,18 +41,6 @@ public class GoalJpaRepository implements GoalRepository {
                 .intValue();
     }
 
-    // TODO: 2022/11/03 조회용 쿼리로 변경
-    @Override
-    public List<Goal> findOngoingGoalList(Long userId) {
-        return queryFactory.select(goal)
-                .from(teamMate)
-                .join(teamMate.goal, goal)
-                .where(teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING),
-                        goal.goalStatus.eq(GoalStatus.ONGOING))
-                .fetch();
-    }
-
     @Override
     public Optional<Goal> findByIdForUpdate(long goalId) {
         return Optional.ofNullable(

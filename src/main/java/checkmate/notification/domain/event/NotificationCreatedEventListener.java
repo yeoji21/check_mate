@@ -16,6 +16,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.List;
 import java.util.stream.Collectors;
 
+// TODO: 2022/11/13 EventListener에 비즈니스 로직이 있어도 될지
 @Slf4j
 @RequiredArgsConstructor
 @Service

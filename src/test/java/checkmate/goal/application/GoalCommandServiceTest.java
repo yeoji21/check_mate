@@ -5,16 +5,17 @@ import checkmate.common.cache.CacheTemplate;
 import checkmate.exception.ExceedGoalLimitException;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
+import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.*;
-import checkmate.goal.presentation.dto.GoalDtoMapper;
-import checkmate.goal.presentation.dto.request.GoalModifyDto;
+import checkmate.goal.domain.event.GoalCreatedEvent;
 import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
 import checkmate.user.domain.User;
-import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -37,10 +38,10 @@ public class GoalCommandServiceTest {
     @Mock private GoalRepository goalRepository;
     @Mock private CacheTemplate cacheTemplate;
     @Mock private TeamMateRepository teamMateRepository;
-    @Mock private UserRepository userRepository;
     @Mock private ApplicationEventPublisher eventPublisher;
+    @Spy
     private GoalCommandMapper commandMapper = GoalCommandMapper.INSTANCE;
-    private GoalDtoMapper dtoMapper = GoalDtoMapper.INSTANCE;
+    @InjectMocks
     private GoalCommandService goalCommandService;
 
     private TeamMate teamMate;
@@ -48,9 +49,6 @@ public class GoalCommandServiceTest {
     private User user;
     @BeforeEach
     void setUp() {
-        goalCommandService = new GoalCommandService(goalRepository, teamMateRepository, userRepository,
-                                                    eventPublisher, cacheTemplate, commandMapper);
-
         user = TestEntityFactory.user(1L, "tester");
         goal = TestEntityFactory.goal(1L, "testGoal");
         teamMate = goal.join(user);
@@ -91,7 +89,7 @@ public class GoalCommandServiceTest {
         //given
         LocalDate endDate = goal.getEndDate();
         LocalTime now = LocalTime.now();
-        GoalModifyDto dto = GoalModifyDto.builder()
+        GoalModifyCommand command = GoalModifyCommand.builder()
                 .endDate(endDate.plusDays(10L))
                 .appointmentTime(now)
                 .build();
@@ -100,7 +98,7 @@ public class GoalCommandServiceTest {
         given(goalRepository.findByIdForUpdate(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
-        goalCommandService.modifyGoal(dtoMapper.toModifyCommand(dto, 1L, 1L));
+        goalCommandService.modifyGoal(command);
 
         //then
         assertThat(goal.getEndDate()).isAfter(endDate);
@@ -118,7 +116,6 @@ public class GoalCommandServiceTest {
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays("월수금")
                 .build();
-        given(userRepository.findById(command.getUserId())).willReturn(Optional.ofNullable(user));
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(0);
         doAnswer((invocation) -> {
             Goal argument = (Goal) invocation.getArgument(0);
@@ -131,6 +128,7 @@ public class GoalCommandServiceTest {
 
         //then
         assertThat(goalId).isGreaterThan(0L);
+        verify(eventPublisher).publishEvent(any(GoalCreatedEvent.class));
     }
 
     @Test
@@ -143,7 +141,6 @@ public class GoalCommandServiceTest {
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays("월수금")
                 .build();
-        given(userRepository.findById(command.getUserId())).willReturn(Optional.ofNullable(user));
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(11);
         assertThrows(ExceedGoalLimitException.class,
                 () -> goalCommandService.create(command));

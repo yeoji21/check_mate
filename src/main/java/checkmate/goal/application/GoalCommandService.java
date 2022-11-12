@@ -8,9 +8,8 @@ import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.*;
+import checkmate.goal.domain.event.GoalCreatedEvent;
 import checkmate.notification.domain.event.StaticNotificationCreatedEvent;
-import checkmate.user.domain.User;
-import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -27,24 +26,16 @@ import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 public class GoalCommandService {
     private final GoalRepository goalRepository;
     private final TeamMateRepository teamMateRepository;
-    private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CacheTemplate cacheTemplate;
     private final GoalCommandMapper mapper;
 
-    // TODO: 2022/11/12 목표 생성 방식 개선 예정
     @Transactional
     public long create(GoalCreateCommand command) {
-        int ongoingGoalCount = goalRepository.countOngoingGoals(command.getUserId());
-
-        User user = userRepository.findById(command.getUserId()).orElseThrow(UserNotFoundException::new);
+        ongoingGoalCountCheck(command.getUserId());
         Goal goal = mapper.toGoal(command);
         goalRepository.save(goal);
-
-        // 목표를 생성하는 것 외에 팀원을 추가하는 역할
-        TeamMate teamMate = goal.join(user);
-        teamMate.initiateGoal(ongoingGoalCount);
-        teamMateRepository.save(teamMate);
+        eventPublisher.publishEvent(new GoalCreatedEvent(goal.getId(), command.getUserId()));
         return goal.getId();
     }
 
@@ -75,6 +66,10 @@ public class GoalCommandService {
         eventPublisher.publishEvent(new StaticNotificationCreatedEvent(COMPLETE_GOAL,
                 mapper.toGoalCompleteNotificationDtos(teamMates)));
         cacheTemplate.deleteTMCacheData(teamMates);
+    }
+
+    private void ongoingGoalCountCheck(long userId) {
+        GoalJoiningPolicy.ongoingGoalCount(goalRepository.countOngoingGoals(userId));
     }
 
     private void checkUserIsInGoal(long goalId, long userId) {

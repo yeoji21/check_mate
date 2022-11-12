@@ -34,8 +34,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TeamMateCommandServiceTest {
@@ -61,6 +60,21 @@ public class TeamMateCommandServiceTest {
         teamMate = TestEntityFactory.teamMate(1L, 1L);
         goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         goal.addTeamMate(teamMate);
+    }
+
+    @Test @DisplayName("목표 생성자 팀원 생성 후 목표 수행 시작")
+    void initiatingGoalCreator() throws Exception{
+        //given
+        User user = TestEntityFactory.user(1L, "user");
+        given(goalRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(goal));
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
+        given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(5);
+
+        //when
+        teamMateCommandService.initiatingGoalCreator(1L, 1L);
+
+        //then
+        verify(teamMateRepository).save(any(TeamMate.class));
     }
 
     @Test @DisplayName("초대를 거절한 적이 있는 유저에게 초대")

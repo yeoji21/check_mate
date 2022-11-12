@@ -47,6 +47,15 @@ public class TeamMateCommandService {
     private final TeamMateCommandMapper mapper;
 
     @Transactional
+    public void initiatingGoalCreator(long goalId, long userId) {
+        Goal goal = goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
+        User creator = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        TeamMate teamMate = goal.join(creator);
+        teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
+        teamMateRepository.save(teamMate);
+    }
+
+    @Transactional
     public void inviteTeamMate(TeamMateInviteCommand command) {
         Goal goal = findGoal(command.getGoalId());
         User invitee = findUser(command.getInviteeNickname());
