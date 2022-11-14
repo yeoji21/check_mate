@@ -5,7 +5,9 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -38,21 +40,26 @@ public class GoalHistoryInfo {
         this.endDate = endDate;
         this.appointmentTime = appointmentTime;
         this.weekDays = new GoalCheckDays(weekDays).getKorWeekDay();
-        Goal goal = Goal.builder()
-                .checkDays(this.weekDays)
-                .startDate(startDate)
-                .endDate(endDate)
-                .build();
-        TeamMate teamMate = new TeamMate(0);
+        TeamMate teamMate;
         try {
-            Field workingDaysField = TeamMateProgress.class.getDeclaredField("workingDays");
-            workingDaysField.setAccessible(true);
-            workingDaysField.setInt(teamMate.getProgress(), workingDays);
+            Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            teamMate = constructor.newInstance();
 
             Field goalField = TeamMate.class.getDeclaredField("goal");
             goalField.setAccessible(true);
+            Goal goal = Goal.builder()
+                    .checkDays(this.weekDays)
+                    .startDate(startDate)
+                    .endDate(endDate)
+                    .build();
             goalField.set(teamMate, goal);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+
+            Field progressField = TeamMate.class.getDeclaredField("progress");
+            progressField.setAccessible(true);
+            progressField.set(teamMate, new TeamMateProgress(workingDays, 0));
+        } catch (NoSuchFieldException | IllegalAccessException  | NoSuchMethodException
+                 | InvocationTargetException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
         this.achievementRate = teamMate.calcProgressPercent();
@@ -75,4 +82,6 @@ public class GoalHistoryInfo {
         this(id, category, title, startDate, endDate, appointmentTime, weekDays, workingDays);
         this.teamMateNames = teamMateNames;
     }
+
+
 }

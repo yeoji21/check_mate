@@ -7,7 +7,9 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,12 +30,17 @@ public class TeamMateScheduleInfo {
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
-        TeamMate teamMate = new TeamMate(0L);
+        TeamMate teamMate;
         try {
+            Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            teamMate = constructor.newInstance();
+
             Field goalField = TeamMate.class.getDeclaredField("goal");
             goalField.setAccessible(true);
             goalField.set(teamMate, goal);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException
+                 | InvocationTargetException | InstantiationException e) {
             throw new IllegalArgumentException(e);
         }
         this.startDate = startDate;

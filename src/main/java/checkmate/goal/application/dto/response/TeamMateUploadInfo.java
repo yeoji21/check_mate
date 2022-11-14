@@ -1,13 +1,13 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
 import checkmate.goal.domain.TeamMate;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 
 @Getter
@@ -24,13 +24,18 @@ public class TeamMateUploadInfo {
                               String nickname) {
         this.id = teamMateId;
         this.userId = userId;
-        TeamMate teamMate = new TeamMate(userId);
+        TeamMate teamMate;
         try {
+            Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            teamMate = constructor.newInstance();
+
             Field field = TeamMate.class.getDeclaredField("lastUploadDay");
             field.setAccessible(true);
             field.set(teamMate, lastUploadDay);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new BusinessException(ErrorCode.INVALID_REQUEST_PARAMETER);
+        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException
+                 | InvocationTargetException | InstantiationException e) {
+            throw new IllegalArgumentException(e);
         }
         this.uploaded = teamMate.isUploaded();
         this.nickname = nickname;

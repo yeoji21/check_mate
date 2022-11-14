@@ -57,9 +57,8 @@ public class TeamMateCommandServiceTest {
     void setUp() {
         teamMateCommandService = new TeamMateCommandService(userRepository, goalRepository, teamMateRepository, notificationRepository,
                 teamMateInviteService, cacheTemplate, eventPublisher, commandMapper);
-        teamMate = TestEntityFactory.teamMate(1L, 1L);
         goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        goal.addTeamMate(teamMate);
+        teamMate = goal.join(TestEntityFactory.user(1L, "name"));
     }
 
     @Test @DisplayName("목표 생성자 팀원 생성 후 목표 수행 시작")

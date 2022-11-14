@@ -2,6 +2,7 @@ package checkmate.goal.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.common.util.ProgressCalculator;
+import checkmate.user.domain.User;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,16 +36,15 @@ public class TeamMate extends BaseTimeEntity {
     private TeamMateProgress progress;
     private LocalDate lastUploadDay;
 
-    public TeamMate(long userId) {
-        this.userId = userId;
+    TeamMate(Goal goal, User user) {
+        this.userId = user.getId();
         this.status = TeamMateStatus.WAITING;
         this.progress = new TeamMateProgress();
+        this.goal = goal;
     }
 
-    // TODO: 2022/11/12 setGoal 없이 TeamMate 생성자에서 Goal 주입?
-    void setGoal(Goal goal) {
+    public void setGoal(Goal goal) {
         this.goal = goal;
-        this.progress = new TeamMateProgress();
     }
 
     public void updateUploadedDate() {
@@ -75,7 +75,7 @@ public class TeamMate extends BaseTimeEntity {
     public void initiateGoal(int ongoingGoalCount) {
         goal.inviteableCheck();
         changeToOngoingStatus(ongoingGoalCount);
-        progress.setInitialProgress(goal.progressedWorkingDaysCount());
+        progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {

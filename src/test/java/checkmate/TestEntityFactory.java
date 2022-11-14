@@ -7,10 +7,12 @@ import checkmate.goal.domain.TeamMateStatus;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
 import checkmate.post.domain.Post;
-import checkmate.user.domain.UserRole;
 import checkmate.user.domain.User;
+import checkmate.user.domain.UserRole;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 
 public class TestEntityFactory {
@@ -41,10 +43,16 @@ public class TestEntityFactory {
     }
 
     public static TeamMate teamMate(Long teamMateId, long userId) {
-        TeamMate teamMate = new TeamMate(userId);
+        TeamMate teamMate;
+        try {
+            Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            teamMate = constructor.newInstance();
+        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
+            throw new IllegalArgumentException(e);
+        }
         ReflectionTestUtils.setField(teamMate, "id", teamMateId);
         ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-//        teamMate.changeToOngoingStatus(0);
         return teamMate;
     }
 

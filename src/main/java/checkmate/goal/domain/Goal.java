@@ -104,9 +104,7 @@ public class Goal extends BaseTimeEntity {
      */
     public TeamMate join(User user) {
         inviteableCheck();
-        TeamMate teamMate = new TeamMate(user.getId());
-        teamMate.setGoal(this);
-        return teamMate;
+        return new TeamMate(this, user);
     }
 
     public boolean isInviteable() {
