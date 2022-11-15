@@ -9,6 +9,7 @@ import checkmate.goal.domain.TeamMateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -16,18 +17,15 @@ import static checkmate.goal.domain.QTeamMate.teamMate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TeamMateRepositoryTest extends RepositoryTest {
-
     @Test
     void findByTeamMateId() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
 
-        TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        em.persist(goal);
-
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(user);
         em.persist(teamMate);
 
         em.flush();
@@ -37,7 +35,6 @@ class TeamMateRepositoryTest extends RepositoryTest {
         TeamMate findTeamMate = teamMateRepository.findTeamMateWithGoal(teamMate.getId()).orElseThrow(TeamMateNotFoundException::new);
 
         //then
-        assertThat(findTeamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
         assertThat(findTeamMate.getGoal().getId()).isEqualTo(goal.getId());
         assertThat(findTeamMate.getId()).isEqualTo(teamMate.getId());
     }
@@ -50,20 +47,28 @@ class TeamMateRepositoryTest extends RepositoryTest {
         Goal goal2 = TestEntityFactory.goal(null, "goal2");
         em.persist(goal2);
 
-        TeamMate teamMate1 = TestEntityFactory.teamMate(null, 1L);
-        goal1.addTeamMate(teamMate1);
+        User user1 = TestEntityFactory.user(null, "user1");
+        em.persist(user1);
+        TeamMate teamMate1 = goal1.join(user1);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate1);
 
-        TeamMate teamMate2 = TestEntityFactory.teamMate(null, 2L);
-        goal2.addTeamMate(teamMate2);
+        User user2 = TestEntityFactory.user(null, "user2");
+        em.persist(user2);
+        TeamMate teamMate2 = goal1.join(user2);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate2);
 
-        TeamMate notUploadedTm = TestEntityFactory.teamMate(null, 3L);
-        goal1.addTeamMate(notUploadedTm);
+        User user3 = TestEntityFactory.user(null, "user3");
+        em.persist(user3);
+        TeamMate notUploadedTm = goal1.join(user3);
+        ReflectionTestUtils.setField(notUploadedTm, "status", TeamMateStatus.ONGOING);
         em.persist(notUploadedTm);
 
-        TeamMate notCheckedTm = TestEntityFactory.teamMate(null, 4L);
-        goal2.addTeamMate(notCheckedTm);
+        User user4 = TestEntityFactory.user(null, "user4");
+        em.persist(user4);
+        TeamMate notCheckedTm = goal1.join(user4);
+        ReflectionTestUtils.setField(notCheckedTm, "status", TeamMateStatus.ONGOING);
         em.persist(notCheckedTm);
 
         Post post1 = Post.builder().teamMate(teamMate1).text("test").build();
@@ -94,20 +99,28 @@ class TeamMateRepositoryTest extends RepositoryTest {
         Goal goal = TestEntityFactory.goal(null, "goal1");
         em.persist(goal);
 
-        TeamMate teamMate1 = TestEntityFactory.teamMate(null, 1L);
-        goal.addTeamMate(teamMate1);
+        User user1 = TestEntityFactory.user(null, "user1");
+        em.persist(user1);
+        TeamMate teamMate1 = goal.join(user1);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate1);
 
-        TeamMate teamMate2 = TestEntityFactory.teamMate(null, 2L);
-        goal.addTeamMate(teamMate2);
+        User user2 = TestEntityFactory.user(null, "user2");
+        em.persist(user2);
+        TeamMate teamMate2 = goal.join(user2);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate2);
 
-        TeamMate teamMate3 = TestEntityFactory.teamMate(null, 3L);
-        goal.addTeamMate(teamMate3);
+        User user3 = TestEntityFactory.user(null, "user3");
+        em.persist(user3);
+        TeamMate teamMate3 = goal.join(user3);
+        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate3);
 
-        TeamMate teamMate4 = TestEntityFactory.teamMate(null, 4L);
-        goal.addTeamMate(teamMate4);
+        User user4 = TestEntityFactory.user(null, "user4");
+        em.persist(user4);
+        TeamMate teamMate4 = goal.join(user4);
+        ReflectionTestUtils.setField(teamMate4, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate4);
 
         em.flush();

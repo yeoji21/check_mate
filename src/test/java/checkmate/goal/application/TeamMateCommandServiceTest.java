@@ -12,16 +12,17 @@ import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
+import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.InviteGoalNotificationFactory;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -34,7 +35,8 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class TeamMateCommandServiceTest {
@@ -45,26 +47,18 @@ public class TeamMateCommandServiceTest {
     @Mock private TeamMateInviteService teamMateInviteService;
     @Mock private CacheTemplate cacheTemplate;
     @Mock private ApplicationEventPublisher eventPublisher;
-    TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
-    TeamMateDtoMapper dtoMapper = TeamMateDtoMapper.INSTANCE;
-
+    @Spy
+    private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
+    @Spy
+    private TeamMateDtoMapper dtoMapper = TeamMateDtoMapper.INSTANCE;
+    @InjectMocks
     private TeamMateCommandService teamMateCommandService;
-
-    private TeamMate teamMate;
-    private Goal goal;
-
-    @BeforeEach
-    void setUp() {
-        teamMateCommandService = new TeamMateCommandService(userRepository, goalRepository, teamMateRepository, notificationRepository,
-                teamMateInviteService, cacheTemplate, eventPublisher, commandMapper);
-        goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        teamMate = goal.join(TestEntityFactory.user(1L, "name"));
-    }
 
     @Test @DisplayName("목표 생성자 팀원 생성 후 목표 수행 시작")
     void initiatingGoalCreator() throws Exception{
         //given
         User user = TestEntityFactory.user(1L, "user");
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(goal));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(5);
@@ -79,6 +73,7 @@ public class TeamMateCommandServiceTest {
     @Test @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
     void 팀원_초대_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(1L, "inviter");
         User invitee = TestEntityFactory.user(5L, "invitee");
         TeamMateInviteDto dto = new TeamMateInviteDto(1L, invitee.getNickname());
@@ -107,11 +102,12 @@ public class TeamMateCommandServiceTest {
     @Test
     void 팀원_초대_수락_응답_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(2L, "inviter");
-        TeamMate teamMate = TestEntityFactory.teamMate(2L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate inviteeTm = goal.join(TestEntityFactory.user(2L, "invitee"));
+
         Notification inviteNotification = new InviteGoalNotificationFactory()
-                .generate(commandMapper.toInviteGoalNotificationDto(inviter, teamMate));
+                .generate(commandMapper.toInviteGoalNotificationDto(inviter, inviteeTm));
 
         inviteNotification.setUpReceivers(List.of(new NotificationReceiver(1L)));
 
@@ -121,7 +117,7 @@ public class TeamMateCommandServiceTest {
                 .accept(true)
                 .build();
 
-        given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(this.teamMate));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeTm));
         given(notificationRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviteNotification));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
 
@@ -130,7 +126,7 @@ public class TeamMateCommandServiceTest {
 
         //then
         assertThat(response.getGoalId()).isNotNull();
-        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
+        assertThat(inviteeTm.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
     }
 
     @Test

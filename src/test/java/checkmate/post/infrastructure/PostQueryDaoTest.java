@@ -25,8 +25,8 @@ class PostQueryDaoTest extends RepositoryTest {
         em.persist(goal);
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
-        TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(user);
+        em.persist(teamMate);
 
         Post post1 = TestEntityFactory.post(teamMate);
         Post post2 = TestEntityFactory.post(teamMate);

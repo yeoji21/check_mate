@@ -31,9 +31,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(goal2);
         em.persist(goal3);
 
-        goal1.addTeamMate(TestEntityFactory.teamMate(null, user.getId()));
-        goal2.addTeamMate(TestEntityFactory.teamMate(null, user.getId()));
-        goal3.addTeamMate(TestEntityFactory.teamMate(null, user.getId()));
+        TeamMate teamMate1 = goal1.join(user);
+        TeamMate teamMate2 = goal2.join(user);
+        TeamMate teamMate3 = goal3.join(user);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
+        em.persist(teamMate1);
+        em.persist(teamMate2);
+        em.persist(teamMate3);
 
         //when
         List<GoalSimpleInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
@@ -77,13 +83,13 @@ class GoalQueryDaoTest extends RepositoryTest {
         User tester2 = TestEntityFactory.user(null, "tester2");
         em.persist(tester2);
 
-        TeamMate teamMate1 = TestEntityFactory.teamMate(null, tester1.getId());
+        TeamMate teamMate1 = goal.join(tester1);
         ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.SUCCESS);
-        goal.addTeamMate(teamMate1);
+        em.persist(teamMate1);
 
-        TeamMate teamMate2 = TestEntityFactory.teamMate(null, tester2.getId());
+        TeamMate teamMate2 = goal.join(tester2);
         ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.SUCCESS);
-        goal.addTeamMate(teamMate2);
+        em.persist(teamMate2);
 
         em.flush();
         em.clear();
@@ -127,12 +133,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         Goal goal = TestEntityFactory.goal(null, "goal");
         em.persist(goal);
 
-        TeamMate teamMate1 = TestEntityFactory.teamMate(null, user1.getId());
-        TeamMate teamMate2 = TestEntityFactory.teamMate(null, user2.getId());
-        TeamMate teamMate3 = TestEntityFactory.teamMate(null, user3.getId());
-        goal.addTeamMate(teamMate1);
-        goal.addTeamMate(teamMate2);
-        goal.addTeamMate(teamMate3);
+        TeamMate teamMate1 = goal.join(user1);
+        TeamMate teamMate2 = goal.join(user2);
+        TeamMate teamMate3 = goal.join(user3);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
+        em.persist(teamMate1);
+        em.persist(teamMate2);
+        em.persist(teamMate3);
 
         em.flush();
         em.clear();
@@ -155,18 +164,17 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     private void setTodayStartGoal(User user) {
-        Goal todayStart = Goal.builder()
+        Goal todayStartGoal = Goal.builder()
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(20))
                 .category(GoalCategory.ETC)
                 .title("todayGoal")
                 .checkDays("월화수목금토일")
                 .build();
-        em.persist(todayStart);
+        em.persist(todayStartGoal);
 
-        TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        todayStart.addTeamMate(teamMate);
-        teamMate.initiateGoal(0);
+        TeamMate teamMate = todayStartGoal.join(user);
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate);
     }
 
@@ -180,9 +188,8 @@ class GoalQueryDaoTest extends RepositoryTest {
                 .build();
         em.persist(futureGoal);
 
-        TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        futureGoal.addTeamMate(teamMate);
-        teamMate.initiateGoal(0);
+        TeamMate teamMate = futureGoal.join(user);
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate);
     }
 }

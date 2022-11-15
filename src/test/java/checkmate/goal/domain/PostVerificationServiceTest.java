@@ -16,7 +16,8 @@ class PostVerificationServiceTest {
     @Test
     void 조건_검사_성공_테스트() throws Exception{
         //given
-        TeamMate uploader = TestEntityFactory.teamMate(1L, 1L);
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate uploader = goal.join(TestEntityFactory.user(1L, "user"));
         Post post = TestEntityFactory.post(uploader);
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));
@@ -35,7 +36,8 @@ class PostVerificationServiceTest {
     @Test
     void 조건_검사_성공_테스트_v2() throws Exception{
         //given
-        TeamMate uploader = TestEntityFactory.teamMate(1L, 1L);
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate uploader = goal.join(TestEntityFactory.user(1L, "user"));
         Post post = TestEntityFactory.post(uploader);
 
         //when
@@ -49,7 +51,8 @@ class PostVerificationServiceTest {
     @Test
     void 조건_검사_실패_테스트() throws Exception{
         //given
-        TeamMate uploader = TestEntityFactory.teamMate(1L, 1L);
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate uploader = goal.join(TestEntityFactory.user(1L, "user"));
         Post post = TestEntityFactory.post(uploader);
         post.addLikes(new Likes(1L));
 

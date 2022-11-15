@@ -17,8 +17,7 @@ class TeamMateTest {
     void 진행률_0_계산_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         //when
         double progress = teamMate.calcProgressPercent();
@@ -92,8 +91,7 @@ class TeamMateTest {
     void 초대응답_수락_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         int before = teamMate.getWorkingDays();
 

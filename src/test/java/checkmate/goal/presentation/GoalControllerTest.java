@@ -15,6 +15,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -299,9 +300,9 @@ public class GoalControllerTest extends ControllerTest {
 
     private GoalDetailInfo getGoalInformationResponse() {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        TeamMate selector = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(selector);
-        goal.addTeamMate(TestEntityFactory.teamMate(2L, 2L));
+        TeamMate selector = goal.join(TestEntityFactory.user(1L, "user"));
+        ReflectionTestUtils.setField(selector, "id", 1L);
+
         TeamMateUploadInfo teamMateUploadInfo = TeamMateUploadInfo.builder()
                 .teamMateId(selector.getId())
                 .userId(selector.getUserId())

@@ -125,9 +125,8 @@ class NotificationControllerTest extends ControllerTest {
     }
 
     private List<NotificationInfo> getNotificationDetailResponseList() {
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         Goal testGoal = TestEntityFactory.goal(1L, "testGoal");
-        testGoal.addTeamMate(teamMate);
+        TeamMate teamMate = testGoal.join(TestEntityFactory.user(1L, "user"));
 
         CompleteGoalNotificationDto dto = CompleteGoalNotificationDto.builder()
                 .userId(teamMate.getUserId())

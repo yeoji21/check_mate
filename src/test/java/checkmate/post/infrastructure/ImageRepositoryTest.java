@@ -7,7 +7,6 @@ import checkmate.goal.domain.TeamMate;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,22 +14,20 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ImageRepositoryTest extends RepositoryTest {
-    private User user1, user2;
-
-    @BeforeEach
-    void setUp() {
-        user1 = TestEntityFactory.user(null, "user1");
+    @Test
+    void findAllByUserId() throws Exception{
+        //given
+        User user1 = TestEntityFactory.user(null, "user1");
         em.persist(user1);
-        user2 = TestEntityFactory.user(null, "user2");
+        User user2 = TestEntityFactory.user(null, "user2");
         em.persist(user2);
 
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
-        TeamMate teamMate1 = TestEntityFactory.teamMate(null, user1.getId());
-        goal.addTeamMate(teamMate1);
+
+        TeamMate teamMate1 = goal.join(user1);
         em.persist(teamMate1);
-        TeamMate teamMate2 = TestEntityFactory.teamMate(null, user2.getId());
-        goal.addTeamMate(teamMate2);
+        TeamMate teamMate2 = goal.join(user2);
         em.persist(teamMate2);
 
         Post post1 = Post.builder().teamMate(teamMate1).build();
@@ -68,12 +65,6 @@ class ImageRepositoryTest extends RepositoryTest {
 
         em.flush();
         em.clear();
-    }
-
-    @Test
-    void findAllByUserId() throws Exception{
-        //given
-        System.out.println(user1.getId());
 
         //when
         List<Image> imageList = imageRepository.findAllByUserId(user1.getId());

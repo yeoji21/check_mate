@@ -10,10 +10,10 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class TeamMateProgress {
-    private Integer workingDays;
-    private Integer hookyDays;
+    private int workingDays;
+    private int hookyDays;
 
-    public TeamMateProgress(Integer workingDays, Integer hookyDays) {
+    public TeamMateProgress(int workingDays, int hookyDays) {
         this.workingDays = workingDays;
         this.hookyDays = hookyDays;
     }

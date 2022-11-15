@@ -48,7 +48,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
     @Override
     public List<TeamMate> updateYesterdayHookyTMs() {
-        List<TeamMate> yesterDayTMs = queryFactory
+        List<TeamMate> yesterdayTMs = queryFactory
                 .select(teamMate)
                 .from(teamMate)
                 .join(teamMate.goal, goal)
@@ -65,18 +65,18 @@ public class TeamMateJpaRepository implements TeamMateRepository {
                 .select(post.teamMate.id)
                 .from(post)
                 .where(
-                        post.teamMate.in(yesterDayTMs),
+                        post.teamMate.in(yesterdayTMs),
                         post.uploadedDate.eq(LocalDate.now()),
                         post.isChecked.isTrue())
                 .fetch();
-        yesterDayTMs.removeIf(tm -> checkedTeamMateIds.contains(tm.getId()));
+        yesterdayTMs.removeIf(tm -> checkedTeamMateIds.contains(tm.getId()));
 
         queryFactory.update(teamMate)
-                .where(teamMate.in(yesterDayTMs))
+                .where(teamMate.in(yesterdayTMs))
                 .set(teamMate.progress.hookyDays, teamMate.progress.hookyDays.add(1))
                 .execute();
 
-        return yesterDayTMs;
+        return yesterdayTMs;
     }
 
     @Override

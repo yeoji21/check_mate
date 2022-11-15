@@ -6,6 +6,7 @@ import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.post.domain.Post;
+import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,11 +18,10 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
-
-        TeamMate teamMate = TestEntityFactory.teamMate(null, 1L);
-        goal.addTeamMate(teamMate);
+        User user = TestEntityFactory.user(null, "user");
+        em.persist(user);
+        TeamMate teamMate = goal.join(user);
         em.persist(teamMate);
-
         Post post = TestEntityFactory.post(teamMate);
         em.persist(post);
 

@@ -4,11 +4,12 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
+import checkmate.goal.domain.TeamMateStatus;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,26 +18,21 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PostRepositoryTest extends RepositoryTest {
-    private Goal goal;
-    private TeamMate teamMate;
-    private Post post1, post2, post3;
-
-    @BeforeEach
-    void setUp() {
-        goal = TestEntityFactory.goal(null, "testGoal");
+    @Test
+    void findByTeamMateIdsAndDate() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
 
-        teamMate = TestEntityFactory.teamMate(null, user.getId());
-        goal.addTeamMate(teamMate);
-        teamMate.initiateGoal(0);
-
-        em.persist(goal);
+        TeamMate teamMate = goal.join(user);
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate);
 
-        post1 = Post.builder().teamMate(teamMate).text("post body text1").build();
-        post2 = Post.builder().teamMate(teamMate).text("post body text2").build();
-        post3 = Post.builder().teamMate(teamMate).text("post body text3").build();
+        Post post1 = Post.builder().teamMate(teamMate).text("post body text1").build();
+        Post post2 = Post.builder().teamMate(teamMate).text("post body text2").build();
+        Post post3 = Post.builder().teamMate(teamMate).text("post body text3").build();
 
         em.persist(post1);
         em.persist(post2);
@@ -44,11 +40,6 @@ class PostRepositoryTest extends RepositoryTest {
 
         em.flush();
         em.clear();
-    }
-
-    @Test
-    void findByTeamMateIdsAndDate() throws Exception{
-        //given
 
         //when
         Map<Post, List<Image>> postListMap = postRepository.findByTeamMateIdsAndDate(List.of(teamMate.getId()), LocalDate.now());

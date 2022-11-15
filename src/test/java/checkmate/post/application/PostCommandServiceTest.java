@@ -2,12 +2,12 @@ package checkmate.post.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.*;
+import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.post.application.dto.request.PostUploadCommand;
 import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.user.domain.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +19,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,21 +39,16 @@ class PostCommandServiceTest {
     @Mock private PostVerificationService postVerificationService;
     @Mock private ApplicationEventPublisher eventPublisher;
 
-    private Goal goal;
-    private TeamMate teamMate;
-    @BeforeEach
-    void setUp() {
-        teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        goal.addTeamMate(teamMate);
-    }
-
     @Test
     void 목표인증_저장_테스트() throws Exception{
         //given
         PostUploadCommand dto = getPostRegisterDto();
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(teamMate));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "tester")));
+        given(goalRepository.findConditions(any(Long.class))).willReturn(Collections.EMPTY_LIST);
 
         //when
         postCommandService.upload(dto);
@@ -60,14 +56,14 @@ class PostCommandServiceTest {
         //then
         verify(postRepository).save(any());
         verify(postVerificationService).verify(any(Post.class), any(List.class));
+        verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
     @Test
     void 좋아요_테스트() throws Exception{
         //given
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
         Post post = Post.builder().teamMate(teamMate).text("post body text").build();
         ReflectionTestUtils.setField(post, "id", 1L);
 
@@ -84,9 +80,8 @@ class PostCommandServiceTest {
     @Test
     void 좋아요_취소_테스트() throws Exception{
         //given
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
         Post post = Post.builder().teamMate(teamMate).text("post body text").build();
         ReflectionTestUtils.setField(post, "id", 1L);
         post.addLikes(new Likes(teamMate.getUserId()));
@@ -105,12 +100,5 @@ class PostCommandServiceTest {
         return new PostUploadCommand(1L,
                 List.of(new MockMultipartFile("originalName", InputStream.nullInputStream())),
                 "posting text");
-    }
-
-    private Post getPost(PostUploadCommand dto, TeamMate teamMate) {
-        return Post.builder()
-                .teamMate(teamMate)
-                .text(dto.getText())
-                .build();
     }
 }

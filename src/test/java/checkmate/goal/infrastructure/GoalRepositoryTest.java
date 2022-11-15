@@ -29,15 +29,17 @@ public class GoalRepositoryTest extends RepositoryTest {
         Goal goal3 = TestEntityFactory.goal(null, "goal3");
         em.persist(goal3);
 
-        TeamMate teamMate1 = TestEntityFactory.teamMate(null, user.getId());
+        TeamMate teamMate1 = goal1.join(user);
         ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        goal1.addTeamMate(teamMate1);
-        TeamMate teamMate2 = TestEntityFactory.teamMate(null, user.getId());
+        em.persist(teamMate1);
+
+        TeamMate teamMate2 = goal1.join(user);
         ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        goal1.addTeamMate(teamMate2);
-        TeamMate teamMate3 = TestEntityFactory.teamMate(null, user.getId());
+        em.persist(teamMate2);
+
+        TeamMate teamMate3 = goal1.join(user);
         ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
-        goal1.addTeamMate(teamMate3);
+        em.persist(teamMate3);
 
         //when
         int count = goalRepository.countOngoingGoals(user.getId());
