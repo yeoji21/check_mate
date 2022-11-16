@@ -14,13 +14,13 @@ public class InviteReplyNotificationFactory extends NotificationFactory<InviteRe
     public Notification generate(InviteReplyNotificationDto dto) {
         Notification notification = Notification.builder()
                 .userId(dto.inviteeUserId())
+                .type(getType())
                 .title("초대 응답")
                 .body(getBody(dto))
+                .receivers(List.of(new NotificationReceiver(dto.inviterUserId())))
                 .build();
-        notification.setUpReceivers(List.of(new NotificationReceiver(dto.inviterUserId())));
         notification.addAttribute("goalId", dto.goalId());
         notification.addAttribute("accept", String.valueOf(dto.accept()));
-        notification.setNotificationType(getType());
         return notification;
     }
 

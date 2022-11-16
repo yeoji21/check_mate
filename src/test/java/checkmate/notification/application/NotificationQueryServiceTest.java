@@ -5,9 +5,10 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationInfo;
-import checkmate.notification.domain.*;
-import checkmate.notification.domain.factory.CompleteGoalNotificationFactory;
-import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
+import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationReceiver;
+import checkmate.notification.domain.NotificationRepository;
+import checkmate.notification.domain.NotificationType;
 import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.user.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,11 +17,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,13 +51,15 @@ class NotificationQueryServiceTest {
     @Test
     void 단건_알림_조회_테스트() throws Exception{
         //given
-        Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.POST_UPLOAD);
-        Map<String, String> map = new HashMap<>();
-        map.put("goalId", "1L");
-        ReflectionTestUtils.setField(notification, "attributes", new NotificationAttributes(map));
-
         NotificationReceiver receiver = new NotificationReceiver(1L);
-        notification.setUpReceivers(List.of(receiver));
+        Notification notification = Notification.builder()
+                .userId(1L)
+                .title("title")
+                .body("body")
+                .type(NotificationType.POST_UPLOAD)
+                .receivers(List.of(receiver))
+                .build();
+        notification.addAttribute("goalId", 1L);
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
 
@@ -71,15 +72,5 @@ class NotificationQueryServiceTest {
         assertThat(attributes.containsKey("goalId")).isTrue();
         assertThat(response.getTitle()).isEqualTo(notification.getTitle());
         assertThat(response.getBody()).isEqualTo(notification.getBody());
-    }
-
-    private List<Notification> getGoalCompleteNotifications() {
-        CompleteGoalNotificationFactory factory = new CompleteGoalNotificationFactory();
-        CompleteGoalNotificationDto dto = CompleteGoalNotificationDto.builder()
-                .userId(teamMate.getUserId())
-                .goalTitle(teamMate.getGoal().getTitle())
-                .goalId(teamMate.getGoal().getId())
-                .build();
-        return List.of(factory.generate(dto), factory.generate(dto));
     }
 }

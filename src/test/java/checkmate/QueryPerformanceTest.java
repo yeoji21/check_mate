@@ -90,7 +90,7 @@ public class QueryPerformanceTest {
                 .selectFrom(notification)
                 .join(notification.receivers.receivers, notificationReceiver).on(notificationReceiver.checked.eq(false))
                 .where(notificationReceiver.userId.eq(11L),
-                        notification.notificationType.eq(NotificationType.COMPLETE_GOAL))
+                        notification.type.eq(NotificationType.COMPLETE_GOAL))
                 .fetch();
         stopWatch.stop();
         System.out.println("# First : " + stopWatch.getTotalTimeMillis());
@@ -100,7 +100,7 @@ public class QueryPerformanceTest {
                 .selectFrom(notification).distinct()
                 .join(notification.receivers.receivers, notificationReceiver).on(notificationReceiver.checked.eq(false))
                 .where(notificationReceiver.userId.eq(11L),
-                        notification.notificationType.eq(NotificationType.COMPLETE_GOAL))
+                        notification.type.eq(NotificationType.COMPLETE_GOAL))
                 .fetch();
         stopWatch.stop();
         System.out.println("# Second : " + stopWatch.getTotalTimeMillis());

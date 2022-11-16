@@ -22,12 +22,12 @@ class NotificationRepositoryTest extends RepositoryTest {
         em.persist(sender);
 
         Notification notification = Notification.builder()
+                .userId(sender.getId())
+                .type(NotificationType.INVITE_GOAL)
                 .title("notification title")
                 .body("notification body")
-                .userId(sender.getId())
+                .receivers(List.of(new NotificationReceiver(2L), new NotificationReceiver(3L)))
                 .build();
-        notification.setNotificationType(NotificationType.INVITE_GOAL);
-        notification.setUpReceivers(List.of(new NotificationReceiver(2L), new NotificationReceiver(3L)));
         em.persist(notification);
 
         //when
@@ -53,13 +53,12 @@ class NotificationRepositoryTest extends RepositoryTest {
         em.persist(receiver2);
 
         Notification notification = Notification.builder()
+                .userId(sender.getId())
+                .type(NotificationType.INVITE_GOAL)
                 .title("notification title")
                 .body("notification body")
-                .userId(sender.getId())
+                .receivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())))
                 .build();
-        notification.setNotificationType(NotificationType.INVITE_GOAL);
-        notification.setUpReceivers(List.of(new NotificationReceiver(receiver1.getId()),
-                new NotificationReceiver(receiver2.getId())));
         em.persist(notification);
 
         //when

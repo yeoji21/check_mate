@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
@@ -46,8 +45,7 @@ class PushNotificationSenderTest {
     @Test
     void 전송_테스트() throws Exception {
         //given
-        Notification notification = TestEntityFactory.notification(1L, 1L, null);
-        ReflectionTestUtils.setField(notification, "notificationType", NotificationType.POST_UPLOAD);
+        Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.POST_UPLOAD);
         FcmSingleMessage message = FcmSingleMessage.getMessage(notification, "token");
 
         given(pushNotificationFactory.create(any(Notification.class), any(List.class))).willReturn(message);

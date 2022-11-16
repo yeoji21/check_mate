@@ -16,13 +16,12 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
     public Notification generate(PostUploadNotificationDto dto) {
         Notification notification = Notification.builder()
                 .userId(dto.uploaderUserId())
+                .type(getType())
                 .title("팀원의 목표인증")
                 .body(dto.goalTitle() + " 목표의 " + dto.uploaderNickname() + "님이 목표 수행을 인증했어요!")
+                .receivers(getReceivers(dto.teamMateUserIds()))
                 .build();
-
         notification.addAttribute("goalId", dto.goalId());
-        notification.setUpReceivers(getNotificationReceivers(dto.teamMateUserIds()));
-        notification.setNotificationType(NotificationType.POST_UPLOAD);
         return notification;
     }
 
@@ -31,7 +30,7 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
         return NotificationType.POST_UPLOAD;
     }
 
-    private static List<NotificationReceiver> getNotificationReceivers(List<Long> teamMateUserIds) {
+    private static List<NotificationReceiver> getReceivers(List<Long> teamMateUserIds) {
         return teamMateUserIds
                 .stream()
                 .map(NotificationReceiver::new)

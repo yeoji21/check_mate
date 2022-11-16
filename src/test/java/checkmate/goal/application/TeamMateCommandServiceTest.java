@@ -10,7 +10,6 @@ import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.notification.domain.Notification;
-import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
@@ -108,8 +107,6 @@ public class TeamMateCommandServiceTest {
 
         Notification inviteNotification = new InviteGoalNotificationFactory()
                 .generate(commandMapper.toInviteGoalNotificationDto(inviter, inviteeTm));
-
-        inviteNotification.setUpReceivers(List.of(new NotificationReceiver(1L)));
 
         TeamMateInviteReplyCommand command = TeamMateInviteReplyCommand.builder()
                 .teamMateId(1L)

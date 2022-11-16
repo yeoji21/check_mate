@@ -15,7 +15,7 @@ public interface NotificationQueryMapper {
     NotificationQueryMapper INSTANCE = Mappers.getMapper(NotificationQueryMapper.class);
 
     @Mappings({
-            @Mapping(target = "notificationType", source = "notification.notificationType", qualifiedByName = "getNotificationType"),
+            @Mapping(target = "type", source = "notification.type", qualifiedByName = "getNotificationType"),
             @Mapping(target = "attributes", source = "notification", qualifiedByName = "getAttributes")
     })
     NotificationInfo toInfo(Notification notification);

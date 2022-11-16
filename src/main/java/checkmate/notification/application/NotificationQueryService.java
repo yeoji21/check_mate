@@ -52,7 +52,7 @@ public class NotificationQueryService {
     }
 
     private void read(NotificationReceiver receiver) {
-        if(receiver.getNotification().getNotificationType() != NotificationType.INVITE_GOAL)
+        if(receiver.getNotification().getType() != NotificationType.INVITE_GOAL)
             receiver.read();
     }
 }

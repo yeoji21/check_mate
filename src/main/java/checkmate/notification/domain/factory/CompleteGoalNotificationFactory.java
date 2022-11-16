@@ -16,13 +16,13 @@ public class CompleteGoalNotificationFactory extends NotificationFactory<Complet
     public Notification generate(CompleteGoalNotificationDto dto) {
         Notification notification = Notification.builder()
                 .userId(dto.userId())
+                .type(getType())
                 .title("목표 수행 완료")
                 .body(dto.goalTitle() + " 목표 수행을 끝까지 완수하였습니다")
+                .receivers(List.of(new NotificationReceiver(dto.userId())))
                 .build();
         notification.addAttribute("userId", dto.userId());
         notification.addAttribute("goalId", dto.goalId());
-        notification.setUpReceivers(List.of(new NotificationReceiver(dto.userId())));
-        notification.setNotificationType(getType());
         return notification;
     }
 

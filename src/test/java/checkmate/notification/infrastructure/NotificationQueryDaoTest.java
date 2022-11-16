@@ -26,21 +26,21 @@ class NotificationQueryDaoTest extends RepositoryTest {
         User receiver2 = TestEntityFactory.user(2L, "receiver2");
 
         Notification notification1 = Notification.builder()
+                .userId(sender.getId())
+                .type(NotificationType.INVITE_GOAL)
                 .title("notification title2")
                 .body("notification body2")
-                .userId(sender.getId())
+                .receivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())))
                 .build();
-        notification1.setNotificationType(NotificationType.INVITE_GOAL);
-        notification1.setUpReceivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())));
         em.persist(notification1);
 
         Notification notification2 = Notification.builder()
+                .userId(sender.getId())
+                .type(NotificationType.POST_UPLOAD)
                 .title("notification title")
                 .body("notification body")
-                .userId(sender.getId())
+                .receivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())))
                 .build();
-        notification2.setNotificationType(NotificationType.POST_UPLOAD);
-        notification2.setUpReceivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())));
         em.persist(notification2);
 
         em.flush();
@@ -69,12 +69,12 @@ class NotificationQueryDaoTest extends RepositoryTest {
         em.persist(receiver);
 
         Notification notification = Notification.builder()
+                .userId(sender.getId())
+                .type(NotificationType.COMPLETE_GOAL)
                 .title("notification title")
                 .body("notification body")
-                .userId(sender.getId())
+                .receivers(List.of(new NotificationReceiver(receiver.getId())))
                 .build();
-        notification.setNotificationType(NotificationType.COMPLETE_GOAL);
-        notification.setUpReceivers(List.of(new NotificationReceiver(receiver.getId())));
         em.persist(notification);
 
         em.flush();
@@ -85,7 +85,7 @@ class NotificationQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(receivers.size()).isEqualTo(1);
-        assertThat(receivers.get(0).getNotification().getNotificationType()).isEqualTo(NotificationType.COMPLETE_GOAL);
+        assertThat(receivers.get(0).getNotification().getType()).isEqualTo(NotificationType.COMPLETE_GOAL);
         assertThat(receivers.get(0).getUserId()).isEqualTo(receiver.getId());
         assertThat(receivers.get(0).getNotification().getUserId()).isEqualTo(sender.getId());
     }

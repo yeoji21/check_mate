@@ -20,35 +20,28 @@ public class Notification extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long userId;
     @NotNull @Enumerated(EnumType.STRING)
-    private NotificationType notificationType;
+    private NotificationType type;
     @NotNull
     private String title;
     @NotNull
     private String body;
     @Getter(value = AccessLevel.PROTECTED)
     @Convert(converter = NotificationAttributeConverter.class)
-    private NotificationAttributes attributes;
+    private NotificationAttributes attributes = new NotificationAttributes(new HashMap<>());
     @Embedded
-    private NotificationReceivers receivers;
+    private NotificationReceivers receivers = new NotificationReceivers();
 
     @Builder
-    protected Notification(long userId, String title, String body) {
+    protected Notification(long userId,
+                           NotificationType type,
+                           String title,
+                           String body,
+                           List<NotificationReceiver> receivers) {
         this.userId = userId;
+        this.type = type;
         this.title = title;
         this.body = body;
-        this.attributes = new NotificationAttributes(new HashMap<>());
-        this.receivers = new NotificationReceivers();
-    }
-
-    public void setNotificationType(NotificationType notificationType) {
-        this.notificationType = notificationType;
-    }
-
-    public void setUpReceivers(List<NotificationReceiver> receivers) {
-        receivers.forEach(receiver -> {
-            this.receivers.addReceiver(receiver);
-            receiver.setNotification(this);
-        });
+        setUpReceivers(receivers);
     }
 
     public void read(long userId) {
@@ -69,5 +62,12 @@ public class Notification extends BaseTimeEntity {
 
     public List<NotificationReceiver> getReceivers() {
         return receivers.getReceivers();
+    }
+
+    private void setUpReceivers(List<NotificationReceiver> receivers) {
+        receivers.forEach(receiver -> {
+            this.receivers.addReceiver(receiver);
+            receiver.setNotification(this);
+        });
     }
 }

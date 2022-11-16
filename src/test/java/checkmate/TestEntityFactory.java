@@ -14,6 +14,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
+import java.util.Collections;
 
 public class TestEntityFactory {
 
@@ -66,11 +67,12 @@ public class TestEntityFactory {
     public static Notification notification(long id, long userId, NotificationType type) {
         Notification notification = Notification.builder()
                 .userId(userId)
+                .type(type)
                 .title("title")
                 .body("body")
+                .receivers(Collections.EMPTY_LIST)
                 .build();
         ReflectionTestUtils.setField(notification, "id", id);
-        notification.setNotificationType(type);
         return notification;
     }
 }

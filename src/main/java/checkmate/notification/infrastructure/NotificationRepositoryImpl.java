@@ -59,7 +59,7 @@ public class NotificationRepositoryImpl implements NotificationRepository {
                 .select(notificationReceiver)
                 .from(notificationReceiver)
                 .where(notificationReceiver.userId.eq(userId),
-                        notification.notificationType.eq(NotificationType.COMPLETE_GOAL))
+                        notification.type.eq(NotificationType.COMPLETE_GOAL))
                 .fetch();
     }
 

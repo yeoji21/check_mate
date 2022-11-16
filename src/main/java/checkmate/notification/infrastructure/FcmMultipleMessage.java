@@ -19,7 +19,7 @@ public class FcmMultipleMessage implements PushNotification {
         Data data = Data.builder()
                 .title(notification.getTitle())
                 .body(notification.getBody())
-                .type(notification.getNotificationType().name())
+                .type(notification.getType().name())
                 .notificationId(String.valueOf(notification.getId()))
                 .build();
 
