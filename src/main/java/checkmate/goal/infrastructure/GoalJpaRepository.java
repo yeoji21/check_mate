@@ -36,7 +36,7 @@ public class GoalJpaRepository implements GoalRepository {
                 .join(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
                         teamMate.status.eq(TeamMateStatus.ONGOING),
-                        goal.goalStatus.eq(GoalStatus.ONGOING))
+                        goal.status.eq(GoalStatus.ONGOING))
                 .fetchOne()
                 .intValue();
     }
@@ -44,8 +44,9 @@ public class GoalJpaRepository implements GoalRepository {
     @Override
     public Optional<Goal> findByIdForUpdate(long goalId) {
         return Optional.ofNullable(
-                queryFactory.selectFrom(goal)
-                        .join(goal.team.teamMates, teamMate).fetchJoin()
+                queryFactory.select(goal)
+                        .from(teamMate)
+                        .join(teamMate.goal, goal)
                         .where(goal.id.eq(goalId),
                                 teamMate.status.eq(TeamMateStatus.ONGOING)
                                         .or(teamMate.status.eq(TeamMateStatus.SUCCESS)))
@@ -73,20 +74,23 @@ public class GoalJpaRepository implements GoalRepository {
         return fetchOne != null;
     }
 
-    public List<Goal> updateYesterdayOveredGoals() {
+    public List<Long> updateYesterdayOveredGoals() {
         List<Goal> yesterdayOveredGoal = queryFactory
-                .selectFrom(goal).distinct()
-                .join(goal.team.teamMates, teamMate).fetchJoin()
+                .selectFrom(goal)
                 .where(goal.period.endDate.eq(LocalDate.now().minusDays(1)),
-                        goal.goalStatus.eq(GoalStatus.ONGOING))
+                        goal.status.eq(GoalStatus.ONGOING))
                 .fetch();
 
         queryFactory.update(goal)
                 .where(goal.in(yesterdayOveredGoal))
-                .set(goal.goalStatus, GoalStatus.OVER)
+                .set(goal.status, GoalStatus.OVER)
                 .execute();
 
-        return yesterdayOveredGoal;
+        List<Long> goalIds = yesterdayOveredGoal.stream().map(Goal::getId).toList();
+        entityManager.flush();
+        entityManager.clear();
+
+        return goalIds;
     }
 
     @Override

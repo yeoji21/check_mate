@@ -109,11 +109,15 @@ public class GoalRepositoryTest extends RepositoryTest {
                 .category(GoalCategory.ETC)
                 .build();
         em.persist(oneDayGoal);
+
         em.flush();
         em.clear();
 
         //when
-        List<Goal> goals = goalRepository.updateYesterdayOveredGoals();
-        goals.forEach(goal -> assertThat(goal.getGoalStatus()).isEqualTo(GoalStatus.OVER));
+        List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
+        List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
+                .setParameter("ids", overedGoalIds)
+                .getResultList();
+        goals.forEach(goal -> assertThat(goal.getStatus()).isEqualTo(GoalStatus.OVER));
     }
 }

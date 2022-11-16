@@ -33,10 +33,7 @@ public class Goal extends BaseTimeEntity {
     @Embedded @NotNull
     private GoalCheckDays checkDays;
     @Enumerated(EnumType.STRING) @NotNull
-    private GoalStatus goalStatus;
-    // TODO: 2022/07/22 aggregate 분리 -> 후순위
-    @Embedded
-    public Team team;
+    private GoalStatus status;
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
 
@@ -56,8 +53,7 @@ public class Goal extends BaseTimeEntity {
         this.checkDays = new GoalCheckDays(checkDays);
         this.period = new GoalPeriod(startDate, endDate);
         this.appointmentTime = appointmentTime;
-        this.goalStatus = GoalStatus.ONGOING;
-        team = new Team();
+        this.status = GoalStatus.ONGOING;
     }
 
     public void addCondition(VerificationCondition condition) {

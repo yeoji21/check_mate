@@ -61,7 +61,7 @@ public class GoalCommandServiceTest {
         ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
 
         //given
-        given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1, goal2));
+        given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
         given(teamMateRepository.findTeamMates(anyList())).willReturn(List.of(teamMate1, teamMate2, teamMate3));
 
         //when

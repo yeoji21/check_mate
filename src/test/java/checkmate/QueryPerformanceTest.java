@@ -52,7 +52,7 @@ public class QueryPerformanceTest {
                         new CaseBuilder().when(teamMate.lastUploadDay.eq(LocalDate.now())).then(true).otherwise(false)))
                 .from(teamMate)
                 .join(teamMate.goal, goal).on(goal.checkDays.checkDays.divide(WeekDayConverter.localDateToValue(LocalDate.now()))
-                        .floor().mod(10).eq(1), goal.goalStatus.eq(GoalStatus.ONGOING))
+                        .floor().mod(10).eq(1), goal.status.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(11L),
                         teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
@@ -71,7 +71,7 @@ public class QueryPerformanceTest {
         List<TodayGoalInfo> slowResult = queryFactory.select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
                         new CaseBuilder().when(teamMate.lastUploadDay.eq(LocalDate.now())).then(true).otherwise(false)))
                 .from(teamMate)
-                .join(teamMate.goal, goal).on(goal.checkDays.checkDays.in(right), goal.goalStatus.eq(GoalStatus.ONGOING))
+                .join(teamMate.goal, goal).on(goal.checkDays.checkDays.in(right), goal.status.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(11L),
                         teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();

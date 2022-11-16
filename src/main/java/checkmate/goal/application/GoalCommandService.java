@@ -55,10 +55,8 @@ public class GoalCommandService {
 
     @Transactional
     public void updateYesterdayOveredGoals() {
-        List<Goal> overedGoals = goalRepository.updateYesterdayOveredGoals();
-
-        List<Long> goalIds = overedGoals.stream().map(Goal::getId).toList();
-        List<TeamMate> teamMates = teamMateRepository.findTeamMates(goalIds)
+        List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
+        List<TeamMate> teamMates = teamMateRepository.findTeamMates(overedGoalIds)
                 .stream()
                 .filter(tm -> tm.getStatus() == TeamMateStatus.ONGOING)
                 .toList();

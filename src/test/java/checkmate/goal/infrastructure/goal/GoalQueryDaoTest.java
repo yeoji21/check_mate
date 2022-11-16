@@ -75,7 +75,7 @@ class GoalQueryDaoTest extends RepositoryTest {
     void 성공한_목표_목록_조회() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
-        ReflectionTestUtils.setField(goal, "goalStatus", GoalStatus.OVER);
+        ReflectionTestUtils.setField(goal, "status", GoalStatus.OVER);
         em.persist(goal);
 
         User tester1 = TestEntityFactory.user(null, "tester1");

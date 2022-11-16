@@ -37,7 +37,7 @@ public class GoalQueryDao{
                                 .otherwise(false)))
                 .from(teamMate)
                 .join(teamMate.goal, goal)
-                .on(goal.checkDays.checkDays.divide(num).floor().mod(10).eq(1), goal.goalStatus.eq(GoalStatus.ONGOING))
+                .on(goal.checkDays.checkDays.divide(num).floor().mod(10).eq(1), goal.status.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(userId),
                         teamMate.status.eq(TeamMateStatus.ONGOING),
                         goal.period.startDate.loe(LocalDate.now()))
@@ -73,7 +73,7 @@ public class GoalQueryDao{
                 .innerJoin(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
                         teamMate.status.eq(TeamMateStatus.SUCCESS),
-                        goal.goalStatus.eq(GoalStatus.OVER))
+                        goal.status.eq(GoalStatus.OVER))
                 .fetch();
         List<Long> goalIds = list.stream().map(GoalHistoryInfo::getId).toList();
 

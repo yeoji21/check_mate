@@ -57,7 +57,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
                                 .divide(WeekDayConverter.localDateToValue(LocalDate.now().minusDays(1)))
                                 .floor().mod(10)
                                 .eq(1),
-                        goal.goalStatus.eq(GoalStatus.ONGOING),
+                        goal.status.eq(GoalStatus.ONGOING),
                         teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
 
