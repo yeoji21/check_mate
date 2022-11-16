@@ -30,8 +30,7 @@ class TeamMateTest {
     void 초대_수락시_진행중인_목표개수_검사_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         //when then
         assertThrows(ExceedGoalLimitException.class,
@@ -40,9 +39,8 @@ class TeamMateTest {
 
     @Test
     void 업로드_가능_테스트() throws Exception{
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         Uploadable uploadable = teamMate.getUploadable();
         assertThat(uploadable.isUploadable()).isTrue();
@@ -66,8 +64,7 @@ class TeamMateTest {
                 .appointmentTime(LocalTime.MIN)
                 .checkDays("월화수목금토일")
                 .build();
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
 
         assertThat(teamMate.getUploadable().isTimeOver()).isTrue();
     }
@@ -82,8 +79,7 @@ class TeamMateTest {
                 .endDate(LocalDate.now().plusDays(20))
                 .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().plusDays(1)))
                 .build();
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
         assertThat(teamMate.getUploadable().isWorkingDay()).isFalse();
     }
 
@@ -107,8 +103,7 @@ class TeamMateTest {
     @Test
     void 초대응답_거절_테스트() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
         teamMate.applyInviteReject();
 
         assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);
@@ -121,8 +116,7 @@ class TeamMateTest {
                 .startDate(LocalDate.now().minusDays(2))
                 .endDate(LocalDate.now().plusDays(1))
                 .build();
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
 
         assertThrows(UnInviteableGoalException.class, () -> teamMate.initiateGoal(0));
     }

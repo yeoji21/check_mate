@@ -2,7 +2,6 @@ package checkmate.notification.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
@@ -80,8 +79,6 @@ class NotificationPushServiceTest {
     private PostUploadNotificationDto getNotificationCommand() {
         User user = TestEntityFactory.user(1L, "user");
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, user.getId());
-        goal.addTeamMate(teamMate);
 
         return PostUploadNotificationDto.builder()
                 .uploaderUserId(user.getId())

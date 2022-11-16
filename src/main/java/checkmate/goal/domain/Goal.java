@@ -92,12 +92,6 @@ public class Goal extends BaseTimeEntity {
         this.appointmentTime = appointmentTime;
     }
 
-    public void addTeamMate(TeamMate teamMate) {
-        team.add(teamMate);
-        teamMate.setGoal(this);
-    }
-
-    // TODO: 2022/11/11 addTeamMate와 join 두 가지 메소드 통일
     /*
      User가 Goal에 참여
      생성된 TeamMate의 status는 waiting이므로 목표 인증을 시작하지 않은 상태

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
 
@@ -30,8 +31,7 @@ class TeamMateInviteServiceTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         User user = TestEntityFactory.user(1L, "user");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(user);
 
         //when / then
         assertThrows(UserAlreadyInGoalException.class,
@@ -43,9 +43,8 @@ class TeamMateInviteServiceTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         User invitee = TestEntityFactory.user(5L, "invitee");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, invitee.getId());
-        teamMate.applyInviteReject();
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(invitee);
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.REJECT);
 
         //when
         teamMateInviteService.invite(goal, Optional.of(teamMate), invitee);

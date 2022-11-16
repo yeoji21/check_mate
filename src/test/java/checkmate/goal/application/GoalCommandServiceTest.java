@@ -10,7 +10,6 @@ import checkmate.goal.domain.*;
 import checkmate.goal.domain.event.GoalCreatedEvent;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,33 +43,22 @@ public class GoalCommandServiceTest {
     @InjectMocks
     private GoalCommandService goalCommandService;
 
-    private TeamMate teamMate;
-    private Goal goal;
-    private User user;
-    @BeforeEach
-    void setUp() {
-        user = TestEntityFactory.user(1L, "tester");
-        goal = TestEntityFactory.goal(1L, "testGoal");
-        teamMate = goal.join(user);
-        goal.addTeamMate(teamMate);
-    }
-
     @Test
     void 성공한_목표_처리_스케쥴러_테스트() throws Exception{
         Goal goal1 = TestEntityFactory.goal(1L, "testGoal1");
         Goal goal2 = TestEntityFactory.goal(3L, "testGoal3");
 
-        TeamMate teamMate1 = TestEntityFactory.teamMate(1L, 1L);
-        TeamMate teamMate2 = TestEntityFactory.teamMate(2L, 2L);
-        TeamMate teamMate3 = TestEntityFactory.teamMate(3L, 3L);
+        User user1 = TestEntityFactory.user(1L, "user1");
+        User user2 = TestEntityFactory.user(2L, "user2");
+        User user3 = TestEntityFactory.user(3L, "user3");
 
-        goal1.addTeamMate(teamMate1);
-        goal1.addTeamMate(teamMate2);
-        goal2.addTeamMate(teamMate3);
+        TeamMate teamMate1 = goal1.join(user1);
+        TeamMate teamMate2 = goal1.join(user2);
+        TeamMate teamMate3 = goal2.join(user3);
 
-        teamMate1.initiateGoal(0);
-        teamMate2.initiateGoal(0);
-        teamMate3.initiateGoal(0);
+        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
+        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
 
         //given
         given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1, goal2));
@@ -87,6 +75,7 @@ public class GoalCommandServiceTest {
     @Test
     void 목표수정_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "testGoal");
         LocalDate endDate = goal.getEndDate();
         LocalTime now = LocalTime.now();
         GoalModifyCommand command = GoalModifyCommand.builder()

@@ -33,8 +33,7 @@ public class PostUploadIntegrationTest extends IntegrationTest {
 
         User user = TestEntityFactory.user(null, "tester");
         entityManager.persist(user);
-        TeamMate teamMate = TestEntityFactory.teamMate(null, user.getId());
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(user);
         entityManager.persist(teamMate);
         int beforeWorkingDays = teamMate.getWorkingDays();
 

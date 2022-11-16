@@ -77,8 +77,7 @@ public class TeamMateCommandServiceTest {
         User invitee = TestEntityFactory.user(5L, "invitee");
         TeamMateInviteDto dto = new TeamMateInviteDto(1L, invitee.getNickname());
 
-        TeamMate inviteeTeamMate = TestEntityFactory.teamMate(1L, invitee.getId());
-        goal.addTeamMate(inviteeTeamMate);
+        TeamMate inviteeTeamMate = goal.join(invitee);
         ReflectionTestUtils.setField(inviteeTeamMate, "status", TeamMateStatus.REJECT);
 
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));

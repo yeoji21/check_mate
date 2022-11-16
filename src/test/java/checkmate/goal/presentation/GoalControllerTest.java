@@ -181,8 +181,7 @@ public class GoalControllerTest extends ControllerTest {
     @Test
     void 유저의_성공한_목표_목록_조회_테스트() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
-        goal.addTeamMate(teamMate);
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         List<GoalHistoryInfo> goalHistoryInfoList =
                 List.of(historyGoalInfoResponseDto(goal, List.of("nickname")),

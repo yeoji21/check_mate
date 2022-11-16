@@ -1,8 +1,5 @@
 package checkmate.notification.application;
 
-import checkmate.TestEntityFactory;
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.Notification;
@@ -10,12 +7,12 @@ import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.infrastructure.NotificationQueryDao;
-import checkmate.user.domain.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
@@ -30,23 +27,9 @@ import static org.mockito.BDDMockito.given;
 class NotificationQueryServiceTest {
     @Mock private NotificationRepository notificationRepository;
     @Mock private NotificationQueryDao notificationQueryDao;
-    private NotificationQueryMapper mapper = NotificationQueryMapper.INSTANCE;
-    private NotificationQueryService notificationQueryService;
+    @Spy private NotificationQueryMapper mapper = NotificationQueryMapper.INSTANCE;
+    @InjectMocks private NotificationQueryService notificationQueryService;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private TeamMate teamMate;
-    private Goal goal;
-
-    @BeforeEach
-    void setUp() {
-        notificationQueryService = new NotificationQueryService(notificationRepository, notificationQueryDao, mapper);
-
-        User user = TestEntityFactory.user(1L, "tester");
-        goal = TestEntityFactory.goal(1L, "test goal");
-        teamMate = TestEntityFactory.teamMate(1L, user.getId());
-        goal.addTeamMate(teamMate);
-        teamMate.initiateGoal(0);
-    }
 
     @Test
     void 단건_알림_조회_테스트() throws Exception{
