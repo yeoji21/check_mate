@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 @Getter
 @RequiredArgsConstructor
 public enum WeekDayConverter {

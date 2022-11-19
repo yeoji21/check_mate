@@ -74,7 +74,8 @@ public class TeamMate extends BaseTimeEntity {
     // TODO: 2022/11/03 외부에서 ongoingGoalCount를 받는 게 맞을지
     public void initiateGoal(int ongoingGoalCount) {
         goal.inviteableCheck();
-        changeToOngoingStatus(ongoingGoalCount);
+        GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
+        this.status = TeamMateStatus.ONGOING;
         progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
@@ -106,8 +107,4 @@ public class TeamMate extends BaseTimeEntity {
         return (lastUploadDay != null && lastUploadDay.isEqual(LocalDate.now()));
     }
 
-    private void changeToOngoingStatus(int ongoingGoalCount) {
-        GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
-        this.status = TeamMateStatus.ONGOING;
-    }
 }

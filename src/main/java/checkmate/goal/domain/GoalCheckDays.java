@@ -24,6 +24,7 @@ public class GoalCheckDays implements Serializable {
     public GoalCheckDays(String korWeekDays) {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
             throw new InvalidWeekDaysException();
+        // TODO: 2022/11/19 같은 문자가 두 개 이상 들어올 때 예외 처리 추가 ex) 월월
         this.checkDays = korWeekDaysToValue(korWeekDays);
     }
 

@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
 
-// TODO: 2022/11/03 클래스 패키지 이동
 @UtilityClass
 public class ProgressCalculator {
     public static double calculate(int progressedCount, int totalCount) {
