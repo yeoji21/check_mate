@@ -2,7 +2,6 @@ package checkmate.goal.infrastructure.goal;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.common.util.WeekDayConverter;
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.*;
 import checkmate.user.domain.User;
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -117,7 +117,10 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(todayGoals.size()).isEqualTo(1);
-        assertThat(todayGoals.get(0).getCheckDays()).contains(WeekDayConverter.convertEngToKor(LocalDate.now()));
+        todayGoals.forEach(
+                goal -> assertThat(new GoalCheckDays(goal.getCheckDays()))
+                        .isEqualTo(new GoalCheckDays(Collections.singletonList(LocalDate.now())))
+        );
     }
 
     @Test @DisplayName("목표 상세 정보 조회")
@@ -169,7 +172,7 @@ class GoalQueryDaoTest extends RepositoryTest {
                 .endDate(LocalDate.now().plusDays(20))
                 .category(GoalCategory.ETC)
                 .title("todayGoal")
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
         em.persist(todayStartGoal);
 
@@ -184,7 +187,7 @@ class GoalQueryDaoTest extends RepositoryTest {
                 .endDate(LocalDate.now().plusDays(20))
                 .category(GoalCategory.ETC)
                 .title("futureGoal")
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
         em.persist(futureGoal);
 

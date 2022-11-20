@@ -2,7 +2,6 @@ package checkmate.goal.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.common.util.WeekDayConverter;
 import checkmate.goal.domain.*;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,7 +85,7 @@ public class GoalRepositoryTest extends RepositoryTest {
         //given
         Goal testGoal = Goal.builder()
                 .title("testGoal")
-                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(2)))
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .category(GoalCategory.ETC)
                 .startDate(LocalDate.now().minusDays(6))
                 .endDate(LocalDate.now().minusDays(1))
@@ -96,7 +96,7 @@ public class GoalRepositoryTest extends RepositoryTest {
                 .title("testGoal2")
                 .startDate(LocalDate.now().minusDays(6))
                 .endDate(LocalDate.now().minusDays(1))
-                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(2)))
+                .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().minusDays(2))))
                 .category(GoalCategory.ETC)
                 .build();
         em.persist(testGoal2);
@@ -105,7 +105,7 @@ public class GoalRepositoryTest extends RepositoryTest {
                 .title("하루짜리 목표")
                 .startDate(LocalDate.now().minusDays(1))
                 .endDate(LocalDate.now().minusDays(1))
-                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().minusDays(1)))
+                .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().minusDays(1))))
                 .category(GoalCategory.ETC)
                 .build();
         em.persist(oneDayGoal);

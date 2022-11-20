@@ -50,9 +50,6 @@ public class CheckDaysConverterTest {
 
     @Test @DisplayName("인증일 검사")
     void test_V4() throws Exception{
-        //given
-
-        //when
         LocalDate monday = LocalDate.of(2022, 10, 31);
         LocalDate tuesday = LocalDate.of(2022, 11, 1);
         LocalDate wednesday = LocalDate.of(2022, 11, 2);
@@ -61,7 +58,6 @@ public class CheckDaysConverterTest {
         LocalDate saturday = LocalDate.of(2022, 11, 5);
         LocalDate sunday = LocalDate.of(2022, 11, 6);
 
-        //then
         isWorkingDay(1, monday);
         isNotWorkingDay(1, tuesday);
         isWorkingDay(2, tuesday);

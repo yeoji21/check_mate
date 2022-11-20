@@ -26,7 +26,7 @@ public class TeamMateScheduleInfo {
                                 int weekDays,
                                 List<LocalDate> uploadedDates) {
         Goal goal = Goal.builder()
-                .checkDays(new GoalCheckDays(weekDays).getKorWeekDay())
+                .checkDays(new GoalCheckDays(weekDays))
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();

@@ -45,7 +45,7 @@ public enum CheckDaysConverter {
         return isWorkingDay(value, CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).value);
     }
 
-    private String getKor() {
+    public String getKor() {
         return kor;
     }
 }

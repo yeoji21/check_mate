@@ -39,7 +39,7 @@ public class GoalHistoryInfo {
         this.startDate = startDate;
         this.endDate = endDate;
         this.appointmentTime = appointmentTime;
-        this.weekDays = new GoalCheckDays(weekDays).getKorWeekDay();
+        this.weekDays = CheckDaysConverter.toDays(weekDays);
         TeamMate teamMate;
         try {
             Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
@@ -49,7 +49,7 @@ public class GoalHistoryInfo {
             Field goalField = TeamMate.class.getDeclaredField("goal");
             goalField.setAccessible(true);
             Goal goal = Goal.builder()
-                    .checkDays(this.weekDays)
+                    .checkDays(new GoalCheckDays(this.weekDays))
                     .startDate(startDate)
                     .endDate(endDate)
                     .build();

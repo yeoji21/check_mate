@@ -21,7 +21,7 @@ public class GoalScheduleInfo {
         this.startDate = startDate;
         this.endDate = endDate;
         this.schedule = Goal.builder()
-                .checkDays(new GoalCheckDays(weekDays).getKorWeekDay())
+                .checkDays(new GoalCheckDays(weekDays))
                 .startDate(startDate)
                 .endDate(endDate)
                 .build().getSchedule();

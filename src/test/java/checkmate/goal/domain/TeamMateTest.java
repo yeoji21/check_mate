@@ -1,7 +1,6 @@
 package checkmate.goal.domain;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.util.WeekDayConverter;
 import checkmate.exception.ExceedGoalLimitException;
 import checkmate.exception.UnInviteableGoalException;
 import org.junit.jupiter.api.Test;
@@ -62,7 +61,7 @@ class TeamMateTest {
                 .startDate(LocalDate.of(2021, 12, 20))
                 .endDate(LocalDate.of(2021, 12, 31))
                 .appointmentTime(LocalTime.MIN)
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
         TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
 
@@ -77,7 +76,7 @@ class TeamMateTest {
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(10))
                 .endDate(LocalDate.now().plusDays(20))
-                .checkDays(WeekDayConverter.convertEngToKor(LocalDate.now().plusDays(1)))
+                .checkDays(new GoalCheckDays(String.valueOf(LocalDate.now().plusDays(1))))
                 .build();
         TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
         assertThat(teamMate.getUploadable().isWorkingDay()).isFalse();
@@ -112,7 +111,7 @@ class TeamMateTest {
     @Test
     void 기간만료된_초대응답_테스트() throws Exception{
         Goal goal = Goal.builder()
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .startDate(LocalDate.now().minusDays(2))
                 .endDate(LocalDate.now().plusDays(1))
                 .build();

@@ -1,9 +1,6 @@
 package checkmate;
 
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.goal.domain.*;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
 import checkmate.post.domain.Post;
@@ -24,7 +21,7 @@ public class TestEntityFactory {
                 .title(title)
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
         ReflectionTestUtils.setField(goal, "id", id);
         return goal;

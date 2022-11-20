@@ -1,7 +1,6 @@
 package checkmate.goal.domain;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.util.WeekDayConverter;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
@@ -13,9 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -43,32 +39,13 @@ class GoalTest {
     }
 
     @Test
-    void 테스트용_데이터_체크() throws Exception{
-        LocalDate startDate = LocalDate.of(2022, 5, 16);
-        LocalDate endDate = LocalDate.of(2022, 5, 31);
-        String weekDays = "월수금";
-
-        System.out.println(weekDays);
-
-        String[] splitDate = weekDays.split("");
-        List<String> engDate = Arrays.stream(splitDate).map(WeekDayConverter::convertKorToEng).collect(Collectors.toList());
-
-        String totalBinaryDate = startDate.datesUntil(endDate.plusDays(1))
-                .map(date -> {
-                    if (engDate.contains(date.getDayOfWeek().toString())) return "1";
-                    else return "0";
-                }).collect(Collectors.joining());
-        System.out.println(totalBinaryDate);
-    }
-
-    @Test
     void 인증_시간_경과_테스트() throws Exception{
         Goal timeSetGoal = Goal.builder()
                 .category(GoalCategory.ETC)
                 .title("title")
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .appointmentTime(LocalTime.MIN)
                 .build();
         assertThat(timeSetGoal.getAppointmentTime().isBefore(LocalTime.now())).isTrue();
@@ -139,7 +116,7 @@ class GoalTest {
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(200L))
                 .endDate(LocalDate.now().plusDays(100L))
-                .checkDays("월화수목금토일")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
 
         assertThat(goal.isInviteable()).isFalse();
@@ -149,6 +126,7 @@ class GoalTest {
     @Test
     void 오늘까지_진행된_일_수_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
 
         //when
         int futureCount = goal.progressedWorkingDaysCount();

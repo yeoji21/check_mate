@@ -1,20 +1,22 @@
 package checkmate.goal.domain;
 
-import checkmate.common.util.WeekDayConverter;
 import checkmate.exception.InvalidWeekDaysException;
+import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: 2022/07/22 이건 어떻게 처리할지 좀 더 고민 -> 후순위
+@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class GoalCheckDays implements Serializable {
@@ -22,18 +24,17 @@ public class GoalCheckDays implements Serializable {
     private int checkDays;
 
     public GoalCheckDays(String korWeekDays) {
-        if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
-            throw new InvalidWeekDaysException();
-        // TODO: 2022/11/19 같은 문자가 두 개 이상 들어올 때 예외 처리 추가 ex) 월월
-        this.checkDays = korWeekDaysToValue(korWeekDays);
+        correctDayCheck(korWeekDays);
+        duplicateDayCheck(korWeekDays);
+        this.checkDays = CheckDaysConverter.toValue(korWeekDays);
     }
 
-    public GoalCheckDays(int checkDays) {
-        this.checkDays = checkDays;
+    public GoalCheckDays(List<LocalDate> localDates) {
+        this(localDatesToKorWeekDays(localDates));
     }
 
-    public String getKorWeekDay() {
-        return WeekDayConverter.valueToKorWeekDay(checkDays);
+    public GoalCheckDays(int value) {
+        this(CheckDaysConverter.toDays(value));
     }
 
     public int intValue() {
@@ -41,18 +42,27 @@ public class GoalCheckDays implements Serializable {
     }
 
     boolean isWorkingDay(LocalDate date) {
-        return WeekDayConverter.isWorkingDay(checkDays, WeekDayConverter.localDateToValue(date));
+        return CheckDaysConverter.isWorkingDay(checkDays, date);
     }
 
     int calcWorkingDayCount(Stream<LocalDate> dateStream) {
         return (int) dateStream.filter(this::isWorkingDay).count();
     }
 
-    private int korWeekDaysToValue(String korWeekDays) {
-        List<String> weekDayList = Arrays.stream(korWeekDays.split("")).toList();
-        return weekDayList.stream()
-                .mapToInt(weekDay -> WeekDayConverter.valueOf(WeekDayConverter.convertKorToEng(weekDay)).getValue())
-                .sum();
+    private void correctDayCheck(String korWeekDays) {
+        if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
+            throw new InvalidWeekDaysException();
+    }
+
+    private void duplicateDayCheck(String korWeekDays) {
+        String[] split = korWeekDays.split("");
+        Assert.isTrue(split.length == new HashSet<>(List.of(split)).size(), "중복 요일");
+    }
+
+    private static String localDatesToKorWeekDays(List<LocalDate> localDates) {
+        return localDates.stream()
+                .map(date -> CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).getKor())
+                .collect(Collectors.joining());
     }
 
     @Override
