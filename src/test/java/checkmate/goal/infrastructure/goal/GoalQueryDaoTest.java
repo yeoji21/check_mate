@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -114,12 +113,13 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //when
         List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(tester.getId());
+        System.out.println(todayGoals.get(0).getCheckDays());
 
         //then
         assertThat(todayGoals.size()).isEqualTo(1);
         todayGoals.forEach(
-                goal -> assertThat(new GoalCheckDays(goal.getCheckDays()))
-                        .isEqualTo(new GoalCheckDays(Collections.singletonList(LocalDate.now())))
+                goal -> assertThat(CheckDaysConverter.isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()))
+                        .isTrue()
         );
     }
 

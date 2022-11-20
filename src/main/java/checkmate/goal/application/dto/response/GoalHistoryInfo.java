@@ -20,7 +20,7 @@ public class GoalHistoryInfo {
     private LocalDate startDate;
     private LocalDate endDate;
     private LocalTime appointmentTime;
-    private String weekDays;
+    private String checkDays;
     private double achievementRate;
     private List<String> teamMateNames;
 
@@ -31,7 +31,7 @@ public class GoalHistoryInfo {
                            LocalDate startDate,
                            LocalDate endDate,
                            LocalTime appointmentTime,
-                           int weekDays,
+                           int checkDays,
                            int workingDays) {
         this.id = id;
         this.category = category;
@@ -39,7 +39,7 @@ public class GoalHistoryInfo {
         this.startDate = startDate;
         this.endDate = endDate;
         this.appointmentTime = appointmentTime;
-        this.weekDays = CheckDaysConverter.toDays(weekDays);
+        this.checkDays = CheckDaysConverter.toDays(checkDays);
         TeamMate teamMate;
         try {
             Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
@@ -49,7 +49,7 @@ public class GoalHistoryInfo {
             Field goalField = TeamMate.class.getDeclaredField("goal");
             goalField.setAccessible(true);
             Goal goal = Goal.builder()
-                    .checkDays(new GoalCheckDays(this.weekDays))
+                    .checkDays(new GoalCheckDays(this.checkDays))
                     .startDate(startDate)
                     .endDate(endDate)
                     .build();
@@ -76,12 +76,10 @@ public class GoalHistoryInfo {
                            LocalDate startDate,
                            LocalDate endDate,
                            LocalTime appointmentTime,
-                           int weekDays,
+                           int checkDays,
                            int workingDays,
                            List<String> teamMateNames) {
-        this(id, category, title, startDate, endDate, appointmentTime, weekDays, workingDays);
+        this(id, category, title, startDate, endDate, appointmentTime, checkDays, workingDays);
         this.teamMateNames = teamMateNames;
     }
-
-
 }

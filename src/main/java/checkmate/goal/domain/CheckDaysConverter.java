@@ -1,5 +1,6 @@
 package checkmate.goal.domain;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Getter
 @RequiredArgsConstructor
 public enum CheckDaysConverter {
     MONDAY(0, "월"),
@@ -43,9 +45,5 @@ public enum CheckDaysConverter {
 
     public static boolean isWorkingDay(int value, LocalDate date) {
         return isWorkingDay(value, CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).value);
-    }
-
-    public String getKor() {
-        return kor;
     }
 }

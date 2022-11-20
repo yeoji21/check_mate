@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -76,7 +77,7 @@ class TeamMateTest {
                 .title("자바의 정석 스터디")
                 .startDate(LocalDate.now().minusDays(10))
                 .endDate(LocalDate.now().plusDays(20))
-                .checkDays(new GoalCheckDays(String.valueOf(LocalDate.now().plusDays(1))))
+                .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))))
                 .build();
         TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
         assertThat(teamMate.getUploadable().isWorkingDay()).isFalse();

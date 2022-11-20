@@ -181,7 +181,6 @@ public class GoalControllerTest extends ControllerTest {
     @Test
     void 유저의_성공한_목표_목록_조회_테스트() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         List<GoalHistoryInfo> goalHistoryInfoList =
                 List.of(historyGoalInfoResponseDto(goal, List.of("nickname")),
@@ -208,7 +207,7 @@ public class GoalControllerTest extends ControllerTest {
                 .startDate(goal.getStartDate())
                 .endDate(goal.getEndDate())
                 .appointmentTime(goal.getAppointmentTime())
-                .weekDays(goal.getCheckDays().intValue())
+                .checkDays(goal.getCheckDays().intValue())
                 .teamMateNames(nicknames)
                 .build();
     }
@@ -220,7 +219,7 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
                 fieldWithPath("info[].startDate").type(JsonFieldType.STRING).description("시작일"),
                 fieldWithPath("info[].endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("info[].weekDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
                 fieldWithPath("info[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("info[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
                 fieldWithPath("info[].teamMateNames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")

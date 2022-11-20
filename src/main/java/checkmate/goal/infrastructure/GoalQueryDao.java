@@ -1,15 +1,13 @@
 package checkmate.goal.infrastructure;
 
-import checkmate.common.util.WeekDayConverter;
 import checkmate.goal.application.dto.response.*;
-import checkmate.goal.domain.GoalStatus;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.goal.domain.*;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -24,24 +22,25 @@ import static checkmate.user.domain.QUser.user;
 @Repository
 public class GoalQueryDao{
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
     // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
-        int num = WeekDayConverter.localDateToValue(LocalDate.now());
-
-        return queryFactory
-                .select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
-                            new CaseBuilder()
-                                .when(teamMate.lastUploadDay.eq(LocalDate.now()))
-                                .then(true)
-                                .otherwise(false)))
-                .from(teamMate)
-                .join(teamMate.goal, goal)
-                .on(goal.checkDays.checkDays.divide(num).floor().mod(10).eq(1), goal.status.eq(GoalStatus.ONGOING))
-                .where(teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING),
-                        goal.period.startDate.loe(LocalDate.now()))
-                .fetch();
+        List<Object[]> resultList = entityManager.createNativeQuery(
+                        "select g.goal_id, g.category, g.title, g.check_days, " +
+                                " case when tm.last_upload_day = :today then true else false end" +
+                                " from team_mate as tm" +
+                                " join goal as g on g.goal_id = tm.goal_id" +
+                                " where tm.user_id = :userId" +
+                                " and BITAND(g.check_days," + (1 << CheckDaysConverter.valueOf(LocalDate.now().getDayOfWeek().toString()).getValue()) +") != 0" +
+                                " and tm.status = 'ONGOING' and g.start_date <= :today")
+                .setParameter("today", LocalDate.now())
+                .setParameter("userId", userId)
+                .getResultList();
+        return resultList.stream()
+                .map(arr -> new TodayGoalInfo(Long.parseLong(String.valueOf(arr[0])), GoalCategory.valueOf(String.valueOf(arr[1])),
+                        (String) arr[2], new GoalCheckDays(Integer.parseInt(String.valueOf(arr[3]))), (Boolean) arr[4]))
+                .toList();
     }
 
     /*

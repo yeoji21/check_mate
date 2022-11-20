@@ -1,5 +1,6 @@
 package checkmate.goal.application.dto.response;
 
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.GoalCategory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ class GoalHistoryInfoTest {
                 .category(GoalCategory.ETC)
                 .startDate(LocalDate.now().minusDays(9))
                 .endDate(LocalDate.now().plusDays(10))
-                .weekDays(1111111)
+                .checkDays(CheckDaysConverter.toValue("월화수목금토일"))
                 .appointmentTime(null)
                 .workingDays(10)
                 .teamMateNames(Collections.emptyList())
@@ -30,6 +31,6 @@ class GoalHistoryInfoTest {
 
         //then
         assertThat(info.getAchievementRate()).isEqualTo(50);
-        assertThat(info.getWeekDays()).isEqualTo("월화수목금토일");
+        assertThat(info.getCheckDays()).isEqualTo("월화수목금토일");
     }
 }

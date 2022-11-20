@@ -1,6 +1,5 @@
 package checkmate;
 
-import checkmate.common.util.WeekDayConverter;
 import checkmate.config.WebSecurityConfig;
 import checkmate.goal.application.dto.response.QTodayGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
@@ -25,7 +24,6 @@ import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QTeamMate.teamMate;
 import static checkmate.notification.domain.QNotification.notification;
 import static checkmate.notification.domain.QNotificationReceiver.notificationReceiver;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 @Disabled
@@ -43,23 +41,19 @@ public class QueryPerformanceTest {
 
     @Test
     void findTodayGoalInfoDtoList() throws Exception{
-        //given
-
-        //when
-        stopWatch.start();
-
-        List<TodayGoalInfo> result = queryFactory.select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
-                        new CaseBuilder().when(teamMate.lastUploadDay.eq(LocalDate.now())).then(true).otherwise(false)))
-                .from(teamMate)
-                .join(teamMate.goal, goal).on(goal.checkDays.checkDays.divide(WeekDayConverter.localDateToValue(LocalDate.now()))
-                        .floor().mod(10).eq(1), goal.status.eq(GoalStatus.ONGOING))
-                .where(teamMate.userId.eq(11L),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
-                .fetch();
-        stopWatch.stop();
-        //then
-        result.forEach(r -> System.out.println(r.getTitle()));
-        System.out.println(stopWatch.getTotalTimeMillis());
+//        stopWatch.start();
+//
+//        List<TodayGoalInfo> result = queryFactory.select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
+//                        new CaseBuilder().when(teamMate.lastUploadDay.eq(LocalDate.now())).then(true).otherwise(false)))
+//                .from(teamMate)
+//                .join(teamMate.goal, goal).on(goal.checkDays.checkDays.divide(WeekDayConverter.localDateToValue(LocalDate.now()))
+//                        .floor().mod(10).eq(1), goal.status.eq(GoalStatus.ONGOING))
+//                .where(teamMate.userId.eq(11L),
+//                        teamMate.status.eq(TeamMateStatus.ONGOING))
+//                .fetch();
+//        stopWatch.stop();
+//        result.forEach(r -> System.out.println(r.getTitle()));
+//        System.out.println(stopWatch.getTotalTimeMillis());
 
 
         stopWatch.start();
@@ -78,7 +72,7 @@ public class QueryPerformanceTest {
         stopWatch.stop();
 
         //then
-        assertThat(slowResult).isEqualTo(result);
+//        assertThat(slowResult).isEqualTo(result);
         slowResult.forEach(r -> System.out.println(r.getTitle()));
         System.out.println(stopWatch.getTotalTimeMillis());
     }

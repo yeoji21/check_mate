@@ -1,7 +1,6 @@
 package checkmate.goal.infrastructure;
 
-import checkmate.common.util.WeekDayConverter;
-import checkmate.goal.domain.GoalStatus;
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.domain.TeamMateStatus;
@@ -48,18 +47,13 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
     @Override
     public List<TeamMate> updateYesterdayHookyTMs() {
-        List<TeamMate> yesterdayTMs = queryFactory
-                .select(teamMate)
-                .from(teamMate)
-                .join(teamMate.goal, goal)
-                .where(
-                        goal.checkDays.checkDays
-                                .divide(WeekDayConverter.localDateToValue(LocalDate.now().minusDays(1)))
-                                .floor().mod(10)
-                                .eq(1),
-                        goal.status.eq(GoalStatus.ONGOING),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
-                .fetch();
+        List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
+                        "select tm.* from team_mate as tm" +
+                                " join goal as g on g.goal_id = tm.goal_id " +
+                                " where BITAND(g.check_days," +
+                                (1 << CheckDaysConverter.valueOf(LocalDate.now().minusDays(1).getDayOfWeek().toString()).getValue()) + ") != 0 " +
+                                " and g.status = 'ONGOING' and tm.status = 'ONGOING'", TeamMate.class)
+                .getResultList();
 
         List<Long> checkedTeamMateIds = queryFactory
                 .select(post.teamMate.id)
