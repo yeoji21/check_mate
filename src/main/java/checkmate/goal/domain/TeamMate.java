@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Entity
 public class TeamMate extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="team_mate_id")
+    @Column(name="id")
     private Long id;
     @NotNull @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = false)
@@ -31,10 +31,11 @@ public class TeamMate extends BaseTimeEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
     @NotNull @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private TeamMateStatus status;
     @NotNull @Embedded
     private TeamMateProgress progress;
-    private LocalDate lastUploadDay;
+    private LocalDate lastUploadDate;
 
     TeamMate(Goal goal, User user) {
         this.userId = user.getId();
@@ -48,7 +49,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public void updateUploadedDate() {
-        lastUploadDay = LocalDate.now();
+        lastUploadDate = LocalDate.now();
     }
 
     public void applyInviteReject() {
@@ -64,11 +65,11 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public int getWorkingDays() {
-        return progress.getWorkingDays();
+        return progress.getCheckDayCount();
     }
 
     public int getHookyDays() {
-        return progress.getHookyDays();
+        return progress.getSkippedDayCount();
     }
 
     // TODO: 2022/11/03 외부에서 ongoingGoalCount를 받는 게 맞을지
@@ -92,7 +93,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(progress.getWorkingDays(), goal.totalWorkingDaysCount());
+        return ProgressCalculator.calculate(progress.getCheckDayCount(), goal.totalWorkingDaysCount());
     }
 
     public Uploadable getUploadable() {
@@ -104,7 +105,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public boolean isUploaded() {
-        return (lastUploadDay != null && lastUploadDay.isEqual(LocalDate.now()));
+        return (lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now()));
     }
 
 }

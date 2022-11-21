@@ -6,17 +6,17 @@ import lombok.Getter;
 @Getter
 public class NotificationInfo {
     private String title;
-    private String body;
+    private String content;
     private String type;
     private String attributes;
 
     @Builder
     public NotificationInfo(String title,
-                            String body,
+                            String content,
                             String type,
                             String attributes) {
         this.title = title;
-        this.body = body;
+        this.content = content;
         this.type = type;
         this.attributes = attributes;
     }

@@ -38,7 +38,7 @@ class NotificationQueryServiceTest {
         Notification notification = Notification.builder()
                 .userId(1L)
                 .title("title")
-                .body("body")
+                .content("body")
                 .type(NotificationType.POST_UPLOAD)
                 .receivers(List.of(receiver))
                 .build();
@@ -54,6 +54,6 @@ class NotificationQueryServiceTest {
         assertThat(receiver.isChecked()).isTrue();
         assertThat(attributes.containsKey("goalId")).isTrue();
         assertThat(response.getTitle()).isEqualTo(notification.getTitle());
-        assertThat(response.getBody()).isEqualTo(notification.getBody());
+        assertThat(response.getContent()).isEqualTo(notification.getContent());
     }
 }

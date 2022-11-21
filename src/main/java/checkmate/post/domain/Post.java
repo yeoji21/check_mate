@@ -6,6 +6,7 @@ import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +19,15 @@ import java.util.List;
 @Entity
 public class Post extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "post_id")
+    @Column(name = "id")
     private long id;
-    @Column(name="text_data")
-    private String text;
+    @NotNull
+    @Column(name="content")
+    private String content;
     @Column(name = "uploaded_date")
     private LocalDate uploadedDate = LocalDate.now();
-    @Column(name = "is_checked")
-    private boolean isChecked = false;
+    @Column(name = "checked")
+    private boolean checked = false;
     @Embedded
     private Images images;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,9 +37,9 @@ public class Post extends BaseTimeEntity {
     private List<Likes> likes = new ArrayList<>();
 
     @Builder
-    protected Post(TeamMate teamMate, String text) {
+    protected Post(TeamMate teamMate, String content) {
         this.teamMate = teamMate;
-        this.text = text;
+        this.content = content;
         images = new Images();
     }
 
@@ -61,12 +63,12 @@ public class Post extends BaseTimeEntity {
     }
 
     public void check() {
-        isChecked = true;
+        checked = true;
         teamMate.plusWorkingDay();
     }
 
     public void uncheck() {
-        isChecked = false;
+        checked = false;
         teamMate.minusWorkingDay();
     }
 

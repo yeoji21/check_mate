@@ -17,7 +17,7 @@ public class ExpulsionGoalNotificationFactory extends NotificationFactory<Expuls
                 .userId(dto.userId())
                 .type(getType())
                 .title("목표 퇴출 알림")
-                .body(dto.goalTitle() + " 목표에서 퇴출되었습니다.")
+                .content(dto.goalTitle() + " 목표에서 퇴출되었습니다.")
                 .receivers(List.of(new NotificationReceiver(dto.userId())))
                 .build();
         notification.addAttribute("teamMateId", dto.teamMateId());

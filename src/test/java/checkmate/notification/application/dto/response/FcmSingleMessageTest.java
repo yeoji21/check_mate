@@ -24,7 +24,7 @@ class FcmSingleMessageTest {
         Notification notification = Notification.builder()
                 .userId(1L)
                 .title("title")
-                .body("body")
+                .content("body")
                 .type(NotificationType.INVITE_GOAL)
                 .receivers(List.of(new NotificationReceiver(user.getId())))
                 .build();
@@ -39,7 +39,7 @@ class FcmSingleMessageTest {
         assertThat(message.getData().getType()).isEqualTo(NotificationType.INVITE_GOAL.name());
         assertThat(message.getData().getNotificationId()).isEqualTo("1");
         assertThat(message.getData().getTitle()).isEqualTo(notification.getTitle());
-        assertThat(message.getData().getBody()).isEqualTo(notification.getBody());
+        assertThat(message.getData().getBody()).isEqualTo(notification.getContent());
     }
 
     @Test
@@ -54,7 +54,7 @@ class FcmSingleMessageTest {
         //then
         assertThat(multipleMessage.getData().getType()).isEqualTo(NotificationType.INVITE_GOAL.name());
         assertThat(multipleMessage.getData().getTitle()).isEqualTo(notification.getTitle());
-        assertThat(multipleMessage.getData().getBody()).isEqualTo(notification.getBody());
+        assertThat(multipleMessage.getData().getBody()).isEqualTo(notification.getContent());
         assertThat(multipleMessage.getData().getNotificationId()).isEqualTo("1");
         assertThat(multipleMessage.getRegistration_ids().size()).isEqualTo(3);
         assertThat(multipleMessage.getRegistration_ids()).contains("id1", "id2", "id3");
@@ -74,7 +74,7 @@ class FcmSingleMessageTest {
                 .userId(1L)
                 .type(NotificationType.INVITE_GOAL)
                 .title("title")
-                .body("body")
+                .content("body")
                 .receivers(List.of(new NotificationReceiver(user2.getId()), new NotificationReceiver(user3.getId())))
                 .build();
         ReflectionTestUtils.setField(notification, "id", 1L);

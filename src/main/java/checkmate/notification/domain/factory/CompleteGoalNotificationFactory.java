@@ -18,7 +18,7 @@ public class CompleteGoalNotificationFactory extends NotificationFactory<Complet
                 .userId(dto.userId())
                 .type(getType())
                 .title("목표 수행 완료")
-                .body(dto.goalTitle() + " 목표 수행을 끝까지 완수하였습니다")
+                .content(dto.goalTitle() + " 목표 수행을 끝까지 완수하였습니다")
                 .receivers(List.of(new NotificationReceiver(dto.userId())))
                 .build();
         notification.addAttribute("userId", dto.userId());

@@ -14,17 +14,20 @@ import java.util.List;
 @Entity
 public class Notification extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_id")
+    @Column(name = "id")
     private Long id;
     @NotNull
     @Column(name = "user_id")
     private Long userId;
     @NotNull @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private NotificationType type;
     @NotNull
+    @Column(name = "title")
     private String title;
     @NotNull
-    private String body;
+    @Column(name = "content")
+    private String content;
     @Getter(value = AccessLevel.PROTECTED)
     @Convert(converter = NotificationAttributeConverter.class)
     private NotificationAttributes attributes = new NotificationAttributes(new HashMap<>());
@@ -35,12 +38,12 @@ public class Notification extends BaseTimeEntity {
     protected Notification(long userId,
                            NotificationType type,
                            String title,
-                           String body,
+                           String content,
                            List<NotificationReceiver> receivers) {
         this.userId = userId;
         this.type = type;
         this.title = title;
-        this.body = body;
+        this.content = content;
         setUpReceivers(receivers);
     }
 

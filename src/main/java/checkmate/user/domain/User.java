@@ -16,32 +16,36 @@ import java.time.LocalDate;
 @Entity
 public class User extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="user_id")
+    @Column(name="id")
     private Long id;
     @NotNull
+    @Column(name = "username")
     private String username;
-    @Email
-    private String email;
+    @Email @Column(name = "email_address")
+    private String emailAddress;
+    @Column(name = "password")
     private String password;
-    @Column(unique = true)
+    @Column(unique = true, name ="provider_id")
     private String providerId;
-    @Column(unique = true)
+    @Column(unique = true, name = "nickname")
     private String nickname;
-    @NotNull
+    @NotNull @Column(name = "role")
     private String role;
+    @Column(name = "fcm_token")
     private String fcmToken;
-    private LocalDate nicknameUpdated;
+    @Column(name = "nickname_updated_date")
+    private LocalDate nicknameUpdatedDate;
 
     @Builder
     protected User(String username,
-                   String email,
+                   String emailAddress,
                    String nickname,
                    String password,
                    String providerId,
                    String role,
                    String fcmToken) {
         this.username = username;
-        this.email = email;
+        this.emailAddress = emailAddress;
         this.nickname = nickname;
         this.password = password;
         this.providerId = providerId;
@@ -50,10 +54,10 @@ public class User extends BaseTimeEntity {
     }
 
     public void changeNickname(String nickname) {
-        if(nicknameUpdated != null && nicknameUpdated.plusDays(30L).isAfter(LocalDate.now()))
+        if(nicknameUpdatedDate != null && nicknameUpdatedDate.plusDays(30L).isAfter(LocalDate.now()))
             throw new UpdateDurationException();
         this.nickname = nickname;
-        this.nicknameUpdated = LocalDate.now();
+        this.nicknameUpdatedDate = LocalDate.now();
     }
 
     public void updateFcmToken(String fcmToken){

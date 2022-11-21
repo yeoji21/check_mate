@@ -4,25 +4,28 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class TeamMateProgress {
-    private int workingDays;
-    private int hookyDays;
+    @Column(name = "check_day_count")
+    private int checkDayCount;
+    @Column(name = "skipped_day_count")
+    private int skippedDayCount;
 
-    public TeamMateProgress(int workingDays, int hookyDays) {
-        this.workingDays = workingDays;
-        this.hookyDays = hookyDays;
+    public TeamMateProgress(int checkDayCount, int skippedDayCount) {
+        this.checkDayCount = checkDayCount;
+        this.skippedDayCount = skippedDayCount;
     }
 
     void plusWorkingDay() {
-        workingDays++;
+        checkDayCount++;
     }
 
     void minusWorkingDay() {
-        workingDays--;
+        checkDayCount--;
     }
 }

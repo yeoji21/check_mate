@@ -20,7 +20,7 @@ public class FcmSingleMessage implements PushNotification {
 
     public static FcmSingleMessage getMessage(Notification notification, String fcmToken) {
         Data data = Data.builder()
-                .body(notification.getBody())
+                .body(notification.getContent())
                 .title(notification.getTitle())
                 .type(notification.getType().name())
                 .notificationId(String.valueOf(notification.getId()))

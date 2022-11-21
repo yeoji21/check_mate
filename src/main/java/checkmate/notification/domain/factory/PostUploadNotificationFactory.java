@@ -18,7 +18,7 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
                 .userId(dto.uploaderUserId())
                 .type(getType())
                 .title("팀원의 목표인증")
-                .body(dto.goalTitle() + " 목표의 " + dto.uploaderNickname() + "님이 목표 수행을 인증했어요!")
+                .content(dto.goalTitle() + " 목표의 " + dto.uploaderNickname() + "님이 목표 수행을 인증했어요!")
                 .receivers(getReceivers(dto.teamMateUserIds()))
                 .build();
         notification.addAttribute("goalId", dto.goalId());

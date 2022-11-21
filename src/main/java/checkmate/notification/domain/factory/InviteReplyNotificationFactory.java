@@ -16,7 +16,7 @@ public class InviteReplyNotificationFactory extends NotificationFactory<InviteRe
                 .userId(dto.inviteeUserId())
                 .type(getType())
                 .title("초대 응답")
-                .body(getBody(dto))
+                .content(getBody(dto))
                 .receivers(List.of(new NotificationReceiver(dto.inviterUserId())))
                 .build();
         notification.addAttribute("goalId", dto.goalId());

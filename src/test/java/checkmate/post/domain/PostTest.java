@@ -18,7 +18,7 @@ class PostTest {
     @BeforeEach
     void setUp() {
         teamMate = TestEntityFactory.teamMate(1L, 1L);
-        post = Post.builder().teamMate(teamMate).text("post body text").build();
+        post = Post.builder().teamMate(teamMate).content("post body text").build();
     }
 
     @Test

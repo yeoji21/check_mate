@@ -16,7 +16,7 @@ public class InviteGoalNotificationFactory extends NotificationFactory<InviteGoa
                 .userId(dto.inviterUserId())
                 .type(getType())
                 .title("팀원 초대")
-                .body(dto.inviterNickname() + "님이 " + dto.goalTitle() + " 목표로 초대했습니다!")
+                .content(dto.inviterNickname() + "님이 " + dto.goalTitle() + " 목표로 초대했습니다!")
                 .receivers(List.of(new NotificationReceiver(dto.inviteeUserId())))
                 .build();
         notification.addAttribute("teamMateId", dto.inviteeTeamMateId());

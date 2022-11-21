@@ -4,6 +4,7 @@ import checkmate.common.domain.BaseTimeEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 
 @Getter
@@ -12,9 +13,13 @@ import javax.persistence.*;
 @Entity
 public class Image extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "image_id")
+    @Column(name = "id")
     private long id;
+    @NotNull
+    @Column(name = "original_name")
     private String originalName;
+    @NotNull
+    @Column(name = "stored_name")
     private String storedName;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")

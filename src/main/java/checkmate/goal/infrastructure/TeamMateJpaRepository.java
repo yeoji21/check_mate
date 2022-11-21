@@ -49,7 +49,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
     public List<TeamMate> updateYesterdayHookyTMs() {
         List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
                         "select tm.* from team_mate as tm" +
-                                " join goal as g on g.goal_id = tm.goal_id " +
+                                " join goal as g on g.id = tm.goal_id " +
                                 " where BITAND(g.check_days," +
                                 (1 << CheckDaysConverter.valueOf(LocalDate.now().minusDays(1).getDayOfWeek().toString()).getValue()) + ") != 0 " +
                                 " and g.status = 'ONGOING' and tm.status = 'ONGOING'", TeamMate.class)
@@ -61,13 +61,13 @@ public class TeamMateJpaRepository implements TeamMateRepository {
                 .where(
                         post.teamMate.in(yesterdayTMs),
                         post.uploadedDate.eq(LocalDate.now()),
-                        post.isChecked.isTrue())
+                        post.checked.isTrue())
                 .fetch();
         yesterdayTMs.removeIf(tm -> checkedTeamMateIds.contains(tm.getId()));
 
         queryFactory.update(teamMate)
                 .where(teamMate.in(yesterdayTMs))
-                .set(teamMate.progress.hookyDays, teamMate.progress.hookyDays.add(1))
+                .set(teamMate.progress.skippedDayCount, teamMate.progress.skippedDayCount.add(1))
                 .execute();
 
         return yesterdayTMs;

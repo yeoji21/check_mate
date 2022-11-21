@@ -30,7 +30,7 @@ public class TeamMateUploadInfo {
             constructor.setAccessible(true);
             teamMate = constructor.newInstance();
 
-            Field field = TeamMate.class.getDeclaredField("lastUploadDay");
+            Field field = TeamMate.class.getDeclaredField("lastUploadDate");
             field.setAccessible(true);
             field.set(teamMate, lastUploadDay);
         } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException

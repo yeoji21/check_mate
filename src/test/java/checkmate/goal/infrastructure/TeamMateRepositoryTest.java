@@ -71,15 +71,15 @@ class TeamMateRepositoryTest extends RepositoryTest {
         ReflectionTestUtils.setField(notCheckedTm, "status", TeamMateStatus.ONGOING);
         em.persist(notCheckedTm);
 
-        Post post1 = Post.builder().teamMate(teamMate1).text("test").build();
+        Post post1 = Post.builder().teamMate(teamMate1).content("test").build();
         post1.check();
         em.persist(post1);
 
-        Post post2 = Post.builder().teamMate(teamMate2).text("test").build();
+        Post post2 = Post.builder().teamMate(teamMate2).content("test").build();
         post2.check();
         em.persist(post2);
 
-        Post post3 = Post.builder().teamMate(notCheckedTm).text("test").build();
+        Post post3 = Post.builder().teamMate(notCheckedTm).content("test").build();
         em.persist(post3);
 
         em.flush();
@@ -128,7 +128,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
 
         queryFactory.update(teamMate)
                 .where(teamMate.id.in(teamMate1.getId(), teamMate2.getId()))
-                .set(teamMate.progress.hookyDays, 50)
+                .set(teamMate.progress.skippedDayCount, 50)
                 .execute();
 
         //when

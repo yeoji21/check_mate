@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @Entity
 public class Goal extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="goal_id")
+    @Column(name="id")
     private Long id;
     @Enumerated(EnumType.STRING) @NotNull
     @Column(name = "category", nullable = false)
@@ -33,6 +33,7 @@ public class Goal extends BaseTimeEntity {
     @Embedded @NotNull
     private GoalCheckDays checkDays;
     @Enumerated(EnumType.STRING) @NotNull
+    @Column(name = "status")
     private GoalStatus status;
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;

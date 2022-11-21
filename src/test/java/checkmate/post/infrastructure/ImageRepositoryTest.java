@@ -30,7 +30,9 @@ class ImageRepositoryTest extends RepositoryTest {
         TeamMate teamMate2 = goal.join(user2);
         em.persist(teamMate2);
 
-        Post post1 = Post.builder().teamMate(teamMate1).build();
+        Post post1 = Post.builder()
+                        .content("content")
+                        .teamMate(teamMate1).build();
         em.persist(post1);
         for (int i = 0; i < 3; i++) {
             Image image = Image.builder()
@@ -41,7 +43,10 @@ class ImageRepositoryTest extends RepositoryTest {
             em.persist(image);
         }
 
-        Post post2 = Post.builder().teamMate(teamMate1).build();
+        Post post2 = Post.builder()
+                .teamMate(teamMate1)
+                .content("content")
+                .build();
         em.persist(post2);
         for (int i = 3; i < 6; i++) {
             Image image = Image.builder()
@@ -52,7 +57,10 @@ class ImageRepositoryTest extends RepositoryTest {
             em.persist(image);
         }
 
-        Post post3 = Post.builder().teamMate(teamMate2).build();
+        Post post3 = Post.builder()
+                .content("content")
+                .teamMate(teamMate2)
+                .build();
         em.persist(post3);
         for (int i = 6; i < 9; i++) {
             Image image = Image.builder()

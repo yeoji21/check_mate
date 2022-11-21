@@ -48,7 +48,7 @@ class NotificationControllerTest extends ControllerTest {
                 .andDo(document("find-goal-complete",
                         responseFields(
                                 fieldWithPath("notifications[].title").type(JsonFieldType.STRING).description("푸쉬 알림 타이틀"),
-                                fieldWithPath("notifications[].body").type(JsonFieldType.STRING).description("푸쉬 알림 내용"),
+                                fieldWithPath("notifications[].content").type(JsonFieldType.STRING).description("푸쉬 알림 내용"),
                                 fieldWithPath("notifications[].type").type(JsonFieldType.STRING).description("푸쉬 알림 종류"),
                                 fieldWithPath("notifications[].attributes").type(JsonFieldType.STRING).description("해당 알림에 필요한 추가 데이터 - JSON 형식").optional()
                         )
@@ -117,7 +117,7 @@ class NotificationControllerTest extends ControllerTest {
                                 parameterWithName("notificationId").description("notificationId")),
                         responseFields(
                                 fieldWithPath("title").type(JsonFieldType.STRING).description("푸쉬 알림 타이틀"),
-                                fieldWithPath("body").type(JsonFieldType.STRING).description("푸쉬 알림 내용"),
+                                fieldWithPath("content").type(JsonFieldType.STRING).description("푸쉬 알림 내용"),
                                 fieldWithPath("type").type(JsonFieldType.STRING).description("푸쉬 알림 종류"),
                                 fieldWithPath("attributes").type(JsonFieldType.STRING).description("해당 알림에 필요한 추가 데이터 - JSON 형식").optional()
                         )

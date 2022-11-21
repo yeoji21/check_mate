@@ -63,7 +63,7 @@ public class QueryPerformanceTest {
         right.stream().forEach(n -> System.out.print(n + ", "));
 
         List<TodayGoalInfo> slowResult = queryFactory.select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
-                        new CaseBuilder().when(teamMate.lastUploadDay.eq(LocalDate.now())).then(true).otherwise(false)))
+                        new CaseBuilder().when(teamMate.lastUploadDate.eq(LocalDate.now())).then(true).otherwise(false)))
                 .from(teamMate)
                 .join(teamMate.goal, goal).on(goal.checkDays.checkDays.in(right), goal.status.eq(GoalStatus.ONGOING))
                 .where(teamMate.userId.eq(11L),

@@ -32,7 +32,7 @@ public class TestEntityFactory {
                 .username(name)
                 .nickname(name)
                 .providerId(name)
-                .email(name + "@mail.com")
+                .emailAddress(name + "@mail.com")
                 .role(UserRole.USER.getRole())
                 .fcmToken("fcmToken")
                 .build();
@@ -57,7 +57,7 @@ public class TestEntityFactory {
     public static Post post(TeamMate uploader) {
         return Post.builder()
                 .teamMate(uploader)
-                .text("test post")
+                .content("test post")
                 .build();
     }
 
@@ -66,7 +66,7 @@ public class TestEntityFactory {
                 .userId(userId)
                 .type(type)
                 .title("title")
-                .body("body")
+                .content("body")
                 .receivers(Collections.EMPTY_LIST)
                 .build();
         ReflectionTestUtils.setField(notification, "id", id);

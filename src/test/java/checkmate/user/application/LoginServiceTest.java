@@ -76,7 +76,7 @@ class LoginServiceTest {
     void 닉네임을_설정하지_않았던_회원_테스트() throws Exception{
         //given
         User user = User.builder()
-                .email("mail")
+                .emailAddress("mail")
                 .providerId("id")
                 .username("name")
                 .fcmToken("fcm token")

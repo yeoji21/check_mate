@@ -29,7 +29,7 @@ class NotificationQueryDaoTest extends RepositoryTest {
                 .userId(sender.getId())
                 .type(NotificationType.INVITE_GOAL)
                 .title("notification title2")
-                .body("notification body2")
+                .content("notification body2")
                 .receivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())))
                 .build();
         em.persist(notification1);
@@ -38,7 +38,7 @@ class NotificationQueryDaoTest extends RepositoryTest {
                 .userId(sender.getId())
                 .type(NotificationType.POST_UPLOAD)
                 .title("notification title")
-                .body("notification body")
+                .content("notification body")
                 .receivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())))
                 .build();
         em.persist(notification2);
@@ -72,7 +72,7 @@ class NotificationQueryDaoTest extends RepositoryTest {
                 .userId(sender.getId())
                 .type(NotificationType.COMPLETE_GOAL)
                 .title("notification title")
-                .body("notification body")
+                .content("notification body")
                 .receivers(List.of(new NotificationReceiver(receiver.getId())))
                 .build();
         em.persist(notification);

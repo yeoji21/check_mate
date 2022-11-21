@@ -30,9 +30,9 @@ class PostRepositoryTest extends RepositoryTest {
         ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
         em.persist(teamMate);
 
-        Post post1 = Post.builder().teamMate(teamMate).text("post body text1").build();
-        Post post2 = Post.builder().teamMate(teamMate).text("post body text2").build();
-        Post post3 = Post.builder().teamMate(teamMate).text("post body text3").build();
+        Post post1 = Post.builder().teamMate(teamMate).content("post body text1").build();
+        Post post2 = Post.builder().teamMate(teamMate).content("post body text2").build();
+        Post post3 = Post.builder().teamMate(teamMate).content("post body text3").build();
 
         em.persist(post1);
         em.persist(post2);

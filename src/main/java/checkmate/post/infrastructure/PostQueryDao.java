@@ -31,6 +31,6 @@ public class PostQueryDao {
                         post.uploadedDate.eq(date))
                 .orderBy(post.createdDateTime.desc())
                 .transform(GroupBy.groupBy(post).list(new QPostInfo(post.id, post.teamMate.id, user.nickname,
-                        post.createdDateTime, list(image.storedName), post.text, list(likes.userId))));
+                        post.createdDateTime, list(image.storedName), post.content, list(likes.userId))));
     }
 }

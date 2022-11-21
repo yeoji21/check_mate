@@ -25,7 +25,7 @@ class NotificationRepositoryTest extends RepositoryTest {
                 .userId(sender.getId())
                 .type(NotificationType.INVITE_GOAL)
                 .title("notification title")
-                .body("notification body")
+                .content("notification body")
                 .receivers(List.of(new NotificationReceiver(2L), new NotificationReceiver(3L)))
                 .build();
         em.persist(notification);
@@ -56,7 +56,7 @@ class NotificationRepositoryTest extends RepositoryTest {
                 .userId(sender.getId())
                 .type(NotificationType.INVITE_GOAL)
                 .title("notification title")
-                .body("notification body")
+                .content("notification body")
                 .receivers(List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId())))
                 .build();
         em.persist(notification);

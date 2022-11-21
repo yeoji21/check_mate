@@ -27,10 +27,10 @@ public class GoalQueryDao{
     // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
         List<Object[]> resultList = entityManager.createNativeQuery(
-                        "select g.goal_id, g.category, g.title, g.check_days, " +
-                                " case when tm.last_upload_day = :today then true else false end" +
+                        "select g.id, g.category, g.title, g.check_days, " +
+                                " case when tm.last_upload_date = :today then true else false end" +
                                 " from team_mate as tm" +
-                                " join goal as g on g.goal_id = tm.goal_id" +
+                                " join goal as g on g.id = tm.goal_id" +
                                 " where tm.user_id = :userId" +
                                 " and BITAND(g.check_days," + (1 << CheckDaysConverter.valueOf(LocalDate.now().getDayOfWeek().toString()).getValue()) +") != 0" +
                                 " and tm.status = 'ONGOING' and g.start_date <= :today")
@@ -67,7 +67,7 @@ public class GoalQueryDao{
         List<GoalHistoryInfo> list = queryFactory.select(
                         new QGoalHistoryInfo(goal.id, goal.category, goal.title, goal.period.startDate,
                                 goal.period.endDate, goal.appointmentTime, goal.checkDays.checkDays,
-                                teamMate.progress.workingDays))
+                                teamMate.progress.checkDayCount))
                 .from(teamMate)
                 .innerJoin(teamMate.goal, goal)
                 .where(teamMate.userId.eq(userId),
@@ -117,7 +117,7 @@ public class GoalQueryDao{
 
     private List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
         return queryFactory
-                .select(new QTeamMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDay, user.nickname))
+                .select(new QTeamMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
                 .from(teamMate)
                 .join(user).on(teamMate.userId.eq(user.id))
                 .where(teamMate.goal.id.eq(goalId),

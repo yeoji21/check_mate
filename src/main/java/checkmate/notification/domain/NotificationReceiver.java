@@ -1,5 +1,6 @@
 package checkmate.notification.domain;
 
+import checkmate.common.domain.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -12,14 +13,15 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
 @Entity
-public class NotificationReceiver {
+public class NotificationReceiver extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notification_receiver_id")
+    @Column(name = "id")
     private Long id;
     @NotNull
     @Column(name = "user_id")
     private Long userId;
     @NotNull
+    @Column(name = "checked")
     private boolean checked;
     @NotNull @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notification_id")
