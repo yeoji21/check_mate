@@ -54,6 +54,11 @@ public class GoalCommandService {
     }
 
     @Transactional
+    public void updateTodayStartGoal() {
+        goalRepository.updateTodayStartGoal();
+    }
+
+    @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
         List<TeamMate> teamMates = teamMateRepository.findTeamMates(overedGoalIds)

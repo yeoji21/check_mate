@@ -74,6 +74,16 @@ public class GoalJpaRepository implements GoalRepository {
         return fetchOne != null;
     }
 
+    @Override
+    public void updateTodayStartGoal() {
+        queryFactory.update(goal)
+                .where(goal.status.eq(GoalStatus.WAITING), goal.period.startDate.eq(LocalDate.now()))
+                .set(goal.status, GoalStatus.ONGOING)
+                .execute();
+        entityManager.flush();
+        entityManager.clear();
+    }
+
     public List<Long> updateYesterdayOveredGoals() {
         List<Goal> yesterdayOveredGoal = queryFactory
                 .selectFrom(goal)

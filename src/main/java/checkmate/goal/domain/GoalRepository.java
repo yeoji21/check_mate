@@ -11,4 +11,5 @@ public interface GoalRepository {
     List<Long> updateYesterdayOveredGoals();
     List<VerificationCondition> findConditions(Long goalId);
     int countOngoingGoals(long userId);
+    void updateTodayStartGoal();
 }

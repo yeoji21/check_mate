@@ -14,6 +14,11 @@ public class DailyScheduler {
     private final GoalCommandService goalCommandService;
     private final TeamMateCommandService teamMateCommandService;
 
+    @Scheduled(cron = "0 0 0 1/1 * ?")
+    public void updateInitiateGoal() {
+        goalCommandService.updateTodayStartGoal();
+    }
+
     @Scheduled(cron = "0 5 0 1/1 * ?")
     public void updateHookyDay() {
         teamMateCommandService.updateHookyTeamMate();

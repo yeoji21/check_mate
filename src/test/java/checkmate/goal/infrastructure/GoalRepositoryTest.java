@@ -80,6 +80,44 @@ public class GoalRepositoryTest extends RepositoryTest {
         assertThat(findCondition.getMinimumLike()).isEqualTo(5);
     }
 
+    @Test @DisplayName("오늘 시작일인 목표의 status 업데이트")
+    void updateTodayStartGoal() throws Exception{
+        //given
+        Goal todayStart1 = Goal.builder()
+                .title("todayStart1")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
+                .category(GoalCategory.ETC)
+                .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(10)))
+                .build();
+        ReflectionTestUtils.setField(todayStart1, "status", GoalStatus.WAITING);
+        em.persist(todayStart1);
+
+        Goal todayStart2 = Goal.builder()
+                .title("todayStart2")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
+                .category(GoalCategory.ETC)
+                .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(10)))
+                .build();
+        ReflectionTestUtils.setField(todayStart2, "status", GoalStatus.WAITING);
+        em.persist(todayStart2);
+
+        Goal notToday = Goal.builder()
+                .title("todayStart2")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
+                .category(GoalCategory.ETC)
+                .period(new GoalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
+                .build();
+        em.persist(notToday);
+
+        //when
+        goalRepository.updateTodayStartGoal();
+
+        //then
+        assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(GoalStatus.ONGOING);
+        assertThat(em.find(Goal.class, todayStart2.getId()).getStatus()).isEqualTo(GoalStatus.ONGOING);
+        assertThat(em.find(Goal.class, notToday.getId()).getStatus()).isEqualTo(GoalStatus.WAITING);
+    }
+
     @Test
     void updateYesterdayOveredGoals() throws Exception{
         //given

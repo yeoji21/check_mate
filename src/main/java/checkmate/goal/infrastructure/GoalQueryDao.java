@@ -33,7 +33,7 @@ public class GoalQueryDao{
                                 " join goal as g on g.id = tm.goal_id" +
                                 " where tm.user_id = :userId" +
                                 " and BITAND(g.check_days," + (1 << CheckDaysConverter.valueOf(LocalDate.now().getDayOfWeek().toString()).getValue()) +") != 0" +
-                                " and tm.status = 'ONGOING' and g.start_date <= :today")
+                                " and tm.status = 'ONGOING' and g.status = 'ONGOING'")
                 .setParameter("today", LocalDate.now())
                 .setParameter("userId", userId)
                 .getResultList();
