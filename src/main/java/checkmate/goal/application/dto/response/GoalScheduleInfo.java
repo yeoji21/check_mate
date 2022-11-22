@@ -2,6 +2,7 @@ package checkmate.goal.application.dto.response;
 
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalPeriod;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,8 +23,7 @@ public class GoalScheduleInfo {
         this.endDate = endDate;
         this.schedule = Goal.builder()
                 .checkDays(new GoalCheckDays(weekDays))
-                .startDate(startDate)
-                .endDate(endDate)
+                .period(new GoalPeriod(startDate, endDate))
                 .build().getSchedule();
     }
 }

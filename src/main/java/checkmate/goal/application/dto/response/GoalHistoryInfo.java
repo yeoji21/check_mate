@@ -50,8 +50,7 @@ public class GoalHistoryInfo {
             goalField.setAccessible(true);
             Goal goal = Goal.builder()
                     .checkDays(new GoalCheckDays(this.checkDays))
-                    .startDate(startDate)
-                    .endDate(endDate)
+                    .period(new GoalPeriod(startDate, endDate))
                     .build();
             goalField.set(teamMate, goal);
 

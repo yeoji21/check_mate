@@ -2,10 +2,7 @@ package checkmate.goal.application.dto;
 
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCheckDays;
-import checkmate.goal.domain.GoalModifyRequest;
-import checkmate.goal.domain.TeamMate;
+import checkmate.goal.domain.*;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,14 +16,20 @@ import java.util.List;
 public interface GoalCommandMapper {
     GoalCommandMapper INSTANCE = Mappers.getMapper(GoalCommandMapper.class);
 
-    @Mappings(
-            @Mapping(target = "checkDays", source = "checkDays", qualifiedByName = "checkDays")
-    )
+    @Mappings({
+            @Mapping(target = "checkDays", source = "checkDays", qualifiedByName = "checkDays"),
+            @Mapping(target = "period", source = "command", qualifiedByName = "goalPeriod")
+    })
     Goal toGoal(GoalCreateCommand command);
 
     @Named("checkDays")
     default GoalCheckDays checkDays(String checkDays) {
         return new GoalCheckDays(checkDays);
+    }
+
+    @Named("goalPeriod")
+    default GoalPeriod period(GoalCreateCommand command) {
+        return new GoalPeriod(command.getStartDate(), command.getEndDate());
     }
 
     GoalModifyRequest toGoalModifyRequest(GoalModifyCommand command);

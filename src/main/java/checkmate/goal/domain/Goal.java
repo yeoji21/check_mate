@@ -45,16 +45,15 @@ public class Goal extends BaseTimeEntity {
     @Builder
     public Goal(GoalCategory category,
                 String title,
-                LocalDate startDate,
-                LocalDate endDate,
+                GoalPeriod period,
                 GoalCheckDays checkDays,
                 LocalTime appointmentTime) {
         this.category = category;
         this.title = title;
         this.checkDays = checkDays;
-        this.period = new GoalPeriod(startDate, endDate);
+        this.period = period;
         this.appointmentTime = appointmentTime;
-        this.status = period.isTodayStart() ? GoalStatus.ONGOING : GoalStatus.WAITING;
+        this.status = period.isUninitiated() ? GoalStatus.WAITING : GoalStatus.ONGOING;
     }
 
     public void addCondition(VerificationCondition condition) {

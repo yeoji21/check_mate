@@ -22,8 +22,7 @@ class GoalTest {
         Goal timeSetGoal = Goal.builder()
                 .category(GoalCategory.ETC)
                 .title("title")
-                .startDate(LocalDate.now().minusDays(10L))
-                .endDate(LocalDate.now().plusDays(30L))
+                .period(new GoalPeriod(LocalDate.now().minusDays(10L), LocalDate.now().plusDays(30L)))
                 .checkDays(new GoalCheckDays("월화수목금토일"))
                 .appointmentTime(LocalTime.MIN)
                 .build();
@@ -99,8 +98,7 @@ class GoalTest {
         Goal goal = Goal.builder()
                 .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
-                .startDate(LocalDate.now().minusDays(200L))
-                .endDate(LocalDate.now().plusDays(100L))
+                .period(new GoalPeriod(LocalDate.now().minusDays(200L), LocalDate.now().plusDays(100L)))
                 .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
 

@@ -87,15 +87,13 @@ public class GoalRepositoryTest extends RepositoryTest {
                 .title("testGoal")
                 .checkDays(new GoalCheckDays("월화수목금토일"))
                 .category(GoalCategory.ETC)
-                .startDate(LocalDate.now().minusDays(6))
-                .endDate(LocalDate.now().minusDays(1))
+                .period(new GoalPeriod(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1)))
                 .build();
         em.persist(testGoal);
 
         Goal testGoal2 = Goal.builder()
                 .title("testGoal2")
-                .startDate(LocalDate.now().minusDays(6))
-                .endDate(LocalDate.now().minusDays(1))
+                .period(new GoalPeriod(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1)))
                 .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().minusDays(2))))
                 .category(GoalCategory.ETC)
                 .build();
@@ -103,8 +101,7 @@ public class GoalRepositoryTest extends RepositoryTest {
 
         Goal oneDayGoal = Goal.builder()
                 .title("하루짜리 목표")
-                .startDate(LocalDate.now().minusDays(1))
-                .endDate(LocalDate.now().minusDays(1))
+                .period(new GoalPeriod(LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
                 .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().minusDays(1))))
                 .category(GoalCategory.ETC)
                 .build();

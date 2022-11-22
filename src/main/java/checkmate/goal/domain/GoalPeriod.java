@@ -19,17 +19,17 @@ public class GoalPeriod {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    // TODO: 2022/11/22 validation 없음
     public GoalPeriod(LocalDate startDate, LocalDate endDate) {
+        if(startDate.isAfter(endDate))
+            throw new IllegalArgumentException("올바르지 않은 날짜입니다.");
         this.startDate = startDate;
         this.endDate = endDate;
     }
 
     double calcProgressedPercent() {
         return ProgressCalculator.calculate(
-                isUninitiatedGoal() ?
-                    0 : (int) startDate.datesUntil(LocalDate.now()).count(),
-                (int)startDate.datesUntil(endDate.plusDays(1)).count()
+                isUninitiated() ? 0 : (int)(startDate.datesUntil(LocalDate.now()).count()),
+                (int)(startDate.datesUntil(endDate.plusDays(1)).count())
         );
     }
 
@@ -38,18 +38,15 @@ public class GoalPeriod {
     }
 
     Stream<LocalDate> fromStartToToday() {
-        return isUninitiatedGoal() ?
+        return isUninitiated() ?
                 Stream.empty() : startDate.datesUntil(LocalDate.now());
     }
+
     boolean checkDateRange() {
-        return !isUninitiatedGoal() && !endDate.isBefore(LocalDate.now());
+        return !isUninitiated() && !endDate.isBefore(LocalDate.now());
     }
 
-    private boolean isUninitiatedGoal() {
+    boolean isUninitiated() {
         return startDate.isAfter(LocalDate.now());
-    }
-
-    public boolean isTodayStart() {
-        return startDate.equals(LocalDate.now());
     }
 }

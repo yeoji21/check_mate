@@ -168,8 +168,7 @@ class GoalQueryDaoTest extends RepositoryTest {
 
     private void setTodayStartGoal(User user) {
         Goal todayStartGoal = Goal.builder()
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(20))
+                .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(20)))
                 .category(GoalCategory.ETC)
                 .title("todayGoal")
                 .checkDays(new GoalCheckDays("월화수목금토일"))
@@ -183,8 +182,7 @@ class GoalQueryDaoTest extends RepositoryTest {
 
     private void setFutureStartGoal(User user) {
         Goal futureGoal = Goal.builder()
-                .startDate(LocalDate.now().plusDays(10))
-                .endDate(LocalDate.now().plusDays(20))
+                .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
                 .category(GoalCategory.ETC)
                 .title("futureGoal")
                 .checkDays(new GoalCheckDays("월화수목금토일"))

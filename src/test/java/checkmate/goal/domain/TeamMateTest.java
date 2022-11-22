@@ -60,8 +60,8 @@ class TeamMateTest {
         Goal goal = Goal.builder()
                 .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
-                .startDate(LocalDate.of(2021, 12, 20))
-                .endDate(LocalDate.of(2021, 12, 31))
+                .period(new GoalPeriod(LocalDate.of(2021, 12, 20),
+                                        LocalDate.of(2021, 12, 31)))
                 .appointmentTime(LocalTime.MIN)
                 .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
@@ -76,8 +76,7 @@ class TeamMateTest {
         Goal goal = Goal.builder()
                 .category(GoalCategory.LEARNING)
                 .title("자바의 정석 스터디")
-                .startDate(LocalDate.now().minusDays(10))
-                .endDate(LocalDate.now().plusDays(20))
+                .period(new GoalPeriod(LocalDate.now().minusDays(10), LocalDate.now().plusDays(20)))
                 .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))))
                 .build();
         TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
@@ -115,8 +114,7 @@ class TeamMateTest {
     void 기간만료된_초대응답_테스트() throws Exception{
         Goal goal = Goal.builder()
                 .checkDays(new GoalCheckDays("월화수목금토일"))
-                .startDate(LocalDate.now().minusDays(2))
-                .endDate(LocalDate.now().plusDays(1))
+                .period(new GoalPeriod(LocalDate.now().minusDays(2), LocalDate.now().plusDays(1)))
                 .build();
         TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
 
