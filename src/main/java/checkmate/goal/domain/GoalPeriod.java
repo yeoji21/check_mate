@@ -19,6 +19,7 @@ public class GoalPeriod {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    // TODO: 2022/11/22 validation 없음
     public GoalPeriod(LocalDate startDate, LocalDate endDate) {
         this.startDate = startDate;
         this.endDate = endDate;
@@ -46,5 +47,9 @@ public class GoalPeriod {
 
     private boolean isUninitiatedGoal() {
         return startDate.isAfter(LocalDate.now());
+    }
+
+    public boolean isTodayStart() {
+        return startDate.equals(LocalDate.now());
     }
 }

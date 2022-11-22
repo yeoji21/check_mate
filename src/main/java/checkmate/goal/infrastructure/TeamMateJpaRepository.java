@@ -50,7 +50,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
         List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
                         "select tm.* from team_mate as tm" +
                                 " join goal as g on g.id = tm.goal_id " +
-                                " where BITAND(g.check_days," +
+                                " where BITAND(g.check_days, " +
                                 (1 << CheckDaysConverter.valueOf(LocalDate.now().minusDays(1).getDayOfWeek().toString()).getValue()) + ") != 0 " +
                                 " and g.status = 'ONGOING' and tm.status = 'ONGOING'", TeamMate.class)
                 .getResultList();

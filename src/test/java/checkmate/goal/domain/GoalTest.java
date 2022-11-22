@@ -3,12 +3,11 @@ package checkmate.goal.domain;
 import checkmate.TestEntityFactory;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
-import checkmate.goal.presentation.dto.GoalDtoMapper;
 import checkmate.goal.presentation.dto.request.GoalModifyDto;
 import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,26 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GoalTest {
-    private Goal goal;
-    private GoalDtoMapper dtoMapper = GoalDtoMapper.INSTANCE;
-
-    @BeforeEach
-    void setUp() {
-        goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-    }
-
-    @Test
-    void test() throws Exception{
-        //given
-
-        //when
-        String calendar = goal.getSchedule();
-        System.out.println(calendar);
-
-        //then
-
-    }
-
     @Test
     void 인증_시간_경과_테스트() throws Exception{
         Goal timeSetGoal = Goal.builder()
@@ -54,23 +33,18 @@ class GoalTest {
 
     @Test
     void 땡땡이_최대치_조회_테스트() throws Exception{
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        ReflectionTestUtils.setField(goal.period, "startDate", LocalDate.now().minusDays(10));
+
         int hookyDayLimit = goal.getHookyDayLimit();
         assertThat(hookyDayLimit).isEqualTo(5);
         assertThat(hookyDayLimit).isLessThan(goal.getSchedule().length());
     }
 
-    private GoalModifyRequest toGoalModifyDto(GoalModifyCommand goalModifyCommand){
-        return GoalModifyRequest.builder()
-                .endDate(goalModifyCommand.getEndDate())
-                .timeReset(goalModifyCommand.isTimeReset())
-                .appointmentTime(goalModifyCommand.getAppointmentTime())
-                .build();
-    }
-
     @Test
     void 즉시_인증_목표_수정_테스트() throws Exception{
         //given
-        goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         LocalDate endDate = goal.getEndDate();
         GoalModifyDto dto = GoalModifyDto.builder()
                 .endDate(endDate.plusDays(10L))
@@ -78,7 +52,13 @@ class GoalTest {
                 .build();
 
         //when
-        GoalModifyCommand command = dtoMapper.toModifyCommand(dto, 1L, 2L);
+        GoalModifyCommand command = GoalModifyCommand.builder()
+                .goalId(goal.getId())
+                .userId(1L)
+                .endDate(dto.getEndDate())
+                .appointmentTime(dto.getAppointmentTime())
+                .timeReset(false)
+                .build();
 
         int beforePeriodLength = goal.getSchedule().length();
         GoalUpdater goalUpdater = new GoalUpdater(toGoalModifyDto(command));
@@ -94,7 +74,12 @@ class GoalTest {
     @Test
     void 목표_인증시간_삭제_테스트() throws Exception{
         //given
-        GoalModifyCommand command = dtoMapper.toModifyCommand(GoalModifyDto.builder().timeReset(true).build(), 1L, 2L);
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+
+        GoalModifyCommand command = GoalModifyCommand.builder()
+                .timeReset(true)
+                .build();
+
         //when
         GoalUpdater goalUpdater = new GoalUpdater(toGoalModifyDto(command));
         goalUpdater.update(goal);
@@ -127,6 +112,7 @@ class GoalTest {
     void 오늘까지_진행된_일_수_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        ReflectionTestUtils.setField(goal.period, "startDate", LocalDate.now().minusDays(10));
 
         //when
         int futureCount = goal.progressedWorkingDaysCount();
@@ -169,5 +155,13 @@ class GoalTest {
 
         boolean secondResult = testGoal.verifyConditions(post);
         assertThat(secondResult).isTrue();
+    }
+
+    private GoalModifyRequest toGoalModifyDto(GoalModifyCommand goalModifyCommand){
+        return GoalModifyRequest.builder()
+                .endDate(goalModifyCommand.endDate())
+                .timeReset(goalModifyCommand.timeReset())
+                .appointmentTime(goalModifyCommand.appointmentTime())
+                .build();
     }
 }

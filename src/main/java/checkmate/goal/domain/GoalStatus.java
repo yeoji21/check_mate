@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public enum GoalStatus {
-    ONGOING, OVER;
+    ONGOING, OVER, WAITING;
 }

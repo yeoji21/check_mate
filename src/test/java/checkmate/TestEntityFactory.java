@@ -19,7 +19,7 @@ public class TestEntityFactory {
         Goal goal = Goal.builder()
                 .category(GoalCategory.ETC)
                 .title(title)
-                .startDate(LocalDate.now().minusDays(10L))
+                .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();

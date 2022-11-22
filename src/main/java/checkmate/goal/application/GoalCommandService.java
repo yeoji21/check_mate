@@ -41,9 +41,9 @@ public class GoalCommandService {
 
     @Transactional
     public void modifyGoal(GoalModifyCommand command) {
-        checkUserIsInGoal(command.getGoalId(), command.getUserId());
+        checkUserIsInGoal(command.goalId(), command.userId());
         GoalUpdater updater = new GoalUpdater(mapper.toGoalModifyRequest(command));
-        updater.update(findGoalForUpdate(command.getGoalId()));
+        updater.update(findGoalForUpdate(command.goalId()));
     }
 
     @Transactional
