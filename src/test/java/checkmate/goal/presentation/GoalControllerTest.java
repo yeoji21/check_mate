@@ -153,7 +153,25 @@ public class GoalControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 유저가_오늘해야할_목표_조회_테스트() throws Exception{
-        TodayGoalInfoResult result = new TodayGoalInfoResult(List.of(getTodayGoalInfo(true), getTodayGoalInfo(false)));
+        Goal goal = TestEntityFactory.goal(1L, "testGoal");
+        TodayGoalInfo checked = TodayGoalInfo
+                .builder()
+                .id(goal.getId())
+                .category(goal.getCategory())
+                .title(goal.getTitle())
+                .checkDays(goal.getCheckDays())
+                .lastUploadDate(LocalDate.now())
+                .build();
+        TodayGoalInfo notChecked = TodayGoalInfo
+                .builder()
+                .id(goal.getId())
+                .category(goal.getCategory())
+                .title(goal.getTitle())
+                .checkDays(goal.getCheckDays())
+                .lastUploadDate(LocalDate.now().minusDays(1))
+                .build();
+
+        TodayGoalInfoResult result = new TodayGoalInfoResult(List.of(checked, notChecked));
         when(goalQueryService.findTodayGoalInfo(any(Long.class))).thenReturn(result);
 
         mockMvc.perform(get("/goal/today")
@@ -163,18 +181,6 @@ public class GoalControllerTest extends ControllerTest {
                 .andDo(document("find-todayGoal",
                         todayGoalInfoResponseFieldsSnippet()
                 ));
-    }
-
-    private TodayGoalInfo getTodayGoalInfo(boolean checked) {
-        Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        return TodayGoalInfo
-                .builder()
-                .id(goal.getId())
-                .category(goal.getCategory())
-                .title(goal.getTitle())
-                .checkDays(goal.getCheckDays())
-                .checked(checked)
-                .build();
     }
 
     @WithMockAuthUser

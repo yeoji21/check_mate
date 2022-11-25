@@ -47,13 +47,25 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
     @Override
     public List<TeamMate> updateYesterdayHookyTMs() {
+        // bit
         List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
                         "select tm.* from team_mate as tm" +
                                 " join goal as g on g.id = tm.goal_id " +
-                                " where BITAND(g.check_days, " +
-                                (1 << CheckDaysConverter.valueOf(LocalDate.now().minusDays(1).getDayOfWeek().toString()).getValue()) + ") != 0 " +
-                                " and g.status = 'ONGOING' and tm.status = 'ONGOING'", TeamMate.class)
+                                " where g.check_days & " + (1 << CheckDaysConverter.valueOf(LocalDate.now().minusDays(1).getDayOfWeek().toString()).getValue()) + " != 0" +
+                                " and g.status = 'ONGOING' and tm.status = 'ONGOING'"
+                        , TeamMate.class)
                 .getResultList();
+
+        // in
+//        List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
+//                        "select tm.* from team_mate as tm" +
+//                                " join goal as g on g.id = tm.goal_id " +
+//                                " where g.check_days in :values" +
+//                                " and g.status = 'ONGOING' and tm.status = 'ONGOING'"
+////                                + " limit 10000"
+//                        , TeamMate.class)
+//                .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now().minusDays(1)))
+//                .getResultList();
 
         List<Long> checkedTeamMateIds = queryFactory
                 .select(post.teamMate.id)

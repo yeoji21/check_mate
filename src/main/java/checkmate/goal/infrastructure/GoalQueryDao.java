@@ -5,6 +5,7 @@ import checkmate.goal.domain.*;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -21,25 +22,42 @@ import static checkmate.user.domain.QUser.user;
 @RequiredArgsConstructor
 @Repository
 public class GoalQueryDao{
+    private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
     // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
+//        return jdbcTemplate.query("select g.id, g.category, g.title, g.check_days, tm.last_upload_date" +
+//                " from team_mate as tm" +
+//                " join goal as g on g.id = tm.goal_id" +
+//                " where tm.user_id = " + userId + " and tm.status = 'ONGOING'" +
+//                " and g.status = 'ONGOING'" +
+//                " and g.check_days & " + (1 << CheckDaysConverter.valueOf(LocalDate.now().getDayOfWeek().toString()).getValue()) +" != 0",
+//                (resultSet, rowNum) ->
+//                     TodayGoalInfo.builder()
+//                            .id(resultSet.getLong("id"))
+//                            .category(GoalCategory.valueOf(resultSet.getString("category")))
+//                            .title(resultSet.getString("title"))
+//                            .checkDays(new GoalCheckDays(resultSet.getInt("check_days")))
+//                            .lastUploadDate(resultSet.getObject("last_upload_date", LocalDate.class))
+//                            .build()
+//        );
+
         List<Object[]> resultList = entityManager.createNativeQuery(
-                        "select g.id, g.category, g.title, g.check_days, " +
-                                " case when tm.last_upload_date = :today then true else false end" +
+                        "select g.id, g.category, g.title, g.check_days, tm.last_upload_date" +
                                 " from team_mate as tm" +
                                 " join goal as g on g.id = tm.goal_id" +
                                 " where tm.user_id = :userId" +
-                                " and BITAND(g.check_days," + (1 << CheckDaysConverter.valueOf(LocalDate.now().getDayOfWeek().toString()).getValue()) +") != 0" +
+                                " and g.check_days in :values" +
                                 " and tm.status = 'ONGOING' and g.status = 'ONGOING'")
-                .setParameter("today", LocalDate.now())
                 .setParameter("userId", userId)
+                .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now()))
                 .getResultList();
+
         return resultList.stream()
                 .map(arr -> new TodayGoalInfo(Long.parseLong(String.valueOf(arr[0])), GoalCategory.valueOf(String.valueOf(arr[1])),
-                        (String) arr[2], new GoalCheckDays(Integer.parseInt(String.valueOf(arr[3]))), (Boolean) arr[4]))
+                        (String) arr[2], new GoalCheckDays(Integer.parseInt(String.valueOf(arr[3]))), (LocalDate) arr[4]))
                 .toList();
     }
 

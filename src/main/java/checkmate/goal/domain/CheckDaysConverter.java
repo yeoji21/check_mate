@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Getter
@@ -45,5 +47,14 @@ public enum CheckDaysConverter {
 
     public static boolean isWorkingDay(int value, LocalDate date) {
         return isWorkingDay(value, CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).value);
+    }
+
+    public static List<Integer> matchingDateValues(LocalDate localDate) {
+        int dateValue = CheckDaysConverter.valueOf(localDate.getDayOfWeek().toString()).getValue();
+        return IntStream.rangeClosed(1, 128)
+                .filter(value -> isWorkingDay(value, dateValue))
+                .mapToObj(Integer::valueOf)
+                .toList();
+
     }
 }

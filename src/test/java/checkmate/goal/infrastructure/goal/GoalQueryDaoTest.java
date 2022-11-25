@@ -7,13 +7,17 @@ import checkmate.goal.domain.*;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.StopWatch;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@AutoConfigureBefore(DataSourceAutoConfiguration.class)
 
 class GoalQueryDaoTest extends RepositoryTest {
     @Test @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
@@ -102,6 +106,27 @@ class GoalQueryDaoTest extends RepositoryTest {
         assertThat(historyGoalList.get(0).getTeamMateNames().get(0)).isNotEqualTo(historyGoalList.get(0).getTeamMateNames().get(1));
     }
 
+    @Test
+    void test() throws Exception{
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        em.createNativeQuery("select * from goal where goal.check_days2 like '%금%' limit 1000", Goal.class)
+                .getResultList();
+        stopWatch.stop();
+        System.out.println("=================================================");
+        System.out.println("time : " + stopWatch.getTotalTimeMillis());
+        System.out.println("=================================================");
+
+        stopWatch.start();
+        em.createNativeQuery("select * from goal where goal.check_days in :values limit 1000", Goal.class)
+                .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now()))
+                .getResultList();
+        stopWatch.stop();
+        System.out.println("=================================================");
+        System.out.println("time : " + stopWatch.getTotalTimeMillis());
+        System.out.println("=================================================");
+    }
+
     @Test @DisplayName("오늘 진행할 목표 정보")
     void findTodayGoalInfo() throws Exception{
         //given
@@ -112,7 +137,11 @@ class GoalQueryDaoTest extends RepositoryTest {
         setTodayStartGoal(tester);
 
         //when
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(tester.getId());
+        stopWatch.stop();
+        System.out.println("time : " + stopWatch.getTotalTimeMillis());
         System.out.println(todayGoals.get(0).getCheckDays());
 
         //then
