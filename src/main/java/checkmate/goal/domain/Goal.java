@@ -28,7 +28,7 @@ public class Goal extends BaseTimeEntity {
     @NotNull @Column(name = "title", nullable = false)
     private String title;
     @Embedded @NotNull
-    public GoalPeriod period;
+    private GoalPeriod period;
     @Embedded @NotNull
     private GoalCheckDays checkDays;
     @Enumerated(EnumType.STRING) @NotNull
@@ -36,7 +36,7 @@ public class Goal extends BaseTimeEntity {
     private GoalStatus status;
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
-
+    // TODO: 2022/11/30 같은 종류의 condition은 추가되면 안되는 제약 사항
     @Getter(value = AccessLevel.PRIVATE)
     @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VerificationCondition> conditions = new ArrayList<>();
@@ -60,10 +60,10 @@ public class Goal extends BaseTimeEntity {
         condition.setGoal(this);
     }
 
-    public boolean verifyConditions(Post post) {
-        if(post.isChecked()) return false;
-        return conditions.stream()
-                .allMatch(condition -> condition.satisfy(post));
+    public void checkConditions(Post post) {
+        boolean verified = conditions.stream().allMatch(condition -> condition.satisfy(post));
+        if(post.isChecked() && !verified) post.uncheck();
+        else if(!post.isChecked() && verified) post.check();
     }
 
     public int getHookyDayLimit() {

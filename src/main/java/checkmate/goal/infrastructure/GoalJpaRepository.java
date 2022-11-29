@@ -104,9 +104,12 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public List<VerificationCondition> findConditions(Long goalId) {
-        return queryFactory.selectFrom(verificationCondition)
-                .where(verificationCondition.goal.id.eq(goalId))
-                .fetch();
+    public Optional<Goal> findWithConditions(Long goalId) {
+        return Optional.ofNullable(
+                queryFactory.selectFrom(goal)
+                        .join(goal.conditions, verificationCondition).fetchJoin()
+                        .where(goal.id.eq(goalId))
+                        .fetchOne()
+        );
     }
 }

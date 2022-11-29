@@ -3,10 +3,7 @@ package checkmate.post.application;
 import checkmate.exception.ImageProcessIOException;
 import checkmate.exception.TeamMateNotFoundException;
 import checkmate.exception.UserNotFoundException;
-import checkmate.goal.domain.GoalRepository;
-import checkmate.goal.domain.PostVerificationService;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateRepository;
+import checkmate.goal.domain.*;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
@@ -37,7 +34,6 @@ public class PostCommandService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final TeamMateRepository teamMateRepository;
-    private final PostVerificationService postVerificationService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
@@ -66,7 +62,8 @@ public class PostCommandService {
     }
 
     private void verifyGoalConditions(Long goalId, Post post) {
-        postVerificationService.verify(post, goalRepository.findConditions(goalId));
+        Goal goal = goalRepository.findWithConditions(goalId).orElseThrow(IllegalArgumentException::new);
+        goal.checkConditions(post);
     }
 
     private long validateUserInGoal(long userId, Post post) {

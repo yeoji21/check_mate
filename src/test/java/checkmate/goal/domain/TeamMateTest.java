@@ -87,7 +87,7 @@ class TeamMateTest {
     void 초대응답_수락_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal.period, "startDate", LocalDate.now().minusDays(10));
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         int before = teamMate.getWorkingDays();

@@ -19,7 +19,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,6 @@ class PostCommandServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private GoalRepository goalRepository;
     @Mock private TeamMateRepository teamMateRepository;
-    @Mock private PostVerificationService postVerificationService;
     @Mock private ApplicationEventPublisher eventPublisher;
 
     @Test
@@ -48,14 +46,13 @@ class PostCommandServiceTest {
 
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(teamMate));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "tester")));
-        given(goalRepository.findConditions(any(Long.class))).willReturn(Collections.EMPTY_LIST);
+        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
         postCommandService.upload(dto);
 
         //then
         verify(postRepository).save(any());
-        verify(postVerificationService).verify(any(Post.class), any(List.class));
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
@@ -69,6 +66,7 @@ class PostCommandServiceTest {
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
+        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
         postCommandService.like(teamMate.getUserId(), post.getId());
@@ -88,6 +86,7 @@ class PostCommandServiceTest {
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
+        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
         postCommandService.unlike(teamMate.getUserId(), post.getId());

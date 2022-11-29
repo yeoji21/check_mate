@@ -9,7 +9,7 @@ public interface GoalRepository {
     Optional<Goal> findByIdForUpdate(long goalId);
     boolean checkUserIsInGoal(long goalId, long userId);
     List<Long> updateYesterdayOveredGoals();
-    List<VerificationCondition> findConditions(Long goalId);
+    Optional<Goal> findWithConditions(Long goalId);
     int countOngoingGoals(long userId);
     void updateTodayStartGoal();
 }

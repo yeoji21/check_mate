@@ -6,6 +6,7 @@ import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.presentation.dto.request.GoalModifyDto;
 import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -33,7 +34,7 @@ class GoalTest {
     @Test
     void 땡땡이_최대치_조회_테스트() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        ReflectionTestUtils.setField(goal.period, "startDate", LocalDate.now().minusDays(10));
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
 
         int hookyDayLimit = goal.getHookyDayLimit();
         assertThat(hookyDayLimit).isEqualTo(5);
@@ -110,7 +111,7 @@ class GoalTest {
     void 오늘까지_진행된_일_수_테스트() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        ReflectionTestUtils.setField(goal.period, "startDate", LocalDate.now().minusDays(10));
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
 
         //when
         int futureCount = goal.progressedWorkingDaysCount();
@@ -127,10 +128,10 @@ class GoalTest {
         Post post = TestEntityFactory.post(teamMate);
 
         //when
-        boolean result = goal.verifyConditions(post);
+        goal.checkConditions(post);
 
         //then
-        assertThat(result).isTrue();
+        assertThat(post.isChecked()).isTrue();
     }
 
     @Test
@@ -142,33 +143,34 @@ class GoalTest {
         Post post = TestEntityFactory.post(teamMate);
 
         //when
-        boolean result = goal.verifyConditions(post);
+        goal.checkConditions(post);
+        assertThat(post.isChecked()).isFalse();
 
         //then
-        assertThat(result).isFalse();
-
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
 
-        boolean secondResult = goal.verifyConditions(post);
-        assertThat(secondResult).isTrue();
+        goal.checkConditions(post);
+        assertThat(post.isChecked()).isTrue();
     }
 
-    @Test
-    void verifyPost() throws Exception{
+    @Test @DisplayName("인증 성공했다가 취소되는 경우")
+    void failVerifyConditions() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        goal.addCondition(new LikeCountCondition(10));
+        goal.addCondition(new LikeCountCondition(3));
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(teamMate);
+        ReflectionTestUtils.setField(post, "checked", true);
 
         //when
-
-
+        goal.checkConditions(post);
 
         //then
-
+        assertThat(post.isChecked()).isFalse();
     }
 
     private GoalModifyRequest toGoalModifyDto(GoalModifyCommand goalModifyCommand){

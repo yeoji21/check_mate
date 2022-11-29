@@ -51,14 +51,17 @@ public class GoalRepositoryTest extends RepositoryTest {
     @Test
     void findConditions() throws Exception{
         //given
-        Goal testGoal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(testGoal);
-        testGoal.addCondition(new LikeCountCondition(5));
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+        goal.addCondition(new LikeCountCondition(5));
+        em.flush();
+        em.clear();
 
         //when
-        List<VerificationCondition> conditions = goalRepository.findConditions(testGoal.getId());
+        Goal findGoal = goalRepository.findWithConditions(goal.getId()).orElseThrow(IllegalArgumentException::new);
 
         //then
+        List conditions = (List) ReflectionTestUtils.getField(findGoal, "conditions");
         assertThat(conditions.size()).isEqualTo(1);
     }
 
