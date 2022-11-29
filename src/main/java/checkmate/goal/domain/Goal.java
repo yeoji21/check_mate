@@ -25,8 +25,7 @@ public class Goal extends BaseTimeEntity {
     @Enumerated(EnumType.STRING) @NotNull
     @Column(name = "category", nullable = false)
     private GoalCategory category;
-    @NotNull
-    @Column(name = "title", nullable = false)
+    @NotNull @Column(name = "title", nullable = false)
     private String title;
     @Embedded @NotNull
     public GoalPeriod period;

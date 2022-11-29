@@ -128,13 +128,14 @@ public class TeamMateCommandServiceTest {
     @Test
     void 인증하지_않은_팀원_업데이트_테스트() throws Exception{
         //given
-        List<TeamMate> hookeyTms = new ArrayList<>();
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        List<TeamMate> hookyTms = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            hookeyTms.add(TestEntityFactory.teamMate((long) i, i));
+            hookyTms.add(goal.join(TestEntityFactory.user((long) i, "user" + i)));
         }
 
-        given(teamMateRepository.updateYesterdayHookyTMs()).willReturn(hookeyTms);
-        given(teamMateRepository.eliminateOveredTMs(hookeyTms)).willReturn(Collections.EMPTY_LIST);
+        given(teamMateRepository.updateYesterdayHookyTMs()).willReturn(hookyTms);
+        given(teamMateRepository.eliminateOveredTMs(hookyTms)).willReturn(Collections.EMPTY_LIST);
 
         //when
         teamMateCommandService.updateHookyTeamMate();

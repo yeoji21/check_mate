@@ -1,8 +1,8 @@
 package checkmate.post.domain;
 
 import checkmate.TestEntityFactory;
+import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -13,17 +13,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PostTest {
-    private Post post;
-    private TeamMate teamMate;
-    @BeforeEach
-    void setUp() {
-        teamMate = TestEntityFactory.teamMate(1L, 1L);
-        post = Post.builder().teamMate(teamMate).content("post body text").build();
-    }
-
     @Test
     void 좋아요_매핑_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+
         post.addLikes(new Likes(2L));
         post.addLikes(new Likes(3L));
         //when
@@ -35,6 +31,10 @@ class PostTest {
 
     @Test
     void 좋아요_가능_여부() throws Exception{
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+
         ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
         assertThat(post.isLikeable()).isFalse();
 
@@ -51,6 +51,10 @@ class PostTest {
     @Test
     void 좋아요_제거_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));
         post.addLikes(new Likes(3L));
@@ -66,13 +70,16 @@ class PostTest {
     @Test
     void 좋아요_제거_실패_테스트() throws Exception{
         //given
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));
         post.addLikes(new Likes(3L));
 
         //when //then
-        assertThrows(IllegalArgumentException.class,
-                () -> post.removeLikes(5L));
+        assertThrows(IllegalArgumentException.class, () -> post.removeLikes(5L));
     }
 }
 

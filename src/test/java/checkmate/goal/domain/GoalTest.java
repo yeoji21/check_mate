@@ -122,11 +122,12 @@ class GoalTest {
     @Test
     void 기본_인증_조건_확인() throws Exception{
         //given
-        Goal testGoal = TestEntityFactory.goal(1L, "test");
-        Post post = TestEntityFactory.post(TestEntityFactory.teamMate(1L, 1L));
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(teamMate);
 
         //when
-        boolean result = testGoal.verifyConditions(post);
+        boolean result = goal.verifyConditions(post);
 
         //then
         assertThat(result).isTrue();
@@ -135,12 +136,13 @@ class GoalTest {
     @Test
     void 좋아요_개수_인증_조건_확인() throws Exception{
         //given
-        Goal testGoal = TestEntityFactory.goal(1L, "test");
-        testGoal.addCondition(new LikeCountCondition(5));
-        Post post = TestEntityFactory.post(TestEntityFactory.teamMate(1L, 1L));
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        goal.addCondition(new LikeCountCondition(5));
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(teamMate);
 
         //when
-        boolean result = testGoal.verifyConditions(post);
+        boolean result = goal.verifyConditions(post);
 
         //then
         assertThat(result).isFalse();
@@ -151,8 +153,22 @@ class GoalTest {
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
 
-        boolean secondResult = testGoal.verifyConditions(post);
+        boolean secondResult = goal.verifyConditions(post);
         assertThat(secondResult).isTrue();
+    }
+
+    @Test
+    void verifyPost() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        goal.addCondition(new LikeCountCondition(10));
+
+        //when
+
+
+
+        //then
+
     }
 
     private GoalModifyRequest toGoalModifyDto(GoalModifyCommand goalModifyCommand){

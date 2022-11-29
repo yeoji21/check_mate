@@ -1,6 +1,8 @@
 package checkmate.post.domain;
 
 import checkmate.TestEntityFactory;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.TeamMate;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,7 +11,9 @@ class ImageTest {
     @Test
     void 이미지_엔티티_생성_테스트() throws Exception{
         //given
-        Post post = Post.builder().teamMate(TestEntityFactory.teamMate(1L, 1L)).content("post body text").build();
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
         Image image = Image.builder()
                 .post(post)
                 .storedName("stored name")

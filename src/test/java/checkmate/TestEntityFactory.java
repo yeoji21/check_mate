@@ -8,8 +8,6 @@ import checkmate.user.domain.User;
 import checkmate.user.domain.UserRole;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.Collections;
 
@@ -37,20 +35,6 @@ public class TestEntityFactory {
                 .build();
         ReflectionTestUtils.setField(user, "id", id);
         return user;
-    }
-
-    public static TeamMate teamMate(Long teamMateId, long userId) {
-        TeamMate teamMate;
-        try {
-            Constructor<TeamMate> constructor = TeamMate.class.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            teamMate = constructor.newInstance();
-        } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
-            throw new IllegalArgumentException(e);
-        }
-        ReflectionTestUtils.setField(teamMate, "id", teamMateId);
-        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-        return teamMate;
     }
 
     public static Post post(TeamMate uploader) {

@@ -21,7 +21,7 @@ public enum CheckDaysConverter {
     FRIDAY(4, "금"),
     SATURDAY(5, "토"),
     SUNDAY(6, "일");
-    private final int value;
+    private final int shift;
     private final String kor;
     private static final Map<String, CheckDaysConverter> KOR_MAP =
             Stream.of(values()).collect(Collectors.toMap(CheckDaysConverter::getKor, e -> e));
@@ -29,14 +29,14 @@ public enum CheckDaysConverter {
     public static int toValue(String korWeekDays) {
         int value = 0;
         for (String weekDay : korWeekDays.split("")) {
-            value |= (1 << KOR_MAP.get(weekDay).value);
+            value |= (1 << KOR_MAP.get(weekDay).shift);
         }
         return value;
     }
 
     public static String toDays(int value) {
         return Arrays.stream(values())
-                .filter(day -> isWorkingDay(value, day.value))
+                .filter(day -> isWorkingDay(value, day.shift))
                 .map(day -> day.kor)
                 .collect(Collectors.joining());
     }
@@ -46,11 +46,11 @@ public enum CheckDaysConverter {
     }
 
     public static boolean isWorkingDay(int value, LocalDate date) {
-        return isWorkingDay(value, CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).value);
+        return isWorkingDay(value, CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).shift);
     }
 
     public static List<Integer> matchingDateValues(LocalDate localDate) {
-        int dateValue = CheckDaysConverter.valueOf(localDate.getDayOfWeek().toString()).getValue();
+        int dateValue = CheckDaysConverter.valueOf(localDate.getDayOfWeek().toString()).getShift();
         return IntStream.rangeClosed(1, 128)
                 .filter(value -> isWorkingDay(value, dateValue))
                 .mapToObj(Integer::valueOf)

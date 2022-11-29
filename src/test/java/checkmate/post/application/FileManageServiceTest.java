@@ -1,6 +1,7 @@
 package checkmate.post.application;
 
 import checkmate.TestEntityFactory;
+import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.post.domain.FileStore;
 import checkmate.post.domain.Image;
@@ -27,7 +28,8 @@ class FileManageServiceTest {
     @Test
     void 파일_업로드_테스트() throws Exception{
         //given
-        TeamMate teamMate = TestEntityFactory.teamMate(1L, 1L);
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
         Post post = TestEntityFactory.post(teamMate);
         MockMultipartFile file = new MockMultipartFile("filename", new byte[]{});
 
