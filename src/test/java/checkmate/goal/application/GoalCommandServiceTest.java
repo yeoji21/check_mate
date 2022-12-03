@@ -2,7 +2,8 @@ package checkmate.goal.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.ExceedGoalLimitException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
@@ -131,7 +132,7 @@ public class GoalCommandServiceTest {
                 .checkDays("월수금")
                 .build();
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(11);
-        assertThrows(ExceedGoalLimitException.class,
-                () -> goalCommandService.create(command));
+        BusinessException exception = assertThrows(BusinessException.class, () -> goalCommandService.create(command));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 }

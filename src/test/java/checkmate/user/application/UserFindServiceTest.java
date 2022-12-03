@@ -1,7 +1,8 @@
 package checkmate.user.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.DuplicatedNicknameException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -34,7 +36,8 @@ class UserFindServiceTest {
     @Test
     void 닉네임_중복_예외_테스트() throws Exception{
         when(userRepository.findByNickname(any(String.class))).thenReturn(Optional.of(TestEntityFactory.user(1L, "tester")));
-        assertThrows(DuplicatedNicknameException.class, () -> userFindService.existsNicknameCheck("existsNickname"));
+        BusinessException exception = assertThrows(BusinessException.class, () -> userFindService.existsNicknameCheck("existsNickname"));
         verify(userRepository).findByNickname(any(String.class));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_NICKNAME);
     }
 }

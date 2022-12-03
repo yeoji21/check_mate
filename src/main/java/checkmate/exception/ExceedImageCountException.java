@@ -5,6 +5,6 @@ import checkmate.exception.format.InvalidValueException;
 
 public class ExceedImageCountException extends InvalidValueException {
     public ExceedImageCountException() {
-        super(ErrorCode.EXCEED_LIMIT);
+        super(ErrorCode.EXCEED_IMAGE_LIMIT);
     }
 }

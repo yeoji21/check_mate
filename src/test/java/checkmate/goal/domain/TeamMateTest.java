@@ -1,8 +1,9 @@
 package checkmate.goal.domain;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.ExceedGoalLimitException;
 import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -34,8 +35,8 @@ class TeamMateTest {
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
 
         //when then
-        assertThrows(ExceedGoalLimitException.class,
-                () -> teamMate.initiateGoal(11));
+        BusinessException exception = assertThrows(BusinessException.class, () -> teamMate.initiateGoal(11));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 
     @Test
