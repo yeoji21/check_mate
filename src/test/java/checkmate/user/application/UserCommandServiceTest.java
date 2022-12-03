@@ -1,7 +1,8 @@
 package checkmate.user.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.UpdateDurationException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import checkmate.user.application.dto.UserCommandMapper;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
@@ -69,6 +70,7 @@ class UserCommandServiceTest {
         UserNicknameModifyCommand command = new UserNicknameModifyCommand(1L, "newNickname");
         given(userRepository.findById(any(Long.class))).willReturn(Optional.of(user));
 
-        assertThrows(UpdateDurationException.class, () -> userRegisterService.nicknameUpdate(command));
+        BusinessException exception = assertThrows(BusinessException.class, () -> userRegisterService.nicknameUpdate(command));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.UPDATE_DURATION);
     }
 }

@@ -1,7 +1,8 @@
 package checkmate.user.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
-import checkmate.exception.UpdateDurationException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import lombok.*;
 
 import javax.persistence.*;
@@ -55,7 +56,7 @@ public class User extends BaseTimeEntity {
 
     public void changeNickname(String nickname) {
         if(nicknameUpdatedDate != null && nicknameUpdatedDate.plusDays(30L).isAfter(LocalDate.now()))
-            throw new UpdateDurationException();
+            throw new BusinessException(ErrorCode.UPDATE_DURATION);
         this.nickname = nickname;
         this.nicknameUpdatedDate = LocalDate.now();
     }

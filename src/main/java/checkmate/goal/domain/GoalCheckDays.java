@@ -1,6 +1,7 @@
 package checkmate.goal.domain;
 
-import checkmate.exception.InvalidWeekDaysException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -51,7 +52,7 @@ public class GoalCheckDays implements Serializable {
 
     private void correctDayCheck(String korWeekDays) {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
-            throw new InvalidWeekDaysException();
+            throw new BusinessException(ErrorCode.INVALID_GOAL_WEEK_DAYS);
     }
 
     private void duplicateDayCheck(String korWeekDays) {

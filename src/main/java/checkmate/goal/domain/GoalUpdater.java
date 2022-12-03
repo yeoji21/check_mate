@@ -1,7 +1,7 @@
 package checkmate.goal.domain;
 
-import checkmate.exception.InvalidDateRangeException;
-import checkmate.exception.UpdateDurationException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
@@ -32,11 +32,11 @@ public class GoalUpdater {
 
     private void endDateCheck(Goal goal) {
         if (request.getEndDate() != null && goal.getEndDate().isAfter(request.getEndDate()))
-            throw new InvalidDateRangeException();
+            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
     }
 
     private void modifiedDateCheck(Goal goal) {
         if(goal.getModifiedDateTime() != null && goal.getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now()))
-            throw new UpdateDurationException();
+            throw new BusinessException(ErrorCode.UPDATE_DURATION);
     }
 }

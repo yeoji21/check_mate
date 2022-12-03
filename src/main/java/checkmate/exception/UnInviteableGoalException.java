@@ -5,6 +5,6 @@ import checkmate.exception.format.InvalidValueException;
 
 public class UnInviteableGoalException extends InvalidValueException {
     public UnInviteableGoalException() {
-        super(ErrorCode.WAITING_INVITE);
+        super(ErrorCode.DUPLICATED_INVITE_REQUEST);
     }
 }
