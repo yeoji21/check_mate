@@ -1,4 +1,4 @@
-package checkmate.exception.format;
+package checkmate.exception;
 
 import lombok.Builder;
 import lombok.Getter;

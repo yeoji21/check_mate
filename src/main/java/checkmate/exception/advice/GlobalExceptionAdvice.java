@@ -1,10 +1,9 @@
 package checkmate.exception.advice;
 
-import checkmate.exception.ImageProcessIOException;
-import checkmate.exception.NotificationPushIOException;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorResponse;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.ErrorResponse;
+import checkmate.exception.RuntimeIOException;
 import com.amazonaws.services.ecr.model.ImageNotFoundException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,15 +63,9 @@ public class GlobalExceptionAdvice {
     }
 
     @ExceptionHandler
-    private ResponseEntity<ErrorResponse> fcmNotificationPush(NotificationPushIOException e) {
-        log.warn("[handleNotificationPushIOException] : {}", e.getMessage());
-        return ErrorResponse.toResponseEntity(ErrorCode.SERVICE_UNAVAILABLE);
-    }
-
-    @ExceptionHandler
-    protected ResponseEntity<ErrorResponse> s3ImageSave(ImageProcessIOException e) {
-        log.warn("[handleImageSaveIOException] : {}", e.getMessage());
-        return ErrorResponse.toResponseEntity(ErrorCode.SERVICE_UNAVAILABLE);
+    protected ResponseEntity<ErrorResponse> s3ImageSave(RuntimeIOException e) {
+        log.warn("[handleRuntimeIOException] : {}", e.getMessage());
+        return ErrorResponse.toResponseEntity(e.getErrorCode());
     }
 
     @ExceptionHandler

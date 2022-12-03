@@ -1,8 +1,8 @@
 package checkmate.user.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
 import lombok.*;
 
 import javax.persistence.*;

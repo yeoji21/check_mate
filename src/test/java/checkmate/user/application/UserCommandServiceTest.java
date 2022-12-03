@@ -1,8 +1,8 @@
 package checkmate.user.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
 import checkmate.user.application.dto.UserCommandMapper;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;

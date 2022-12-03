@@ -1,4 +1,4 @@
-package checkmate.exception.format;
+package checkmate.exception;
 
 public class NotFoundException extends BusinessException{
     public NotFoundException(ErrorCode errorCode) {

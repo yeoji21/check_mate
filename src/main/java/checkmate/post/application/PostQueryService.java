@@ -1,7 +1,7 @@
 package checkmate.post.application;
 
-import checkmate.exception.format.ErrorCode;
-import checkmate.exception.format.NotFoundException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.NotFoundException;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.post.application.dto.response.PostInfo;

@@ -1,7 +1,7 @@
 package checkmate.notification.domain;
 
-import checkmate.exception.format.ErrorCode;
-import checkmate.exception.format.NotFoundException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.NotFoundException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

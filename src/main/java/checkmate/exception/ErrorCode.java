@@ -1,4 +1,4 @@
-package checkmate.exception.format;
+package checkmate.exception;
 
 import checkmate.common.CommonCode;
 import checkmate.config.jwt.TokenCode;
@@ -29,6 +29,8 @@ public enum ErrorCode {
     EMPTY_NICKNAME(UserCode.EMPTY_NICKNAME.getCode(), BAD_REQUEST, UserCode.EMPTY_NICKNAME.getMessage()),
     EXCEED_IMAGE_LIMIT(PostCode.IMAGE_LIMIT.getCode(), BAD_REQUEST, PostCode.IMAGE_LIMIT.getMessage()),
     REFRESH_TOKEN_EXPIRED(TokenCode.REFRESH_TOKEN_EXPIRED.getCode(), BAD_REQUEST, TokenCode.REFRESH_TOKEN_EXPIRED.getMessage()),
+    IMAGE_PROCESSING_IO(PostCode.IMAGE_IO.getCode(), BAD_REQUEST, PostCode.IMAGE_IO.getMessage()),
+    NOTIFICATION_PUSH_IO(NotificationCode.PUSH_IO.getCode(), BAD_REQUEST, NotificationCode.PUSH_IO.getMessage()),
 
     // 404 NOT_FOUND : Resource를 찾을 수 없음
     USER_NOT_FOUND(UserCode.NOT_FOUND.getCode(), NOT_FOUND, UserCode.NOT_FOUND.getMessage()),

@@ -1,6 +1,6 @@
 package checkmate.common;
 
-import checkmate.exception.format.BusinessCode;
+import checkmate.exception.BusinessCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

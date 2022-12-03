@@ -1,6 +1,7 @@
 package checkmate.notification.infrastructure;
 
-import checkmate.exception.NotificationPushIOException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.RuntimeIOException;
 import checkmate.notification.domain.push.PushNotification;
 import checkmate.notification.domain.push.PushNotificationSendStrategy;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
@@ -40,7 +41,7 @@ public class SingleFcmMessageSendStrategy implements PushNotificationSendStrateg
                 .bodyValue(fcmSingleMessage)
                 .retrieve()
                 .onStatus(HttpStatus::isError, clientResponse -> {
-                    throw new NotificationPushIOException();
+                    throw new RuntimeIOException(ErrorCode.NOTIFICATION_PUSH_IO);
                 })
                 .bodyToMono(String.class)
                 .subscribe(response -> log.info("firebase message send response : {}", response));
@@ -58,7 +59,7 @@ public class SingleFcmMessageSendStrategy implements PushNotificationSendStrateg
             googleCredential.refreshToken();
             return googleCredential.getAccessToken();
         } catch (IOException e) {
-            throw new NotificationPushIOException(e);
+            throw new RuntimeIOException(e, ErrorCode.NOTIFICATION_PUSH_IO);
         }
     }
 }

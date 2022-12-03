@@ -1,6 +1,7 @@
 package checkmate.post.infrastructure;
 
-import checkmate.exception.ImageProcessIOException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.RuntimeIOException;
 import checkmate.post.domain.FileStore;
 import checkmate.post.domain.ImageFileUtil;
 import com.amazonaws.services.s3.AmazonS3;
@@ -24,7 +25,7 @@ public class S3FileStore implements FileStore {
         try (inputStream) {
             s3.putObject(BUCKET_NAME, storedFilename, inputStream, ImageFileUtil.getObjectMetadata(originalFilename));
         } catch (IOException e) {
-            throw new ImageProcessIOException(e);
+            throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
         }
     }
 
@@ -33,7 +34,7 @@ public class S3FileStore implements FileStore {
         try {
             s3.deleteObject("checkmate", storedName);
         } catch (AmazonS3Exception e) {
-            throw new ImageProcessIOException(e);
+            throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
         }
     }
 }

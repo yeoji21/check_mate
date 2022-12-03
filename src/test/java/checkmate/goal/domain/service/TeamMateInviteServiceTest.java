@@ -1,8 +1,8 @@
 package checkmate.goal.domain.service;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
@@ -34,7 +34,7 @@ class TeamMateInviteServiceTest {
         User user = TestEntityFactory.user(1L, "user");
         TeamMate teamMate = goal.join(user);
         ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-        
+
         //when / then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> teamMateInviteService.invite(goal, Optional.of(teamMate), user));

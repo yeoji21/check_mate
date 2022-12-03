@@ -1,6 +1,7 @@
 package checkmate.notification.infrastructure;
 
-import checkmate.exception.NotificationPushIOException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.RuntimeIOException;
 import checkmate.notification.domain.push.PushNotification;
 import checkmate.notification.domain.push.PushNotificationSendStrategy;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class MultipleFcmMessageSendStrategy implements PushNotificationSendStrat
                 .bodyValue(fcmMultipleMessage)
                 .retrieve()
                 .onStatus(HttpStatus::isError, clientResponse -> {
-                    throw new NotificationPushIOException();
+                    throw new RuntimeIOException(ErrorCode.NOTIFICATION_PUSH_IO);
                 })
                 .bodyToMono(String.class)
                 .subscribe(response -> log.info("firebase message send response : {}", response));

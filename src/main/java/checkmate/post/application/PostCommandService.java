@@ -1,8 +1,8 @@
 package checkmate.post.application;
 
-import checkmate.exception.ImageProcessIOException;
-import checkmate.exception.format.ErrorCode;
-import checkmate.exception.format.NotFoundException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.NotFoundException;
+import checkmate.exception.RuntimeIOException;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.TeamMate;
@@ -111,7 +111,7 @@ public class PostCommandService {
                 try {
                     eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
                 } catch (IOException e) {
-                    throw new ImageProcessIOException(e);
+                    throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
                 }
             });
         }

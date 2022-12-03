@@ -1,8 +1,8 @@
 package checkmate.user.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

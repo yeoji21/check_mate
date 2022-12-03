@@ -1,4 +1,4 @@
-package checkmate.exception.format;
+package checkmate.exception;
 
 public interface BusinessCode {
     String getCode();

@@ -2,8 +2,8 @@ package checkmate.goal.domain;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.UnInviteableGoalException;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 

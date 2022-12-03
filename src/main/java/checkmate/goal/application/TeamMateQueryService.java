@@ -1,7 +1,7 @@
 package checkmate.goal.application;
 
-import checkmate.exception.format.ErrorCode;
-import checkmate.exception.format.NotFoundException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;

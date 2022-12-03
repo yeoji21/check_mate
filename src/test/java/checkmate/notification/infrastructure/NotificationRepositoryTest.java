@@ -2,8 +2,8 @@ package checkmate.notification.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.exception.format.ErrorCode;
-import checkmate.exception.format.NotFoundException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.NotFoundException;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;

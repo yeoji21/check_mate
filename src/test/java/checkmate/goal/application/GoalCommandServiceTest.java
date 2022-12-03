@@ -2,8 +2,8 @@ package checkmate.goal.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.format.BusinessException;
-import checkmate.exception.format.ErrorCode;
+import checkmate.exception.BusinessException;
+import checkmate.exception.ErrorCode;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;

@@ -1,8 +1,8 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.format.ErrorCode;
-import checkmate.exception.format.NotFoundException;
+import checkmate.exception.ErrorCode;
+import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static checkmate.exception.format.ErrorCode.USER_NOT_FOUND;
+import static checkmate.exception.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.*;
 
 @Slf4j
