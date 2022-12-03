@@ -4,14 +4,14 @@ import checkmate.config.auth.AuthConstants;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
 import checkmate.exception.RefreshTokenNotFoundException;
-import checkmate.exception.UserNotFoundException;
 import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.presentation.dto.response.LoginTokenResponse;
-import checkmate.exception.format.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+
+import static checkmate.exception.format.ErrorCode.USER_NOT_FOUND;
 
 
 @Slf4j
@@ -34,17 +36,16 @@ public class LoginService {
 
     public LoginTokenResponse login(SnsLoginCommand snsLoginCommand) {
         User user = userRepository.findByProviderId(snsLoginCommand.getProviderId())
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         fcmTokenUpdate(user, snsLoginCommand.getFcmToken());
-        if(user.getNickname() == null)
-            throw new BusinessException(ErrorCode.NICKNAME_NOT_FOUND);
+        if(user.getNickname() == null) throw new BusinessException(ErrorCode.NICKNAME_NOT_FOUND);
         return getLoginTokenResponse(user);
     }
 
     public LoginTokenResponse reissueToken(TokenReissueCommand command) {
         String providerId = jwtDecoder.getProviderId(command.getAccessToken());
         refreshTokenExistCheck(providerId, command.getRefreshToken());
-        User user = userRepository.findByProviderId(providerId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findByProviderId(providerId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return getLoginTokenResponse(user);
     }
 
@@ -58,7 +59,7 @@ public class LoginService {
     }
 
     public void logout(long userId) {
-        User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
         redisTemplate.delete(user.getProviderId());
     }
 

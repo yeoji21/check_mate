@@ -3,13 +3,13 @@ package checkmate.user.application;
 import checkmate.TestEntityFactory;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
-import checkmate.exception.UserNotFoundException;
 import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.NotFoundException;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
-import checkmate.user.domain.UserRole;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
+import checkmate.user.domain.UserRole;
 import checkmate.user.presentation.dto.response.LoginTokenResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -69,7 +69,7 @@ class LoginServiceTest {
         //when
 
         //then
-        assertThrows(UserNotFoundException.class, () -> loginService.login(new SnsLoginCommand("id", "fcmToken")));
+        assertThrows(NotFoundException.class, () -> loginService.login(new SnsLoginCommand("id", "fcmToken")));
     }
 
     @Test

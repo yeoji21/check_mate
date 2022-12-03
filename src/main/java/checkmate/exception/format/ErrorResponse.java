@@ -17,10 +17,10 @@ public class ErrorResponse {
 
     public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorCode errorCode) {
         return ResponseEntity
-                .status(errorCode.getHttpStatus())
+                .status(errorCode.getStatus())
                 .body(ErrorResponse.builder()
-                        .status(errorCode.getHttpStatus().value())
-                        .error(errorCode.getHttpStatus().name())
+                        .status(errorCode.getStatus().value())
+                        .error(errorCode.getStatus().name())
                         .code(errorCode.name())
                         .message(errorCode.getDetail())
                         .build());

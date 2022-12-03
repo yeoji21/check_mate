@@ -1,10 +1,17 @@
 package checkmate.exception.format;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
 public class BusinessException extends RuntimeException{
     private final ErrorCode errorCode;
+
+    public BusinessException(ErrorCode errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public BusinessException(ErrorCode errorCode, String message) {
+        super(message);
+        this.errorCode = errorCode;
+    }
 }

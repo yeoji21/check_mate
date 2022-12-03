@@ -1,6 +1,7 @@
 package checkmate.user.application;
 
-import checkmate.exception.UserNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.user.application.dto.UserCommandMapper;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
@@ -26,7 +27,8 @@ public class UserCommandService {
 
     @Transactional
     public void nicknameUpdate(UserNicknameModifyCommand command) {
-        User user = userRepository.findById(command.getUserId()).orElseThrow(UserNotFoundException::new);
+        User user = userRepository.findById(command.getUserId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.getUserId()));
         user.changeNickname(command.getNickname());
     }
 }

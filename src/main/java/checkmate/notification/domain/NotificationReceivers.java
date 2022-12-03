@@ -1,6 +1,7 @@
 package checkmate.notification.domain;
 
-import checkmate.exception.UserNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +30,6 @@ public class NotificationReceivers {
         return receivers.stream()
                 .filter(receiver -> receiver.getUserId() == userId)
                 .findAny()
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
     }
 }

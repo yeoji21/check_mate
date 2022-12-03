@@ -4,7 +4,8 @@ import checkmate.common.cache.CacheTemplate;
 import checkmate.exception.GoalNotFoundException;
 import checkmate.exception.NotificationNotFoundException;
 import checkmate.exception.TeamMateNotFoundException;
-import checkmate.exception.UserNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
@@ -16,8 +17,8 @@ import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
+import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.InviteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
 import checkmate.user.domain.User;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static checkmate.exception.format.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.*;
 
 @Slf4j
@@ -49,7 +51,7 @@ public class TeamMateCommandService {
     @Transactional
     public void initiatingGoalCreator(long goalId, long userId) {
         Goal goal = goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
-        User creator = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        User creator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         TeamMate teamMate = goal.join(creator);
         teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
         teamMateRepository.save(teamMate);
@@ -123,13 +125,13 @@ public class TeamMateCommandService {
     }
 
     private TeamMate findInviteeTeamMate(long goalId, long userId) {
-        return teamMateRepository
-                .findTeamMateWithGoal(goalId, userId)
+        return teamMateRepository.findTeamMateWithGoal(goalId, userId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
     private TeamMate findTeamMate(long teamMateId) {
-        return teamMateRepository.findTeamMateWithGoal(teamMateId).orElseThrow(TeamMateNotFoundException::new);
+        return teamMateRepository.findTeamMateWithGoal(teamMateId)
+                .orElseThrow(TeamMateNotFoundException::new);
     }
 
     private Goal findGoal(long goalId) {
@@ -137,10 +139,10 @@ public class TeamMateCommandService {
     }
 
     private User findUser(String nickname) {
-        return userRepository.findByNickname(nickname).orElseThrow(UserNotFoundException::new);
+        return userRepository.findByNickname(nickname).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
     private User findUser(long userId) {
-        return userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
     }
 }

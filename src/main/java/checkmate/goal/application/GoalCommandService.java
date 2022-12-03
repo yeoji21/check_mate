@@ -2,7 +2,7 @@ package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
 import checkmate.exception.GoalNotFoundException;
-import checkmate.exception.UserNotFoundException;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static checkmate.exception.format.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 
 @Slf4j
@@ -76,7 +77,7 @@ public class GoalCommandService {
 
     private void checkUserIsInGoal(long goalId, long userId) {
         if (!goalRepository.checkUserIsInGoal(goalId, userId))
-            throw new UserNotFoundException();
+            throw new NotFoundException(USER_NOT_FOUND, userId);
     }
 
     private Goal findGoalForUpdate(long goalId) {

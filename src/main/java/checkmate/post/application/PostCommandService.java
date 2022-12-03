@@ -2,8 +2,12 @@ package checkmate.post.application;
 
 import checkmate.exception.ImageProcessIOException;
 import checkmate.exception.TeamMateNotFoundException;
-import checkmate.exception.UserNotFoundException;
-import checkmate.goal.domain.*;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.domain.TeamMate;
+import checkmate.goal.domain.TeamMateRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
@@ -116,7 +120,7 @@ public class PostCommandService {
 
     private User findUser(TeamMate uploader) {
         return userRepository.findById(uploader.getUserId())
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, uploader.getUserId()));
     }
 
     private TeamMate findTeamMate(long teamMateId) {
