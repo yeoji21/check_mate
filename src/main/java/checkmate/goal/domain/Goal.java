@@ -101,7 +101,8 @@ public class Goal extends BaseTimeEntity {
     }
 
     public void inviteableCheck() {
-        if (!isInviteable()) throw new UnInviteableGoalException();
+        if (!isInviteable())
+            throw new UnInviteableGoalException();
     }
 
     public String getSchedule() {

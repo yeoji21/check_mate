@@ -1,6 +1,7 @@
 package checkmate.post.domain;
 
-import checkmate.exception.ExceedImageCountException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 
 import javax.persistence.Embeddable;
 import javax.persistence.OneToMany;
@@ -22,7 +23,8 @@ public class Images {
     }
 
     void putImage(Image image) {
-        if(images.size() > 2) throw new ExceedImageCountException();
+        if(images.size() > 2)
+            throw new BusinessException(ErrorCode.EXCEED_IMAGE_LIMIT);
         images.add(image);
     }
 }

@@ -50,7 +50,7 @@ public class PostCommandService {
 
     @Transactional
     public void like(long userId, long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
         post.addLikes(new Likes(userId));
         verifyGoalConditions(goalId, post);
@@ -58,14 +58,14 @@ public class PostCommandService {
 
     @Transactional
     public void unlike(long userId, long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(IllegalArgumentException::new);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
         post.removeLikes(userId);
         verifyGoalConditions(goalId, post);
     }
 
     private void verifyGoalConditions(Long goalId, Post post) {
-        Goal goal = goalRepository.findWithConditions(goalId).orElseThrow(IllegalArgumentException::new);
+        Goal goal = goalRepository.findWithConditions(goalId).orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
         goal.checkConditions(post);
     }
 
@@ -124,6 +124,6 @@ public class PostCommandService {
 
     private TeamMate findTeamMate(long teamMateId) {
         return teamMateRepository.findTeamMateWithGoal(teamMateId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMateId));
     }
 }

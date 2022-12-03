@@ -48,7 +48,7 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler({MaxUploadSizeExceededException.class, SizeLimitExceededException.class, MissingServletRequestPartException.class, MultipartException.class})
     protected ResponseEntity<ErrorResponse> imageFileSize(Exception e) {
         log.warn("[handleMultipartException] : {}", e.getMessage());
-        return ErrorResponse.toResponseEntity(ErrorCode.IMAGE_FILE_SIZE);
+        return ErrorResponse.toResponseEntity(ErrorCode.FILE_SIZE);
     }
 
     @ExceptionHandler({JsonProcessingException.class, HttpMessageNotReadableException.class})

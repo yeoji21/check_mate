@@ -1,7 +1,8 @@
 package checkmate.goal.domain.service;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.UserAlreadyInGoalException;
+import checkmate.exception.format.BusinessException;
+import checkmate.exception.format.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
@@ -32,10 +33,12 @@ class TeamMateInviteServiceTest {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         User user = TestEntityFactory.user(1L, "user");
         TeamMate teamMate = goal.join(user);
-
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
+        
         //when / then
-        assertThrows(UserAlreadyInGoalException.class,
+        BusinessException exception = assertThrows(BusinessException.class,
                 () -> teamMateInviteService.invite(goal, Optional.of(teamMate), user));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
     }
 
     @Test
