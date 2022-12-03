@@ -2,7 +2,8 @@ package checkmate.goal.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.exception.TeamMateNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
@@ -32,7 +33,8 @@ class TeamMateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        TeamMate findTeamMate = teamMateRepository.findTeamMateWithGoal(teamMate.getId()).orElseThrow(TeamMateNotFoundException::new);
+        TeamMate findTeamMate = teamMateRepository.findTeamMateWithGoal(teamMate.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMate.getId()));
 
         //then
         assertThat(findTeamMate.getGoal().getId()).isEqualTo(goal.getId());

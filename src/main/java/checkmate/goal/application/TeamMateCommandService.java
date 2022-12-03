@@ -1,9 +1,6 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.GoalNotFoundException;
-import checkmate.exception.NotificationNotFoundException;
-import checkmate.exception.TeamMateNotFoundException;
 import checkmate.exception.format.ErrorCode;
 import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
@@ -50,8 +47,10 @@ public class TeamMateCommandService {
 
     @Transactional
     public void initiatingGoalCreator(long goalId, long userId) {
-        Goal goal = goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
-        User creator = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         TeamMate teamMate = goal.join(creator);
         teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
         teamMateRepository.save(teamMate);
@@ -62,7 +61,6 @@ public class TeamMateCommandService {
         Goal goal = findGoal(command.getGoalId());
         User invitee = findUser(command.getInviteeNickname());
         Optional<TeamMate> teamMate = teamMateRepository.findTeamMateWithGoal(goal.getId(), invitee.getId());
-//        invite(goal, invitee, teamMate);
         inviteService.invite(goal, teamMate, invitee);
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
                 getInviteGoalNotificationDto(command, invitee.getId())));
@@ -71,7 +69,8 @@ public class TeamMateCommandService {
     // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리하는 메소드
     @Transactional
     public TeamMateInviteReplyResult applyInviteReply(TeamMateInviteReplyCommand command) {
-        TeamMate invitee = findTeamMate(command.getTeamMateId());
+        TeamMate invitee = teamMateRepository.findTeamMateWithGoal(command.getTeamMateId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, command.getTeamMateId()));
         Notification inviteNotification = findAndReadNotification(command.getNotificationId(), invitee.getUserId());
         updateForInviteReply(invitee, command.isAccept());
 
@@ -90,16 +89,9 @@ public class TeamMateCommandService {
         cacheTemplate.deleteTMCacheData(eliminators);
     }
 
-    private void invite(Goal goal, User invitee, Optional<TeamMate> teamMate) {
-        teamMate.ifPresentOrElse(
-                TeamMate::changeToWaitingStatus,
-                () -> teamMateRepository.save(goal.join(invitee))
-        );
-    }
-
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {
         Notification inviteNotification = notificationRepository.findById(notificationId)
-                .orElseThrow(NotificationNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
         inviteNotification.read(inviteeUserId);
         return inviteNotification;
     }
@@ -126,16 +118,11 @@ public class TeamMateCommandService {
 
     private TeamMate findInviteeTeamMate(long goalId, long userId) {
         return teamMateRepository.findTeamMateWithGoal(goalId, userId)
-                .orElseThrow(IllegalArgumentException::new);
-    }
-
-    private TeamMate findTeamMate(long teamMateId) {
-        return teamMateRepository.findTeamMateWithGoal(teamMateId)
-                .orElseThrow(TeamMateNotFoundException::new);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND));
     }
 
     private Goal findGoal(long goalId) {
-        return goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
+        return goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 
     private User findUser(String nickname) {

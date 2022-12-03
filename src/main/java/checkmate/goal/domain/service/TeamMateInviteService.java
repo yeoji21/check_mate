@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+
+// TODO: 2022/12/03 리팩토링 대상
 @RequiredArgsConstructor
 @Component
 public class TeamMateInviteService {

@@ -1,5 +1,7 @@
 package checkmate.notification.application;
 
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.request.NotificationDetailsCriteria;
 import checkmate.notification.application.dto.response.NotificationDetailsResult;
@@ -26,7 +28,7 @@ public class NotificationQueryService {
     @Transactional
     public NotificationInfo findNotificationInfo(long notificationId, long userId) {
         NotificationReceiver receiver = notificationRepository.findNotificationReceiver(notificationId, userId)
-                                                            .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
         read(receiver);
         return mapper.toInfo(receiver.getNotification());
     }

@@ -21,7 +21,7 @@ public class ErrorResponse {
                 .body(ErrorResponse.builder()
                         .status(errorCode.getStatus().value())
                         .error(errorCode.getStatus().name())
-                        .code(errorCode.name())
+                        .code(errorCode.getCode())
                         .message(errorCode.getDetail())
                         .build());
     }

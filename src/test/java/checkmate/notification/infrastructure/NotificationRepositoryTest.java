@@ -2,7 +2,8 @@ package checkmate.notification.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.exception.NotificationNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
@@ -10,7 +11,6 @@ import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,8 +31,8 @@ class NotificationRepositoryTest extends RepositoryTest {
         em.persist(notification);
 
         //when
-        Optional<Notification> optionalNotification = notificationRepository.findById(notification.getId());
-        Notification findNotification = optionalNotification.orElseThrow(NotificationNotFoundException::new);
+        Notification findNotification = notificationRepository.findById(notification.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notification.getId()));
 
         //then
         assertThat(findNotification.getId()).isEqualTo(notification.getId());

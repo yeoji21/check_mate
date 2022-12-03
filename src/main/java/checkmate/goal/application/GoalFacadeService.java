@@ -1,6 +1,7 @@
 package checkmate.goal.application;
 
-import checkmate.exception.TeamMateNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalViewResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
@@ -29,7 +30,7 @@ public class GoalFacadeService {
         return teamMates.stream()
                 .filter(tm -> tm.getUserId() == userId)
                 .findAny()
-                .orElseThrow(TeamMateNotFoundException::new)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND))
                 .getId();
     }
 }

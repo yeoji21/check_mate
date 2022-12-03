@@ -1,7 +1,6 @@
 package checkmate.post.application;
 
 import checkmate.exception.ImageProcessIOException;
-import checkmate.exception.TeamMateNotFoundException;
 import checkmate.exception.format.ErrorCode;
 import checkmate.exception.format.NotFoundException;
 import checkmate.goal.domain.Goal;
@@ -72,7 +71,7 @@ public class PostCommandService {
 
     private long validateUserInGoal(long userId, Post post) {
         return teamMateRepository.findTeamMateWithGoal(post.getTeamMate().getGoal().getId(), userId)
-                .orElseThrow(TeamMateNotFoundException::new)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, post.getTeamMate().getId()))
                 .getGoal()
                 .getId();
     }

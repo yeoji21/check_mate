@@ -1,6 +1,7 @@
 package checkmate.post.application;
 
-import checkmate.exception.GoalNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.post.application.dto.response.PostInfo;
@@ -22,7 +23,7 @@ public class PostQueryService {
     private final PostQueryDao postQueryDao;
 
     public PostInfoListResult findPostByGoalIdAndDate(long goalId, String date) {
-        Goal goal = goalRepository.findById(goalId).orElseThrow(GoalNotFoundException::new);
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
         List<PostInfo> postInfos = postQueryDao.findTimelinePosts(goalId, LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyyMMdd")));
         return new PostInfoListResult(goal.getTitle(), postInfos);
     }

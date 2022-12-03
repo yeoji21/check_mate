@@ -1,5 +1,7 @@
 package checkmate.goal.application;
 
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.infrastructure.GoalQueryDao;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,8 @@ public class GoalQueryService {
 
     @Transactional(readOnly = true)
     public GoalDetailInfo findGoalDetail(long goalId, long userId) {
-        return goalQueryDao.findDetailInfo(goalId, userId).orElseThrow(IllegalArgumentException::new);
+        return goalQueryDao.findDetailInfo(goalId, userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 
     @Transactional(readOnly = true)
@@ -25,7 +28,8 @@ public class GoalQueryService {
 
     @Transactional(readOnly = true)
     public GoalScheduleInfo findGoalPeriodInfo(long goalId) {
-        return goalQueryDao.findGoalScheduleInfo(goalId).orElseThrow(IllegalArgumentException::new);
+        return goalQueryDao.findGoalScheduleInfo(goalId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 
     @Transactional(readOnly = true)

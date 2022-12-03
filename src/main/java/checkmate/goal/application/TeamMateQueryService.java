@@ -1,6 +1,7 @@
 package checkmate.goal.application;
 
-import checkmate.exception.TeamMateNotFoundException;
+import checkmate.exception.format.ErrorCode;
+import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
@@ -23,12 +24,9 @@ public class TeamMateQueryService {
 
     @Transactional(readOnly = true)
     public double getProgressPercent(long teamMateId) {
-        TeamMate teamMate = findTeamMate(teamMateId);
+        TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(teamMateId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMateId));
         return teamMate.calcProgressPercent();
     }
 
-    private TeamMate findTeamMate(long teamMateId) {
-        return teamMateRepository.findTeamMateWithGoal(teamMateId)
-                .orElseThrow(TeamMateNotFoundException::new);
-    }
 }

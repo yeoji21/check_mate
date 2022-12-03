@@ -1,7 +1,7 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.GoalNotFoundException;
+import checkmate.exception.format.ErrorCode;
 import checkmate.exception.format.NotFoundException;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
@@ -50,7 +50,8 @@ public class GoalCommandService {
     @Transactional
     public void setLikeCountCondition(LikeCountCreateCommand command) {
         checkUserIsInGoal(command.getGoalId(), command.getUserId());
-        Goal goal = goalRepository.findById(command.getGoalId()).orElseThrow(IllegalArgumentException::new);
+        Goal goal = goalRepository.findById(command.getGoalId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, command.getGoalId()));
         goal.addCondition(new LikeCountCondition(command.getLikeCount()));
     }
 
@@ -81,6 +82,7 @@ public class GoalCommandService {
     }
 
     private Goal findGoalForUpdate(long goalId) {
-        return goalRepository.findByIdForUpdate(goalId).orElseThrow(GoalNotFoundException::new);
+        return goalRepository.findByIdForUpdate(goalId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 }

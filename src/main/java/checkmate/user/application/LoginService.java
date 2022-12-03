@@ -3,7 +3,6 @@ package checkmate.user.application;
 import checkmate.config.auth.AuthConstants;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
-import checkmate.exception.RefreshTokenNotFoundException;
 import checkmate.exception.format.BusinessException;
 import checkmate.exception.format.ErrorCode;
 import checkmate.exception.format.NotFoundException;
@@ -38,7 +37,7 @@ public class LoginService {
         User user = userRepository.findByProviderId(snsLoginCommand.getProviderId())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         fcmTokenUpdate(user, snsLoginCommand.getFcmToken());
-        if(user.getNickname() == null) throw new BusinessException(ErrorCode.NICKNAME_NOT_FOUND);
+        if(user.getNickname() == null) throw new BusinessException(ErrorCode.EMPTY_NICKNAME);
         return getLoginTokenResponse(user);
     }
 
@@ -68,10 +67,10 @@ public class LoginService {
         findRefreshToken.ifPresentOrElse(
                 findToken -> {
                     if (!findToken.equals(AuthConstants.TOKEN_PREFIX.getValue() + refreshToken))
-                        throw new RefreshTokenNotFoundException();
+                        throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
                 },
                 () -> {
-                    throw new RefreshTokenNotFoundException();
+                    throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
                 });
     }
 
