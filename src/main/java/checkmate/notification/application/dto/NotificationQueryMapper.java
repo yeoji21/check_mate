@@ -29,6 +29,6 @@ public abstract class NotificationQueryMapper {
 
     @Named("getAttributes")
     String getAttributes(Notification notification) {
-        return converter.attributesToJson(notification);
+        return converter.convertToDatabaseColumn(notification.getAttributes());
     }
 }

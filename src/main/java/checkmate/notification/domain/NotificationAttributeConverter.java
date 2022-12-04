@@ -1,9 +1,9 @@
 package checkmate.notification.domain;
 
+import checkmate.exception.JsonConvertingException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.AttributeConverter;
@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 @Converter
 public class NotificationAttributeConverter implements AttributeConverter<NotificationAttributes, String> {
-    private static final ObjectMapper objectMapper = new ObjectMapper()
+    private final ObjectMapper objectMapper = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Override
@@ -23,7 +23,7 @@ public class NotificationAttributeConverter implements AttributeConverter<Notifi
         try {
             return objectMapper.writeValueAsString(attribute.getAttributes());
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new JsonConvertingException(e, attribute.toString());
         }
     }
 
@@ -32,12 +32,7 @@ public class NotificationAttributeConverter implements AttributeConverter<Notifi
         try {
             return new NotificationAttributes(objectMapper.readValue(dbData, Map.class));
         } catch (JsonProcessingException e) {
-            throw new IllegalArgumentException(e);
+            throw new JsonConvertingException(e, dbData);
         }
-    }
-
-    @SneakyThrows
-    public String attributesToJson(Notification notification){
-        return convertToDatabaseColumn(notification.getAttributes());
     }
 }

@@ -31,9 +31,12 @@ public class NotificationAttributes {
     @Override
     public String toString() {
         StringBuilder attributeStr = new StringBuilder();
+        attributeStr.append("{");
         for (String key : attributes.keySet()) {
-            attributeStr.append(key).append(" : ").append(attributes.get(key));
+            attributeStr.append("\"").append(key).append("\"").append(":").append("\"").append(attributes.get(key)).append("\"").append(",");
         }
-        return "NotificationAttributes{" + "attributes=" + attributeStr.toString() + '}';
+        attributeStr.deleteCharAt(attributeStr.length() - 1);
+        attributeStr.append("}");
+        return attributeStr.toString();
     }
 }

@@ -5,9 +5,11 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+// TODO: 2022/12/05 TEST
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,7 +30,6 @@ public class Notification extends BaseTimeEntity {
     @NotNull
     @Column(name = "content")
     private String content;
-    @Getter(value = AccessLevel.PROTECTED)
     @Convert(converter = NotificationAttributeConverter.class)
     private NotificationAttributes attributes = new NotificationAttributes(new HashMap<>());
     @Embedded
@@ -65,6 +66,10 @@ public class Notification extends BaseTimeEntity {
 
     public List<NotificationReceiver> getReceivers() {
         return receivers.getReceivers();
+    }
+
+    public NotificationAttributes getAttributes() {
+        return new NotificationAttributes(Collections.unmodifiableMap(attributes.getAttributes()));
     }
 
     private void setUpReceivers(List<NotificationReceiver> receivers) {

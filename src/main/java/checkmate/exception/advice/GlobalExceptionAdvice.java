@@ -1,12 +1,8 @@
 package checkmate.exception.advice;
 
-import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
-import checkmate.exception.ErrorResponse;
-import checkmate.exception.RuntimeIOException;
+import checkmate.exception.*;
 import com.amazonaws.services.ecr.model.ImageNotFoundException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.http.ResponseEntity;
@@ -50,9 +46,15 @@ public class GlobalExceptionAdvice {
         return ErrorResponse.toResponseEntity(ErrorCode.FILE_SIZE);
     }
 
-    @ExceptionHandler({JsonProcessingException.class, HttpMessageNotReadableException.class})
-    protected ResponseEntity<ErrorResponse> invalidJsonParsing(Exception e) {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ErrorResponse> invalidHttpMessageParsing(HttpMessageNotReadableException e) {
         log.warn("[handleHttpMessageNotReadableException] : {}", e.getMessage());
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_JSON_TYPE);
+    }
+
+    @ExceptionHandler(JsonConvertingException.class)
+    protected ResponseEntity<ErrorResponse> invalidJsonParsing(JsonConvertingException e) {
+        log.warn("[handleJsonConvertingException] : {}", e.getMessage());
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_JSON_TYPE);
     }
 
