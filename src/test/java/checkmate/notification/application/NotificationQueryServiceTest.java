@@ -2,18 +2,17 @@ package checkmate.notification.application;
 
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationInfo;
-import checkmate.notification.domain.Notification;
-import checkmate.notification.domain.NotificationReceiver;
-import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.NotificationType;
+import checkmate.notification.domain.*;
 import checkmate.notification.infrastructure.NotificationQueryDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +29,11 @@ class NotificationQueryServiceTest {
     @Spy private NotificationQueryMapper mapper = NotificationQueryMapper.INSTANCE;
     @InjectMocks private NotificationQueryService notificationQueryService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    void setUp() {
+        ReflectionTestUtils.setField(mapper, "converter", new NotificationAttributeConverter());
+    }
 
     @Test
     void 단건_알림_조회_테스트() throws Exception{

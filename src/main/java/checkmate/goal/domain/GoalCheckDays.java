@@ -52,7 +52,7 @@ public class GoalCheckDays implements Serializable {
 
     private void correctDayCheck(String korWeekDays) {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find())
-            throw new BusinessException(ErrorCode.INVALID_GOAL_WEEK_DAYS);
+            throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
     }
 
     private void duplicateDayCheck(String korWeekDays) {

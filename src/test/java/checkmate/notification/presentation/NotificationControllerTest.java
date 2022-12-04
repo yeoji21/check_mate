@@ -5,11 +5,11 @@ import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
-import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationDetails;
 import checkmate.notification.application.dto.response.NotificationDetailsResult;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributes;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.CompleteGoalNotificationFactory;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -139,6 +140,11 @@ class NotificationControllerTest extends ControllerTest {
     }
 
     private NotificationInfo toNotificationInfo(Notification notification) {
-        return NotificationQueryMapper.INSTANCE.toInfo(notification);
+        return NotificationInfo.builder()
+                .title(notification.getTitle())
+                .content(notification.getContent())
+                .type(notification.getType().toString())
+                .attributes(new NotificationAttributes(Collections.emptyMap()).toString())
+                .build();
     }
 }

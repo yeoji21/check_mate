@@ -9,24 +9,26 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@Mapper(componentModel = "spring")
-public interface NotificationQueryMapper {
-    NotificationQueryMapper INSTANCE = Mappers.getMapper(NotificationQueryMapper.class);
+@Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
+public abstract class NotificationQueryMapper {
+    public static NotificationQueryMapper INSTANCE = Mappers.getMapper(NotificationQueryMapper.class);
+    @Autowired NotificationAttributeConverter converter;
 
     @Mappings({
             @Mapping(target = "type", source = "notification.type", qualifiedByName = "getNotificationType"),
             @Mapping(target = "attributes", source = "notification", qualifiedByName = "getAttributes")
     })
-    NotificationInfo toInfo(Notification notification);
+    public abstract NotificationInfo toInfo(Notification notification);
 
     @Named("getNotificationType")
-    default String getNotificationType(NotificationType type) {
+    String getNotificationType(NotificationType type) {
         return type.name();
     }
 
     @Named("getAttributes")
-    default String getAttributes(Notification notification) {
-        return NotificationAttributeConverter.attributesToJson(notification);
+    String getAttributes(Notification notification) {
+        return converter.attributesToJson(notification);
     }
 }

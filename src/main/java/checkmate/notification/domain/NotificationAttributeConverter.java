@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.springframework.stereotype.Component;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Map;
 
+
+// TODO: 2022/12/04 리팩토링
+@Component
 @Converter
 public class NotificationAttributeConverter implements AttributeConverter<NotificationAttributes, String> {
     private static final ObjectMapper objectMapper = new ObjectMapper()
@@ -33,7 +37,7 @@ public class NotificationAttributeConverter implements AttributeConverter<Notifi
     }
 
     @SneakyThrows
-    public static String attributesToJson(Notification notification){
-        return objectMapper.writeValueAsString(notification.getAttributes().getAttributes());
+    public String attributesToJson(Notification notification){
+        return convertToDatabaseColumn(notification.getAttributes());
     }
 }
