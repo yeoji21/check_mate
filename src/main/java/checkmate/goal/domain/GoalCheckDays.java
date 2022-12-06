@@ -1,7 +1,7 @@
 package checkmate.goal.domain;
 
 import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import com.mysema.commons.lang.Assert;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

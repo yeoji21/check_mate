@@ -11,7 +11,6 @@ import javax.persistence.Converter;
 import java.util.Map;
 
 
-// TODO: 2022/12/04 리팩토링
 @Component
 @Converter
 public class NotificationAttributeConverter implements AttributeConverter<NotificationAttributes, String> {

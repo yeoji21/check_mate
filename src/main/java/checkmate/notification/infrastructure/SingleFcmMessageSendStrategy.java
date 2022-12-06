@@ -1,6 +1,6 @@
 package checkmate.notification.infrastructure;
 
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.RuntimeIOException;
 import checkmate.notification.domain.push.PushNotification;
 import checkmate.notification.domain.push.PushNotificationSendStrategy;

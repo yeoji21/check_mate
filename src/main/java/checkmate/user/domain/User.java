@@ -2,7 +2,7 @@ package checkmate.user.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import lombok.*;
 
 import javax.persistence.*;

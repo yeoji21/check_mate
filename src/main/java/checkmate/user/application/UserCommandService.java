@@ -1,6 +1,6 @@
 package checkmate.user.application;
 
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.user.application.dto.UserCommandMapper;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;

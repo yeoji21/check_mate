@@ -1,5 +1,6 @@
 package checkmate.exception;
 
+import checkmate.exception.code.ErrorCode;
 import lombok.Getter;
 
 @Getter

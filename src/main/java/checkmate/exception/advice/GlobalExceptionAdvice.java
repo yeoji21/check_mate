@@ -1,6 +1,7 @@
 package checkmate.exception.advice;
 
 import checkmate.exception.*;
+import checkmate.exception.code.ErrorCode;
 import com.amazonaws.services.ecr.model.ImageNotFoundException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;

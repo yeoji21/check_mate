@@ -2,7 +2,7 @@ package checkmate.goal.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;

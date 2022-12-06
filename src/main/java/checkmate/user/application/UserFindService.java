@@ -1,7 +1,7 @@
 package checkmate.user.application;
 
 import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

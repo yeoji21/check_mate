@@ -1,6 +1,6 @@
 package checkmate.post.application;
 
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
 import checkmate.goal.domain.Goal;

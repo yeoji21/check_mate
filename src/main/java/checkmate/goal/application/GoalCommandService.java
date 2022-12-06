@@ -1,7 +1,7 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static checkmate.exception.ErrorCode.USER_NOT_FOUND;
+import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 
 @Slf4j

@@ -1,7 +1,7 @@
 package checkmate.goal.domain;
 
 import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 
 public class GoalJoiningPolicy {
     private static final int MAX_ONGOING_COUNT = 10;

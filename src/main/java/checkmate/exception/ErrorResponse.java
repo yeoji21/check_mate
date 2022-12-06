@@ -1,5 +1,6 @@
 package checkmate.exception;
 
+import checkmate.exception.code.ErrorCode;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;

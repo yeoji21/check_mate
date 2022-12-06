@@ -1,6 +1,6 @@
 package checkmate.post.infrastructure;
 
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.RuntimeIOException;
 import checkmate.post.domain.FileStore;
 import checkmate.post.domain.ImageFileUtil;

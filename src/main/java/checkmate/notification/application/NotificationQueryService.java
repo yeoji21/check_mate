@@ -1,6 +1,6 @@
 package checkmate.notification.application;
 
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.request.NotificationDetailsCriteria;

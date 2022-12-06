@@ -1,5 +1,7 @@
 package checkmate.exception;
 
+import checkmate.exception.code.ErrorCode;
+
 /*
     1. 이미 목표에 속한 팀원인 경우
     2. 이미 초대 메시지를 보낸 경우

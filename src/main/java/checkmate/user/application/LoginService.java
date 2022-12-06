@@ -4,7 +4,7 @@ import checkmate.config.auth.AuthConstants;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
 import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import static checkmate.exception.ErrorCode.USER_NOT_FOUND;
+import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 
 
 @Slf4j

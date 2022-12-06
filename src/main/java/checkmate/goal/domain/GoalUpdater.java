@@ -1,7 +1,7 @@
 package checkmate.goal.domain;
 
 import checkmate.exception.BusinessException;
-import checkmate.exception.ErrorCode;
+import checkmate.exception.code.ErrorCode;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
