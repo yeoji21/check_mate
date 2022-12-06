@@ -1,5 +1,7 @@
 package checkmate;
 
+import checkmate.common.api.TestController;
+import checkmate.exception.ErrorCodeController;
 import checkmate.goal.application.*;
 import checkmate.goal.presentation.GoalController;
 import checkmate.goal.presentation.TeamMateController;
@@ -39,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 @WebMvcTest({
+        ErrorCodeController.class,
         GoalController.class,
         TeamMateController.class,
         NotificationController.class,
