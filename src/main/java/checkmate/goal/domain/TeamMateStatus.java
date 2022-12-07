@@ -5,7 +5,7 @@ import checkmate.exception.UnInviteableGoalException;
 public enum TeamMateStatus {
     WAITING, ONGOING, REJECT, OUT, SUCCESS;
 
-    void inviteeStatusCheck() {
+    void inviteableCheck() {
         if(this == TeamMateStatus.ONGOING || this == TeamMateStatus.SUCCESS)
             throw UnInviteableGoalException.ALREADY_IN_GOAL;
         else if(this == TeamMateStatus.WAITING)

@@ -10,10 +10,11 @@ import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
+import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
-import checkmate.notification.domain.factory.InviteGoalNotificationFactory;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -46,10 +47,8 @@ public class TeamMateCommandServiceTest {
     @Mock private TeamMateInviteService teamMateInviteService;
     @Mock private CacheTemplate cacheTemplate;
     @Mock private ApplicationEventPublisher eventPublisher;
-    @Spy
-    private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
-    @Spy
-    private TeamMateDtoMapper dtoMapper = TeamMateDtoMapper.INSTANCE;
+    @Spy private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
+    @Spy private TeamMateDtoMapper dtoMapper = TeamMateDtoMapper.INSTANCE;
     @InjectMocks
     private TeamMateCommandService teamMateCommandService;
 
@@ -70,7 +69,7 @@ public class TeamMateCommandServiceTest {
     }
 
     @Test @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
-    void 팀원_초대_테스트() throws Exception{
+    void inviteTeamMate() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(1L, "inviter");
@@ -97,15 +96,21 @@ public class TeamMateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
-    @Test
-    void 팀원_초대_수락_응답_테스트() throws Exception{
+    @Test @DisplayName("팀원 초대 수락")
+    void applyInviteReply() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(2L, "inviter");
         TeamMate inviteeTm = goal.join(TestEntityFactory.user(2L, "invitee"));
 
-        Notification inviteNotification = new InviteGoalNotificationFactory()
-                .generate(commandMapper.toInviteGoalNotificationDto(inviter, inviteeTm));
+        NotificationReceiver receiver = new NotificationReceiver(inviteeTm.getUserId());
+        Notification inviteNotification = Notification.builder()
+                .userId(1L)
+                .type(NotificationType.INVITE_GOAL)
+                .title("title")
+                .content("content")
+                .receivers(List.of(receiver))
+                .build();
 
         TeamMateInviteReplyCommand command = TeamMateInviteReplyCommand.builder()
                 .teamMateId(1L)
@@ -114,7 +119,7 @@ public class TeamMateCommandServiceTest {
                 .build();
 
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeTm));
-        given(notificationRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviteNotification));
+        given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
 
         //when
@@ -125,8 +130,8 @@ public class TeamMateCommandServiceTest {
         assertThat(inviteeTm.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
     }
 
-    @Test
-    void 인증하지_않은_팀원_업데이트_테스트() throws Exception{
+    @Test @DisplayName("인증일에 인증하지 않은 팀원 업데이트")
+    void updateHookyTeamMate() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         List<TeamMate> hookyTms = new ArrayList<>();

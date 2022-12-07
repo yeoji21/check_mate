@@ -88,7 +88,7 @@ public class TeamMate extends BaseTimeEntity {
 
     public void changeToWaitingStatus() {
         goal.inviteableCheck();
-        status.inviteeStatusCheck();
+        status.inviteableCheck();
         status = TeamMateStatus.WAITING;
     }
 

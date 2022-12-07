@@ -13,6 +13,7 @@ import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
@@ -56,6 +57,7 @@ public class TeamMateCommandService {
         teamMateRepository.save(teamMate);
     }
 
+    // TODO: 2022/12/08 inviteService 존재 여부
     @Transactional
     public void inviteTeamMate(TeamMateInviteCommand command) {
         Goal goal = findGoal(command.getGoalId());
@@ -90,10 +92,10 @@ public class TeamMateCommandService {
     }
 
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {
-        Notification inviteNotification = notificationRepository.findById(notificationId)
+        NotificationReceiver receiver = notificationRepository.findNotificationReceiver(notificationId, inviteeUserId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
-        inviteNotification.read(inviteeUserId);
-        return inviteNotification;
+        receiver.read();
+        return receiver.getNotification();
     }
 
     private InviteGoalNotificationDto getInviteGoalNotificationDto(TeamMateInviteCommand command, Long inviteeUserId) {

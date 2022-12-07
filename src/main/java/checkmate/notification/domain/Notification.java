@@ -48,10 +48,6 @@ public class Notification extends BaseTimeEntity {
         setUpReceivers(receivers);
     }
 
-    public void read(long userId) {
-        receivers.findReceiver(userId).read();
-    }
-
     public <T> void addAttribute(String key, T value) {
         attributes.addAttribute(key, value.toString());
     }

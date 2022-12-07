@@ -31,6 +31,7 @@ public class GoalCommandService {
     private final CacheTemplate cacheTemplate;
     private final GoalCommandMapper mapper;
 
+    // TODO: 2022/12/08 이벤트로 끊는게 맞을지..
     @Transactional
     public long create(GoalCreateCommand command) {
         ongoingGoalCountCheck(command.getUserId());
