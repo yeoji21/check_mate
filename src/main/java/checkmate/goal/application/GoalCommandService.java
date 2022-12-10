@@ -1,15 +1,16 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.*;
-import checkmate.goal.domain.event.GoalCreatedEvent;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
+import checkmate.user.domain.User;
+import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -26,18 +27,18 @@ import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 @Service
 public class GoalCommandService {
     private final GoalRepository goalRepository;
+    private final UserRepository userRepository;
     private final TeamMateRepository teamMateRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final CacheTemplate cacheTemplate;
     private final GoalCommandMapper mapper;
 
-    // TODO: 2022/12/08 이벤트로 끊는게 맞을지..
     @Transactional
     public long create(GoalCreateCommand command) {
-        ongoingGoalCountCheck(command.getUserId());
-        Goal goal = mapper.toGoal(command);
-        goalRepository.save(goal);
-        eventPublisher.publishEvent(new GoalCreatedEvent(goal.getId(), command.getUserId()));
+        Goal goal = goalRepository.save(mapper.toGoal(command));
+        TeamMate teamMate = joinToGoal(goal, command.getUserId());
+        teamMate.initiateGoal(goalRepository.countOngoingGoals(command.getUserId()));
+        teamMateRepository.save(teamMate);
         return goal.getId();
     }
 
@@ -73,8 +74,10 @@ public class GoalCommandService {
         cacheTemplate.deleteTMCacheData(teamMates);
     }
 
-    private void ongoingGoalCountCheck(long userId) {
-        GoalJoiningPolicy.ongoingGoalCount(goalRepository.countOngoingGoals(userId));
+    private TeamMate joinToGoal(Goal goal, long userId) {
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
+        return goal.join(creator);
     }
 
     private void checkUserIsInGoal(long goalId, long userId) {

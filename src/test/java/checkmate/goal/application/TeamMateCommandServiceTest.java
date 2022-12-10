@@ -49,22 +49,6 @@ public class TeamMateCommandServiceTest {
     @InjectMocks
     private TeamMateCommandService teamMateCommandService;
 
-    @Test @DisplayName("목표 생성자 팀원 생성 후 목표 수행 시작")
-    void initiatingGoalCreator() throws Exception{
-        //given
-        User user = TestEntityFactory.user(1L, "user");
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        given(goalRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(goal));
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
-        given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(5);
-
-        //when
-        teamMateCommandService.initiatingGoalCreator(1L, 1L);
-
-        //then
-        verify(teamMateRepository).save(any(TeamMate.class));
-    }
-
     @Test @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
     void inviteTeamMate() throws Exception{
         //given

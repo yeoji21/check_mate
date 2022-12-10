@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.*;
 
 @Slf4j
@@ -42,13 +41,6 @@ public class TeamMateCommandService {
     private final CacheTemplate cacheTemplate;
     private final ApplicationEventPublisher eventPublisher;
     private final TeamMateCommandMapper mapper;
-
-    @Transactional
-    public void initiatingGoalCreator(long goalId, long userId) {
-        TeamMate teamMate = createGoalCreator(goalId, userId);
-        teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
-        teamMateRepository.save(teamMate);
-    }
 
     @Transactional
     public void inviteTeamMate(TeamMateInviteCommand command) {
@@ -86,14 +78,6 @@ public class TeamMateCommandService {
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
                 mapper.toKickOutNotificationDtos(eliminators)));
         cacheTemplate.deleteTMCacheData(eliminators);
-    }
-
-    private TeamMate createGoalCreator(long goalId, long userId) {
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-        User creator = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
-        return goal.join(creator);
     }
 
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {

@@ -8,9 +8,9 @@ import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.*;
-import checkmate.goal.domain.event.GoalCreatedEvent;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.User;
+import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,8 +36,9 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 public class GoalCommandServiceTest {
     @Mock private GoalRepository goalRepository;
-    @Mock private CacheTemplate cacheTemplate;
+    @Mock private UserRepository userRepository;
     @Mock private TeamMateRepository teamMateRepository;
+    @Mock private CacheTemplate cacheTemplate;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Spy
     private GoalCommandMapper commandMapper = GoalCommandMapper.INSTANCE;
@@ -106,23 +107,27 @@ public class GoalCommandServiceTest {
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays("월수금")
                 .build();
-        given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(0);
+        User user = TestEntityFactory.user(1L, "user");
+
         doAnswer((invocation) -> {
             Goal argument = (Goal) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "id", 1L);
             return argument;
         }).when(goalRepository).save(any(Goal.class));
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
+        given(goalRepository.countOngoingGoals(user.getId())).willReturn(0);
 
         //when
         long goalId = goalCommandService.create(command);
 
         //then
         assertThat(goalId).isGreaterThan(0L);
-        verify(eventPublisher).publishEvent(any(GoalCreatedEvent.class));
+        verify(teamMateRepository).save(any(TeamMate.class));
     }
 
     @Test
     void 목표생성한_유저의_현재목표가_최대치_이상() throws Exception{
+        //given
         GoalCreateCommand command = GoalCreateCommand.builder()
                 .userId(1L)
                 .category(GoalCategory.LEARNING)
@@ -131,7 +136,17 @@ public class GoalCommandServiceTest {
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays("월수금")
                 .build();
+        User user = TestEntityFactory.user(1L, "user");
+
+        doAnswer((invocation) -> {
+            Goal argument = (Goal) invocation.getArgument(0);
+            ReflectionTestUtils.setField(argument, "id", 1L);
+            return argument;
+        }).when(goalRepository).save(any(Goal.class));
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(11);
+
+        //when then
         BusinessException exception = assertThrows(BusinessException.class, () -> goalCommandService.create(command));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
