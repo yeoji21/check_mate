@@ -6,7 +6,6 @@ import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.domain.*;
-import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.notification.domain.Notification;
@@ -35,7 +34,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +42,6 @@ public class TeamMateCommandServiceTest {
     @Mock private UserRepository userRepository;
     @Mock private TeamMateRepository teamMateRepository;
     @Mock private NotificationRepository notificationRepository;
-    @Mock private TeamMateInviteService teamMateInviteService;
     @Mock private CacheTemplate cacheTemplate;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Spy private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
@@ -82,10 +79,6 @@ public class TeamMateCommandServiceTest {
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeTeamMate));
-        doAnswer(invocation -> {
-            ReflectionTestUtils.setField(inviteeTeamMate, "status", TeamMateStatus.WAITING);
-            return inviteeTeamMate;
-        }).when(teamMateInviteService).invite(any(Goal.class), any(Optional.class), any(User.class));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
 
         //when

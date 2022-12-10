@@ -10,5 +10,5 @@ public interface TeamMateRepository {
     List<TeamMate> eliminateOveredTMs(List<TeamMate> hookyTMs);
     List<Long> findTeamMateUserIds(Long goalId);
     List<TeamMate> findTeamMates(List<Long> goalIds);
-    void save(TeamMate teamMate);
+    TeamMate save(TeamMate teamMate);
 }

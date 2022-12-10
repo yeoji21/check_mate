@@ -1,8 +1,8 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheTemplate;
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
@@ -11,7 +11,6 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
-import checkmate.goal.domain.service.TeamMateInviteService;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
@@ -28,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.*;
@@ -41,34 +39,34 @@ public class TeamMateCommandService {
     private final GoalRepository goalRepository;
     private final TeamMateRepository teamMateRepository;
     private final NotificationRepository notificationRepository;
-    private final TeamMateInviteService inviteService;
     private final CacheTemplate cacheTemplate;
     private final ApplicationEventPublisher eventPublisher;
     private final TeamMateCommandMapper mapper;
 
     @Transactional
     public void initiatingGoalCreator(long goalId, long userId) {
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-        User creator = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
-        TeamMate teamMate = goal.join(creator);
+        TeamMate teamMate = createGoalCreator(goalId, userId);
         teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
         teamMateRepository.save(teamMate);
     }
 
-    // TODO: 2022/12/08 inviteService 존재 여부
     @Transactional
     public void inviteTeamMate(TeamMateInviteCommand command) {
-        Goal goal = findGoal(command.getGoalId());
-        User invitee = findUser(command.getInviteeNickname());
-        Optional<TeamMate> teamMate = teamMateRepository.findTeamMateWithGoal(goal.getId(), invitee.getId());
-        inviteService.invite(goal, teamMate, invitee);
+        TeamMate teamMate = invite(command.getGoalId(), command.getInviteeNickname());
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
-                getInviteGoalNotificationDto(command, invitee.getId())));
+                getInviteGoalNotificationDto(command, teamMate.getUserId())));
     }
 
-    // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리하는 메소드
+    private TeamMate invite(long goalId, String inviteeNickname) {
+        Goal goal = findGoal(goalId);
+        User invitee = findUser(inviteeNickname);
+        TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(goal.getId(), invitee.getId())
+                .orElseGet(() -> teamMateRepository.save(goal.join(invitee)));
+        teamMate.changeToWaitingStatus();
+        return teamMate;
+    }
+
+    // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리
     @Transactional
     public TeamMateInviteReplyResult applyInviteReply(TeamMateInviteReplyCommand command) {
         TeamMate invitee = teamMateRepository.findTeamMateWithGoal(command.getTeamMateId())
@@ -80,7 +78,6 @@ public class TeamMateCommandService {
                 getInviteReplyNotificationDto(invitee, inviteNotification.getUserId(), command.isAccept())));
         return mapper.toInviteReplyResult(invitee.getGoal().getId());
     }
-
     @Transactional
     public void updateHookyTeamMate() {
         List<TeamMate> hookyTMs = teamMateRepository.updateYesterdayHookyTMs();
@@ -89,6 +86,14 @@ public class TeamMateCommandService {
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
                 mapper.toKickOutNotificationDtos(eliminators)));
         cacheTemplate.deleteTMCacheData(eliminators);
+    }
+
+    private TeamMate createGoalCreator(long goalId, long userId) {
+        Goal goal = goalRepository.findById(goalId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
+        return goal.join(creator);
     }
 
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {

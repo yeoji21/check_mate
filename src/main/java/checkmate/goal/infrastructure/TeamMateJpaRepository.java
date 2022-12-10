@@ -118,8 +118,9 @@ public class TeamMateJpaRepository implements TeamMateRepository {
     }
 
     @Override
-    public void save(TeamMate teamMate) {
+    public TeamMate save(TeamMate teamMate) {
         entityManager.persist(teamMate);
+        return teamMate;
     }
 
 }
