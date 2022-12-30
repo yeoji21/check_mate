@@ -86,7 +86,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 
     @Override
     public List<TeamMate> eliminateOveredTMs(List<TeamMate> hookyTMs) {
-        // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는걸로 바꾸기
+        // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
         List<TeamMate> eliminators = hookyTMs.stream()
                 .filter(tm -> tm.getHookyDays() >= tm.getGoal().getHookyDayLimit())
                 .collect(Collectors.toList());

@@ -36,7 +36,6 @@ public class Goal extends BaseTimeEntity {
     private GoalStatus status;
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
-    // TODO: 2022/11/30 같은 종류의 condition은 추가되면 안되는 제약 사항
     @Getter(value = AccessLevel.PRIVATE)
     @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VerificationCondition> conditions = new ArrayList<>();

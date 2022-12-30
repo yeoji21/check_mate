@@ -52,9 +52,13 @@ public class TeamMateCommandService {
     private TeamMate invite(long goalId, String inviteeNickname) {
         Goal goal = findGoal(goalId);
         User invitee = findUser(inviteeNickname);
+
+        // TODO: 2022/12/30 초대를 거절했던 팀원도 같은 방식으로 처리하는 것 고려
         TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(goal.getId(), invitee.getId())
                 .orElseGet(() -> teamMateRepository.save(goal.join(invitee)));
         teamMate.changeToWaitingStatus();
+        //
+
         return teamMate;
     }
 
@@ -75,8 +79,10 @@ public class TeamMateCommandService {
         List<TeamMate> hookyTMs = teamMateRepository.updateYesterdayHookyTMs();
         List<TeamMate> eliminators = teamMateRepository.eliminateOveredTMs(hookyTMs);
 
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
-                mapper.toKickOutNotificationDtos(eliminators)));
+        eventPublisher.publishEvent(
+                new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
+                mapper.toKickOutNotificationDtos(eliminators))
+        );
         cacheTemplate.deleteTMCacheData(eliminators);
     }
 

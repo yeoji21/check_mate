@@ -1,4 +1,4 @@
-package checkmate.goal.domain.goal;
+package checkmate.goal.domain;
 
 import checkmate.goal.domain.GoalCheckDays;
 import org.junit.jupiter.api.DisplayName;

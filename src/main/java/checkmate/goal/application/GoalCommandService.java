@@ -36,9 +36,7 @@ public class GoalCommandService {
     @Transactional
     public long create(GoalCreateCommand command) {
         Goal goal = goalRepository.save(mapper.toGoal(command));
-        TeamMate teamMate = joinToGoal(goal, command.getUserId());
-        teamMate.initiateGoal(goalRepository.countOngoingGoals(command.getUserId()));
-        teamMateRepository.save(teamMate);
+        teamMateRepository.save(joinToGoal(goal, command.getUserId()));
         return goal.getId();
     }
 
@@ -77,7 +75,9 @@ public class GoalCommandService {
     private TeamMate joinToGoal(Goal goal, long userId) {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
-        return goal.join(creator);
+        TeamMate teamMate = goal.join(creator);
+        teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
+        return teamMate;
     }
 
     private void checkUserIsInGoal(long goalId, long userId) {
