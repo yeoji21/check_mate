@@ -1,18 +1,13 @@
 package checkmate.goal.domain;
 
 import checkmate.TestEntityFactory;
-import checkmate.exception.UnInviteableGoalException;
-import checkmate.exception.BusinessException;
-import checkmate.exception.code.ErrorCode;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TeamMateTest {
     @Test
@@ -26,17 +21,6 @@ class TeamMateTest {
 
         //then
         assertThat(progress).isEqualTo(0);
-    }
-
-    @Test
-    void 초대_수락시_진행중인_목표개수_검사_테스트() throws Exception{
-        //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-
-        //when then
-        BusinessException exception = assertThrows(BusinessException.class, () -> teamMate.initiateGoal(11));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 
     @Test
@@ -85,40 +69,11 @@ class TeamMateTest {
     }
 
     @Test
-    void 초대응답_수락_테스트() throws Exception{
-        //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-
-        int before = teamMate.getWorkingDays();
-
-        //when
-        teamMate.initiateGoal(0);
-        int after = teamMate.getWorkingDays();
-
-        //then
-        assertThat(after).isGreaterThan(before);
-        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
-    }
-
-    @Test
     void 초대응답_거절_테스트() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "goal");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
         teamMate.applyInviteReject();
 
         assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);
-    }
-
-    @Test
-    void 기간만료된_초대응답_테스트() throws Exception{
-        Goal goal = Goal.builder()
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .period(new GoalPeriod(LocalDate.now().minusDays(2), LocalDate.now().plusDays(1)))
-                .build();
-        TeamMate teamMate = new TeamMate(goal, TestEntityFactory.user(1L, "user"));
-
-        assertThrows(UnInviteableGoalException.class, () -> teamMate.initiateGoal(0));
     }
 }

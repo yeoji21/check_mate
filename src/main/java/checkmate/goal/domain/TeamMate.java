@@ -72,14 +72,17 @@ public class TeamMate extends BaseTimeEntity {
         return progress.getSkippedDayCount();
     }
 
-    // TODO: 2022/11/03 외부에서 ongoingGoalCount를 받는 게 맞을지
-    // 이 메소드 호출 전에 DB에서 TeamMate 객체를 꺼내와야 함
-    // 파라미터로 ongoingGoalCount가 아니라 TeamMate + ongoingGoalCount를 포함하는 객체로 변경
     public void initiateGoal(int ongoingGoalCount) {
         goal.inviteableCheck();
         GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
         this.status = TeamMateStatus.ONGOING;
         progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
+    }
+
+    void changeToOngoingStatus() {
+        goal.inviteableCheck();
+        this.status = TeamMateStatus.ONGOING;
+        this.progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
