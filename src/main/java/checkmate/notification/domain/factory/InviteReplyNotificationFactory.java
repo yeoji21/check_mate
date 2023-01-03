@@ -11,27 +11,25 @@ import java.util.List;
 @Component
 public class InviteReplyNotificationFactory extends NotificationFactory<InviteReplyNotificationDto> {
     @Override
-    public Notification generate(InviteReplyNotificationDto dto) {
-        Notification notification = Notification.builder()
-                .userId(dto.inviteeUserId())
-                .type(getType())
-                .title("초대 응답")
-                .content(getBody(dto))
-                .receivers(List.of(new NotificationReceiver(dto.inviterUserId())))
-                .build();
-        notification.addAttribute("goalId", dto.goalId());
-        notification.addAttribute("accept", String.valueOf(dto.accept()));
-        return notification;
-    }
-
-    private static String getBody(InviteReplyNotificationDto command) {
-        String body = command.inviteeNickname() + "님이 " + command.goalTitle();
-        body += command.accept() ? "목표로 합류했어요!" : "목표로 합류를 거절했어요";
-        return body;
+    public NotificationType getType() {
+        return NotificationType.INVITE_GOAL_REPLY;
     }
 
     @Override
-    public NotificationType getType() {
-        return NotificationType.INVITE_GOAL_REPLY;
+    String getContent(InviteReplyNotificationDto dto) {
+        StringBuilder content = new StringBuilder(dto.inviteeNickname() + "님이 " + dto.goalTitle());
+        content.append(dto.accept() ? "목표로 합류했어요!" : "목표로 합류를 거절했어요");
+        return content.toString();
+    }
+
+    @Override
+    List<NotificationReceiver> getReceivers(InviteReplyNotificationDto dto) {
+        return List.of(new NotificationReceiver(dto.inviterUserId()));
+    }
+
+    @Override
+    void setAttributes(Notification notification, InviteReplyNotificationDto dto) {
+        notification.addAttribute("goalId", dto.goalId());
+        notification.addAttribute("accept", String.valueOf(dto.accept()));
     }
 }

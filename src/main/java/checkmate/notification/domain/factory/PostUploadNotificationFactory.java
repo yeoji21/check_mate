@@ -13,27 +13,25 @@ import java.util.stream.Collectors;
 @Component
 public class PostUploadNotificationFactory extends NotificationFactory<PostUploadNotificationDto> {
     @Override
-    public Notification generate(PostUploadNotificationDto dto) {
-        Notification notification = Notification.builder()
-                .userId(dto.uploaderUserId())
-                .type(getType())
-                .title("팀원의 목표인증")
-                .content(dto.goalTitle() + " 목표의 " + dto.uploaderNickname() + "님이 목표 수행을 인증했어요!")
-                .receivers(getReceivers(dto.teamMateUserIds()))
-                .build();
-        notification.addAttribute("goalId", dto.goalId());
-        return notification;
-    }
-
-    @Override
     public NotificationType getType() {
         return NotificationType.POST_UPLOAD;
     }
 
-    private static List<NotificationReceiver> getReceivers(List<Long> teamMateUserIds) {
-        return teamMateUserIds
+    @Override
+    String getContent(PostUploadNotificationDto dto) {
+        return dto.goalTitle() + " 목표의 " + dto.uploaderNickname() + "님이 목표 수행을 인증했어요!";
+    }
+
+    @Override
+    List<NotificationReceiver> getReceivers(PostUploadNotificationDto dto) {
+        return dto.teamMateUserIds()
                 .stream()
                 .map(NotificationReceiver::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    void setAttributes(Notification notification, PostUploadNotificationDto dto) {
+        notification.addAttribute("goalId", dto.goalId());
     }
 }

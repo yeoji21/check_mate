@@ -13,21 +13,23 @@ import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 @Component
 public class CompleteGoalNotificationFactory extends NotificationFactory<CompleteGoalNotificationDto> {
     @Override
-    public Notification generate(CompleteGoalNotificationDto dto) {
-        Notification notification = Notification.builder()
-                .userId(dto.userId())
-                .type(getType())
-                .title("목표 수행 완료")
-                .content(dto.goalTitle() + " 목표 수행을 끝까지 완수하였습니다")
-                .receivers(List.of(new NotificationReceiver(dto.userId())))
-                .build();
-        notification.addAttribute("userId", dto.userId());
-        notification.addAttribute("goalId", dto.goalId());
-        return notification;
+    public NotificationType getType() {
+        return COMPLETE_GOAL;
     }
 
     @Override
-    public NotificationType getType() {
-        return COMPLETE_GOAL;
+    String getContent(CompleteGoalNotificationDto dto) {
+        return dto.goalTitle() + " 목표 수행을 끝까지 완수하였습니다";
+    }
+
+    @Override
+    List<NotificationReceiver> getReceivers(CompleteGoalNotificationDto dto) {
+        return List.of(new NotificationReceiver(dto.userId()));
+    }
+
+    @Override
+    void setAttributes(Notification notification, CompleteGoalNotificationDto dto) {
+        notification.addAttribute("userId", dto.userId());
+        notification.addAttribute("goalId", dto.goalId());
     }
 }

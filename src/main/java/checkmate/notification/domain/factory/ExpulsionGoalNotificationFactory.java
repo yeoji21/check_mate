@@ -10,22 +10,23 @@ import java.util.List;
 
 @Component
 public class ExpulsionGoalNotificationFactory extends NotificationFactory<ExpulsionGoalNotificationDto> {
-
-    @Override
-    public Notification generate(ExpulsionGoalNotificationDto dto) {
-        Notification notification = Notification.builder()
-                .userId(dto.userId())
-                .type(getType())
-                .title("목표 퇴출 알림")
-                .content(dto.goalTitle() + " 목표에서 퇴출되었습니다.")
-                .receivers(List.of(new NotificationReceiver(dto.userId())))
-                .build();
-        notification.addAttribute("teamMateId", dto.teamMateId());
-        return notification;
-    }
-
     @Override
     public NotificationType getType() {
         return NotificationType.EXPULSION_GOAL;
+    }
+
+    @Override
+    String getContent(ExpulsionGoalNotificationDto dto) {
+        return dto.goalTitle() + " 목표에서 퇴출되었습니다.";
+    }
+
+    @Override
+    List<NotificationReceiver> getReceivers(ExpulsionGoalNotificationDto dto) {
+        return List.of(new NotificationReceiver(dto.userId()));
+    }
+
+    @Override
+    void setAttributes(Notification notification, ExpulsionGoalNotificationDto dto) {
+        notification.addAttribute("teamMateId", dto.teamMateId());
     }
 }

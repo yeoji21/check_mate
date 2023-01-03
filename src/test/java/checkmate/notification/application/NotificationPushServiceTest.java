@@ -7,7 +7,6 @@ import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.NotificationGenerator;
-import checkmate.notification.domain.factory.PostUploadNotificationFactory;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
@@ -41,7 +40,7 @@ class NotificationPushServiceTest {
     void 전송_알림_테스트() throws Exception{
         //given
         PostUploadNotificationDto dto = getNotificationCommand();
-        Notification notification = new PostUploadNotificationFactory().generate(dto);
+        Notification notification = TestEntityFactory.notification(1L, 1L, POST_UPLOAD);
 
         given(notificationGenerator.generate(any(NotificationType.class), any(NotificationCreateDto.class))).willReturn(notification);
         doAnswer((invocation -> {

@@ -3,16 +3,12 @@ package checkmate.notification.presentation;
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
 import checkmate.notification.application.dto.response.NotificationDetails;
 import checkmate.notification.application.dto.response.NotificationDetailsResult;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributes;
 import checkmate.notification.domain.NotificationType;
-import checkmate.notification.domain.factory.CompleteGoalNotificationFactory;
-import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.notification.presentation.dto.response.NotificationInfosResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -126,16 +122,7 @@ class NotificationControllerTest extends ControllerTest {
     }
 
     private List<NotificationInfo> getNotificationDetailResponseList() {
-        Goal testGoal = TestEntityFactory.goal(1L, "testGoal");
-        TeamMate teamMate = testGoal.join(TestEntityFactory.user(1L, "user"));
-
-        CompleteGoalNotificationDto dto = CompleteGoalNotificationDto.builder()
-                .userId(teamMate.getUserId())
-                .goalTitle(teamMate.getGoal().getTitle())
-                .goalId(teamMate.getGoal().getId())
-                .build();
-
-        Notification notification = new CompleteGoalNotificationFactory().generate(dto);
+        Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.COMPLETE_GOAL);
         return List.of(toNotificationInfo(notification), toNotificationInfo(notification));
     }
 

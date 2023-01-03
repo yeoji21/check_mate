@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum NotificationType{
-    COMPLETE_GOAL,
-    INVITE_GOAL,
-    INVITE_GOAL_REPLY,
-    EXPULSION_GOAL,
-    POST_UPLOAD;
+    COMPLETE_GOAL("목표 수행 완료"),
+    INVITE_GOAL("팀원 초대"),
+    INVITE_GOAL_REPLY("초대 응답"),
+    EXPULSION_GOAL("목표 퇴출 알림"),
+    POST_UPLOAD("팀원의 목표인증");
+
+    private final String title;
 }
