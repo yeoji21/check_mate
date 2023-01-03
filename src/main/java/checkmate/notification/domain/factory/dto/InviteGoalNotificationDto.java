@@ -9,4 +9,8 @@ public record InviteGoalNotificationDto (
     String goalTitle,
     long inviteeUserId,
     long inviteeTeamMateId) implements NotificationCreateDto{
+    @Override
+    public long getSenderUserId() {
+        return inviterUserId;
+    }
 }

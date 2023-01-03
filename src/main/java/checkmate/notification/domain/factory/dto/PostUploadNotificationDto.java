@@ -11,4 +11,8 @@ public record PostUploadNotificationDto (
     long goalId,
     String goalTitle,
     List<Long> teamMateUserIds) implements NotificationCreateDto{
+    @Override
+    public long getSenderUserId() {
+        return uploaderUserId;
+    }
 }

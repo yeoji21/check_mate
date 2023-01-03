@@ -1,7 +1,6 @@
 package checkmate.notification.domain.factory.dto;
 
 import lombok.Builder;
-import lombok.Getter;
 
 @Builder
 public record InviteReplyNotificationDto (
@@ -11,4 +10,8 @@ public record InviteReplyNotificationDto (
     String goalTitle,
     long inviterUserId,
     boolean accept) implements NotificationCreateDto{
+    @Override
+    public long getSenderUserId() {
+        return inviteeUserId;
+    }
 }

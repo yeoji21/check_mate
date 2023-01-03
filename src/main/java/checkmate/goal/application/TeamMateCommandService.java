@@ -62,7 +62,7 @@ public class TeamMateCommandService {
         return teamMate;
     }
 
-    // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리
+    // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리 -> 두 가지 API로 분리
     @Transactional
     public TeamMateInviteReplyResult applyInviteReply(TeamMateInviteReplyCommand command) {
         TeamMate invitee = teamMateRepository.findTeamMateWithGoal(command.getTeamMateId())
