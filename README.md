@@ -39,6 +39,12 @@
 -  [AWS CloudWatch를 통한 로그 수집](https://yeoji21.github.io/posts/cloudwatch-log/) 
 -  [컨트롤러에서 습관성 ResponseEntity 남발](https://yeoji21.github.io/posts/controller-return/)
 
+### ERD
+
+<img width="800" alt="check-mate" src="https://user-images.githubusercontent.com/78997487/211186163-8efc0050-6006-42fd-b7a0-a8f6a35f6820.png">
+
+https://www.erdcloud.com/d/DoHeXawHAHQA6GJxy
+
 ### API 명세 및 에러 코드 문서화
 
 <img width="700" alt="check-mate" src="https://user-images.githubusercontent.com/78997487/211143903-b09a6c7c-d91b-4cc2-97bc-aa5725f2ebdf.png">
