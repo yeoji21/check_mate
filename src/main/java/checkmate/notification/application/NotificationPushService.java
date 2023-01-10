@@ -5,7 +5,7 @@ import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.NotificationGenerator;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
-import checkmate.notification.domain.push.PushNotificationSender;
+import checkmate.notification.infrastructure.PushNotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
