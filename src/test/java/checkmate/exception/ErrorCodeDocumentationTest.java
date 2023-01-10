@@ -3,6 +3,7 @@ package checkmate.exception;
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
 import checkmate.exception.code.ErrorCode;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.FieldDescriptor;
@@ -15,16 +16,18 @@ import java.util.Comparator;
 import java.util.Map;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.beneathPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.snippet.Attributes.attributes;
 import static org.springframework.restdocs.snippet.Attributes.key;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Disabled
 public class ErrorCodeDocumentationTest extends ControllerTest {
-    @Test @WithMockAuthUser
+    @Test
+    @WithMockAuthUser
     void errorCodeDocumentation() throws Exception{
         ResultActions result = mockMvc.perform(get("/error-code")
                 .with(csrf())

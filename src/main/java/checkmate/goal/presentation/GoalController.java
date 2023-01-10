@@ -40,7 +40,7 @@ public class GoalController {
     })
     @PostMapping("/goal")
     public long save(@RequestBody @Valid GoalCreateDto dto,
-                                 @AuthenticationPrincipal JwtUserDetails details) {
+                     @AuthenticationPrincipal JwtUserDetails details) {
         return goalCommandService.create(mapper.toCreateCommand(dto, details.getUserId()));
     }
 

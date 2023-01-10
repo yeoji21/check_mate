@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name="dtype")
 @Table(
-        name = "goal_verification_method",
+        name = "goal_verification_condition",
         uniqueConstraints = @UniqueConstraint(columnNames = {"goal_id", "dtype"})
 )
 @Entity

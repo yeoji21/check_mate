@@ -1,6 +1,5 @@
 package checkmate.goal.domain;
 
-import checkmate.goal.domain.CheckDaysConverter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -114,6 +114,7 @@ public class GoalControllerTest extends ControllerTest {
                 .category(GoalCategory.LEARNING).title("자바의 정석 스터디")
                 .startDate(LocalDate.of(2021,12,20))
                 .endDate(LocalDate.of(2021,12,31))
+                .appointmentTime(LocalTime.of(19, 30))
                 .checkDays("월수금")
                 .build();
 
@@ -265,8 +266,7 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
                 fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
                 fieldWithPath("checkDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
-                fieldWithPath("minimumLike").type(JsonFieldType.NUMBER).description("확인 후 인증의 최소 좋아요 수").optional()
+                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional()
         );
     }
 

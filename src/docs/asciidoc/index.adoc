@@ -2,7 +2,7 @@ ifndef::snippets[]
 //:snippets: ../../../build/generated-snippets
 :snippets: ./build/generated-snippets
 endif::[]
-= 체크 메이트 Rest API
+= 체크 메이트 API 명세
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
@@ -56,26 +56,28 @@ include::{snippets}/find-goalinfo/http-response.adoc[]
 include::{snippets}/progress-percent/path-parameters.adoc[]
 
 == 닉네임 중복 검사
-operation::nickname-dup[snippets='curl-request,http-response']
-=== Request Fields
-include::{snippets}/save-goal/request-fields.adoc[]
+=== Request Parameters
+include::{snippets}/nickname-dup/request-parameters.adoc[]
 
 === HTTP Request
-include::{snippets}/save-goal/http-request.adoc[]
+include::{snippets}/nickname-dup/http-request.adoc[]
 
 === HTTP Response
-include::{snippets}/save-goal/http-response.adoc[]
+include::{snippets}/nickname-dup/http-response.adoc[]
 
 == 목표 인증
-operation::save-post[snippets='curl-request,request-parts,request-parameters,http-response']
-=== Request Fields
-include::{snippets}/save-goal/request-fields.adoc[]
+//operation::save-post[snippets='curl-request,request-parts,request-parameters,http-response']
+=== Request Parameters
+include::{snippets}/save-post/request-parameters.adoc[]
+
+=== Request Parts
+include::{snippets}/save-post/request-parts.adoc[]
 
 === HTTP Request
-include::{snippets}/save-goal/http-request.adoc[]
+include::{snippets}/save-post/http-request.adoc[]
 
 === HTTP Response
-include::{snippets}/save-goal/http-response.adoc[]
+include::{snippets}/save-post/http-response.adoc[]
 
 == 팀원 초대 응답
 === HTTP Response
