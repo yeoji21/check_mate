@@ -4,29 +4,33 @@ import checkmate.notification.domain.Notification;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-// TODO: 2023/01/10 TEST
+@AllArgsConstructor
 @Component
 public class PushNotificationSender {
+    private final FirebaseMessaging firebaseMessaging;
+
     public void send(Notification notification, List<String> tokens) {
-        com.google.firebase.messaging.Notification FCMNotification =
+        com.google.firebase.messaging.Notification FcmNotification =
                 new com.google.firebase.messaging.Notification(notification.getTitle(), notification.getContent());
+
         if(tokens.size() == 1){
             Message message = Message.builder()
-                    .setNotification(FCMNotification)
+                    .setNotification(FcmNotification)
                     .setToken(tokens.get(0))
                     .build();
-            FirebaseMessaging.getInstance().sendAsync(message);
+            firebaseMessaging.sendAsync(message);
         }
         else{
             MulticastMessage multicastMessage = MulticastMessage.builder()
-                    .setNotification(FCMNotification)
+                    .setNotification(FcmNotification)
                     .addAllTokens(tokens)
                     .build();
-            FirebaseMessaging.getInstance().sendMulticastAsync(multicastMessage);
+            firebaseMessaging.sendMulticastAsync(multicastMessage);
         }
     }
 }
