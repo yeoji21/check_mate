@@ -15,7 +15,7 @@ import static checkmate.post.domain.QPost.post;
 
 @Repository
 @RequiredArgsConstructor
-public class ImageRepositoryImpl implements ImageRepository {
+public class ImageJpaRepository implements ImageRepository {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 

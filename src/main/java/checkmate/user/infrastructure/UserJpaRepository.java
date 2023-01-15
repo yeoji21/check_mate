@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
-public class UserRepositoryImpl implements UserRepository {
+public class UserJpaRepository implements UserRepository {
     private final UserDao userDao;
 
     @Override

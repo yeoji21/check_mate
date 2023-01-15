@@ -10,12 +10,12 @@ import checkmate.goal.infrastructure.TeamMateJpaRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.infrastructure.NotificationQueryDao;
-import checkmate.notification.infrastructure.NotificationRepositoryImpl;
+import checkmate.notification.infrastructure.NotificationJpaRepository;
 import checkmate.post.domain.ImageRepository;
 import checkmate.post.domain.PostRepository;
-import checkmate.post.infrastructure.ImageRepositoryImpl;
+import checkmate.post.infrastructure.ImageJpaRepository;
 import checkmate.post.infrastructure.PostQueryDao;
-import checkmate.post.infrastructure.PostRepositoryImpl;
+import checkmate.post.infrastructure.PostJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +32,9 @@ import javax.persistence.EntityManager;
         GoalQueryDao.class,
         TeamMateJpaRepository.class,
         TeamMateQueryDao.class,
-        NotificationRepositoryImpl.class,
-        ImageRepositoryImpl.class,
-        PostRepositoryImpl.class,
+        NotificationJpaRepository.class,
+        ImageJpaRepository.class,
+        PostJpaRepository.class,
         GoalJpaRepository.class,
         PostQueryDao.class,
         NotificationQueryDao.class
