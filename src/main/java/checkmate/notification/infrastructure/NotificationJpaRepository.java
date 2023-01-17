@@ -19,7 +19,7 @@ import static checkmate.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
-public class NotificationRepositoryImpl implements NotificationRepository {
+public class NotificationJpaRepository implements NotificationRepository {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 

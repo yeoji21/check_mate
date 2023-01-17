@@ -22,7 +22,7 @@ import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
-public class PostRepositoryImpl implements PostRepository {
+public class PostJpaRepository implements PostRepository {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
@@ -32,7 +32,8 @@ public class PostRepositoryImpl implements PostRepository {
                 .from(post)
                 .leftJoin(post.images.images, image)
                 .join(post.teamMate, teamMate).fetchJoin()
-                .where(post.teamMate.id.in(teamMateIds), post.createdDateTime.between(uploadDate.atStartOfDay(), uploadDate.plusDays(1).atStartOfDay()))
+                .where(post.teamMate.id.in(teamMateIds),
+                        post.createdDateTime.between(uploadDate.atStartOfDay(), uploadDate.plusDays(1).atStartOfDay()))
                 .transform(GroupBy.groupBy(post).as(list(image)));
     }
 

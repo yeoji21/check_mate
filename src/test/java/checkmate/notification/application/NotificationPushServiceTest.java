@@ -10,7 +10,7 @@ import checkmate.notification.domain.factory.NotificationGenerator;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
-import checkmate.notification.domain.push.PushNotificationSender;
+import checkmate.notification.infrastructure.PushNotificationSender;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

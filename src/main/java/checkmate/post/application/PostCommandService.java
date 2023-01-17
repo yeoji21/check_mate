@@ -65,7 +65,8 @@ public class PostCommandService {
     }
 
     private void verifyGoalConditions(Long goalId, Post post) {
-        Goal goal = goalRepository.findWithConditions(goalId).orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+        Goal goal = goalRepository.findWithConditions(goalId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
         goal.checkConditions(post);
     }
 

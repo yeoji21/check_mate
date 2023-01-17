@@ -1,5 +1,6 @@
 package checkmate.goal.domain;
 
+// TODO: 2023/01/17 ?
 public class TeamMateCandidate {
     private final TeamMate teamMate;
 
