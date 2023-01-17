@@ -48,7 +48,7 @@ public class GoalRepositoryTest extends RepositoryTest {
         assertThat(count).isEqualTo(3);
     }
 
-    @Test
+    @Test @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
     void findConditions() throws Exception{
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
@@ -58,15 +58,34 @@ public class GoalRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Goal findGoal = goalRepository.findWithConditions(goal.getId()).orElseThrow(IllegalArgumentException::new);
+        Goal findGoal = goalRepository.findWithConditions(goal.getId())
+                .orElseThrow(IllegalArgumentException::new);
 
         //then
         List conditions = (List) ReflectionTestUtils.getField(findGoal, "conditions");
         assertThat(conditions.size()).isEqualTo(1);
     }
 
+
+    @Test @DisplayName("목표와 조건 함께 조회 - 조건이 없는 경우")
+    void findConditionsWithNoConditions() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+        em.flush();
+        em.clear();
+
+        //when
+        Goal findGoal = goalRepository.findWithConditions(goal.getId())
+                .orElseThrow(IllegalArgumentException::new);
+
+        //then
+        List conditions = (List) ReflectionTestUtils.getField(findGoal, "conditions");
+        assertThat(conditions.size()).isEqualTo(0);
+    }
+
     @Test
-    void save_VerificationCondition() throws Exception{
+    void saveVerificationCondition() throws Exception{
         //given
         Goal testGoal = TestEntityFactory.goal(null, "test");
         em.persist(testGoal);

@@ -106,12 +106,12 @@ public class GoalJpaRepository implements GoalRepository {
         return goalIds;
     }
 
-    // TODO: 2023/01/17 condition이 없는 경우
     @Override
     public Optional<Goal> findWithConditions(Long goalId) {
         return Optional.ofNullable(
-                queryFactory.selectFrom(goal)
-                        .leftJoin(goal.conditions, verificationCondition)
+                queryFactory.select(goal).distinct()
+                        .from(goal)
+                        .leftJoin(goal.conditions, verificationCondition).fetchJoin()
                         .where(goal.id.eq(goalId))
                         .fetchOne()
         );

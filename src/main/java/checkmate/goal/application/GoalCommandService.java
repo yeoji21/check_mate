@@ -72,13 +72,11 @@ public class GoalCommandService {
         cacheTemplate.deleteTMCacheData(teamMates);
     }
 
-    // TODO: 2022/12/30 TEST
     private TeamMate joinToGoal(Goal goal, long userId) {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         TeamMate teamMate = goal.join(creator);
-        TeamMateCandidate candidate = new TeamMateCandidate(teamMate, goalRepository.countOngoingGoals(userId));
-        candidate.initiate();
+        teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
         return teamMate;
     }
 
