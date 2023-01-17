@@ -59,9 +59,9 @@ class JwtFactoryTest {
     }
 
     @Test
-    void test() throws Exception{
+    void token() throws Exception{
         User user = TestEntityFactory.user(1L, "hi");
-        ReflectionTestUtils.setField(user,"providerId", "NAVER_W6AL7W-Xoubs1RxK5ZGHfdfN7N1Qpei6rNMHNatkUxI");
+        ReflectionTestUtils.setField(user,"providerId", "testId");
         ReflectionTestUtils.setField(user,"username", "tester");
         String made = jwtFactory.accessToken(user);
         System.out.println(made);
@@ -70,20 +70,10 @@ class JwtFactoryTest {
                 .withSubject(this.user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TIME))
                 .withClaim("id", 1L)
-                .withClaim("providerId", "NAVER_W6AL7W-Xoubs1RxK5ZGHfdfN7N1Qpei6rNMHNatkUxI")
-                .withClaim("nickname", "hi")
+                .withClaim("providerId", "user")
+                .withClaim("nickname", "user")
                 .withClaim("auth", this.user.getRole())
                 .sign(Algorithm.HMAC512("test"));
         System.out.println(sign);
-
-
-        System.out.println(JWT.create()
-                .withSubject(this.user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TIME))
-                .withClaim("id", 10077L)
-                .withClaim("providerId", "NAVER_W6AL7W-Xoubs1RxK5ZGHfdfN7N1Qpei6rNMHNatkUxI")
-                .withClaim("nickname", "여여투레")
-                .withClaim("auth", this.user.getRole())
-                .sign(Algorithm.HMAC512("test")));
     }
 }

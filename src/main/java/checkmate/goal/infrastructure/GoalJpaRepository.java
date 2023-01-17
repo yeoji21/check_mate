@@ -1,6 +1,9 @@
 package checkmate.goal.infrastructure;
 
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.domain.GoalStatus;
+import checkmate.goal.domain.TeamMateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -103,11 +106,12 @@ public class GoalJpaRepository implements GoalRepository {
         return goalIds;
     }
 
+    // TODO: 2023/01/17 condition이 없는 경우
     @Override
     public Optional<Goal> findWithConditions(Long goalId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(goal)
-                        .join(goal.conditions, verificationCondition).fetchJoin()
+                        .leftJoin(goal.conditions, verificationCondition)
                         .where(goal.id.eq(goalId))
                         .fetchOne()
         );
