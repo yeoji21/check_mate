@@ -99,10 +99,13 @@ public class PostCommandService {
     private Post save(PostUploadCommand command, TeamMate uploader) {
         Assert.isTrue(uploader.getUploadable().isUploadable(), "uploadable");
 
-        Post post = Post.builder().teamMate(uploader).content(command.getText()).build();
+        Post post = Post.builder()
+                .teamMate(uploader)
+                .content(command.getText())
+                .build();
         postRepository.save(post);
-        uploader.updateUploadedDate();
         publishFileUploadedEvent(command, post);
+        uploader.updateUploadedDate();
         return post;
     }
 

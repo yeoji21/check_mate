@@ -24,7 +24,8 @@ public enum ErrorCode {
     EXCEED_IMAGE_LIMIT(PostCode.IMAGE_LIMIT.getCode(), BAD_REQUEST, "업로드 가능한 최대 이미지 수를 초과한 경우"),
     REFRESH_TOKEN_EXPIRED(TokenCode.REFRESH_TOKEN_EXPIRED.getCode(), BAD_REQUEST, "Refresh Token이 만료된 경우"),
     IMAGE_PROCESSING_IO(PostCode.IMAGE_IO.getCode(), BAD_REQUEST, "이미지 처리 중 문제가 발생한 경우"),
-    NOTIFICATION_PUSH_IO(NotificationCode.PUSH_IO.getCode(), BAD_REQUEST, "알림 전송 중 문제가 발생한 경우"),
+
+    UNAUTHORIZED_OPERATION(CommonCode.UNAUTHORIZED_OPERATION.getCode(), BAD_REQUEST, "허가되지 않은 작업을 시도한 경우"),
 
     // 404 NOT_FOUND : Resource를 찾을 수 없음
     USER_NOT_FOUND(UserCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 유저"),

@@ -3,6 +3,7 @@ package checkmate.goal.application;
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheTemplate;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
+import checkmate.goal.application.dto.request.InviteReplyCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.domain.*;
@@ -105,6 +106,37 @@ public class TeamMateCommandServiceTest {
         //then
         assertThat(response.getGoalId()).isNotNull();
         assertThat(inviteeTm.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
+    }
+
+    @Test @DisplayName("팀원 초대 거절")
+    void inviteReject() throws Exception{
+        //given
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        User inviter = TestEntityFactory.user(1L, "inviter");
+        User invitee = TestEntityFactory.user(2L, "invitee");
+        TeamMate teamMate = goal.join(invitee);
+
+        NotificationReceiver receiver = new NotificationReceiver(teamMate.getUserId());
+        Notification notification = Notification.builder()
+                .userId(inviter.getId())
+                .type(NotificationType.INVITE_GOAL)
+                .title("title")
+                .content("content")
+                .receivers(List.of(receiver))
+                .build();
+        notification.addAttribute("teamMateId", 1L);
+        ReflectionTestUtils.setField(notification, "id", 1L);
+
+        given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
+                .willReturn(Optional.of(receiver));
+        given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(teamMate));
+
+        //when
+        teamMateCommandService.inviteReject(new InviteReplyCommand(invitee.getId(), notification.getId()));
+
+        //then
+        assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);
+        assertThat(receiver.isChecked()).isTrue();
     }
 
     @Test @DisplayName("인증일에 인증하지 않은 팀원 업데이트")

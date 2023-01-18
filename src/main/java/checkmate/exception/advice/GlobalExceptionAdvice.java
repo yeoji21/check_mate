@@ -88,4 +88,10 @@ public class GlobalExceptionAdvice {
         log.warn("[handleRefreshTokenExpiredException] : {}", e.getMessage());
         return ErrorResponse.toResponseEntity(ErrorCode.REFRESH_TOKEN_EXPIRED);
     }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> authorityException(UnauthorizedException e) {
+        log.warn("[handleAuthorityException] : {}", e.getErrorCode().getDetail());
+        return ErrorResponse.toResponseEntity(e.getErrorCode());
+    }
 }

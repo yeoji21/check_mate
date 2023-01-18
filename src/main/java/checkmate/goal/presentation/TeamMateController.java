@@ -4,9 +4,11 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
+import checkmate.goal.application.dto.request.InviteReplyCommand;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
+import checkmate.goal.presentation.dto.request.InviteReplyDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +48,16 @@ public class TeamMateController {
     public TeamMateInviteReplyResult inviteReply(@RequestBody TeamMateInviteReplyDto dto,
                                                  @AuthenticationPrincipal JwtUserDetails principal) {
         return teamMateCommandService.applyInviteReply(mapper.toInviteReplyCommand(dto));
+    }
+
+    @PatchMapping("/mate/reject")
+    public void inviteReject(@RequestBody InviteReplyDto dto,
+                             @AuthenticationPrincipal JwtUserDetails principal) {
+        InviteReplyCommand command = InviteReplyCommand.builder()
+                .userId(principal.getUserId())
+                .notificationId(dto.getNotificationId())
+                .build();
+        teamMateCommandService.inviteReject(command);
     }
 
     @GetMapping("/mate/{teamMateId}/calendar")

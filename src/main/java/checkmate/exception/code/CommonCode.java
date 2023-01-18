@@ -11,6 +11,7 @@ public enum CommonCode{
     UPDATE_DURATION("C-003"),
     FILE_SIZE("C-004"),
     SERVICE_UNAVAILABLE("C-005"),
+    UNAUTHORIZED_OPERATION("C-006")
     ;
 
     private final String code;

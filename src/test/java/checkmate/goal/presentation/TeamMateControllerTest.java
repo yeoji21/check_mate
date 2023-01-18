@@ -3,10 +3,12 @@ package checkmate.goal.presentation;
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
+import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
+import checkmate.goal.presentation.dto.request.InviteReplyDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -62,6 +64,23 @@ class TeamMateControllerTest extends ControllerTest {
                 .andDo(document("invite-reply",
                         getInviteReplyRequestFieldsSnippet(),
                         getInviteReplyResponseFieldsSnippet()
+                ));
+    }
+
+    @WithMockAuthUser
+    @Test @DisplayName("초대 응답 거절")
+    void inviteReject() throws Exception{
+        InviteReplyDto request = new InviteReplyDto(1L);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/reject")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andDo(document("invite-reject",
+                        requestFields(
+                                fieldWithPath("notificationId").type(JsonFieldType.NUMBER).description("notificationId")
+                        )
                 ));
     }
 

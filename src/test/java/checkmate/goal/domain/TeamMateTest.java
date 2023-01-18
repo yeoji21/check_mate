@@ -72,7 +72,7 @@ class TeamMateTest {
     void 초대응답_거절_테스트() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "goal");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        teamMate.applyInviteReject();
+        teamMate.toRejectStatus();
 
         assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);
     }

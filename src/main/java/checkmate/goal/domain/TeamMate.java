@@ -48,41 +48,11 @@ public class TeamMate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    public void updateUploadedDate() {
-        lastUploadDate = LocalDate.now();
-    }
-
-    public void applyInviteReject() {
-        status = TeamMateStatus.REJECT;
-    }
-
-    public void plusWorkingDay() {
-        progress.plusWorkingDay();
-    }
-
-    public void minusWorkingDay() {
-        progress.minusWorkingDay();
-    }
-
-    public int getWorkingDays() {
-        return progress.getCheckDayCount();
-    }
-
-    public int getHookyDays() {
-        return progress.getSkippedDayCount();
-    }
-
     public void initiateGoal(int ongoingGoalCount) {
         goal.inviteableCheck();
         GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
         this.status = TeamMateStatus.ONGOING;
         progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
-    }
-
-    void changeToOngoingStatus() {
-        goal.inviteableCheck();
-        this.status = TeamMateStatus.ONGOING;
-        this.progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
@@ -91,7 +61,7 @@ public class TeamMate extends BaseTimeEntity {
                 .collect(Collectors.joining());
     }
 
-    public void changeToWaitingStatus() {
+    public void toWaitingStatus() {
         goal.inviteableCheck();
         status.inviteableCheck();
         status = TeamMateStatus.WAITING;
@@ -113,4 +83,27 @@ public class TeamMate extends BaseTimeEntity {
         return (lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now()));
     }
 
+    public void updateUploadedDate() {
+        lastUploadDate = LocalDate.now();
+    }
+
+    public void toRejectStatus() {
+        status = TeamMateStatus.REJECT;
+    }
+
+    public void plusWorkingDay() {
+        progress.plusWorkingDay();
+    }
+
+    public void minusWorkingDay() {
+        progress.minusWorkingDay();
+    }
+
+    public int getWorkingDays() {
+        return progress.getCheckDayCount();
+    }
+
+    public int getHookyDays() {
+        return progress.getSkippedDayCount();
+    }
 }
