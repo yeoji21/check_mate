@@ -3,7 +3,7 @@ package checkmate.notification.domain.factory.dto;
 import lombok.Builder;
 
 @Builder
-public record InviteGoalNotificationDto (
+public record TeamMateInviteNotificationDto(
     long inviterUserId,
     String inviterNickname,
     String goalTitle,

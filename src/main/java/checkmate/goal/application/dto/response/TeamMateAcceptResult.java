@@ -1,10 +1,10 @@
 package checkmate.goal.application.dto.response;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
-@NoArgsConstructor
 public class TeamMateAcceptResult {
     private long goalId;
     private long teamMateId;

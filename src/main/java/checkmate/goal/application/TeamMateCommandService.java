@@ -6,9 +6,7 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.InviteReplyCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
-import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
-import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.TeamMate;
@@ -18,8 +16,8 @@ import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
-import checkmate.notification.domain.factory.dto.InviteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
+import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -52,16 +50,24 @@ public class TeamMateCommandService {
                 getInviteGoalNotificationDto(command, teamMate.getUserId())));
     }
 
-    // TODO: 2022/07/20 초대 수락/거절 두 가지 일을 처리 -> 두 가지 API로 분리
     @Transactional
-    public TeamMateInviteReplyResult applyInviteReply(TeamMateInviteReplyCommand command) {
-        TeamMate invitee = findTeamMateWithGoal(command.getTeamMateId());
-        Notification inviteNotification = findAndReadNotification(command.getNotificationId(), invitee.getUserId());
-        updateForInviteReply(invitee, command.isAccept());
-
+    public TeamMateAcceptResult inviteAccept(InviteReplyCommand command) {
+        Notification notification = findAndReadNotification(command.notificationId(), command.userId());
+        TeamMate teamMate = findTeamMateWithGoal(notification.getLongAttribute("teamMateId"));
+        teamMate.initiateGoal(goalRepository.countOngoingGoals(teamMate.getUserId()));
+        // TODO: 2023/01/19 boolean flag로 분기하는 로직 개선 고려
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL_REPLY,
-                getInviteReplyNotificationDto(invitee, inviteNotification.getUserId(), command.isAccept())));
-        return mapper.toInviteReplyResult(invitee.getGoal().getId());
+                getInviteReplyNotificationDto(teamMate, notification.getUserId(), true)));
+        return mapper.toResult(teamMate);
+    }
+
+    @Transactional
+    public void inviteReject(InviteReplyCommand command) {
+        Notification notification = findAndReadNotification(command.notificationId(), command.userId());
+        TeamMate teamMate = findTeamMateWithGoal(notification.getLongAttribute("teamMateId"));
+        teamMate.toRejectStatus();
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL_REPLY,
+                getInviteReplyNotificationDto(teamMate, notification.getUserId(), false)));
     }
 
     @Transactional
@@ -74,12 +80,6 @@ public class TeamMateCommandService {
                 mapper.toKickOutNotificationDtos(eliminators))
         );
         cacheTemplate.deleteTMCacheData(eliminators);
-    }
-
-    @Transactional
-    public void inviteReject(InviteReplyCommand command) {
-        Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        findTeamMateWithGoal(notification.getLongAttribute("teamMateId")).toRejectStatus();
     }
 
     private TeamMate invite(long goalId, String inviteeNickname) {
@@ -99,7 +99,7 @@ public class TeamMateCommandService {
         return receiver.getNotification();
     }
 
-    private InviteGoalNotificationDto getInviteGoalNotificationDto(TeamMateInviteCommand command, Long inviteeUserId) {
+    private TeamMateInviteNotificationDto getInviteGoalNotificationDto(TeamMateInviteCommand command, Long inviteeUserId) {
         TeamMate inviteeTeamMate = findTeamMateWithGoal(command.getGoalId(), inviteeUserId);
         User sender = findUser(command.getInviterUserId());
         return mapper.toInviteGoalNotificationDto(sender, inviteeTeamMate);
@@ -108,15 +108,6 @@ public class TeamMateCommandService {
     private InviteReplyNotificationDto getInviteReplyNotificationDto(TeamMate invitee, long inviterUserId, boolean accept) {
         String inviteeNickname = findUser(invitee.getUserId()).getNickname();
         return mapper.toInviteReplyNotificationDto(invitee, inviteeNickname, inviterUserId, accept);
-    }
-
-    private void updateForInviteReply(TeamMate invitee, boolean accept) {
-        if(accept) {
-            int ongoingGoalCount = goalRepository.countOngoingGoals(invitee.getUserId());
-            invitee.initiateGoal(ongoingGoalCount);
-        }
-        else
-            invitee.toRejectStatus();
     }
 
     private TeamMate findTeamMateWithGoal(long goalId, long userId) {
@@ -131,9 +122,5 @@ public class TeamMateCommandService {
 
     private User findUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
-    }
-
-    public TeamMateAcceptResult inviteAccept(InviteReplyCommand command) {
-        return null;
     }
 }
