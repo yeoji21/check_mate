@@ -1,6 +1,5 @@
 package checkmate;
 
-import checkmate.common.api.TestController;
 import checkmate.exception.ErrorCodeController;
 import checkmate.goal.application.*;
 import checkmate.goal.presentation.GoalController;
@@ -15,8 +14,8 @@ import checkmate.post.application.PostQueryService;
 import checkmate.post.presentation.PostController;
 import checkmate.post.presentation.dto.PostDtoMapper;
 import checkmate.user.application.LoginService;
-import checkmate.user.application.UserFindService;
 import checkmate.user.application.UserCommandService;
+import checkmate.user.application.UserFindService;
 import checkmate.user.presentation.LoginController;
 import checkmate.user.presentation.UserController;
 import checkmate.user.presentation.dto.LoginDtoMapper;

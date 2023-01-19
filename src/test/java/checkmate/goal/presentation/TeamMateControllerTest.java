@@ -2,12 +2,10 @@ package checkmate.goal.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
-import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
+import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.presentation.dto.request.InviteReplyDto;
-import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -31,8 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class TeamMateControllerTest extends ControllerTest {
-    private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
-
     @WithMockAuthUser
     @Test
     void 팀원_초대_테스트() throws Exception {
@@ -48,29 +44,33 @@ class TeamMateControllerTest extends ControllerTest {
     }
 
     @WithMockAuthUser
-    @Test
-    void 팀원_초대_응답_테스트() throws Exception{
-        TeamMateInviteReplyDto request = new TeamMateInviteReplyDto(1L, 1L, true);
-        TeamMateInviteReplyResult result = commandMapper.toInviteReplyResult(1L);
+    @Test @DisplayName("초대 응답 수락")
+    void inviteAccept() throws Exception{
+        TeamMateInviteReplyDto dto = new TeamMateInviteReplyDto(1L);
+        TeamMateAcceptResult result = new TeamMateAcceptResult(1L, 1L);
 
-        given(teamMateCommandService.applyInviteReply(any())).willReturn(result);
+        given(teamMateCommandService.inviteAccept(any())).willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate")
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/accept")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("invite-reply",
-                        getInviteReplyRequestFieldsSnippet(),
-                        getInviteReplyResponseFieldsSnippet()
-                ));
+                .andDo(document("invite-accept",
+                        requestFields(
+                                fieldWithPath("notificationId").type(JsonFieldType.NUMBER).description("notificationId")
+                        ),
+                        responseFields(
+                                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("goalId"),
+                                fieldWithPath("teamMateId").type(JsonFieldType.NUMBER).description("teamMateId")
+                        )));
     }
 
     @WithMockAuthUser
     @Test @DisplayName("초대 응답 거절")
     void inviteReject() throws Exception{
-        InviteReplyDto request = new InviteReplyDto(1L);
+        TeamMateInviteReplyDto request = new TeamMateInviteReplyDto(1L);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/reject")
                         .with(csrf())
@@ -129,18 +129,6 @@ class TeamMateControllerTest extends ControllerTest {
                 fieldWithPath("endDate").type(JsonFieldType.STRING).description("목표 수행 종료일"),
                 fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
                 fieldWithPath("teamMateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정")
-        );
-    }
-
-    private ResponseFieldsSnippet getInviteReplyResponseFieldsSnippet() {
-        return responseFields(fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"));
-    }
-
-    private RequestFieldsSnippet getInviteReplyRequestFieldsSnippet() {
-        return requestFields(
-                fieldWithPath("teamMateId").type(JsonFieldType.NUMBER).description("teamMateId"),
-                fieldWithPath("notificationId").type(JsonFieldType.NUMBER).description("notificationId"),
-                fieldWithPath("accept").type(JsonFieldType.BOOLEAN).description("수락 여부")
         );
     }
 

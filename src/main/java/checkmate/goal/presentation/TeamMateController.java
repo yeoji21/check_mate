@@ -4,13 +4,11 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
-import checkmate.goal.application.dto.request.InviteReplyCommand;
+import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
-import checkmate.goal.presentation.dto.request.InviteReplyDto;
-import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -37,27 +35,21 @@ public class TeamMateController {
     @Caching(evict = {
             @CacheEvict(
                     value = RedisKey.ONGOING_GOALS,
-                    key = "{#principal.userId, T(java.time.LocalDate).now()}",
-                    condition = "#dto.accept == true"),
+                    key = "{#principal.userId, T(java.time.LocalDate).now()}"),
             @CacheEvict(value =
                     RedisKey.TODAY_GOALS,
-                    key = "{#principal.userId, T(java.time.LocalDate).now()}",
-                    condition = "#dto.accept == true")
+                    key = "{#principal.userId, T(java.time.LocalDate).now()}")
     })
-    @PatchMapping("/mate")
-    public TeamMateInviteReplyResult inviteReply(@RequestBody TeamMateInviteReplyDto dto,
-                                                 @AuthenticationPrincipal JwtUserDetails principal) {
-        return teamMateCommandService.applyInviteReply(mapper.toInviteReplyCommand(dto));
+    @PatchMapping("/mate/accept")
+    public TeamMateAcceptResult inviteAccept(@RequestBody TeamMateInviteReplyDto dto,
+                                             @AuthenticationPrincipal JwtUserDetails principal) {
+        return teamMateCommandService.inviteAccept(mapper.toCommand(dto, principal.getUserId()));
     }
 
     @PatchMapping("/mate/reject")
-    public void inviteReject(@RequestBody InviteReplyDto dto,
+    public void inviteReject(@RequestBody TeamMateInviteReplyDto dto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
-        InviteReplyCommand command = InviteReplyCommand.builder()
-                .userId(principal.getUserId())
-                .notificationId(dto.getNotificationId())
-                .build();
-        teamMateCommandService.inviteReject(command);
+        teamMateCommandService.inviteReject(mapper.toCommand(dto, principal.getUserId()));
     }
 
     @GetMapping("/mate/{teamMateId}/calendar")

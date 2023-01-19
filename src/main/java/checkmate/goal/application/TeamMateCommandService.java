@@ -7,6 +7,7 @@ import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.InviteReplyCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
+import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
@@ -130,5 +131,9 @@ public class TeamMateCommandService {
 
     private User findUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
+    }
+
+    public TeamMateAcceptResult inviteAccept(InviteReplyCommand command) {
+        return null;
     }
 }
