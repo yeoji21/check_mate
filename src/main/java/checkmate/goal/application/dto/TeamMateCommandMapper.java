@@ -1,11 +1,10 @@
 package checkmate.goal.application.dto;
 
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
-import checkmate.goal.application.dto.response.TeamMateInviteReplyResult;
 import checkmate.goal.domain.TeamMate;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
-import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
+import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
 import checkmate.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,8 +16,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface TeamMateCommandMapper {
     TeamMateCommandMapper INSTANCE = Mappers.getMapper(TeamMateCommandMapper.class);
-
-    TeamMateInviteReplyResult toInviteReplyResult(Long goalId);
 
     @Mappings({
             @Mapping(source = "sender.id", target = "inviterUserId"),

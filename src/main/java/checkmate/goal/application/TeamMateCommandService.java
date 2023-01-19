@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static checkmate.notification.domain.NotificationType.*;
 
@@ -52,22 +53,16 @@ public class TeamMateCommandService {
 
     @Transactional
     public TeamMateAcceptResult inviteAccept(InviteReplyCommand command) {
-        Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        TeamMate teamMate = findTeamMateWithGoal(notification.getLongAttribute("teamMateId"));
-        teamMate.initiateGoal(goalRepository.countOngoingGoals(teamMate.getUserId()));
-        // TODO: 2023/01/19 boolean flag로 분기하는 로직 개선 고려
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL_REPLY,
-                getInviteReplyNotificationDto(teamMate, notification.getUserId(), true)));
-        return mapper.toResult(teamMate);
+        return mapper.toResult(
+                inviteReply(command,
+                (teamMate) -> teamMate.initiateGoal(goalRepository.countOngoingGoals(teamMate.getUserId())),
+                true)
+        );
     }
 
     @Transactional
     public void inviteReject(InviteReplyCommand command) {
-        Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        TeamMate teamMate = findTeamMateWithGoal(notification.getLongAttribute("teamMateId"));
-        teamMate.toRejectStatus();
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL_REPLY,
-                getInviteReplyNotificationDto(teamMate, notification.getUserId(), false)));
+        inviteReply(command, TeamMate::toRejectStatus, false);
     }
 
     @Transactional
@@ -80,6 +75,16 @@ public class TeamMateCommandService {
                 mapper.toKickOutNotificationDtos(eliminators))
         );
         cacheTemplate.deleteTMCacheData(eliminators);
+    }
+
+    private TeamMate inviteReply(InviteReplyCommand command, Consumer<TeamMate> consumer, boolean accept) {
+        Notification notification = findAndReadNotification(command.notificationId(), command.userId());
+        TeamMate teamMate = findTeamMateWithGoal(notification.getLongAttribute("teamMateId"));
+        consumer.accept(teamMate);
+        // TODO: 2023/01/19 boolean flag로 분기하는 로직 개선 고려
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL_REPLY,
+                getInviteReplyNotificationDto(teamMate, notification.getUserId(), accept)));
+        return teamMate;
     }
 
     private TeamMate invite(long goalId, String inviteeNickname) {
