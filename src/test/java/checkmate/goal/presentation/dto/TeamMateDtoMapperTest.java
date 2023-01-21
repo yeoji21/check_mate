@@ -21,9 +21,9 @@ class TeamMateDtoMapperTest {
         TeamMateInviteCommand command = mapper.toCommand(dto, inviterUserId);
 
         //then
-        assertThat(command.goalId()).isEqualTo(dto.getGoalId());
-        assertThat(command.inviteeNickname()).isEqualTo(dto.getInviteeNickname());
-        assertThat(command.inviterUserId()).isEqualTo(inviterUserId);
+        isEqualTo(command.goalId(), dto.getGoalId());
+        isEqualTo(command.inviteeNickname(), dto.getInviteeNickname());
+        isEqualTo(command.inviterUserId(), inviterUserId);
     }
 
     @Test
@@ -36,7 +36,11 @@ class TeamMateDtoMapperTest {
         TeamMateInviteReplyCommand command = mapper.toCommand(dto, userId);
 
         //then
-        assertThat(command.notificationId()).isEqualTo(dto.getNotificationId());
-        assertThat(command.userId()).isEqualTo(userId);
+        isEqualTo(command.notificationId(), dto.getNotificationId());
+        isEqualTo(userId, command.userId());
+    }
+
+    private void isEqualTo(Object A, Object B) {
+        assertThat(A).isEqualTo(B);
     }
 }

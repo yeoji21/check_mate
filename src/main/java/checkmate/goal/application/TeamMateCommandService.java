@@ -16,6 +16,7 @@ import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
+import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
 import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
 import checkmate.user.domain.User;
@@ -69,11 +70,10 @@ public class TeamMateCommandService {
     public void updateHookyTeamMate() {
         List<TeamMate> hookyTMs = teamMateRepository.updateYesterdayHookyTMs();
         List<TeamMate> eliminators = teamMateRepository.eliminateOveredTMs(hookyTMs);
+        List<ExpulsionGoalNotificationDto> notificationDtos =
+                eliminators.stream().map(mapper::toNotificationDto).toList();
 
-        eventPublisher.publishEvent(
-                new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
-                mapper.toKickOutNotificationDtos(eliminators))
-        );
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL, notificationDtos));
         cacheTemplate.deleteTMCacheData(eliminators);
     }
 
@@ -107,12 +107,12 @@ public class TeamMateCommandService {
     private TeamMateInviteNotificationDto getInviteGoalNotificationDto(TeamMateInviteCommand command, Long inviteeUserId) {
         TeamMate inviteeTeamMate = findTeamMateWithGoal(command.goalId(), inviteeUserId);
         User sender = findUser(command.inviterUserId());
-        return mapper.toInviteGoalNotificationDto(sender, inviteeTeamMate);
+        return mapper.toNotificationDto(sender, inviteeTeamMate);
     }
 
     private InviteReplyNotificationDto getInviteReplyNotificationDto(TeamMate invitee, long inviterUserId, boolean accept) {
         String inviteeNickname = findUser(invitee.getUserId()).getNickname();
-        return mapper.toInviteReplyNotificationDto(invitee, inviteeNickname, inviterUserId, accept);
+        return mapper.toNotificationDto(invitee, inviteeNickname, inviterUserId, accept);
     }
 
     private TeamMate findTeamMateWithGoal(long goalId, long userId) {

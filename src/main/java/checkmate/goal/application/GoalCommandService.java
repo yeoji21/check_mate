@@ -9,6 +9,7 @@ import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.*;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class GoalCommandService {
 
     @Transactional
     public long create(GoalCreateCommand command) {
-        Goal goal = goalRepository.save(mapper.toGoal(command));
+        Goal goal = goalRepository.save(mapper.toEntity(command));
         teamMateRepository.save(joinToGoal(goal, command.userId()));
         return goal.getId();
     }
@@ -68,8 +69,18 @@ public class GoalCommandService {
                 .filter(tm -> tm.getStatus() == TeamMateStatus.ONGOING)
                 .toList();
 
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, mapper.toGoalCompleteNotificationDtos(teamMates)));
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toDtos(teamMates)));
         cacheTemplate.deleteTMCacheData(teamMates);
+    }
+
+    private List<CompleteGoalNotificationDto> toDtos(List<TeamMate> teamMates) {
+        return teamMates.stream().map(tm -> {
+            return CompleteGoalNotificationDto.builder()
+                    .goalId(tm.getGoal().getId())
+                    .goalTitle(tm.getGoal().getTitle())
+                    .userId(tm.getUserId())
+                    .build();
+        }).toList();
     }
 
     private TeamMate joinToGoal(Goal goal, long userId) {

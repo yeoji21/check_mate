@@ -106,8 +106,8 @@ public class TeamMateCommandServiceTest {
         TeamMateAcceptResult result = teamMateCommandService.inviteAccept(new TeamMateInviteReplyCommand(invitee.getId(), notification.getId()));
 
         //then
-        assertThat(result.getGoalId()).isEqualTo(goal.getId());
-        assertThat(result.getTeamMateId()).isEqualTo(teamMate.getId());
+        assertThat(result.goalId()).isEqualTo(goal.getId());
+        assertThat(result.teamMateId()).isEqualTo(teamMate.getId());
         assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }

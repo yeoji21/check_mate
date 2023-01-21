@@ -33,13 +33,13 @@ class GoalDtoMapperTest {
         GoalCreateCommand command = mapper.toCommand(dto, 1L);
 
         //then
-        assertThat(command.userId()).isEqualTo(1L);
-        assertThat(command.category()).isEqualTo(dto.getCategory());
-        assertThat(command.title()).isEqualTo(dto.getTitle());
-        assertThat(command.startDate()).isEqualTo(dto.getStartDate());
-        assertThat(command.endDate()).isEqualTo(dto.getEndDate());
-        assertThat(command.checkDays()).isEqualTo(dto.getCheckDays());
-        assertThat(command.appointmentTime()).isEqualTo(dto.getAppointmentTime());
+        isEqualTo(command.userId(), 1L);
+        isEqualTo(command.category(), dto.getCategory());
+        isEqualTo(command.title(), dto.getTitle());
+        isEqualTo(command.startDate(), dto.getStartDate());
+        isEqualTo(command.endDate(), dto.getEndDate());
+        isEqualTo(command.checkDays(), dto.getCheckDays());
+        isEqualTo(command.appointmentTime(), dto.getAppointmentTime());
     }
 
     @Test
@@ -57,11 +57,11 @@ class GoalDtoMapperTest {
         GoalModifyCommand command = mapper.toCommand(dto, goalId, userId);
 
         //then
-        assertThat(command.goalId()).isEqualTo(goalId);
-        assertThat(command.userId()).isEqualTo(userId);
-        assertThat(command.endDate()).isEqualTo(dto.getEndDate());
-        assertThat(command.appointmentTime()).isEqualTo(dto.getAppointmentTime());
-        assertThat(command.timeReset()).isEqualTo(dto.isTimeReset());
+        isEqualTo(command.goalId(), goalId);
+        isEqualTo(command.userId(), userId);
+        isEqualTo(command.endDate(), dto.getEndDate());
+        isEqualTo(command.appointmentTime(), dto.getAppointmentTime());
+        isEqualTo(command.timeReset(), dto.isTimeReset());
     }
 
     @Test
@@ -77,8 +77,12 @@ class GoalDtoMapperTest {
         LikeCountCreateCommand command = mapper.toCommand(dto, userId);
 
         //then
-        assertThat(command.goalId()).isEqualTo(dto.getGoalId());
-        assertThat(command.likeCount()).isEqualTo(dto.getLikeCount());
-        assertThat(command.userId()).isEqualTo(userId);
+        isEqualTo(command.goalId(), dto.getGoalId());
+        isEqualTo(command.likeCount(), dto.getLikeCount());
+        isEqualTo(command.userId(), userId);
+    }
+
+    private void isEqualTo(Object A, Object B) {
+        assertThat(A).isEqualTo(B);
     }
 }
