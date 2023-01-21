@@ -41,13 +41,13 @@ public class GoalController {
     @PostMapping("/goal")
     public long save(@RequestBody @Valid GoalCreateDto dto,
                      @AuthenticationPrincipal JwtUserDetails details) {
-        return goalCommandService.create(mapper.toCreateCommand(dto, details.getUserId()));
+        return goalCommandService.create(mapper.toCommand(dto, details.getUserId()));
     }
 
     @PostMapping("/goal/confirm-like")
     public void confirmLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
                                      @AuthenticationPrincipal JwtUserDetails details) {
-        LikeCountCreateCommand command = mapper.toLikeCountCreateCommand(dto, details.getUserId());
+        LikeCountCreateCommand command = mapper.toCommand(dto, details.getUserId());
         goalCommandService.setLikeCountCondition(command);
     }
 
@@ -56,7 +56,7 @@ public class GoalController {
     public void goalModify(@PathVariable long goalId,
                            @RequestBody GoalModifyDto dto,
                            @AuthenticationPrincipal JwtUserDetails details){
-        goalCommandService.modifyGoal(mapper.toModifyCommand(dto, goalId, details.getUserId()));
+        goalCommandService.modifyGoal(mapper.toCommand(dto, goalId, details.getUserId()));
     }
 
     @GetMapping("/goal/{goalId}")

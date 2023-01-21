@@ -3,7 +3,7 @@ package checkmate.goal.application;
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheTemplate;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.request.InviteReplyCommand;
+import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.*;
@@ -103,7 +103,7 @@ public class TeamMateCommandServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(invitee));
 
         //when
-        TeamMateAcceptResult result = teamMateCommandService.inviteAccept(new InviteReplyCommand(invitee.getId(), notification.getId()));
+        TeamMateAcceptResult result = teamMateCommandService.inviteAccept(new TeamMateInviteReplyCommand(invitee.getId(), notification.getId()));
 
         //then
         assertThat(result.getGoalId()).isEqualTo(goal.getId());
@@ -137,7 +137,7 @@ public class TeamMateCommandServiceTest {
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(invitee));
 
         //when
-        teamMateCommandService.inviteReject(new InviteReplyCommand(invitee.getId(), notification.getId()));
+        teamMateCommandService.inviteReject(new TeamMateInviteReplyCommand(invitee.getId(), notification.getId()));
 
         //then
         assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);

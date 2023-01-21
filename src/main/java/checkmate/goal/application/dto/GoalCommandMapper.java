@@ -29,7 +29,7 @@ public interface GoalCommandMapper {
 
     @Named("goalPeriod")
     default GoalPeriod period(GoalCreateCommand command) {
-        return new GoalPeriod(command.getStartDate(), command.getEndDate());
+        return new GoalPeriod(command.startDate(), command.endDate());
     }
 
     GoalModifyRequest toGoalModifyRequest(GoalModifyCommand command);

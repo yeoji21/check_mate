@@ -16,17 +16,17 @@ public interface GoalDtoMapper {
     GoalDtoMapper INSTANCE = Mappers.getMapper(GoalDtoMapper.class);
 
     @Mapping(source = "userId", target = "userId")
-    GoalCreateCommand toCreateCommand(GoalCreateDto dto, long userId);
+    GoalCreateCommand toCommand(GoalCreateDto dto, long userId);
 
     @Mappings({
             @Mapping(source = "userId", target = "userId"),
             @Mapping(source = "goalId", target = "goalId")
     })
-    GoalModifyCommand toModifyCommand(GoalModifyDto dto, long goalId, long userId);
+    GoalModifyCommand toCommand(GoalModifyDto dto, long goalId, long userId);
 
     @Mappings({
         @Mapping(source = "dto.goalId", target = "goalId"),
         @Mapping(source = "dto.likeCount", target = "likeCount")
     })
-    LikeCountCreateCommand toLikeCountCreateCommand(LikeCountCreateDto dto, long userId);
+    LikeCountCreateCommand toCommand(LikeCountCreateDto dto, long userId);
 }

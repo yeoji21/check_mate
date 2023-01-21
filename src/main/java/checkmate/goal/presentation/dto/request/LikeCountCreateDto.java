@@ -1,6 +1,7 @@
 package checkmate.goal.presentation.dto.request;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ public class LikeCountCreateDto {
     @NotNull
     private Integer likeCount;
 
+    @Builder
     public LikeCountCreateDto(long goalId, int likeCount) {
         this.goalId = goalId;
         this.likeCount = likeCount;

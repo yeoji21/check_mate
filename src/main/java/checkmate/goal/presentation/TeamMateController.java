@@ -29,7 +29,7 @@ public class TeamMateController {
     @PostMapping("/mate")
     public void inviteToGoal(@RequestBody @Valid TeamMateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
-        teamMateCommandService.inviteTeamMate(mapper.toInviteCommand(inviteDto, principal.getUserId()));
+        teamMateCommandService.inviteTeamMate(mapper.toCommand(inviteDto, principal.getUserId()));
     }
 
     @Caching(evict = {

@@ -36,7 +36,7 @@ public class GoalCommandService {
     @Transactional
     public long create(GoalCreateCommand command) {
         Goal goal = goalRepository.save(mapper.toGoal(command));
-        teamMateRepository.save(joinToGoal(goal, command.getUserId()));
+        teamMateRepository.save(joinToGoal(goal, command.userId()));
         return goal.getId();
     }
 
@@ -49,10 +49,10 @@ public class GoalCommandService {
 
     @Transactional
     public void setLikeCountCondition(LikeCountCreateCommand command) {
-        checkUserIsInGoal(command.getGoalId(), command.getUserId());
-        Goal goal = goalRepository.findById(command.getGoalId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, command.getGoalId()));
-        goal.addCondition(new LikeCountCondition(command.getLikeCount()));
+        checkUserIsInGoal(command.goalId(), command.userId());
+        Goal goal = goalRepository.findById(command.goalId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, command.goalId()));
+        goal.addCondition(new LikeCountCondition(command.likeCount()));
     }
 
     @Transactional

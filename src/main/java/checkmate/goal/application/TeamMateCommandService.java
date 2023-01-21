@@ -4,7 +4,7 @@ import checkmate.common.cache.CacheTemplate;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.request.InviteReplyCommand;
+import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.Goal;
@@ -45,14 +45,14 @@ public class TeamMateCommandService {
 
     @Transactional
     public void inviteTeamMate(TeamMateInviteCommand command) {
-        TeamMate teamMate = invite(command.getGoalId(), command.getInviteeNickname());
+        TeamMate teamMate = invite(command.goalId(), command.inviteeNickname());
         teamMate.toWaitingStatus();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
                 getInviteGoalNotificationDto(command, teamMate.getUserId())));
     }
 
     @Transactional
-    public TeamMateAcceptResult inviteAccept(InviteReplyCommand command) {
+    public TeamMateAcceptResult inviteAccept(TeamMateInviteReplyCommand command) {
         return mapper.toResult(
                 inviteReply(command,
                 (teamMate) -> teamMate.initiateGoal(goalRepository.countOngoingGoals(teamMate.getUserId())),
@@ -61,7 +61,7 @@ public class TeamMateCommandService {
     }
 
     @Transactional
-    public void inviteReject(InviteReplyCommand command) {
+    public void inviteReject(TeamMateInviteReplyCommand command) {
         inviteReply(command, TeamMate::toRejectStatus, false);
     }
 
@@ -77,7 +77,7 @@ public class TeamMateCommandService {
         cacheTemplate.deleteTMCacheData(eliminators);
     }
 
-    private TeamMate inviteReply(InviteReplyCommand command, Consumer<TeamMate> consumer, boolean accept) {
+    private TeamMate inviteReply(TeamMateInviteReplyCommand command, Consumer<TeamMate> consumer, boolean accept) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
         TeamMate teamMate = findTeamMateWithGoal(notification.getLongAttribute("teamMateId"));
         consumer.accept(teamMate);
@@ -105,8 +105,8 @@ public class TeamMateCommandService {
     }
 
     private TeamMateInviteNotificationDto getInviteGoalNotificationDto(TeamMateInviteCommand command, Long inviteeUserId) {
-        TeamMate inviteeTeamMate = findTeamMateWithGoal(command.getGoalId(), inviteeUserId);
-        User sender = findUser(command.getInviterUserId());
+        TeamMate inviteeTeamMate = findTeamMateWithGoal(command.goalId(), inviteeUserId);
+        User sender = findUser(command.inviterUserId());
         return mapper.toInviteGoalNotificationDto(sender, inviteeTeamMate);
     }
 
