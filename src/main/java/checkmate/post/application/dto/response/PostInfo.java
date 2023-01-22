@@ -18,7 +18,7 @@ public class PostInfo {
     private LocalDateTime uploadAt;
     private List<String> imageUrls;
     private List<Long> likedUserIds;
-    private String text;
+    private String content;
 
     @QueryProjection
     public PostInfo(long postId,
@@ -26,14 +26,14 @@ public class PostInfo {
                     String uploaderNickname,
                     LocalDateTime uploadAt,
                     List<String> imageUrls,
-                    String text,
+                    String content,
                     List<Long> likedUserIds) {
         this.postId = postId;
         this.teamMateId = teamMateId;
         this.uploaderNickname = uploaderNickname;
         this.uploadAt = uploadAt;
         this.imageUrls = imageUrls;
-        this.text = text;
+        this.content = content;
         this.likedUserIds = likedUserIds;
     }
 }

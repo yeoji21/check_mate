@@ -1,5 +1,6 @@
 package checkmate.goal.application.dto;
 
+import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
@@ -9,9 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class GoalCommandMapperTest {
+class GoalCommandMapperTest extends MapperTest {
     private static final GoalCommandMapper mapper = GoalCommandMapper.INSTANCE;
 
     @Test
@@ -37,9 +36,5 @@ class GoalCommandMapperTest {
         isEqualTo(goal.getEndDate(), command.endDate());
         isEqualTo(CheckDaysConverter.toDays(goal.getCheckDays().intValue()), command.checkDays());
         isEqualTo(goal.getAppointmentTime(), command.appointmentTime());
-    }
-
-    private void isEqualTo(Object A, Object B) {
-        assertThat(A).isEqualTo(B);
     }
 }

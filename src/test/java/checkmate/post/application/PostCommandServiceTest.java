@@ -61,7 +61,7 @@ class PostCommandServiceTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
         ReflectionTestUtils.setField(post, "id", 1L);
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
@@ -80,7 +80,7 @@ class PostCommandServiceTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
         ReflectionTestUtils.setField(post, "id", 1L);
         post.addLikes(new Likes(teamMate.getUserId()));
 
@@ -98,6 +98,6 @@ class PostCommandServiceTest {
     private PostUploadCommand getPostRegisterDto() throws IOException {
         return new PostUploadCommand(1L,
                 List.of(new MockMultipartFile("originalName", InputStream.nullInputStream())),
-                "posting text");
+                "posting content");
     }
 }

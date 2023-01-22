@@ -13,12 +13,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PostUploadDto {
     private Long teamMateId;
-    private String text;
+    private String content;
     private List<MultipartFile> images;
 
-    public PostUploadDto(Long teamMateId, List<MultipartFile> images, String text) {
+    public PostUploadDto(Long teamMateId, List<MultipartFile> images, String content) {
         this.teamMateId = teamMateId;
-        this.text = text;
+        this.content = content;
         this.images = images != null ? new ArrayList<>(images) : Collections.emptyList();
     }
 }

@@ -13,7 +13,7 @@ class ImageTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
         Image image = Image.builder()
                 .post(post)
                 .storedName("stored name")
@@ -21,7 +21,7 @@ class ImageTest {
         //when
 
         //then
-        assertThat(image.getPost().getContent()).contains("post body text");
+        assertThat(image.getPost().getContent()).contains("post body content");
         assertThat(post.getImages()).hasSize(1);
 
         Image findImage = post.getImages().get(0);

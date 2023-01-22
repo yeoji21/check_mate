@@ -3,7 +3,6 @@ package checkmate.user.presentation;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.LoginService;
 import checkmate.user.presentation.dto.LoginDtoMapper;
-import checkmate.user.presentation.dto.UserAssembler;
 import checkmate.user.presentation.dto.request.GoogleLoginDto;
 import checkmate.user.presentation.dto.request.KakaoLoginDto;
 import checkmate.user.presentation.dto.request.NaverLoginDto;
@@ -12,7 +11,10 @@ import checkmate.user.presentation.dto.response.LoginTokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -40,7 +42,7 @@ public class LoginController {
 
     @PostMapping("/login/reissue")
     public LoginTokenResponse tokenReissue(@RequestBody TokenReissueDto tokenReissueDto) {
-        return loginService.reissueToken(UserAssembler.tokenReissueCommand(tokenReissueDto));
+        return loginService.reissueToken(loginDtoMapper.toCommand(tokenReissueDto));
     }
 
     @DeleteMapping("/login/logout")

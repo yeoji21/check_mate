@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 public interface NotificationDtoMapper{
     NotificationDtoMapper INSTANCE = Mappers.getMapper(NotificationDtoMapper.class);
 
-    NotificationDetailsCriteria toDetailsCriteria(Long cursorId, Integer size, Long userId);
+    NotificationDetailsCriteria toCriteria(Long cursorId, Integer size, Long userId);
 }

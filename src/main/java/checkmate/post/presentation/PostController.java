@@ -28,9 +28,9 @@ public class PostController {
     @PostMapping("/post")
     public long uploadPost(@ModelAttribute PostUploadDto dto,
                            @AuthenticationPrincipal JwtUserDetails principal) {
-        if (dto.getImages() == null && dto.getText() == null)
+        if (dto.getImages() == null && dto.getContent() == null)
             throw new IllegalArgumentException("빈 목표인증 요청");
-        return postCommandService.upload(postDtoMapper.toUploadCommand(dto));
+        return postCommandService.upload(postDtoMapper.toCommand(dto));
     }
 
     @GetMapping("/post")

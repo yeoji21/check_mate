@@ -41,7 +41,7 @@ public class PostCommandService {
 
     @Transactional
     public Long upload(PostUploadCommand command) {
-        TeamMate uploader = findTeamMate(command.getTeamMateId());
+        TeamMate uploader = findTeamMate(command.teamMateId());
         Post post = save(command, uploader);
         verifyGoalConditions(uploader.getGoal().getId(), post);
         publishNotificationEvent(uploader);
@@ -101,7 +101,7 @@ public class PostCommandService {
 
         Post post = Post.builder()
                 .teamMate(uploader)
-                .content(command.getText())
+                .content(command.content())
                 .build();
         postRepository.save(post);
         publishFileUploadedEvent(command, post);
@@ -110,8 +110,8 @@ public class PostCommandService {
     }
 
     private void publishFileUploadedEvent(PostUploadCommand command, Post post) {
-        if(command.getImages().size() > 0) {
-            command.getImages().forEach(multipartFile -> {
+        if(command.images().size() > 0) {
+            command.images().forEach(multipartFile -> {
                 try {
                     eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
                 } catch (IOException e) {

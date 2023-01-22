@@ -2,7 +2,6 @@ package checkmate.user.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
-import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.presentation.dto.request.GoogleLoginDto;
 import checkmate.user.presentation.dto.request.KakaoLoginDto;
 import checkmate.user.presentation.dto.request.NaverLoginDto;
@@ -43,7 +42,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     void 토큰_재발급_테스트() throws Exception{
         //given
-        TokenReissueDto request = TokenReissueDto.builder()
+        TokenReissueDto dto = TokenReissueDto.builder()
                 .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2NTI2MTE2MTF9.Hj9kuCtbxEQSdXgtGhKf0PnaXBNw4vtzeZ49fm24dREbRF7mOOw634ykk6aO0VjeuinikNVMI0xP5zURZj93OA")
                 .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsl6zsp4Dsm5AiLCJhdXRoIjoiUk9MRV9VU0VSIiwicHJvdmlkZXJJZCI6IktBS0FPXzIwODcxNjM5NzUiLCJuaWNrbmFtZSI6IuynhOuLrOuemCIsImlkIjoxMiwiZXhwIjoxNjUxMjE4MjMzfQ.3_oRpdYdy4dHr9myPS8a032BNS0Acjt9SAqJ3E0yvWU19NFUN9nOQSZWge4cxX5kWucoZ-AAPKDnzcEzyfDEQA")
                 .build();
@@ -51,14 +50,15 @@ class LoginControllerTest extends ControllerTest {
                 .refreshToken("after refresh token")
                 .accessToken("after access token")
                 .build();
+
         //when
-        given(loginService.reissueToken(any(TokenReissueCommand.class))).willReturn(response);
+        given(loginService.reissueToken(any())).willReturn(response);
 
         //then
         mockMvc.perform(post("/login/reissue")
                         .contentType(APPLICATION_JSON)
                         .with(csrf())
-                        .content(objectMapper.writeValueAsBytes(request)))
+                        .content(objectMapper.writeValueAsBytes(dto)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(document("token-reissue",

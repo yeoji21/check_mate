@@ -2,7 +2,6 @@ package checkmate.notification.presentation;
 
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.notification.application.NotificationQueryService;
-import checkmate.notification.application.dto.request.NotificationDetailsCriteria;
 import checkmate.notification.application.dto.response.NotificationDetailsResult;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.presentation.dto.NotificationDtoMapper;
@@ -35,7 +34,7 @@ public class NotificationController {
     public NotificationDetailsResult notificationInfoListFind(Long cursorId,
                                                               @RequestParam(required = false, defaultValue = "10") int size,
                                                               @AuthenticationPrincipal JwtUserDetails userDetails) {
-        NotificationDetailsCriteria criteria = dtoMapper.toDetailsCriteria(cursorId, size, userDetails.getUserId());
-        return notificationQueryService.findNotificationDetails(criteria);
+        return notificationQueryService.findNotificationDetails(
+                dtoMapper.toCriteria(cursorId, size, userDetails.getUserId()));
     }
 }

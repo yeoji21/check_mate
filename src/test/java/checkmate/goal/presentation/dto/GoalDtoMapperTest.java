@@ -1,5 +1,6 @@
 package checkmate.goal.presentation.dto;
 
+import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
@@ -12,9 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class GoalDtoMapperTest {
+class GoalDtoMapperTest extends MapperTest {
     private static final GoalDtoMapper mapper = GoalDtoMapper.INSTANCE;
 
     @Test
@@ -80,9 +79,5 @@ class GoalDtoMapperTest {
         isEqualTo(command.goalId(), dto.getGoalId());
         isEqualTo(command.likeCount(), dto.getLikeCount());
         isEqualTo(command.userId(), userId);
-    }
-
-    private void isEqualTo(Object A, Object B) {
-        assertThat(A).isEqualTo(B);
     }
 }

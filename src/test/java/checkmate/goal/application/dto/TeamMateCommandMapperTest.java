@@ -1,5 +1,6 @@
 package checkmate.goal.application.dto;
 
+import checkmate.MapperTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.Goal;
@@ -11,9 +12,7 @@ import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class TeamMateCommandMapperTest {
+class TeamMateCommandMapperTest extends MapperTest {
     private static final TeamMateCommandMapper mapper = TeamMateCommandMapper.INSTANCE;
 
     @Test
@@ -88,7 +87,4 @@ class TeamMateCommandMapperTest {
         isEqualTo(result.goalId(), goal.getId());
     }
 
-    private void isEqualTo(Object A, Object B) {
-        assertThat(A).isEqualTo(B);
-    }
 }

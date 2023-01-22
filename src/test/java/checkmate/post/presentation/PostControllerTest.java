@@ -39,18 +39,18 @@ class PostControllerTest extends ControllerTest {
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
         PostUploadCommand command = PostUploadCommand.builder()
                 .teamMateId(1L)
-                .text("~~~")
+                .content("~~~")
                 .images(List.of(new MockMultipartFile("file1", new byte[10]),
                                 new MockMultipartFile("file1", new byte[10])))
                 .build();
 
-        given(postDtoMapper.toUploadCommand(any())).willReturn(command);
+        given(postDtoMapper.toCommand(any())).willReturn(command);
         given(postCommandService.upload(any(PostUploadCommand.class))).willReturn(1L);
 
         mockMvc.perform(fileUpload("/post")
                         .file(firstFile).file(secondFile)
                         .param("teamMateId", "1")
-                        .param("text", "posting text data")
+                        .param("text", "posting content data")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(1L)))
@@ -134,7 +134,7 @@ class PostControllerTest extends ControllerTest {
                 fieldWithPath("posts[].uploaderNickname").type(JsonFieldType.STRING).description("업로더의 닉네임"),
                 fieldWithPath("posts[].uploadAt").type(JsonFieldType.STRING).description("업로드 시간"),
                 fieldWithPath("posts[].imageUrls").type(JsonFieldType.ARRAY).description("이미지 파일 접근 주소"),
-                fieldWithPath("posts[].text").type(JsonFieldType.STRING).description("글로 인증 내용"),
+                fieldWithPath("posts[].content").type(JsonFieldType.STRING).description("글로 인증 내용"),
                 fieldWithPath("posts[].likedUserIds").type(JsonFieldType.ARRAY).description("좋아요 누른 유저들"),
                 fieldWithPath("goalTitle").type(JsonFieldType.STRING).description("해당 목표의 타이틀")
         );

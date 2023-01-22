@@ -18,7 +18,7 @@ class PostTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
 
         post.addLikes(new Likes(2L));
         post.addLikes(new Likes(3L));
@@ -33,7 +33,7 @@ class PostTest {
     void 좋아요_가능_여부() throws Exception{
         Goal goal = TestEntityFactory.goal(1L, "test");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
 
         ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
         assertThat(post.isLikeable()).isFalse();
@@ -53,7 +53,7 @@ class PostTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
 
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));
@@ -72,7 +72,7 @@ class PostTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body text").build();
+        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
 
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));

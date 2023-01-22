@@ -1,14 +1,13 @@
 package checkmate.goal.presentation.dto;
 
+import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class TeamMateDtoMapperTest {
+class TeamMateDtoMapperTest extends MapperTest {
     private static final TeamMateDtoMapper mapper = TeamMateDtoMapper.INSTANCE;
 
     @Test
@@ -38,9 +37,5 @@ class TeamMateDtoMapperTest {
         //then
         isEqualTo(command.notificationId(), dto.getNotificationId());
         isEqualTo(userId, command.userId());
-    }
-
-    private void isEqualTo(Object A, Object B) {
-        assertThat(A).isEqualTo(B);
     }
 }

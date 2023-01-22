@@ -36,9 +36,9 @@ public class NotificationQueryService {
     @Transactional(readOnly = true)
     public NotificationDetailsResult findNotificationDetails(NotificationDetailsCriteria criteria) {
         return notificationQueryDao.findNotificationDetailResult(
-                criteria.getUserId(),
-                criteria.getCursorId(),
-                PageRequest.of(0, criteria.getSize())
+                criteria.userId(),
+                criteria.cursorId(),
+                PageRequest.of(0, criteria.size())
         );
     }
 
