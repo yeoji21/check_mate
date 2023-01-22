@@ -7,7 +7,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UserCommandMapper {
-    UserCommandMapper userCommandMapper = Mappers.getMapper(UserCommandMapper.class);
+    UserCommandMapper INSTANCE = Mappers.getMapper(UserCommandMapper.class);
 
     User toEntity(UserSignUpCommand command);
 }

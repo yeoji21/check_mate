@@ -1,14 +1,9 @@
 package checkmate.user.application.dto.request;
 
-import lombok.Getter;
+import lombok.Builder;
 
-@Getter
-public class UserNicknameModifyCommand {
-    private Long userId;
-    private String nickname;
-
-    public UserNicknameModifyCommand(long userId, String nickname) {
-        this.userId = userId;
-        this.nickname = nickname;
-    }
+@Builder
+public record UserNicknameModifyCommand (
+    long userId,
+    String nickname ){
 }

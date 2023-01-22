@@ -36,7 +36,7 @@ class UserCommandServiceTest {
                 .providerId("providerId")
                 .username("여지원")
                 .nickname("yeoz1")
-                .email("test@naver.com")
+                .emailAddress("test@naver.com")
                 .build();
         //when
         given(userCommandMapper.toEntity(any(UserSignUpCommand.class))).willReturn(TestEntityFactory.user(null, "user"));
@@ -60,7 +60,7 @@ class UserCommandServiceTest {
 
         userRegisterService.nicknameUpdate(command);
 
-        assertThat(user.getNickname()).isEqualTo(command.getNickname());
+        assertThat(user.getNickname()).isEqualTo(command.nickname());
     }
 
     @Test

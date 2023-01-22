@@ -16,8 +16,8 @@ public class NaverSignUpDto {
     private String providerId;
     @NotBlank(message = "username is blank")
     private String username;
-    @Email(message = "not email form")
-    private String email;
+    @Email(message = "not emailAddress form")
+    private String emailAddress;
     @NotBlank @Size(max=8)
     private String nickname;
     private String fcmToken;
@@ -25,12 +25,12 @@ public class NaverSignUpDto {
     @Builder
     public NaverSignUpDto(String providerId,
                           String username,
-                          String email,
+                          String emailAddress,
                           String nickname,
                           String fcmToken) {
         this.providerId = providerId;
         this.username = username;
-        this.email = email;
+        this.emailAddress = emailAddress;
         this.nickname = nickname;
         this.fcmToken = fcmToken;
     }

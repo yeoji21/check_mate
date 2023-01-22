@@ -2,7 +2,6 @@ package checkmate.user.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
-import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.presentation.dto.request.GoogleSignUpDto;
@@ -19,7 +18,8 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -33,7 +33,7 @@ class UserControllerTest extends ControllerTest {
                 .providerId("providerId")
                 .username("여지원")
                 .nickname("yeoz1")
-                .email("test@naverLogin.com")
+                .emailAddress("test@naverLogin.com")
                 .fcmToken("fcmToken")
                 .build();
 
@@ -58,7 +58,7 @@ class UserControllerTest extends ControllerTest {
                 .providerId("providerId")
                 .username("여지원")
                 .nickname("yeoz1")
-                .email("test@naverLogin.com")
+                .emailAddress("test@naverLogin.com")
                 .fcmToken("fcmToken")
                 .build();
 
@@ -83,7 +83,7 @@ class UserControllerTest extends ControllerTest {
                 .providerId("providerId")
                 .username("여지원")
                 .nickname("yeoz1")
-                .email("test@naverLogin.com")
+                .emailAddress("test@naverLogin.com")
                 .fcmToken("fcmToken")
                 .build();
 
@@ -106,7 +106,7 @@ class UserControllerTest extends ControllerTest {
     void 닉네임_변경_테스트() throws Exception{
         UserNicknameModifyDto request = new UserNicknameModifyDto("새로운 닉네임");
 
-        given(userDtoMapper.toCommand(any(JwtUserDetails.class), any(UserNicknameModifyDto.class)))
+        given(userDtoMapper.toCommand(any(Long.class), any(UserNicknameModifyDto.class)))
                 .willReturn(new UserNicknameModifyCommand(0L, ""));
 
         mockMvc.perform(patch("/user/nickname")
@@ -137,7 +137,7 @@ class UserControllerTest extends ControllerTest {
         return requestFields(
                 fieldWithPath("providerId").type(JsonFieldType.STRING).description("유저 식별을 위한 id 값"),
                 fieldWithPath("username").type(JsonFieldType.STRING).description("유저의 실명"),
-                fieldWithPath("email").type(JsonFieldType.STRING).description("유저의 이메일"),
+                fieldWithPath("emailAddress").type(JsonFieldType.STRING).description("유저의 이메일"),
                 fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저가 앱에서 사용할 닉네임"),
                 fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("유저의 FCM 토큰"));
     }

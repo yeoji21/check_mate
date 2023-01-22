@@ -41,7 +41,7 @@ public class UserController {
     @PatchMapping("/user/nickname")
     public void updateNickname(@RequestBody @Valid UserNicknameModifyDto userNicknameModifyDto,
                                @AuthenticationPrincipal JwtUserDetails userDetails){
-        userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails, userNicknameModifyDto));
+        userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
     }
 
     @GetMapping("/user/exists")

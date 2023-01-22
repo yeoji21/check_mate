@@ -27,8 +27,8 @@ public class UserCommandService {
 
     @Transactional
     public void nicknameUpdate(UserNicknameModifyCommand command) {
-        User user = userRepository.findById(command.getUserId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.getUserId()));
-        user.changeNickname(command.getNickname());
+        User user = userRepository.findById(command.userId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.userId()));
+        user.changeNickname(command.nickname());
     }
 }

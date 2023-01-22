@@ -1,7 +1,7 @@
 package checkmate.user.presentation.dto.request;
 
-import checkmate.user.domain.ProviderIdGenerator;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,8 +14,9 @@ public class GoogleLoginDto {
     private String providerId;
     private String fcmToken;
 
+    @Builder
     public GoogleLoginDto(String providerId, String fcmToken) {
-        this.providerId = ProviderIdGenerator.google(providerId);
+        this.providerId =providerId;
         this.fcmToken = fcmToken;
     }
 }

@@ -1,6 +1,5 @@
 package checkmate.user.presentation.dto.request;
 
-import checkmate.user.domain.ProviderIdGenerator;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +16,7 @@ public class KakaoLoginDto {
 
     @Builder
     public KakaoLoginDto(String providerId, String fcmToken) {
-        this.providerId = ProviderIdGenerator.kakao(providerId);
+        this.providerId = providerId;
         this.fcmToken = fcmToken;
     }
 }

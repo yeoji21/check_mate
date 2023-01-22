@@ -34,16 +34,16 @@ public class LoginService {
     private final RedisTemplate<String, String> redisTemplate;
 
     public LoginTokenResponse login(SnsLoginCommand snsLoginCommand) {
-        User user = userRepository.findByProviderId(snsLoginCommand.getProviderId())
+        User user = userRepository.findByProviderId(snsLoginCommand.providerId())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        fcmTokenUpdate(user, snsLoginCommand.getFcmToken());
+        fcmTokenUpdate(user, snsLoginCommand.fcmToken());
         if(user.getNickname() == null) throw new BusinessException(ErrorCode.EMPTY_NICKNAME);
         return getLoginTokenResponse(user);
     }
 
     public LoginTokenResponse reissueToken(TokenReissueCommand command) {
-        String providerId = jwtDecoder.getProviderId(command.getAccessToken());
-        refreshTokenExistCheck(providerId, command.getRefreshToken());
+        String providerId = jwtDecoder.getProviderId(command.accessToken());
+        refreshTokenExistCheck(providerId, command.refreshToken());
         User user = userRepository.findByProviderId(providerId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return getLoginTokenResponse(user);
     }
