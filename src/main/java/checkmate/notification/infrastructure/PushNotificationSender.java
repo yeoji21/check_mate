@@ -1,6 +1,5 @@
 package checkmate.notification.infrastructure;
 
-import checkmate.notification.domain.Notification;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
@@ -16,20 +15,18 @@ import java.util.List;
 public class PushNotificationSender {
     private final FirebaseMessaging firebaseMessaging;
 
-    public void send(Notification notification, List<String> tokens) {
-        com.google.firebase.messaging.Notification FcmNotification =
+    public void send(checkmate.notification.domain.Notification notification, List<String> tokens) {
+        com.google.firebase.messaging.Notification fcmNotification =
                 new com.google.firebase.messaging.Notification(notification.getTitle(), notification.getContent());
-
-        if(tokens.size() == 1){
+        if (tokens.size() == 1) {
             Message message = Message.builder()
-                    .setNotification(FcmNotification)
+                    .setNotification(fcmNotification)
                     .setToken(tokens.get(0))
                     .build();
             firebaseMessaging.sendAsync(message);
-        }
-        else{
+        } else {
             MulticastMessage multicastMessage = MulticastMessage.builder()
-                    .setNotification(FcmNotification)
+                    .setNotification(fcmNotification)
                     .addAllTokens(tokens)
                     .build();
             firebaseMessaging.sendMulticastAsync(multicastMessage);

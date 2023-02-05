@@ -31,7 +31,6 @@ public abstract class ExampleSimpleRestDocsTest {
 
     @BeforeEach
     void setUp(RestDocumentationContextProvider contextProvider) {
-
         SecurityFilterChain chain = new SecurityFilterChain() {
             @Override
             public boolean matches(HttpServletRequest request) {

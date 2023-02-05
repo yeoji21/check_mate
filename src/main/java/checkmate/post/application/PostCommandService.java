@@ -1,8 +1,8 @@
 package checkmate.post.application;
 
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.TeamMate;
@@ -98,7 +98,6 @@ public class PostCommandService {
 
     private Post save(PostUploadCommand command, TeamMate uploader) {
         Assert.isTrue(uploader.getUploadable().isUploadable(), "uploadable");
-
         Post post = Post.builder()
                 .teamMate(uploader)
                 .content(command.content())
@@ -110,7 +109,7 @@ public class PostCommandService {
     }
 
     private void publishFileUploadedEvent(PostUploadCommand command, Post post) {
-        if(command.images().size() > 0) {
+        if (command.images().size() > 0) {
             command.images().forEach(multipartFile -> {
                 try {
                     eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
