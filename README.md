@@ -7,6 +7,10 @@
 모두가 부지런하고 계획적인 삶을 꿈꾸지만 꾸준히 노력하고 목적을 달성하기는 쉽지 않습니다.   
 체크메이트는 팀원들이 서로에게 긍정적인 영향을 주며 목표 달성을 위해 함께 나아갈 수 있도록 돕는 서비스입니다.
 
+### 팀 구성
+
+백엔드 1, 안드로이드 1, 기획 1로 구성된 3인 프로젝트
+
 ### 주요 기능
 - 일정 기간동안 이루고자 하는 목표를 생성하고 정해진 날마다 목표 수행을 업로드합니다. 목표에는 나뿐만 아니라 다른 유저들을 초대해 함께 진행 할 수 있습니다.
 - 목표 생성 시, 시작일과 종료일 뿐만 아니라 인증 요일, 인증 시간, 인증 방식 등을 설정할 수 있어요.
@@ -38,6 +42,12 @@
 -  [JWT 비밀키를 외부로 분리하기 위한 문제 해결 과정](https://yeoji21.github.io/posts/jwt-refactoring/)
 -  [AWS CloudWatch를 통한 로그 수집](https://yeoji21.github.io/posts/cloudwatch-log/) 
 -  [컨트롤러에서 습관성 ResponseEntity 남발](https://yeoji21.github.io/posts/controller-return/)
+
+### 테스트 코드
+
+<img width="500" alt="check-mate" src="https://user-images.githubusercontent.com/78997487/213957776-9c43db20-cbca-4e41-a143-64a04c07dfd9.png">
+
+유닛 테스트를 통해 테스트 커버리지 70% 이상 유지
 
 ### ERD
 
