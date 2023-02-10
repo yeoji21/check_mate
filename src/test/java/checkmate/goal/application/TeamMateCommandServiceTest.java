@@ -3,8 +3,8 @@ package checkmate.goal.application;
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheTemplate;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
+import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.*;
 import checkmate.notification.domain.Notification;
@@ -37,18 +37,26 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class TeamMateCommandServiceTest {
-    @Mock private GoalRepository goalRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private TeamMateRepository teamMateRepository;
-    @Mock private NotificationRepository notificationRepository;
-    @Mock private CacheTemplate cacheTemplate;
-    @Mock private ApplicationEventPublisher eventPublisher;
-    @Spy private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private TeamMateRepository teamMateRepository;
+    @Mock
+    private NotificationRepository notificationRepository;
+    @Mock
+    private CacheTemplate cacheTemplate;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+    @Spy
+    private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
     @InjectMocks
     private TeamMateCommandService teamMateCommandService;
 
-    @Test @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
-    void inviteTeamMate() throws Exception{
+    @Test
+    @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
+    void inviteTeamMate() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(1L, "inviter");
@@ -76,8 +84,9 @@ public class TeamMateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
-    @Test @DisplayName("팀원 초대 수락")
-    void inviteAccpet() throws Exception{
+    @Test
+    @DisplayName("팀원 초대 수락")
+    void inviteAccpet() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(1L, "inviter");
@@ -100,7 +109,7 @@ public class TeamMateCommandServiceTest {
                 .willReturn(Optional.of(receiver));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(teamMate));
         given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(7);
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(invitee));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
 
         //when
         TeamMateAcceptResult result = teamMateCommandService.inviteAccept(new TeamMateInviteReplyCommand(invitee.getId(), notification.getId()));
@@ -112,8 +121,9 @@ public class TeamMateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
-    @Test @DisplayName("팀원 초대 거절")
-    void inviteReject() throws Exception{
+    @Test
+    @DisplayName("팀원 초대 거절")
+    void inviteReject() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User inviter = TestEntityFactory.user(1L, "inviter");
@@ -134,7 +144,7 @@ public class TeamMateCommandServiceTest {
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(teamMate));
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(invitee));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
 
         //when
         teamMateCommandService.inviteReject(new TeamMateInviteReplyCommand(invitee.getId(), notification.getId()));
@@ -145,8 +155,9 @@ public class TeamMateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
-    @Test @DisplayName("인증일에 인증하지 않은 팀원 업데이트")
-    void updateHookyTeamMate() throws Exception{
+    @Test
+    @DisplayName("인증일에 인증하지 않은 팀원 업데이트")
+    void updateHookyTeamMate() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         List<TeamMate> hookyTms = new ArrayList<>();

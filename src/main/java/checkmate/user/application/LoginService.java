@@ -4,8 +4,8 @@ import checkmate.config.auth.AuthConstants;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
 import checkmate.exception.BusinessException;
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.User;
@@ -37,7 +37,7 @@ public class LoginService {
         User user = userRepository.findByProviderId(snsLoginCommand.providerId())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         fcmTokenUpdate(user, snsLoginCommand.fcmToken());
-        if(user.getNickname() == null) throw new BusinessException(ErrorCode.EMPTY_NICKNAME);
+        if (user.getNickname() == null) throw new BusinessException(ErrorCode.EMPTY_NICKNAME);
         return getLoginTokenResponse(user);
     }
 
@@ -75,7 +75,7 @@ public class LoginService {
     }
 
     private void fcmTokenUpdate(User user, String fcmToken) {
-        if(!(user.getFcmToken() != null && user.getFcmToken().equals(fcmToken)))
+        if (!(user.getFcmToken() != null && user.getFcmToken().equals(fcmToken)))
             user.updateFcmToken(fcmToken);
     }
 

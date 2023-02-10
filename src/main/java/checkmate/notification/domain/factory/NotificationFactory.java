@@ -8,7 +8,7 @@ import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import java.util.List;
 
 public abstract class NotificationFactory<DTO extends NotificationCreateDto> {
-    final Notification generate(DTO dto){
+    final Notification generate(DTO dto) {
         Notification notification = Notification.builder()
                 .userId(dto.getSenderUserId())
                 .type(getType())
@@ -21,7 +21,10 @@ public abstract class NotificationFactory<DTO extends NotificationCreateDto> {
     }
 
     abstract NotificationType getType();
+
     abstract String getContent(DTO dto);
+
     abstract List<NotificationReceiver> getReceivers(DTO dto);
+
     abstract void setAttributes(Notification notification, DTO dto);
 }

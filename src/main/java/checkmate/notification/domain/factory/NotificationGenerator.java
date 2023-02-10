@@ -5,21 +5,19 @@ import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Component
-public class NotificationGenerator {
-    private final Map<NotificationType, NotificationFactory<NotificationCreateDto>> factoryMap;
+public class NotificationGenerator<DTO extends NotificationCreateDto> {
+    private final Map<NotificationType, NotificationFactory<DTO>> factoryMap = new HashMap<>();
 
-    public NotificationGenerator(List<NotificationFactory<NotificationCreateDto>> factories) {
-        factoryMap = factories.stream()
-                .collect(Collectors.toMap(NotificationFactory::getType, Function.identity()));
+    public NotificationGenerator(List<NotificationFactory<DTO>> factories) {
+        factories.forEach(factory -> factoryMap.put(factory.getType(), factory));
     }
 
-    public Notification generate(NotificationType type, NotificationCreateDto dto) {
+    public Notification generate(NotificationType type, DTO dto) {
         return factoryMap.get(type).generate(dto);
     }
 }

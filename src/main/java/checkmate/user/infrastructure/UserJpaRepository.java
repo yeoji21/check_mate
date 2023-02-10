@@ -28,6 +28,12 @@ public class UserJpaRepository implements UserRepository {
     }
 
     @Override
+    public Optional<String> findNicknameById(long userId) {
+        // TODO: 2023/02/11
+        return null;
+    }
+
+    @Override
     public User save(User user) {
         return userDao.save(user);
     }
