@@ -9,13 +9,14 @@ import checkmate.goal.infrastructure.GoalQueryDao;
 import checkmate.goal.infrastructure.TeamMateJpaRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
 import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.notification.infrastructure.NotificationJpaRepository;
+import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.post.domain.ImageRepository;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.infrastructure.ImageJpaRepository;
-import checkmate.post.infrastructure.PostQueryDao;
 import checkmate.post.infrastructure.PostJpaRepository;
+import checkmate.post.infrastructure.PostQueryDao;
+import checkmate.user.infrastructure.UserJpaRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,20 +38,34 @@ import javax.persistence.EntityManager;
         PostJpaRepository.class,
         GoalJpaRepository.class,
         PostQueryDao.class,
-        NotificationQueryDao.class
+        NotificationQueryDao.class,
+        UserJpaRepository.class
 })
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 public abstract class RepositoryTest {
-    @Autowired protected EntityManager em;
-    @Autowired protected JPAQueryFactory queryFactory;
-    @Autowired protected GoalRepository goalRepository;
-    @Autowired protected TeamMateRepository teamMateRepository;
-    @Autowired protected NotificationRepository notificationRepository;
-    @Autowired protected ImageRepository imageRepository;
-    @Autowired protected PostRepository postRepository;
-    @Autowired protected GoalQueryDao goalQueryDao;
-    @Autowired protected TeamMateQueryDao teamMateQueryDao;
-    @Autowired protected PostQueryDao postQueryDao;
-    @Autowired protected NotificationQueryDao notificationQueryDao;
+    @Autowired
+    protected EntityManager em;
+    @Autowired
+    protected JPAQueryFactory queryFactory;
+    @Autowired
+    protected GoalRepository goalRepository;
+    @Autowired
+    protected TeamMateRepository teamMateRepository;
+    @Autowired
+    protected NotificationRepository notificationRepository;
+    @Autowired
+    protected ImageRepository imageRepository;
+    @Autowired
+    protected PostRepository postRepository;
+    @Autowired
+    protected GoalQueryDao goalQueryDao;
+    @Autowired
+    protected TeamMateQueryDao teamMateQueryDao;
+    @Autowired
+    protected PostQueryDao postQueryDao;
+    @Autowired
+    protected NotificationQueryDao notificationQueryDao;
+    @Autowired
+    protected UserJpaRepository userJpaRepository;
 }
