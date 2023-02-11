@@ -68,7 +68,7 @@ public class TeamMateCommandServiceTest {
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeTeamMate));
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(inviter));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(inviter.getNickname()));
 
         TeamMateInviteCommand command = TeamMateInviteCommand.builder()
                 .goalId(goal.getId())

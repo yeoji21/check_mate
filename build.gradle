@@ -1,16 +1,16 @@
 buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
+    ext {
+        queryDslVersion = "5.0.0"
+    }
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.7.5'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
 //	id "io.franzbecker.gradle-lombok" version "3.0.0"
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.checkyourgoal'
@@ -18,133 +18,132 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
-	asciidoctorExt
+    asciidoctorExt
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation("io.netty:netty-resolver-dns-native-macos:4.1.79.Final:osx-aarch_64")
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    implementation("io.netty:netty-resolver-dns-native-macos:4.1.79.Final:osx-aarch_64")
 
 
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
-	implementation 'mysql:mysql-connector-java'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly "org.mariadb.jdbc:mariadb-java-client"
+    implementation 'mysql:mysql-connector-java'
 
-	//querydsl
-	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+    //querydsl
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0'
+    implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
-	//rest docs
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    //rest docs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 //	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:{project-version}'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:{project-version}'
 
-	testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'io.rest-assured:rest-assured'
 
-	//token
-	implementation 'com.auth0:java-jwt:3.18.3'
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    //token
+    implementation 'com.auth0:java-jwt:3.18.3'
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
 
-	//naver object storage
-	implementation 'com.amazonaws:aws-java-sdk:1.11.238'
+    //naver object storage
+    implementation 'com.amazonaws:aws-java-sdk:1.11.238'
 
-	//firebase
-	implementation 'com.google.firebase:firebase-admin:6.8.1'
+    //firebase
+    implementation 'com.google.firebase:firebase-admin:6.8.1'
 
-	//AWS cloud watch
-	implementation 'ca.pjer:logback-awslogs-appender:1.6.0'
+    //AWS cloud watch
+    implementation 'ca.pjer:logback-awslogs-appender:1.6.0'
 
-	//Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-	implementation (group: 'it.ozimov', name: 'embedded-redis', version: '0.7.3') {
-		exclude group: 'org.slf4j', module: 'slf4j-simple'
-	}
+    //Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation(group: 'it.ozimov', name: 'embedded-redis', version: '0.7.3') {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
 
-	//Lombok & Mapstruct
-	implementation 'org.projectlombok:lombok:1.18.24'
-	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    //Lombok & Mapstruct
+    implementation 'org.projectlombok:lombok:1.18.24'
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
-	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
-	annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
-	//mock S3
-	implementation('io.findify:s3mock_2.13:0.2.6')
+    //mock S3
+    implementation('io.findify:s3mock_2.13:0.2.6')
 }
 
 ext {
-	set('snippetsDir', file("build/generated-snippets"))
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
 tasks.named('test') {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
 tasks.named('asciidoctor') {
-	inputs.dir snippetsDir
-	dependsOn test
+    inputs.dir snippetsDir
+    dependsOn test
 }
 
 test {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
 task copyDocument(type: Copy) {
-	dependsOn bootJar
-	from file("build/docs/asciidoc")
-	into file("src/main/resources/static/docs")
+    dependsOn bootJar
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
 }
 
 asciidoctor.doFirst {
-	delete file('src/main/resources/static/docs')
+    delete file('src/main/resources/static/docs')
 }
 
 
 bootJar {
-	dependsOn asciidoctor
-	copy {
-		from "${asciidoctor.outputDir}"
-		into 'BOOT-INF/classes/static/docs'
-	}
-	finalizedBy 'copyDocument'
+    dependsOn asciidoctor
+    copy {
+        from "${asciidoctor.outputDir}"
+        into 'BOOT-INF/classes/static/docs'
+    }
+    finalizedBy 'copyDocument'
 }
 
 clean {
-	delete file('src/main/generated') // 인텔리제이 Annotation processor 생성물 생성 위치
+    delete file('src/main/generated') // 인텔리제이 Annotation processor 생성물 생성 위치
 }
 
 def querydslDir = "$buildDir/generated/querydsl"
 
 querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
+    jpa = true
+    querydslSourcesDir = querydslDir
 }
 
 sourceSets {
-	main.java.srcDir querydslDir
+    main.java.srcDir querydslDir
 }
 
 compileQuerydsl {
-	options.annotationProcessorPath = configurations.querydsl
+    options.annotationProcessorPath = configurations.querydsl
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	querydsl.extendsFrom compileClasspath
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    querydsl.extendsFrom compileClasspath
 }

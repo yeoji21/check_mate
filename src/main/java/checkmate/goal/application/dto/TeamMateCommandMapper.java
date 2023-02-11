@@ -3,8 +3,9 @@ package checkmate.goal.application.dto;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.TeamMate;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
+import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
+import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
 import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
-import checkmate.user.domain.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -15,13 +16,11 @@ public interface TeamMateCommandMapper {
     TeamMateCommandMapper INSTANCE = Mappers.getMapper(TeamMateCommandMapper.class);
 
     @Mappings({
-            @Mapping(source = "inviter.id", target = "inviterUserId"),
-            @Mapping(source = "inviter.nickname", target = "inviterNickname"),
             @Mapping(source = "invitee.id", target = "inviteeTeamMateId"),
             @Mapping(source = "invitee.userId", target = "inviteeUserId"),
             @Mapping(source = "invitee.goal.title", target = "goalTitle")
     })
-    TeamMateInviteNotificationDto toNotificationDto(User inviter, TeamMate invitee);
+    TeamMateInviteNotificationDto toNotificationDto(long inviterUserId, String inviterNickname, TeamMate invitee);
 
     @Mappings({
             @Mapping(source = "teamMate.userId", target = "userId"),
@@ -35,4 +34,18 @@ public interface TeamMateCommandMapper {
             @Mapping(source = "teamMate.id", target = "teamMateId")
     })
     TeamMateAcceptResult toResult(TeamMate teamMate);
+
+    @Mappings({
+            @Mapping(source = "invitee.userId", target = "inviteeUserId"),
+            @Mapping(source = "invitee.goal.id", target = "goalId"),
+            @Mapping(source = "invitee.goal.title", target = "goalTitle")
+    })
+    InviteAcceptNotificationDto toAcceptNotificationDto(TeamMate invitee, String inviteeNickname, long inviterUserId);
+
+    @Mappings({
+            @Mapping(source = "invitee.userId", target = "inviteeUserId"),
+            @Mapping(source = "invitee.goal.id", target = "goalId"),
+            @Mapping(source = "invitee.goal.title", target = "goalTitle")
+    })
+    InviteRejectNotificationDto toRejectNotificationDto(TeamMate invitee, String inviteeNickname, long inviterUserId);
 }
