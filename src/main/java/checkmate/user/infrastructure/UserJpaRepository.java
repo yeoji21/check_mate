@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import static checkmate.user.domain.QUser.user;
 
-// TODO: 2023/02/11 무의미한 DAO 합성 구조 개선
 @RequiredArgsConstructor
 @Repository
 public class UserJpaRepository implements UserRepository {

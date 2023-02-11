@@ -6,7 +6,6 @@ import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
-import checkmate.notification.domain.factory.dto.InviteReplyNotificationDto;
 import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,7 @@ class TeamMateCommandMapperTest extends MapperTest {
     private static final TeamMateCommandMapper mapper = TeamMateCommandMapper.INSTANCE;
 
     @Test
-    void teamMateInviteNotificationDto() throws Exception{
+    void teamMateInviteNotificationDto() throws Exception {
         //given
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
@@ -36,28 +35,7 @@ class TeamMateCommandMapperTest extends MapperTest {
     }
 
     @Test
-    void inviteReplyNotificationDto() throws Exception{
-        //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        User receiver = TestEntityFactory.user(2L, "receiver");
-        TeamMate invitee = goal.join(receiver);
-        long inviterUserId = 3L;
-        boolean accept = true;
-
-        //when
-        InviteReplyNotificationDto dto = mapper.toNotificationDto(invitee, receiver.getNickname(), inviterUserId, accept);
-
-        //then
-        isEqualTo(dto.inviteeUserId(), invitee.getUserId());
-        isEqualTo(dto.inviteeNickname(), receiver.getNickname());
-        isEqualTo(dto.goalId(), goal.getId());
-        isEqualTo(dto.goalTitle(), goal.getTitle());
-        isEqualTo(dto.inviterUserId(), inviterUserId);
-        isEqualTo(dto.accept(), accept);
-    }
-
-    @Test
-    void expulsionGoalNotificationDto() throws Exception{
+    void expulsionGoalNotificationDto() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         TeamMate teamMate = goal.join(TestEntityFactory.user(2L, "receiver"));
@@ -73,7 +51,7 @@ class TeamMateCommandMapperTest extends MapperTest {
     }
 
     @Test
-    void teamMateAcceptResult() throws Exception{
+    void teamMateAcceptResult() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         TeamMate teamMate = goal.join(TestEntityFactory.user(2L, "receiver"));
