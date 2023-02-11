@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
 import java.util.Optional;
 
 import static checkmate.user.domain.QUser.user;
@@ -14,22 +15,35 @@ import static checkmate.user.domain.QUser.user;
 @RequiredArgsConstructor
 @Repository
 public class UserJpaRepository implements UserRepository {
-    private final UserDao userDao;
+    private final EntityManager entityManager;
     private final JPAQueryFactory queryFactory;
 
     @Override
     public Optional<User> findById(long userId) {
-        return userDao.findById(userId);
+        return Optional.ofNullable(
+                queryFactory.selectFrom(user)
+                        .where(user.id.eq(userId))
+                        .fetchOne()
+        );
     }
 
     @Override
     public Optional<User> findByNickname(String nickname) {
-        return userDao.findByNickname(nickname);
+        return Optional.ofNullable(
+                queryFactory.selectFrom(user)
+                        .where(user.nickname.eq(nickname))
+                        .fetchOne()
+        );
     }
+
 
     @Override
     public Optional<User> findByProviderId(String providerId) {
-        return userDao.findByProviderId(providerId);
+        return Optional.ofNullable(
+                queryFactory.selectFrom(user)
+                        .where(user.providerId.eq(providerId))
+                        .fetchOne()
+        );
     }
 
     @Override
@@ -44,6 +58,7 @@ public class UserJpaRepository implements UserRepository {
 
     @Override
     public User save(User user) {
-        return userDao.save(user);
+        entityManager.persist(user);
+        return user;
     }
 }

@@ -67,5 +67,5 @@ public abstract class RepositoryTest {
     @Autowired
     protected NotificationQueryDao notificationQueryDao;
     @Autowired
-    protected UserJpaRepository userJpaRepository;
+    protected UserJpaRepository userRepository;
 }
