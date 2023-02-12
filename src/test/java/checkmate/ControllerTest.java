@@ -1,7 +1,10 @@
 package checkmate;
 
 import checkmate.exception.ErrorCodeController;
-import checkmate.goal.application.*;
+import checkmate.goal.application.GoalCommandService;
+import checkmate.goal.application.GoalQueryService;
+import checkmate.goal.application.TeamMateCommandService;
+import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.presentation.GoalController;
 import checkmate.goal.presentation.TeamMateController;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
@@ -49,32 +52,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         UserController.class
 })
 public abstract class ControllerTest {
-    @MockBean protected GoalCommandService goalCommandService;
-    @MockBean protected GoalQueryService goalQueryService;
-    @MockBean protected GoalFacadeService goalFacadeService;
+    @MockBean
+    protected GoalCommandService goalCommandService;
+    @MockBean
+    protected GoalQueryService goalQueryService;
 
-    @MockBean protected TeamMateCommandService teamMateCommandService;
-    @MockBean protected TeamMateQueryService teamMateQueryService;
-    @MockBean protected NotificationQueryService notificationQueryService;
-    @MockBean protected NotificationDtoMapper notificationDtoMapper;
+    @MockBean
+    protected TeamMateCommandService teamMateCommandService;
+    @MockBean
+    protected TeamMateQueryService teamMateQueryService;
+    @MockBean
+    protected NotificationQueryService notificationQueryService;
+    @MockBean
+    protected NotificationDtoMapper notificationDtoMapper;
 
-    @MockBean protected PostCommandService postCommandService;
-    @MockBean protected PostQueryService postQueryService;
+    @MockBean
+    protected PostCommandService postCommandService;
+    @MockBean
+    protected PostQueryService postQueryService;
 
-    @MockBean protected LoginService loginService;
+    @MockBean
+    protected LoginService loginService;
 
-    @MockBean protected UserFindService userFindService;
-    @MockBean protected UserCommandService userCommandService;
+    @MockBean
+    protected UserFindService userFindService;
+    @MockBean
+    protected UserCommandService userCommandService;
 
-    @MockBean protected GoalDtoMapper goalDtoMapper;
-    @MockBean protected TeamMateDtoMapper teamMateDtoMapper;
-    @MockBean protected PostDtoMapper postDtoMapper;
-    @MockBean protected LoginDtoMapper loginDtoMapper;
+    @MockBean
+    protected GoalDtoMapper goalDtoMapper;
+    @MockBean
+    protected TeamMateDtoMapper teamMateDtoMapper;
+    @MockBean
+    protected PostDtoMapper postDtoMapper;
+    @MockBean
+    protected LoginDtoMapper loginDtoMapper;
 
-    @MockBean protected UserDtoMapper userDtoMapper;
+    @MockBean
+    protected UserDtoMapper userDtoMapper;
 
     protected MockMvc mockMvc;
-    @Autowired protected ObjectMapper objectMapper;
+    @Autowired
+    protected ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider contextProvider) {

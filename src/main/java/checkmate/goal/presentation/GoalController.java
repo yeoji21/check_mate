@@ -3,7 +3,6 @@ package checkmate.goal.presentation;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.GoalCommandService;
-import checkmate.goal.application.GoalFacadeService;
 import checkmate.goal.application.GoalQueryService;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.application.dto.response.*;
@@ -27,7 +26,6 @@ import javax.validation.Valid;
 public class GoalController {
     private final GoalCommandService goalCommandService;
     private final GoalQueryService goalQueryService;
-    private final GoalFacadeService goalFacadeService;
     private final GoalDtoMapper mapper;
 
     @Caching(evict = {
@@ -55,7 +53,7 @@ public class GoalController {
     @PatchMapping("/goal/{goalId}")
     public void goalModify(@PathVariable long goalId,
                            @RequestBody GoalModifyDto dto,
-                           @AuthenticationPrincipal JwtUserDetails details){
+                           @AuthenticationPrincipal JwtUserDetails details) {
         goalCommandService.modifyGoal(mapper.toCommand(dto, goalId, details.getUserId()));
     }
 
@@ -88,11 +86,4 @@ public class GoalController {
     public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findHistoryGoalInfo(details.getUserId());
     }
-
-    @GetMapping("/goal/view/{goalId}")
-    public GoalViewResult goalDetailViewFind(@PathVariable long goalId,
-                                             @AuthenticationPrincipal JwtUserDetails details) {
-        return goalFacadeService.goalDetailView(goalId, details.getUserId());
-    }
-
 }

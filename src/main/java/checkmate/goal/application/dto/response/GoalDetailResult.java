@@ -1,11 +1,13 @@
 package checkmate.goal.application.dto.response;
 
 import checkmate.goal.domain.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+@Getter
 public class GoalDetailResult {
     private final long id;
     private final GoalCategory category;

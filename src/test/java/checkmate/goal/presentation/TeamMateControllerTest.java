@@ -1,11 +1,16 @@
 package checkmate.goal.presentation;
 
 import checkmate.ControllerTest;
+import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
+import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import checkmate.goal.application.dto.response.TeamMateUploadInfo;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.TeamMate;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
+import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -29,6 +34,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class TeamMateControllerTest extends ControllerTest {
+
+    @WithMockAuthUser
+    @Test
+    void goalDetailResultFind() throws Exception {
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+
+        GoalDetailResult result = new GoalDetailResult(teamMate,
+                List.of(LocalDate.now().minusDays(1), LocalDate.now()),
+                List.of(new TeamMateUploadInfo(1L, 1L, LocalDate.now(), "user")));
+
+        given(teamMateQueryService.findGoalDetailResult(any(Long.class), any(Long.class)))
+                .willReturn(result);
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                        .get("/goal/detail/{goalId}", 1L)
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("goal-detail-result",
+                        goalDetailResultResponseFieldsSnippet()
+                ));
+    }
+
     @WithMockAuthUser
     @Test
     void 팀원_초대_테스트() throws Exception {
@@ -44,8 +74,8 @@ class TeamMateControllerTest extends ControllerTest {
     }
 
     @WithMockAuthUser
-    @Test @DisplayName("초대 응답 수락")
-    void inviteAccept() throws Exception{
+    @Test
+    void 초대_응답_수락() throws Exception {
         TeamMateInviteReplyDto dto = new TeamMateInviteReplyDto(1L);
         TeamMateAcceptResult result = new TeamMateAcceptResult(1L, 1L);
 
@@ -68,8 +98,9 @@ class TeamMateControllerTest extends ControllerTest {
     }
 
     @WithMockAuthUser
-    @Test @DisplayName("초대 응답 거절")
-    void inviteReject() throws Exception{
+    @Test
+    @DisplayName("초대 응답 거절")
+    void inviteReject() throws Exception {
         TeamMateInviteReplyDto request = new TeamMateInviteReplyDto(1L);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/reject")
@@ -86,7 +117,7 @@ class TeamMateControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 목표_진행률_조회_테스트() throws Exception{
+    void 목표_진행률_조회_테스트() throws Exception {
         double result = 20.0;
         given(teamMateQueryService.getProgressPercent(1L)).willReturn(result);
 
@@ -102,7 +133,7 @@ class TeamMateControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 팀원의_목표_수행_캘린더_조회() throws Exception{
+    void 팀원의_목표_수행_캘린더_조회() throws Exception {
         TeamMateScheduleInfo calendarInfo = TeamMateScheduleInfo.builder()
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(10))
@@ -121,6 +152,32 @@ class TeamMateControllerTest extends ControllerTest {
                         pathParameters(parameterWithName("teamMateId").description("teamMateId")),
                         teamMateCalendarResponseFieldsSnippet()
                 ));
+    }
+
+    private ResponseFieldsSnippet goalDetailResultResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("ID 값"),
+                fieldWithPath("teamMates").description("목표에 속한 팀원들"),
+                fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
+                fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
+                fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
+                fieldWithPath("weekDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
+                fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
+                fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
+                fieldWithPath("teamMates[].teamMateId").description("팀메이트 id"),
+                fieldWithPath("teamMates[].userId").description("유저 id"),
+                fieldWithPath("teamMates[].nickname").description("유저의 닉네임"),
+                fieldWithPath("teamMates[].uploaded").description("이미 업로드했는지"),
+                fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 업로드했는지"),
+                fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 업로드할 수 있는지"),
+                fieldWithPath("uploadable.workingDay").description("업로드하는 날이 맞는지"),
+                fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지"),
+                fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
+                fieldWithPath("teamMateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
+                fieldWithPath("progress").type(JsonFieldType.NUMBER).description("팀원의 목표 수행 진행률")
+        );
     }
 
     private ResponseFieldsSnippet teamMateCalendarResponseFieldsSnippet() {

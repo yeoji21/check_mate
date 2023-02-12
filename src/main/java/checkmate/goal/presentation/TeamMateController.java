@@ -4,6 +4,7 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
+import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
@@ -25,6 +26,12 @@ public class TeamMateController {
     private final TeamMateCommandService teamMateCommandService;
     private final TeamMateQueryService teamMateQueryService;
     private final TeamMateDtoMapper mapper;
+
+    @GetMapping("/goal/detail/{goalId}")
+    public GoalDetailResult goalDetailResultFind(@PathVariable long goalId,
+                                                 @AuthenticationPrincipal JwtUserDetails details) {
+        return teamMateQueryService.findGoalDetailResult(goalId, details.getUserId());
+    }
 
     @PostMapping("/mate")
     public void inviteToGoal(@RequestBody @Valid TeamMateInviteDto inviteDto,
