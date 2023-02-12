@@ -18,10 +18,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
-
 class GoalQueryDaoTest extends RepositoryTest {
-    @Test @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
-    void findOngoingSimpleInfo() throws Exception{
+    @Test
+    @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
+    void findOngoingSimpleInfo() throws Exception {
         //given
         User user = TestEntityFactory.user(null, "user");
         em.persist(user);
@@ -58,8 +58,9 @@ class GoalQueryDaoTest extends RepositoryTest {
         }
     }
 
-    @Test @DisplayName("목표 진행 스케쥴 조회")
-    void findGoalScheduleInfo() throws Exception{
+    @Test
+    @DisplayName("목표 진행 스케쥴 조회")
+    void findGoalScheduleInfo() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
@@ -75,7 +76,7 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     @Test
-    void 성공한_목표_목록_조회() throws Exception{
+    void 성공한_목표_목록_조회() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         ReflectionTestUtils.setField(goal, "status", GoalStatus.OVER);
@@ -106,8 +107,9 @@ class GoalQueryDaoTest extends RepositoryTest {
         assertThat(historyGoalList.get(0).getTeamMateNames().get(0)).isNotEqualTo(historyGoalList.get(0).getTeamMateNames().get(1));
     }
 
-    @Test @DisplayName("오늘 진행할 목표 정보")
-    void findTodayGoalInfo() throws Exception{
+    @Test
+    @DisplayName("오늘 진행할 목표 정보")
+    void findTodayGoalInfo() throws Exception {
         //given
         User tester = TestEntityFactory.user(null, "todayGoalFindTester");
         em.persist(tester);
@@ -131,8 +133,9 @@ class GoalQueryDaoTest extends RepositoryTest {
         );
     }
 
-    @Test @DisplayName("목표 상세 정보 조회")
-    void findDetailInfo() throws Exception{
+    @Test
+    @DisplayName("목표 상세 정보 조회")
+    void findDetailInfo() throws Exception {
         //given
         User user1 = TestEntityFactory.user(null, "tester1");
         User user2 = TestEntityFactory.user(null, "tester2");
@@ -167,7 +170,7 @@ class GoalQueryDaoTest extends RepositoryTest {
             TeamMateUploadInfo tm = info.getTeamMates().get(i);
             assertThat(tm.getNickname()).isEqualTo("tester" + (i + 1));
             assertThat(tm.isUploaded()).isFalse();
-            assertThat(tm.getId()).isNotNull();
+            assertThat(tm.getTeamMateId()).isNotNull();
             assertThat(tm.getUserId()).isNotNull();
         }
         assertThat(info.getTeamMates().size()).isEqualTo(3);

@@ -21,19 +21,23 @@ import java.util.stream.Collectors;
 @Table(name = "team_mate")
 @Entity
 public class TeamMate extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @NotNull @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "goal_id", nullable = false)
     private Goal goal;
     @NotNull
     @Column(name = "user_id", nullable = false)
     private Long userId;
-    @NotNull @Enumerated(EnumType.STRING)
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private TeamMateStatus status;
-    @NotNull @Embedded
+    @NotNull
+    @Embedded
     private TeamMateProgress progress;
     private LocalDate lastUploadDate;
 
@@ -48,6 +52,7 @@ public class TeamMate extends BaseTimeEntity {
         this.goal = goal;
     }
 
+    // TODO: 2023/02/12
     public void initiateGoal(int ongoingGoalCount) {
         goal.inviteableCheck();
         GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);

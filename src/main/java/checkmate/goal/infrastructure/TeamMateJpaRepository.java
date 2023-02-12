@@ -39,6 +39,7 @@ public class TeamMateJpaRepository implements TeamMateRepository {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(teamMate)
+                        .join(teamMate.goal, goal).fetchJoin()
                         .where(teamMate.goal.id.eq(goalId),
                                 teamMate.userId.eq(userId))
                         .fetchOne()

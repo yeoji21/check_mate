@@ -1,8 +1,9 @@
 package checkmate.goal.application;
 
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.response.*;
+import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.infrastructure.GoalQueryDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GoalQueryService {
     private final GoalQueryDao goalQueryDao;
+    private final TeamMateRepository teamMateRepository;
 
     @Transactional(readOnly = true)
     public GoalDetailInfo findGoalDetail(long goalId, long userId) {
@@ -41,5 +43,4 @@ public class GoalQueryService {
     public GoalHistoryInfoResult findHistoryGoalInfo(long userId) {
         return new GoalHistoryInfoResult(goalQueryDao.findHistoryGoalInfo(userId));
     }
-
 }

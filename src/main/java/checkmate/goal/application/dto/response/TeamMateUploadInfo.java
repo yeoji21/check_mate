@@ -12,17 +12,18 @@ import java.time.LocalDate;
 
 @Getter
 public class TeamMateUploadInfo {
-    private long id;
     private long userId;
+    private long teamMateId;
     private String nickname;
     private boolean uploaded;
 
-    @QueryProjection @Builder
+    @QueryProjection
+    @Builder
     public TeamMateUploadInfo(long teamMateId,
                               long userId,
                               LocalDate lastUploadDay,
                               String nickname) {
-        this.id = teamMateId;
+        this.teamMateId = teamMateId;
         this.userId = userId;
         TeamMate teamMate;
         try {

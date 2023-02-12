@@ -17,11 +17,12 @@ import java.util.stream.Collectors;
 
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.post.domain.QPost.post;
 import static checkmate.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
-public class GoalQueryDao{
+public class GoalQueryDao {
     private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
@@ -141,5 +142,15 @@ public class GoalQueryDao{
                 .where(teamMate.goal.id.eq(goalId),
                         teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
+    }
+
+    public GoalDetailResult findGoalDetailResult(long goalId, long userId) {
+        return queryFactory.select(new QGoalDetailResult(goal, teamMate))
+                .from(teamMate)
+                .innerJoin(teamMate.goal, goal).on(goal.id.eq(goalId))
+                .leftJoin(post).on(post.teamMate.id.eq(teamMate.id))
+                .where(teamMate.userId.eq(userId))
+                .groupBy(teamMate.id)
+                .fetchOne();
     }
 }

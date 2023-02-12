@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GoalControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
-    void 목표_수정_테스트() throws Exception{
+    void 목표_수정_테스트() throws Exception {
         GoalModifyDto request = GoalModifyDto.builder()
                 .endDate(LocalDate.of(2022, 5, 30))
                 .appointmentTime(LocalTime.now()).build();
@@ -61,7 +61,7 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 좋아요_확인_조건_할당_테스트() throws Exception{
+    void 좋아요_확인_조건_할당_테스트() throws Exception {
         LikeCountCreateDto dto = new LikeCountCreateDto(1L, 5);
 
         mockMvc.perform(RestDocumentationRequestBuilders
@@ -75,7 +75,7 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 목표의_전체_인증일_조회() throws Exception{
+    void 목표의_전체_인증일_조회() throws Exception {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         GoalScheduleInfo goalScheduleInfo = goalPeriodResponseDto(goal);
         given(goalQueryService.findGoalPeriodInfo(any(Long.class))).willReturn(goalScheduleInfo);
@@ -92,7 +92,7 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 개별_목표조회_테스트() throws Exception{
+    void 개별_목표조회_테스트() throws Exception {
         GoalDetailInfo info = getGoalInformationResponse();
         given(goalQueryService.findGoalDetail(any(Long.class), any(Long.class))).willReturn(info);
 
@@ -112,8 +112,8 @@ public class GoalControllerTest extends ControllerTest {
         //given
         GoalCreateDto request = GoalCreateDto.builder()
                 .category(GoalCategory.LEARNING).title("자바의 정석 스터디")
-                .startDate(LocalDate.of(2021,12,20))
-                .endDate(LocalDate.of(2021,12,31))
+                .startDate(LocalDate.of(2021, 12, 20))
+                .endDate(LocalDate.of(2021, 12, 31))
                 .appointmentTime(LocalTime.of(19, 30))
                 .checkDays("월수금")
                 .build();
@@ -135,7 +135,7 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 유저의_진행중인_목표_조회_테스트() throws Exception{
+    void 유저의_진행중인_목표_조회_테스트() throws Exception {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         GoalSimpleInfoResult result = new GoalSimpleInfoResult(List.of(simpleGoalInfo(goal), simpleGoalInfo(goal)));
 
@@ -153,7 +153,7 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 유저가_오늘해야할_목표_조회_테스트() throws Exception{
+    void 유저가_오늘해야할_목표_조회_테스트() throws Exception {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         TodayGoalInfo checked = TodayGoalInfo
                 .builder()
@@ -186,7 +186,7 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 유저의_성공한_목표_목록_조회_테스트() throws Exception{
+    void 유저의_성공한_목표_목록_조회_테스트() throws Exception {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
 
         List<GoalHistoryInfo> goalHistoryInfoList =
@@ -291,7 +291,7 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
                 fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("teamMates[].id").description("팀메이트 id"),
+                fieldWithPath("teamMates[].teamMateId").description("팀메이트 id"),
                 fieldWithPath("teamMates[].userId").description("유저 id"),
                 fieldWithPath("teamMates[].nickname").description("유저의 닉네임"),
                 fieldWithPath("teamMates[].uploaded").description("이미 업로드했는지"),

@@ -1,7 +1,9 @@
 package checkmate.goal.domain;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
+// TODO: 2023/02/12
 @Getter
 public class Uploadable {
     private boolean uploadable;

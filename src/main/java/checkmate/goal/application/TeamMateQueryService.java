@@ -1,7 +1,8 @@
 package checkmate.goal.application;
 
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
+import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
@@ -29,4 +30,12 @@ public class TeamMateQueryService {
         return teamMate.calcProgressPercent();
     }
 
+    @Transactional(readOnly = true)
+    public GoalDetailResult findGoalDetailResult(long goalId, long userId) {
+        TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(goalId, userId)
+                .orElseThrow(IllegalArgumentException::new);
+        return new GoalDetailResult(teamMate,
+                teamMateQueryDao.findUploadedDates(teamMate.getId()),
+                teamMateQueryDao.findTeamMateInfo(goalId));
+    }
 }
