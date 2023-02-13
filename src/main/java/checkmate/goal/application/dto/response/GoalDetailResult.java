@@ -41,10 +41,10 @@ public class GoalDetailResult {
         this.goalStatus = goal.getStatus();
         this.inviteable = goal.isInviteable();
         this.goalSchedule = goal.getSchedule();
+        this.teamMateSchedule = goal.getSchedule(uploadedDates);
 
         this.uploadable = teamMate.getUploadable();
         this.progress = teamMate.calcProgressPercent();
-        this.teamMateSchedule = teamMate.getSchedule(uploadedDates);
 
         this.teamMates = teamMates;
     }

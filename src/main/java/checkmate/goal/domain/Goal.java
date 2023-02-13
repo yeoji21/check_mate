@@ -16,22 +16,28 @@ import java.util.stream.Collectors;
 
 @Getter
 @EqualsAndHashCode(of = "id")
-@NoArgsConstructor(access= AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Goal extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
-    @Enumerated(EnumType.STRING) @NotNull
+    @Enumerated(EnumType.STRING)
+    @NotNull
     @Column(name = "category", nullable = false)
     private GoalCategory category;
-    @NotNull @Column(name = "title", nullable = false)
+    @NotNull
+    @Column(name = "title", nullable = false)
     private String title;
-    @Embedded @NotNull
+    @Embedded
+    @NotNull
     private GoalPeriod period;
-    @Embedded @NotNull
+    @Embedded
+    @NotNull
     private GoalCheckDays checkDays;
-    @Enumerated(EnumType.STRING) @NotNull
+    @Enumerated(EnumType.STRING)
+    @NotNull
     @Column(name = "status")
     private GoalStatus status;
     @Column(name = "appointment_time")
@@ -61,8 +67,8 @@ public class Goal extends BaseTimeEntity {
 
     public void checkConditions(Post post) {
         boolean verified = conditions.stream().allMatch(condition -> condition.satisfy(post));
-        if(post.isChecked() && !verified) post.uncheck();
-        else if(!post.isChecked() && verified) post.check();
+        if (post.isChecked() && !verified) post.uncheck();
+        else if (!post.isChecked() && verified) post.check();
     }
 
     public int getHookyDayLimit() {
@@ -74,7 +80,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTimeOver() {
-        if(this.appointmentTime == null) return false;
+        if (this.appointmentTime == null) return false;
         else return appointmentTime.isBefore(LocalTime.now());
     }
 
@@ -107,6 +113,12 @@ public class Goal extends BaseTimeEntity {
     public String getSchedule() {
         return period.fromStartToEndDate()
                 .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
+                .collect(Collectors.joining());
+    }
+
+    public String getSchedule(List<LocalDate> uploadedDates) {
+        return period.fromStartToEndDate()
+                .map(date -> checkDays.isWorkingDay(date) && uploadedDates.contains(date) ? "1" : "0")
                 .collect(Collectors.joining());
     }
 

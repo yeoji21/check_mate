@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
@@ -25,21 +26,19 @@ import static com.querydsl.core.group.GroupBy.list;
 public class TeamMateQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    // TODO: 2023/02/12
     public Optional<TeamMateScheduleInfo> getTeamMateCalendar(long teamMateId) {
-        return Optional.ofNullable(
-                queryFactory
-                        .from(teamMate)
-                        .innerJoin(teamMate.goal, goal)
-                        .leftJoin(post).on(post.teamMate.id.eq(teamMateId))
-                        .where(teamMate.id.eq(teamMateId))
-                        .transform(
-                                groupBy(teamMate.id).as(
-                                        new QTeamMateScheduleInfo(goal.period.startDate, goal.period.endDate,
-                                                goal.checkDays.checkDays, list(post.uploadedDate))
-                                )
-                        ).get(teamMateId)
-        );
+        Map<Long, TeamMateScheduleInfo> scheduleInfoMap = queryFactory
+                .from(teamMate)
+                .innerJoin(teamMate.goal, goal)
+                .leftJoin(post).on(post.teamMate.id.eq(teamMateId))
+                .where(teamMate.id.eq(teamMateId))
+                .transform(
+                        groupBy(teamMate.id).as(
+                                new QTeamMateScheduleInfo(goal.period.startDate, goal.period.endDate,
+                                        goal.checkDays.checkDays, list(post.uploadedDate))
+                        )
+                );
+        return Optional.ofNullable(scheduleInfoMap.get(teamMateId));
     }
 
     public List<LocalDate> findUploadedDates(long teamMateId) {

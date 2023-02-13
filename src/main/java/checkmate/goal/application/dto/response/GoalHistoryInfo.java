@@ -24,6 +24,7 @@ public class GoalHistoryInfo {
     private double achievementRate;
     private List<String> teamMateNames;
 
+    // TODO: 2023/02/12
     @QueryProjection
     public GoalHistoryInfo(long id,
                            GoalCategory category,
