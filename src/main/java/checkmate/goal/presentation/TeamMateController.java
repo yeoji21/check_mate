@@ -5,6 +5,7 @@ import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.application.dto.response.GoalDetailResult;
+import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.presentation.dto.TeamMateDtoMapper;
@@ -13,6 +14,7 @@ import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +33,12 @@ public class TeamMateController {
     public GoalDetailResult goalDetailResultFind(@PathVariable long goalId,
                                                  @AuthenticationPrincipal JwtUserDetails details) {
         return teamMateQueryService.findGoalDetailResult(goalId, details.getUserId());
+    }
+
+    @Cacheable(value = RedisKey.HISTORY_GOALS, key = "{#details.userId}")
+    @GetMapping("/goal/history")
+    public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
+        return teamMateQueryService.findHistoryGoalInfo(details.getUserId());
     }
 
     @PostMapping("/mate")

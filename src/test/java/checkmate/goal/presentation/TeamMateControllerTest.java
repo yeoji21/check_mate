@@ -3,10 +3,7 @@ package checkmate.goal.presentation;
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
-import checkmate.goal.application.dto.response.GoalDetailResult;
-import checkmate.goal.application.dto.response.TeamMateAcceptResult;
-import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.application.dto.response.TeamMateUploadInfo;
+import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
@@ -26,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -129,6 +127,47 @@ class TeamMateControllerTest extends ControllerTest {
                 .andDo(document("progress-percent",
                         pathParameters(parameterWithName("teamMateId").description("teamMateId"))
                 ));
+    }
+
+    @WithMockAuthUser
+    @Test
+    void 유저의_성공한_목표_목록_조회_테스트() throws Exception {
+        List<GoalHistoryInfo> goalHistoryInfoList = getGoalHistoryInfoList();
+        GoalHistoryInfoResult result = new GoalHistoryInfoResult(goalHistoryInfoList);
+
+        given(teamMateQueryService.findHistoryGoalInfo(any(Long.class))).willReturn(result);
+
+        mockMvc.perform(get("/goal/history")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("goal-history",
+                        historyResponseFieldsSnippet())
+                );
+    }
+
+    private List<GoalHistoryInfo> getGoalHistoryInfoList() {
+        TeamMate teamMate1 = TestEntityFactory.goal(1L, "goal1")
+                .join(TestEntityFactory.user(1L, "user1"));
+        TeamMate teamMate2 = TestEntityFactory.goal(2L, "goal2")
+                .join(TestEntityFactory.user(2L, "user2"));
+
+        return List.of(new GoalHistoryInfo(teamMate1, List.of("nickname")),
+                new GoalHistoryInfo(teamMate2, List.of("nickname")));
+    }
+
+    private ResponseFieldsSnippet historyResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("info[].goalId").description("목표 id").type(JsonFieldType.NUMBER),
+                fieldWithPath("info[].category").type(JsonFieldType.STRING).description("카테고리"),
+                fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("info[].startDate").type(JsonFieldType.STRING).description("시작일"),
+                fieldWithPath("info[].endDate").type(JsonFieldType.STRING).description("종료일"),
+                fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("info[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
+                fieldWithPath("info[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
+                fieldWithPath("info[].teamMateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
+        );
     }
 
     @WithMockAuthUser

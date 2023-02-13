@@ -4,6 +4,7 @@ import checkmate.goal.application.dto.response.QTeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.QTeamMateUploadInfo;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.application.dto.response.TeamMateUploadInfo;
+import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,23 @@ import static com.querydsl.core.group.GroupBy.list;
 @Repository
 public class TeamMateQueryDao {
     private final JPAQueryFactory queryFactory;
+
+    public List<TeamMate> findSuccessTeamMates(long userId) {
+        return queryFactory.select(teamMate)
+                .from(teamMate)
+                .join(teamMate.goal, goal).fetchJoin()
+                .where(teamMate.userId.eq(userId))
+                .fetch();
+    }
+
+    public Map<Long, List<String>> findTeamMateNicknames(List<Long> goalIds) {
+        return queryFactory
+                .from(goal)
+                .leftJoin(teamMate).on(teamMate.goal.eq(goal))
+                .join(user).on(teamMate.userId.eq(user.id))
+                .where(goal.id.in(goalIds))
+                .transform(groupBy(goal.id).as(list(user.nickname)));
+    }
 
     public Optional<TeamMateScheduleInfo> getTeamMateCalendar(long teamMateId) {
         Map<Long, TeamMateScheduleInfo> scheduleInfoMap = queryFactory

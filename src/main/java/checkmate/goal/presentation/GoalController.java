@@ -5,7 +5,10 @@ import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.GoalCommandService;
 import checkmate.goal.application.GoalQueryService;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
-import checkmate.goal.application.dto.response.*;
+import checkmate.goal.application.dto.response.GoalDetailInfo;
+import checkmate.goal.application.dto.response.GoalScheduleInfo;
+import checkmate.goal.application.dto.response.GoalSimpleInfoResult;
+import checkmate.goal.application.dto.response.TodayGoalInfoResult;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
 import checkmate.goal.presentation.dto.request.GoalCreateDto;
 import checkmate.goal.presentation.dto.request.GoalModifyDto;
@@ -79,11 +82,5 @@ public class GoalController {
     @GetMapping("/goal/today")
     public TodayGoalInfoResult todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());
-    }
-
-    @Cacheable(value = RedisKey.HISTORY_GOALS, key = "{#details.userId}")
-    @GetMapping("/goal/history")
-    public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
-        return goalQueryService.findHistoryGoalInfo(details.getUserId());
     }
 }

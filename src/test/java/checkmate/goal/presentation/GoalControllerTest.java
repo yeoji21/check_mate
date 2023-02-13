@@ -184,55 +184,6 @@ public class GoalControllerTest extends ControllerTest {
                 ));
     }
 
-    @WithMockAuthUser
-    @Test
-    void 유저의_성공한_목표_목록_조회_테스트() throws Exception {
-        Goal goal = TestEntityFactory.goal(1L, "testGoal");
-
-        List<GoalHistoryInfo> goalHistoryInfoList =
-                List.of(historyGoalInfoResponseDto(goal, List.of("nickname")),
-                        historyGoalInfoResponseDto(goal, List.of("nickname")));
-        GoalHistoryInfoResult result = new GoalHistoryInfoResult(goalHistoryInfoList);
-
-        given(goalQueryService.findHistoryGoalInfo(any(Long.class))).willReturn(result);
-
-        mockMvc.perform(get("/goal/history")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-history",
-                        historyResponseFieldsSnippet()));
-
-    }
-
-    private GoalHistoryInfo historyGoalInfoResponseDto(Goal goal, List<String> nicknames) {
-        return GoalHistoryInfo.builder()
-                .id(goal.getId())
-                .category(goal.getCategory())
-                .title(goal.getTitle())
-                .workingDays(10)
-                .startDate(goal.getStartDate())
-                .endDate(goal.getEndDate())
-                .appointmentTime(goal.getAppointmentTime())
-                .checkDays(goal.getCheckDays().intValue())
-                .teamMateNames(nicknames)
-                .build();
-    }
-
-    private ResponseFieldsSnippet historyResponseFieldsSnippet() {
-        return responseFields(
-                fieldWithPath("info[].id").description("목표 id").type(JsonFieldType.NUMBER),
-                fieldWithPath("info[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("info[].startDate").type(JsonFieldType.STRING).description("시작일"),
-                fieldWithPath("info[].endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("info[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
-                fieldWithPath("info[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
-                fieldWithPath("info[].teamMateNames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
-        );
-    }
-
     private ResponseFieldsSnippet setGoalFindResponseFields() {
         return responseFields(
                 fieldWithPath("info[].id").description("goal id").type(JsonFieldType.NUMBER),

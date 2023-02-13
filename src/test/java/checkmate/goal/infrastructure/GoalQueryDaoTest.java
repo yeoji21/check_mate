@@ -76,38 +76,6 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     @Test
-    void 성공한_목표_목록_조회() throws Exception {
-        //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        ReflectionTestUtils.setField(goal, "status", GoalStatus.OVER);
-        em.persist(goal);
-
-        User tester1 = TestEntityFactory.user(null, "tester1");
-        em.persist(tester1);
-        User tester2 = TestEntityFactory.user(null, "tester2");
-        em.persist(tester2);
-
-        TeamMate teamMate1 = goal.join(tester1);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.SUCCESS);
-        em.persist(teamMate1);
-
-        TeamMate teamMate2 = goal.join(tester2);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.SUCCESS);
-        em.persist(teamMate2);
-
-        em.flush();
-        em.clear();
-
-        //when
-        List<GoalHistoryInfo> historyGoalList = goalQueryDao.findHistoryGoalInfo(tester1.getId());
-
-        //then
-        assertThat(historyGoalList.size()).isEqualTo(1);
-        assertThat(historyGoalList.get(0).getTeamMateNames().size()).isEqualTo(2);
-        assertThat(historyGoalList.get(0).getTeamMateNames().get(0)).isNotEqualTo(historyGoalList.get(0).getTeamMateNames().get(1));
-    }
-
-    @Test
     @DisplayName("오늘 진행할 목표 정보")
     void findTodayGoalInfo() throws Exception {
         //given

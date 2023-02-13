@@ -1,50 +1,31 @@
 package checkmate.goal.infrastructure;
 
 import checkmate.goal.application.dto.response.*;
-import checkmate.goal.domain.*;
-import com.querydsl.core.Tuple;
+import checkmate.goal.domain.CheckDaysConverter;
+import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.TeamMateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QTeamMate.teamMate;
-import static checkmate.post.domain.QPost.post;
 import static checkmate.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
 public class GoalQueryDao {
-    private final JdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
     // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
-//        return jdbcTemplate.query("select g.id, g.category, g.title, g.check_days, tm.last_upload_date" +
-//                " from team_mate as tm" +
-//                " join goal as g on g.id = tm.goal_id" +
-//                " where tm.user_id = " + userId + " and tm.status = 'ONGOING'" +
-//                " and g.status = 'ONGOING'" +
-//                " and g.check_days & " + (1 << CheckDaysConverter.valueOf(LocalDate.now().getDayOfWeek().toString()).getValue()) +" != 0",
-//                (resultSet, rowNum) ->
-//                     TodayGoalInfo.builder()
-//                            .id(resultSet.getLong("id"))
-//                            .category(GoalCategory.valueOf(resultSet.getString("category")))
-//                            .title(resultSet.getString("title"))
-//                            .checkDays(new GoalCheckDays(resultSet.getInt("check_days")))
-//                            .lastUploadDate(resultSet.getObject("last_upload_date", LocalDate.class))
-//                            .build()
-//        );
-
         List<Object[]> resultList = entityManager.createNativeQuery(
                         "select g.id, g.category, g.title, g.check_days, tm.last_upload_date" +
                                 " from team_mate as tm" +
@@ -80,39 +61,6 @@ public class GoalQueryDao {
         return goalDetailInfo;
     }
 
-    //유저가 이전에 완수한 목표들의 정보
-    public List<GoalHistoryInfo> findHistoryGoalInfo(long userId) {
-        // 완수한 목표 조회
-        List<GoalHistoryInfo> list = queryFactory.select(
-                        new QGoalHistoryInfo(goal.id, goal.category, goal.title, goal.period.startDate,
-                                goal.period.endDate, goal.appointmentTime, goal.checkDays.checkDays,
-                                teamMate.progress.checkDayCount))
-                .from(teamMate)
-                .innerJoin(teamMate.goal, goal)
-                .where(teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.SUCCESS),
-                        goal.status.eq(GoalStatus.OVER))
-                .fetch();
-        List<Long> goalIds = list.stream().map(GoalHistoryInfo::getId).toList();
-
-        // 팀원들의 닉네임을 조회 후 goalID를 기준으로 grouping
-        Map<Long, List<Tuple>> map =
-                queryFactory.select(goal.id, user.nickname)
-                        .from(teamMate)
-                        .innerJoin(user).on(user.id.eq(teamMate.userId))
-                        .join(teamMate.goal, goal)
-                        .where(goal.id.in(goalIds))
-                        .fetch()
-                        .stream()
-                        .collect(Collectors.groupingBy(t -> t.get(goal.id)));
-        list.forEach(info -> {
-            List<String> nicknames = map.get(info.getId()).stream().map(t -> t.get(user.nickname)).toList();
-            info.setTeamMateNames(nicknames);
-        });
-        return list;
-    }
-
-
     // 목표 진행 일정 관련 정보 조회
     public Optional<GoalScheduleInfo> findGoalScheduleInfo(long goalId) {
         return Optional.ofNullable(
@@ -142,15 +90,5 @@ public class GoalQueryDao {
                 .where(teamMate.goal.id.eq(goalId),
                         teamMate.status.eq(TeamMateStatus.ONGOING))
                 .fetch();
-    }
-
-    public GoalDetailResult findGoalDetailResult(long goalId, long userId) {
-        return queryFactory.select(new QGoalDetailResult(goal, teamMate))
-                .from(teamMate)
-                .innerJoin(teamMate.goal, goal).on(goal.id.eq(goalId))
-                .leftJoin(post).on(post.teamMate.id.eq(teamMate.id))
-                .where(teamMate.userId.eq(userId))
-                .groupBy(teamMate.id)
-                .fetchOne();
     }
 }
