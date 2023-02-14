@@ -92,7 +92,7 @@ public class TeamMateCommandService {
     }
 
     private int getOngoingGoalCount(TeamMate tm) {
-        return goalRepository.countOngoingGoals(tm.getUserId());
+        return userRepository.countOngoingGoals(tm.getUserId());
     }
 
     private TeamMate findOrCreateInvitee(long goalId, String inviteeNickname) {

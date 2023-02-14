@@ -17,7 +17,6 @@ import java.util.Optional;
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QTeamMate.teamMate;
 import static checkmate.goal.domain.QVerificationCondition.verificationCondition;
-import static com.querydsl.core.types.ExpressionUtils.count;
 
 
 @RequiredArgsConstructor
@@ -30,18 +29,6 @@ public class GoalJpaRepository implements GoalRepository {
     public Goal save(Goal goal) {
         entityManager.persist(goal);
         return goal;
-    }
-
-    @Override
-    public int countOngoingGoals(long userId) {
-        return queryFactory.select(count(goal.id))
-                .from(teamMate)
-                .join(teamMate.goal, goal)
-                .where(teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING),
-                        goal.status.eq(GoalStatus.ONGOING))
-                .fetchOne()
-                .intValue();
     }
 
     @Override

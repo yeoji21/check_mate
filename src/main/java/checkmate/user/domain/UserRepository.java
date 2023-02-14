@@ -11,5 +11,7 @@ public interface UserRepository {
 
     Optional<String> findNicknameById(long userId);
 
+    int countOngoingGoals(long userId);
+
     User save(User user);
 }

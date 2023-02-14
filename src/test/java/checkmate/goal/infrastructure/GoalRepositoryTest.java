@@ -3,7 +3,6 @@ package checkmate.goal.infrastructure;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.*;
-import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -15,41 +14,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class GoalRepositoryTest extends RepositoryTest {
-
-    @Test @DisplayName("유저가 진행 중인 목표 개수")
-    void countOngoingGoals() throws Exception{
-        //given
-        User user = TestEntityFactory.user(null, "ongoingTester");
-        em.persist(user);
-
-        Goal goal1 = TestEntityFactory.goal(null, "goal1");
-        em.persist(goal1);
-        Goal goal2 = TestEntityFactory.goal(null, "goal2");
-        em.persist(goal2);
-        Goal goal3 = TestEntityFactory.goal(null, "goal3");
-        em.persist(goal3);
-
-        TeamMate teamMate1 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate1);
-
-        TeamMate teamMate2 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate2);
-
-        TeamMate teamMate3 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate3);
-
-        //when
-        int count = goalRepository.countOngoingGoals(user.getId());
-
-        //then
-        assertThat(count).isEqualTo(3);
-    }
-
-    @Test @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
-    void findConditions() throws Exception{
+    @Test
+    @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
+    void findConditions() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
@@ -66,9 +33,9 @@ public class GoalRepositoryTest extends RepositoryTest {
         assertThat(conditions.size()).isEqualTo(1);
     }
 
-
-    @Test @DisplayName("목표와 조건 함께 조회 - 조건이 없는 경우")
-    void findConditionsWithNoConditions() throws Exception{
+    @Test
+    @DisplayName("목표와 조건 함께 조회 - 조건이 없는 경우")
+    void findConditionsWithNoConditions() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
@@ -85,7 +52,7 @@ public class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void saveVerificationCondition() throws Exception{
+    void saveVerificationCondition() throws Exception {
         //given
         Goal testGoal = TestEntityFactory.goal(null, "test");
         em.persist(testGoal);
@@ -102,8 +69,9 @@ public class GoalRepositoryTest extends RepositoryTest {
         assertThat(findCondition.getMinimumLike()).isEqualTo(5);
     }
 
-    @Test @DisplayName("오늘 시작일인 목표의 status 업데이트")
-    void updateTodayStartGoal() throws Exception{
+    @Test
+    @DisplayName("오늘 시작일인 목표의 status 업데이트")
+    void updateTodayStartGoal() throws Exception {
         //given
         Goal todayStart1 = Goal.builder()
                 .title("todayStart1")
@@ -141,7 +109,7 @@ public class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void updateYesterdayOveredGoals() throws Exception{
+    void updateYesterdayOveredGoals() throws Exception {
         //given
         Goal testGoal = Goal.builder()
                 .title("testGoal")

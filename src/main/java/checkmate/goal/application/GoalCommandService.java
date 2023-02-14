@@ -74,20 +74,20 @@ public class GoalCommandService {
     }
 
     private List<CompleteGoalNotificationDto> toDtos(List<TeamMate> teamMates) {
-        return teamMates.stream().map(tm -> {
-            return CompleteGoalNotificationDto.builder()
-                    .goalId(tm.getGoal().getId())
-                    .goalTitle(tm.getGoal().getTitle())
-                    .userId(tm.getUserId())
-                    .build();
-        }).toList();
+        return teamMates.stream().map(
+                tm -> CompleteGoalNotificationDto.builder()
+                        .goalId(tm.getGoal().getId())
+                        .goalTitle(tm.getGoal().getTitle())
+                        .userId(tm.getUserId())
+                        .build()
+        ).toList();
     }
 
     private TeamMate joinToGoal(Goal goal, long userId) {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         TeamMate teamMate = goal.join(creator);
-        teamMate.initiateGoal(goalRepository.countOngoingGoals(userId));
+        teamMate.initiateGoal(userRepository.countOngoingGoals(userId));
         return teamMate;
     }
 

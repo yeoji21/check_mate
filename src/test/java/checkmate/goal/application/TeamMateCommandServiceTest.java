@@ -108,7 +108,7 @@ public class TeamMateCommandServiceTest {
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
         given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(teamMate));
-        given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(7);
+        given(userRepository.countOngoingGoals(any(Long.class))).willReturn(7);
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
 
         //when

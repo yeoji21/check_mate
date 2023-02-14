@@ -35,18 +35,23 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalCommandServiceTest {
-    @Mock private GoalRepository goalRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private TeamMateRepository teamMateRepository;
-    @Mock private CacheTemplate cacheTemplate;
-    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private TeamMateRepository teamMateRepository;
+    @Mock
+    private CacheTemplate cacheTemplate;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
     @Spy
     private GoalCommandMapper commandMapper = GoalCommandMapper.INSTANCE;
     @InjectMocks
     private GoalCommandService goalCommandService;
 
     @Test
-    void 성공한_목표_처리_스케쥴러_테스트() throws Exception{
+    void 성공한_목표_처리_스케쥴러_테스트() throws Exception {
         Goal goal1 = TestEntityFactory.goal(1L, "testGoal1");
         Goal goal2 = TestEntityFactory.goal(3L, "testGoal3");
 
@@ -75,7 +80,7 @@ public class GoalCommandServiceTest {
     }
 
     @Test
-    void 목표수정_테스트() throws Exception{
+    void 목표수정_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         LocalDate endDate = goal.getEndDate();
@@ -97,7 +102,7 @@ public class GoalCommandServiceTest {
     }
 
     @Test
-    void 목표저장_테스트(){
+    void 목표저장_테스트() {
         //given
         GoalCreateCommand command = GoalCreateCommand.builder()
                 .userId(1L)
@@ -115,7 +120,7 @@ public class GoalCommandServiceTest {
             return argument;
         }).when(goalRepository).save(any(Goal.class));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
-        given(goalRepository.countOngoingGoals(user.getId())).willReturn(0);
+        given(userRepository.countOngoingGoals(user.getId())).willReturn(0);
 
         //when
         long goalId = goalCommandService.create(command);
@@ -126,7 +131,7 @@ public class GoalCommandServiceTest {
     }
 
     @Test
-    void 목표생성한_유저의_현재목표가_최대치_이상() throws Exception{
+    void 목표생성한_유저의_현재목표가_최대치_이상() throws Exception {
         //given
         GoalCreateCommand command = GoalCreateCommand.builder()
                 .userId(1L)
@@ -144,7 +149,7 @@ public class GoalCommandServiceTest {
             return argument;
         }).when(goalRepository).save(any(Goal.class));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
-        given(goalRepository.countOngoingGoals(any(Long.class))).willReturn(11);
+        given(userRepository.countOngoingGoals(any(Long.class))).willReturn(11);
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class, () -> goalCommandService.create(command));
