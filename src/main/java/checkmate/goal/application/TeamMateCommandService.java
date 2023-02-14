@@ -7,10 +7,7 @@ import checkmate.goal.application.dto.TeamMateCommandMapper;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
-import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalRepository;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateRepository;
+import checkmate.goal.domain.*;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
@@ -41,6 +38,7 @@ public class TeamMateCommandService {
     private final GoalRepository goalRepository;
     private final TeamMateRepository teamMateRepository;
     private final NotificationRepository notificationRepository;
+    private final TeamMateInitiateManager teamMateInitiateManager;
     private final CacheTemplate cacheTemplate;
     private final ApplicationEventPublisher eventPublisher;
     private final TeamMateCommandMapper mapper;
@@ -57,7 +55,7 @@ public class TeamMateCommandService {
     public TeamMateAcceptResult inviteAccept(TeamMateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
         TeamMate teamMate = applyToTeamMate(notification.getLongAttribute("teamMateId"),
-                (tm) -> tm.initiateGoal(getOngoingGoalCount(tm)));
+                teamMateInitiateManager::initiate);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
                 getInviteAcceptNotificationDto(teamMate, notification.getUserId())));

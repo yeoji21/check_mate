@@ -50,13 +50,6 @@ public class TeamMate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    public void initiateGoal(int ongoingGoalCount) {
-        goal.inviteableCheck();
-        GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
-        this.status = TeamMateStatus.ONGOING;
-        progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
-    }
-
     void toOngoingStatus() {
         goal.inviteableCheck();
         status.initiateableCheck();

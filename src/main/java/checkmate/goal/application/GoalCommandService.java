@@ -30,6 +30,7 @@ public class GoalCommandService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final TeamMateRepository teamMateRepository;
+    private final TeamMateInitiateManager teamMateInitiateManager;
     private final ApplicationEventPublisher eventPublisher;
     private final CacheTemplate cacheTemplate;
     private final GoalCommandMapper mapper;
@@ -87,7 +88,8 @@ public class GoalCommandService {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         TeamMate teamMate = goal.join(creator);
-        teamMate.initiateGoal(userRepository.countOngoingGoals(userId));
+        teamMateInitiateManager.initiate(teamMate);
+//        teamMate.initiateGoal(userRepository.countOngoingGoals(userId));
         return teamMate;
     }
 
