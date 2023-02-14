@@ -16,6 +16,7 @@ public enum ErrorCode {
     UPDATE_DURATION(CommonCode.UPDATE_DURATION.getCode(), BAD_REQUEST, "변경할 수 없는 기간인 경우"),
     INVALID_WEEK_DAYS(GoalCode.WEEK_DAYS.getCode(), BAD_REQUEST, "목표 인증 요일이 올바르지 않은 경우"),
     INVALID_GOAL_DATE(GoalCode.DATE.getCode(), BAD_REQUEST, "목표 기간 설정이 올바르지 않은 경우"),
+    INVALID_TEAM_MATE_STATUS(TeamMateCode.INVALID_STATUS.getCode(), BAD_REQUEST, "팀원의 상태가 올바르지 않은 경우"),
     ALREADY_IN_GOAL(TeamMateCode.ALREADY_IN_GOAL.getCode(), BAD_REQUEST, "이미 해당 목표를 진행 중인 유저를 초대하는 경우"),
     DUPLICATED_INVITE_REQUEST(TeamMateCode.DUPLICATED_INVITE.getCode(), BAD_REQUEST, "이미 해당 목표 초대 요청을 받은 유저를 다시 초대하는 경우"),
     EXCEED_GOAL_INVITEABLE_DATE(GoalCode.INVITEABLE_DATE.getCode(), BAD_GATEWAY, "초대 가능한 기간이 지난 목표로 초대하는 경우"),

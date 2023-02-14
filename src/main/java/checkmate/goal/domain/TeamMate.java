@@ -50,13 +50,17 @@ public class TeamMate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    // TODO: 2023/02/12
-    // 1. 별도의 서비스 클래스 두기
-    // 2. ongoing goal count를 포함하는 새로운 TeamMate 도메인 클래스 두기
     public void initiateGoal(int ongoingGoalCount) {
         goal.inviteableCheck();
         GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
         this.status = TeamMateStatus.ONGOING;
+        progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
+    }
+
+    void toOngoingStatus() {
+        goal.inviteableCheck();
+        status.initiateableCheck();
+        status = TeamMateStatus.ONGOING;
         progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
