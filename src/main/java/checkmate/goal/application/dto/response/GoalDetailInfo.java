@@ -1,9 +1,7 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.goal.domain.Uploadable;
 import checkmate.goal.domain.*;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -42,13 +40,5 @@ public class GoalDetailInfo {
 
     public void setTeamMates(List<TeamMateUploadInfo> teamMates) {
         this.teamMates = teamMates;
-    }
-
-    @Builder
-    public GoalDetailInfo(Goal goal,
-                          TeamMate selector,
-                          List<TeamMateUploadInfo> otherTeamMates) {
-        this(goal, selector);
-        this.teamMates = otherTeamMates;
     }
 }

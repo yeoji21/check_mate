@@ -261,15 +261,11 @@ public class GoalControllerTest extends ControllerTest {
         TeamMateUploadInfo teamMateUploadInfo = TeamMateUploadInfo.builder()
                 .teamMateId(selector.getId())
                 .userId(selector.getUserId())
-                .lastUploadDay(LocalDate.now().minusDays(1))
+                .lastUploadDate(LocalDate.now().minusDays(1))
                 .nickname("tester")
                 .build();
-
-        return GoalDetailInfo.builder()
-                .goal(goal)
-                .selector(selector)
-                .otherTeamMates(List.of(teamMateUploadInfo))
-                .build();
+        GoalDetailInfo info = new GoalDetailInfo(goal, selector);
+        info.setTeamMates(List.of(teamMateUploadInfo));
+        return info;
     }
-
 }

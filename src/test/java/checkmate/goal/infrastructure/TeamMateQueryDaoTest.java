@@ -79,7 +79,7 @@ class TeamMateQueryDaoTest extends RepositoryTest {
             em.persist(user);
             TeamMate teamMate = goal.join(user);
             em.persist(teamMate);
-            teamMate.initiateGoal(0);
+            ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
         }
 
         //when
@@ -118,7 +118,7 @@ class TeamMateQueryDaoTest extends RepositoryTest {
                 User user = TestEntityFactory.user(null, i + "user" + j);
                 em.persist(user);
                 TeamMate teamMate = goal.join(user);
-                teamMate.initiateGoal(0);
+                ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
                 em.persist(teamMate);
             }
         }

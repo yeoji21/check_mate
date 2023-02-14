@@ -77,7 +77,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public boolean isUploaded() {
-        return (lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now()));
+        return lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now());
     }
 
     public void updateUploadedDate() {

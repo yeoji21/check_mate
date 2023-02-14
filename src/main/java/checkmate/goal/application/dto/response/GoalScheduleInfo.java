@@ -15,15 +15,20 @@ public class GoalScheduleInfo {
     private LocalDate endDate;
     private String schedule;
 
-    @Builder @QueryProjection
+    @Builder
+    @QueryProjection
     public GoalScheduleInfo(LocalDate startDate,
                             LocalDate endDate,
                             int weekDays) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.schedule = Goal.builder()
+        this.schedule = createGoal(startDate, endDate, weekDays).getSchedule();
+    }
+
+    private Goal createGoal(LocalDate startDate, LocalDate endDate, int weekDays) {
+        return Goal.builder()
                 .checkDays(new GoalCheckDays(weekDays))
                 .period(new GoalPeriod(startDate, endDate))
-                .build().getSchedule();
+                .build();
     }
 }
