@@ -1,7 +1,9 @@
 package checkmate.goal.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
+import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import lombok.*;
@@ -84,14 +86,6 @@ public class Goal extends BaseTimeEntity {
         else return appointmentTime.isBefore(LocalTime.now());
     }
 
-    void extendEndDate(LocalDate endDate) {
-        period = new GoalPeriod(period.getStartDate(), endDate);
-    }
-
-    void updateAppointmentTime(LocalTime appointmentTime) {
-        this.appointmentTime = appointmentTime;
-    }
-
     /*
      User가 Goal에 참여
      생성된 TeamMate의 status는 waiting이므로 목표 인증을 시작하지 않은 상태
@@ -126,6 +120,7 @@ public class Goal extends BaseTimeEntity {
         return checkDays.calcWorkingDayCount(period.fromStartToToday());
     }
 
+    // TODO: 2023/02/15
     int totalWorkingDaysCount() {
         return checkDays.calcWorkingDayCount(period.fromStartToEndDate());
     }
@@ -136,5 +131,25 @@ public class Goal extends BaseTimeEntity {
 
     public LocalDate getEndDate() {
         return period.getEndDate();
+    }
+
+    public void update(GoalModifyRequest request) {
+        validateModifyRequest(request);
+
+        if (request.getEndDate() != null)
+            period = new GoalPeriod(period.getStartDate(), request.getEndDate());
+        if (request.isTimeReset()) {
+            appointmentTime = null;
+        } else {
+            if (request.getAppointmentTime() != null)
+                appointmentTime = request.getAppointmentTime();
+        }
+    }
+
+    private void validateModifyRequest(GoalModifyRequest request) {
+        if (request.getEndDate() != null && getEndDate().isAfter(request.getEndDate()))
+            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
+        if (getModifiedDateTime() != null && getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now()))
+            throw new BusinessException(ErrorCode.UPDATE_DURATION);
     }
 }
