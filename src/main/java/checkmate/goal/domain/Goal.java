@@ -120,7 +120,6 @@ public class Goal extends BaseTimeEntity {
         return checkDays.calcWorkingDayCount(period.fromStartToToday());
     }
 
-    // TODO: 2023/02/15
     int totalWorkingDaysCount() {
         return checkDays.calcWorkingDayCount(period.fromStartToEndDate());
     }

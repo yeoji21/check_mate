@@ -128,7 +128,7 @@ public class GoalControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(1L)))
-                .andDo(document("save-goal",
+                .andDo(document("create-goal",
                         setSaveGoalRequestField())
                 );
     }

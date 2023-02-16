@@ -40,11 +40,12 @@ public class GoalController {
                     key = "{#details.userId, T(java.time.LocalDate).now()}")
     })
     @PostMapping("/goal")
-    public long save(@RequestBody @Valid GoalCreateDto dto,
-                     @AuthenticationPrincipal JwtUserDetails details) {
+    public long create(@RequestBody @Valid GoalCreateDto dto,
+                       @AuthenticationPrincipal JwtUserDetails details) {
         return goalCommandService.create(mapper.toCommand(dto, details.getUserId()));
     }
 
+    // TODO: 2023/02/15 요청한 유저가 목표에 속해있어야 함
     @PostMapping("/goal/confirm-like")
     public void confirmLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
                                      @AuthenticationPrincipal JwtUserDetails details) {
@@ -52,6 +53,7 @@ public class GoalController {
         goalCommandService.setLikeCountCondition(command);
     }
 
+    // TODO: 2023/02/15 요청한 유저가 목표에 속해있어야 함
     @CacheEvict(value = RedisKey.GOAL_PERIOD, key = "{#goalId}")
     @PatchMapping("/goal/{goalId}")
     public void goalModify(@PathVariable long goalId,

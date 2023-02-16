@@ -11,143 +11,200 @@ endif::[]
 :sectlinks:
 
 == 새 목표 생성
+
 === Request Fields
+
 include::{snippets}/save-goal/request-fields.adoc[]
 
 === HTTP Request
+
 include::{snippets}/save-goal/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/save-goal/http-response.adoc[]
 
 == 팀원 초대
+
 === Request Fields
+
 include::{snippets}/invite-team mate/request-fields.adoc[]
 
 === HTTP Request
+
 include::{snippets}/invite-team mate/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/invite-team mate/http-response.adoc[]
 
 == 유저의 목표 조회
+
 === HTTP Request
+
 include::{snippets}/find-userGoal/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/find-userGoal/http-response.adoc[]
 
 == 유저의 오늘 해야 할 목표 조회
+
 === HTTP Request
+
 include::{snippets}/find-todayGoal/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/find-todayGoal/http-response.adoc[]
 
 == 개별 목표 정보 조회
+
 === HTTP Request
+
 include::{snippets}/find-goalinfo/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/find-goalinfo/http-response.adoc[]
 
 == 유저별 목표 진행률 조회
+
 === Request Fields
+
 include::{snippets}/progress-percent/path-parameters.adoc[]
 
 == 닉네임 중복 검사
+
 === Request Parameters
+
 include::{snippets}/nickname-dup/request-parameters.adoc[]
 
 === HTTP Request
+
 include::{snippets}/nickname-dup/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/nickname-dup/http-response.adoc[]
 
 == 목표 인증
-//operation::save-post[snippets='curl-request,request-parts,request-parameters,http-response']
+//operation::create-post[snippets='curl-request,request-parts,request-parameters,http-response']
 === Request Parameters
+
 include::{snippets}/save-post/request-parameters.adoc[]
 
 === Request Parts
+
 include::{snippets}/save-post/request-parts.adoc[]
 
 === HTTP Request
+
 include::{snippets}/save-post/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/save-post/http-response.adoc[]
 
 == 팀원 초대 응답
+
 === HTTP Response
+
 include::{snippets}/invite-reply/http-response.adoc[]
 
 == 목표의 해당 날짜 게시글 조회
+
 operation::find-posts[snippets='curl-request,http-response,response-fields']
 === Response Field
+
 include::{snippets}/find-posts/response-fields.adoc[]
 
 === HTTP Response
+
 include::{snippets}/find-posts/http-response.adoc[]
 
 == 팀원의 목표 캘린더 조회
+
 === Path Parameter
+
 include::{snippets}/teamMate-calendar/path-parameters.adoc[]
 
 === Response Field
+
 include::{snippets}/teamMate-calendar/response-fields.adoc[]
 
 === HTTP Response
+
 include::{snippets}/teamMate-calendar/http-response.adoc[]
 
 == 개별 알림 조회
+
 === Response Field
+
 include::{snippets}/read-notification/response-fields.adoc[]
 
 === HTTP Response
+
 include::{snippets}/read-notification/http-response.adoc[]
 
 == 유저별 알림 조회
+
 === Response Field
+
 include::{snippets}/find-notifications/response-fields.adoc[]
 
 === HTTP Response
+
 include::{snippets}/find-notifications/http-response.adoc[]
 
 == 좋아요
+
 === Path Parameter
+
 include::{snippets}/like-post/path-parameters.adoc[]
 
 === HTTP Response
+
 include::{snippets}/like-post/http-response.adoc[]
 
 == 좋아요 취소
+
 === Path Parameter
+
 include::{snippets}/unlike-post/path-parameters.adoc[]
 
 === HTTP Response
+
 include::{snippets}/unlike-post/http-response.adoc[]
 
 == 목표 수정
+
 === Path Parameter
+
 include::{snippets}/goal-modify/path-parameters.adoc[]
 
 === HTTP Response
+
 include::{snippets}/goal-modify/http-response.adoc[]
 
 == 닉네임 변경
+
 === HTTP Response
+
 include::{snippets}/nickname-modify/http-response.adoc[]
 
 = 회원가입 & 로그인 API
 
 == 회원 가입
+
 === Request Fields
+
 include::{snippets}/user-sign-in/request-fields.adoc[]
 
 === HTTP Request
+
 include::{snippets}/user-sign-in/http-request.adoc[]
 
 === HTTP Response
+
 include::{snippets}/user-sign-in/http-response.adoc[]

@@ -89,10 +89,6 @@ public class TeamMateCommandService {
         return teamMate;
     }
 
-    private int getOngoingGoalCount(TeamMate tm) {
-        return userRepository.countOngoingGoals(tm.getUserId());
-    }
-
     private TeamMate findOrCreateInvitee(long goalId, String inviteeNickname) {
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));

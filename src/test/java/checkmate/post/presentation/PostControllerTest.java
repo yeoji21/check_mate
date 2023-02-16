@@ -34,14 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PostControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
-    void 목표인증_테스트() throws Exception{
+    void 목표인증_테스트() throws Exception {
         MockMultipartFile firstFile = getMockMultipartFile("imageFile1");
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
         PostUploadCommand command = PostUploadCommand.builder()
                 .teamMateId(1L)
                 .content("~~~")
                 .images(List.of(new MockMultipartFile("file1", new byte[10]),
-                                new MockMultipartFile("file1", new byte[10])))
+                        new MockMultipartFile("file1", new byte[10])))
                 .build();
 
         given(postDtoMapper.toCommand(any())).willReturn(command);
@@ -54,7 +54,7 @@ class PostControllerTest extends ControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(1L)))
-                .andDo(document("save-post",
+                .andDo(document("create-post",
                         getRequestParts(),
                         getRequestParameters()
                 ));
@@ -62,7 +62,7 @@ class PostControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 목표의_날짜별_게시글_조회_테스트() throws Exception{
+    void 목표의_날짜별_게시글_조회_테스트() throws Exception {
         PostInfoListResult result = new PostInfoListResult("goalTitle", getPostInquiryResponses());
 
         given(postQueryService.findPostByGoalIdAndDate(any(Long.class), any(String.class))).willReturn(result);
@@ -82,7 +82,7 @@ class PostControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 인증글_좋아요_테스트() throws Exception{
+    void 인증글_좋아요_테스트() throws Exception {
         mockMvc.perform(post("/post/{postId}/like", 1L)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
@@ -96,7 +96,7 @@ class PostControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 인증글_좋아요_취소_테스트() throws Exception{
+    void 인증글_좋아요_취소_테스트() throws Exception {
         mockMvc.perform(delete("/post/{postId}/unlike", 1L)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))

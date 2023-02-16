@@ -29,6 +29,7 @@ public class TeamMateController {
     private final TeamMateQueryService teamMateQueryService;
     private final TeamMateDtoMapper mapper;
 
+    // TODO: 2023/02/15 요청한 유저가 목표에 속해있어야 함
     @GetMapping("/goal/detail/{goalId}")
     public GoalDetailResult goalDetailResultFind(@PathVariable long goalId,
                                                  @AuthenticationPrincipal JwtUserDetails details) {
@@ -41,6 +42,7 @@ public class TeamMateController {
         return teamMateQueryService.findHistoryGoalInfo(details.getUserId());
     }
 
+    // TODO: 2023/02/15 요청한 유저가 목표에 속해있어야 함
     @PostMapping("/mate")
     public void inviteToGoal(@RequestBody @Valid TeamMateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
