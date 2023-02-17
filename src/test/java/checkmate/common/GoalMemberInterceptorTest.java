@@ -1,6 +1,8 @@
 package checkmate.common;
 
+import checkmate.config.auth.JwtUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.method.HandlerMethod;
 
 import java.nio.charset.StandardCharsets;
@@ -27,6 +34,17 @@ class GoalMemberInterceptorTest {
     @InjectMocks
     private GoalMemberInterceptor interceptor;
 
+    @BeforeEach
+    void beforeEach() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        JwtUserDetails principal = new JwtUserDetails();
+        ReflectionTestUtils.setField(principal, "id", 1L);
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken(principal, "password");
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
+    }
+
     @Test
     @DisplayName("request param에 goalId가 존재하는 경우")
     void goalId_in_param() throws Exception {
@@ -42,7 +60,6 @@ class GoalMemberInterceptorTest {
         //then
         assertThat(result).isTrue();
     }
-
 
     @Test
     @DisplayName("request body에 goalId가 존재하는 경우")

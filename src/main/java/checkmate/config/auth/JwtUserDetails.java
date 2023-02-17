@@ -17,6 +17,7 @@ public class JwtUserDetails implements UserDetails {
     private String role;
     private boolean isAuthenticated;
 
+    // TODO: 2023/02/17 특정 라이브러리에 의존
     public JwtUserDetails(DecodedJWT decodedJWT) {
         id = decodedJWT.getClaim("id").asLong();
         role = decodedJWT.getClaim("auth").asString();

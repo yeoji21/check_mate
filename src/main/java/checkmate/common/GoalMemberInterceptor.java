@@ -1,10 +1,12 @@
 package checkmate.common;
 
+import checkmate.config.auth.JwtUserDetails;
 import checkmate.exception.JsonConvertingException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -27,9 +29,14 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
         if (!hasGoalMemberAnnotation((HandlerMethod) handler)) return true;
 
         long goalId = getGoalIdInRequest(request);
-        System.out.println(goalId);
+        long userId = getRequestUserId();
 
         return HandlerInterceptor.super.preHandle(request, response, handler);
+    }
+
+    private long getRequestUserId() {
+        JwtUserDetails userDetails = (JwtUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return userDetails.getUserId();
     }
 
     private long getGoalIdInRequest(HttpServletRequest request) throws IOException {
