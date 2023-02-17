@@ -2,8 +2,8 @@ package checkmate.goal.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
@@ -19,7 +19,66 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TeamMateRepositoryTest extends RepositoryTest {
     @Test
-    void findByTeamMateId() throws Exception{
+    void isExistTeamMate() throws Exception {
+        //given
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+        User user = TestEntityFactory.user(null, "tester");
+        em.persist(user);
+
+        TeamMate teamMate = goal.join(user);
+        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
+        em.persist(teamMate);
+
+        em.flush();
+        em.clear();
+
+        //when
+        boolean existTeamMate = teamMateRepository.isExistTeamMate(goal.getId(), user.getId());
+
+        //then
+        assertThat(existTeamMate).isTrue();
+    }
+
+    @Test
+    void isExistTeamMate_not_ongoing() throws Exception {
+        //given
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+        User user = TestEntityFactory.user(null, "tester");
+        em.persist(user);
+
+        TeamMate teamMate = goal.join(user);
+        em.persist(teamMate);
+
+        em.flush();
+        em.clear();
+
+        //when
+        boolean existTeamMate = teamMateRepository.isExistTeamMate(goal.getId(), user.getId());
+
+        //then
+        assertThat(existTeamMate).isFalse();
+    }
+
+    @Test
+    void isExistTeamMate_not_exist() throws Exception {
+        //given
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+
+        em.flush();
+        em.clear();
+
+        //when
+        boolean existTeamMate = teamMateRepository.isExistTeamMate(goal.getId(), 22L);
+
+        //then
+        assertThat(existTeamMate).isFalse();
+    }
+
+    @Test
+    void findByTeamMateId() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
@@ -42,7 +101,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void updateYesterdayHookyTMs() throws Exception{
+    void updateYesterdayHookyTMs() throws Exception {
         //given
         Goal goal1 = TestEntityFactory.goal(null, "goal1");
         em.persist(goal1);
@@ -96,7 +155,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    void eliminateOveredTMs() throws Exception{
+    void eliminateOveredTMs() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "goal1");
         em.persist(goal);

@@ -119,6 +119,17 @@ public class TeamMateJpaRepository implements TeamMateRepository {
     }
 
     @Override
+    public boolean isExistTeamMate(long goalId, long userId) {
+        Long teamMateId = queryFactory.select(teamMate.id)
+                .from(teamMate)
+                .where(teamMate.goal.id.eq(goalId),
+                        teamMate.userId.eq(userId),
+                        teamMate.status.eq(TeamMateStatus.ONGOING))
+                .fetchOne();
+        return teamMateId != null;
+    }
+
+    @Override
     public TeamMate save(TeamMate teamMate) {
         entityManager.persist(teamMate);
         return teamMate;

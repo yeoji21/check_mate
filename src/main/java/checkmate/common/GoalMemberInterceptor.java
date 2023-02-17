@@ -2,10 +2,12 @@ package checkmate.common;
 
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.exception.JsonConvertingException;
+import checkmate.goal.domain.TeamMateRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -16,10 +18,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+@Profile("!test")
 @RequiredArgsConstructor
 @Component
 public class GoalMemberInterceptor implements HandlerInterceptor {
     private final ObjectMapper objectMapper;
+    private final TeamMateRepository teamMateRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -30,8 +34,7 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
 
         long goalId = getGoalIdInRequest(request);
         long userId = getRequestUserId();
-
-        return HandlerInterceptor.super.preHandle(request, response, handler);
+        return teamMateRepository.isExistTeamMate(goalId, userId);
     }
 
     private long getRequestUserId() {
