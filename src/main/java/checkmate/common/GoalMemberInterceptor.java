@@ -34,7 +34,9 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
 
         long goalId = getGoalIdInRequest(request);
         long userId = getRequestUserId();
-        return teamMateRepository.isExistTeamMate(goalId, userId);
+        boolean existTeamMate = teamMateRepository.isExistTeamMate(goalId, userId);
+        if (!existTeamMate) throw new IllegalArgumentException("존재하지 않는 팀원");
+        return true;
     }
 
     private long getRequestUserId() {

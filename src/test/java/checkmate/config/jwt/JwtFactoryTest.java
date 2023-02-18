@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtFactoryTest {
-    private User user;
-    private JwtFactory jwtFactory;
     private static final long ACCESS_TIME = TimeUnit.MINUTES.toMillis(30);
     private static final long REFRESH_TIME = TimeUnit.DAYS.toMillis(30);
+    private User user;
+    private JwtFactory jwtFactory;
 
     @BeforeEach
     void setUp() {
@@ -30,7 +30,7 @@ class JwtFactoryTest {
     }
 
     @Test
-    void AccessToken_생성_테스트() throws Exception{
+    void AccessToken_생성_테스트() throws Exception {
         //given
 
         //when
@@ -45,7 +45,7 @@ class JwtFactoryTest {
     }
 
     @Test
-    void RefreshToken_생성_테스트() throws Exception{
+    void RefreshToken_생성_테스트() throws Exception {
         //given
 
         //when
@@ -59,10 +59,10 @@ class JwtFactoryTest {
     }
 
     @Test
-    void token() throws Exception{
+    void token() throws Exception {
         User user = TestEntityFactory.user(1L, "hi");
-        ReflectionTestUtils.setField(user,"providerId", "testId");
-        ReflectionTestUtils.setField(user,"username", "tester");
+        ReflectionTestUtils.setField(user, "providerId", "testId");
+        ReflectionTestUtils.setField(user, "username", "tester");
         String made = jwtFactory.accessToken(user);
         System.out.println(made);
 
