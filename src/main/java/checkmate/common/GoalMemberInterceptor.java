@@ -12,11 +12,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Map;
 
 @Profile("!test")
 @RequiredArgsConstructor
@@ -44,20 +46,30 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
         return userDetails.getUserId();
     }
 
+    // TODO: 2023/02/18 어노테이션 내 필드로 분기 처리?
     private long getGoalIdInRequest(HttpServletRequest request) throws IOException {
-        long goalId = -1;
+        Long goalId = null;
         String goalIdInParam = request.getParameter("goalId");
         if (goalIdInParam != null) {
             goalId = Long.parseLong(goalIdInParam);
         } else {
-            goalId = getGoalIdInBody(request);
+            goalId = getFromPathVariable(request);
         }
+        if (goalId == null) {
+            goalId = getFromMessageBody(request);
+        }
+
         // TODO: 2023/02/16 EXCEPTION
         if (goalId == -1) throw new IllegalArgumentException();
         return goalId;
     }
 
-    private long getGoalIdInBody(HttpServletRequest request) throws IOException {
+    private Long getFromPathVariable(HttpServletRequest request) {
+        Map<String, String> attribute = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
+        return attribute == null ? null : Long.parseLong(attribute.get("goalId"));
+    }
+
+    private long getFromMessageBody(HttpServletRequest request) throws IOException {
         long goalId;
         try {
             StringBuilder requestBody = new StringBuilder();

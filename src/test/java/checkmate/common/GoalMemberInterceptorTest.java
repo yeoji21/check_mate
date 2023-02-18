@@ -19,8 +19,10 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerMapping;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -73,6 +75,24 @@ class GoalMemberInterceptorTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setContent("{\"goalId\": 123}".getBytes(StandardCharsets.UTF_8));
         MockHttpServletResponse response = new MockHttpServletResponse();
+        given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
+        given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+
+        //when
+        boolean result = interceptor.preHandle(request, response, handlerMethod);
+
+        //then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("path variable에 goalId가 존재하는 경우")
+    void goalId_in_path_variable() throws Exception {
+        //given
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
+                Collections.singletonMap("goalId", "1"));
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
