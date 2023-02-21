@@ -78,7 +78,6 @@ public class GoalCommandServiceTest {
         LocalTime beforeTime = goal.getAppointmentTime();
         GoalModifyCommand command = getGoalModifyCommand(goal);
 
-        given(goalRepository.checkUserIsInGoal(any(Long.class), any(Long.class))).willReturn(true);
         given(goalRepository.findByIdForUpdate(any(Long.class))).willReturn(Optional.of(goal));
 
         //when

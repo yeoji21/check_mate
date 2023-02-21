@@ -10,8 +10,6 @@ public interface GoalRepository {
 
     Optional<Goal> findByIdForUpdate(long goalId);
 
-    boolean checkUserIsInGoal(long goalId, long userId);
-
     List<Long> updateYesterdayOveredGoals();
 
     Optional<Goal> findWithConditions(Long goalId);

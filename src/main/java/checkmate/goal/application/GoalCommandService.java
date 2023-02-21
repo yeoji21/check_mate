@@ -44,14 +44,12 @@ public class GoalCommandService {
 
     @Transactional
     public void modifyGoal(GoalModifyCommand command) {
-        checkUserIsInGoal(command.goalId(), command.userId());
         Goal goal = findGoalForUpdate(command.goalId());
         goal.update(mapper.toGoalModifyRequest(command));
     }
 
     @Transactional
-    public void setLikeCountCondition(LikeCountCreateCommand command) {
-        checkUserIsInGoal(command.goalId(), command.userId());
+    public void addLikeCountCondition(LikeCountCreateCommand command) {
         Goal goal = goalRepository.findById(command.goalId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, command.goalId()));
         goal.addCondition(new LikeCountCondition(command.likeCount()));
@@ -91,12 +89,6 @@ public class GoalCommandService {
         teamMateInitiateManager.initiate(teamMate);
 //        teamMate.initiateGoal(userRepository.countOngoingGoals(userId));
         return teamMate;
-    }
-
-    // TODO: 2023/02/15 인터셉터로?
-    private void checkUserIsInGoal(long goalId, long userId) {
-        if (!goalRepository.checkUserIsInGoal(goalId, userId))
-            throw new NotFoundException(USER_NOT_FOUND, userId);
     }
 
     private Goal findGoalForUpdate(long goalId) {

@@ -1,5 +1,6 @@
 package checkmate.goal.presentation;
 
+import checkmate.common.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.GoalCommandService;
@@ -45,15 +46,16 @@ public class GoalController {
         return goalCommandService.create(mapper.toCommand(dto, details.getUserId()));
     }
 
-    // TODO: 2023/02/15 요청한 유저가 목표에 속해있어야 함
+    @GoalMember
     @PostMapping("/goal/confirm-like")
     public void confirmLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
                                      @AuthenticationPrincipal JwtUserDetails details) {
         LikeCountCreateCommand command = mapper.toCommand(dto, details.getUserId());
-        goalCommandService.setLikeCountCondition(command);
+        goalCommandService.addLikeCountCondition(command);
     }
 
     // TODO: 2023/02/15 요청한 유저가 목표에 속해있어야 함
+    @GoalMember
     @CacheEvict(value = RedisKey.GOAL_PERIOD, key = "{#goalId}")
     @PatchMapping("/goal/{goalId}")
     public void goalModify(@PathVariable long goalId,

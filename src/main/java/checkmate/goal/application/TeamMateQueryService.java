@@ -1,7 +1,6 @@
 package checkmate.goal.application;
 
 import checkmate.exception.NotFoundException;
-import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
@@ -15,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+
+import static checkmate.exception.code.ErrorCode.TEAM_MATE_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
@@ -31,14 +32,14 @@ public class TeamMateQueryService {
     @Transactional(readOnly = true)
     public double getProgressPercent(long teamMateId) {
         TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(teamMateId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMateId));
+                .orElseThrow(() -> new NotFoundException(TEAM_MATE_NOT_FOUND, teamMateId));
         return teamMate.calcProgressPercent();
     }
 
     @Transactional(readOnly = true)
     public GoalDetailResult findGoalDetailResult(long goalId, long userId) {
         TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(goalId, userId)
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new NotFoundException(TEAM_MATE_NOT_FOUND));
         return new GoalDetailResult(teamMate,
                 teamMateQueryDao.findUploadedDates(teamMate.getId()),
                 teamMateQueryDao.findTeamMateInfo(goalId));

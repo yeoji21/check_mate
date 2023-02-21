@@ -70,7 +70,7 @@ public class GoalControllerTest extends ControllerTest {
                 .content(objectMapper.writeValueAsString(dto))
                 .with(csrf())
         ).andExpect(status().isOk());
-        verify(goalCommandService).setLikeCountCondition(any());
+        verify(goalCommandService).addLikeCountCondition(any());
     }
 
     @WithMockAuthUser

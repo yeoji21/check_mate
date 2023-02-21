@@ -54,17 +54,6 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public boolean checkUserIsInGoal(long goalId, long userId) {
-        Integer fetchOne = queryFactory.selectOne()
-                .from(teamMate)
-                .where(teamMate.goal.id.eq(goalId),
-                        teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
-                .fetchFirst();
-        return fetchOne != null;
-    }
-
-    @Override
     public void updateTodayStartGoal() {
         queryFactory.update(goal)
                 .where(goal.status.eq(GoalStatus.WAITING), goal.period.startDate.eq(LocalDate.now()))
