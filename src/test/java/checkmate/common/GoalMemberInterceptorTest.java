@@ -1,5 +1,8 @@
 package checkmate.common;
 
+import checkmate.common.interceptor.GoalIdRoute;
+import checkmate.common.interceptor.GoalMember;
+import checkmate.common.interceptor.GoalMemberInterceptor;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.goal.domain.TeamMateRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +30,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 class GoalMemberInterceptorTest {
@@ -36,6 +40,7 @@ class GoalMemberInterceptorTest {
     private ObjectMapper objectMapper = new ObjectMapper();
     @Mock
     private TeamMateRepository teamMateRepository;
+    private GoalMember mockAnnotation;
 
     @InjectMocks
     private GoalMemberInterceptor interceptor;
@@ -49,6 +54,7 @@ class GoalMemberInterceptorTest {
                 new UsernamePasswordAuthenticationToken(principal, "password");
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
+        mockAnnotation = mock(GoalMember.class);
     }
 
     @Test
@@ -58,7 +64,10 @@ class GoalMemberInterceptorTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setParameter("goalId", "123");
         MockHttpServletResponse response = new MockHttpServletResponse();
+
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
+        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
+        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
         given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
         //when
@@ -76,6 +85,8 @@ class GoalMemberInterceptorTest {
         request.setContent("{\"goalId\": 123}".getBytes(StandardCharsets.UTF_8));
         MockHttpServletResponse response = new MockHttpServletResponse();
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
+        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
+        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_BODY);
         given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
         //when
@@ -94,6 +105,8 @@ class GoalMemberInterceptorTest {
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
                 Collections.singletonMap("goalId", "1"));
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
+        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
+        given(mockAnnotation.value()).willReturn(GoalIdRoute.PATH_VARIABLE);
         given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
         //when

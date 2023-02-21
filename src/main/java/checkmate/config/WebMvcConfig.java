@@ -1,6 +1,6 @@
 package checkmate.config;
 
-import checkmate.common.GoalMemberInterceptor;
+import checkmate.common.interceptor.GoalMemberInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

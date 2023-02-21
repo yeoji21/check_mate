@@ -1,7 +1,9 @@
-package checkmate.common;
+package checkmate.common.interceptor;
 
 import checkmate.config.auth.JwtUserDetails;
+import checkmate.exception.BusinessException;
 import checkmate.exception.JsonConvertingException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.TeamMateRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,10 +33,10 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
-        if (!(handler instanceof HandlerMethod)) return true;
-        if (!hasGoalMemberAnnotation((HandlerMethod) handler)) return true;
+        if (!(handler instanceof HandlerMethod handlerMethod)) return true;
+        if (!hasGoalMemberAnnotation(handlerMethod)) return true;
 
-        long goalId = getGoalIdInRequest(request);
+        long goalId = getGoalIdInRequest(handlerMethod, request);
         long userId = getRequestUserId();
         boolean existTeamMate = teamMateRepository.isExistTeamMate(goalId, userId);
         if (!existTeamMate) throw new IllegalArgumentException("존재하지 않는 팀원");
@@ -46,21 +48,15 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
         return userDetails.getUserId();
     }
 
-    // TODO: 2023/02/18 어노테이션 내 필드로 분기 처리?
-    private long getGoalIdInRequest(HttpServletRequest request) throws IOException {
-        Long goalId = null;
-        String goalIdInParam = request.getParameter("goalId");
-        if (goalIdInParam != null) {
-            goalId = Long.parseLong(goalIdInParam);
-        } else {
-            goalId = getFromPathVariable(request);
-        }
-        if (goalId == null) {
-            goalId = getFromMessageBody(request);
-        }
-
-        // TODO: 2023/02/16 EXCEPTION
-        if (goalId == -1) throw new IllegalArgumentException();
+    private long getGoalIdInRequest(HandlerMethod handlerMethod,
+                                    HttpServletRequest request) throws IOException {
+        GoalIdRoute route = handlerMethod.getMethodAnnotation(GoalMember.class).value();
+        Long goalId = switch (route) {
+            case REQUEST_PARAM -> Long.parseLong(request.getParameter("goalId"));
+            case REQUEST_BODY -> getFromMessageBody(request);
+            case PATH_VARIABLE -> getFromPathVariable(request);
+        };
+        if (goalId == null) throw new BusinessException(ErrorCode.TEAM_MATE_NOT_FOUND);
         return goalId;
     }
 

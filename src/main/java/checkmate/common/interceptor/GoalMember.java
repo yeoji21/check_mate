@@ -1,4 +1,4 @@
-package checkmate.common;
+package checkmate.common.interceptor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface GoalMember {
-
+    GoalIdRoute value();
 }
