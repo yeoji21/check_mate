@@ -1,7 +1,7 @@
 package checkmate.goal.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.cache.CacheTemplate;
+import checkmate.common.cache.CacheHandler;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
@@ -41,7 +41,7 @@ public class GoalCommandServiceTest {
     @Mock
     private TeamMateInitiateManager teamMateInitiateManager;
     @Mock
-    private CacheTemplate cacheTemplate;
+    private CacheHandler cacheHandler;
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Spy
@@ -67,7 +67,7 @@ public class GoalCommandServiceTest {
 
         //then
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(cacheTemplate).deleteTMCacheData(any(List.class));
+        verify(cacheHandler).deleteTeamMateCaches(any(List.class));
     }
 
     @Test

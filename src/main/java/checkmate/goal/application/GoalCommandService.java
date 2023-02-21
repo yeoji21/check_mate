@@ -1,6 +1,6 @@
 package checkmate.goal.application;
 
-import checkmate.common.cache.CacheTemplate;
+import checkmate.common.cache.CacheHandler;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.GoalCommandMapper;
@@ -32,7 +32,7 @@ public class GoalCommandService {
     private final TeamMateRepository teamMateRepository;
     private final TeamMateInitiateManager teamMateInitiateManager;
     private final ApplicationEventPublisher eventPublisher;
-    private final CacheTemplate cacheTemplate;
+    private final CacheHandler cacheHandler;
     private final GoalCommandMapper mapper;
 
     @Transactional
@@ -69,7 +69,7 @@ public class GoalCommandService {
                 .toList();
 
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toDtos(teamMates)));
-        cacheTemplate.deleteTMCacheData(teamMates);
+        cacheHandler.deleteTeamMateCaches(teamMates);
     }
 
     private List<CompleteGoalNotificationDto> toDtos(List<TeamMate> teamMates) {

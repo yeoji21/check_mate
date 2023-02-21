@@ -1,6 +1,6 @@
 package checkmate.goal.application;
 
-import checkmate.common.cache.CacheTemplate;
+import checkmate.common.cache.CacheHandler;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
@@ -39,7 +39,7 @@ public class TeamMateCommandService {
     private final TeamMateRepository teamMateRepository;
     private final NotificationRepository notificationRepository;
     private final TeamMateInitiateManager teamMateInitiateManager;
-    private final CacheTemplate cacheTemplate;
+    private final CacheHandler cacheHandler;
     private final ApplicationEventPublisher eventPublisher;
     private final TeamMateCommandMapper mapper;
 
@@ -80,7 +80,7 @@ public class TeamMateCommandService {
                 eliminators.stream().map(mapper::toNotificationDto).toList();
 
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL, notificationDtos));
-        cacheTemplate.deleteTMCacheData(eliminators);
+        cacheHandler.deleteTeamMateCaches(eliminators);
     }
 
     private TeamMate applyToTeamMate(long teamMateId, Consumer<TeamMate> consumer) {

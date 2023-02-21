@@ -1,6 +1,5 @@
 package checkmate.common.cache;
 
-import checkmate.config.redis.RedisKey;
 import checkmate.goal.domain.TeamMate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -11,17 +10,17 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class RedisCacheTemplate implements CacheTemplate{
+public class RedisCacheHandler implements CacheHandler {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public void deleteTMCacheData(List<TeamMate> TMs) {
-        List<Long> eliminatorUserIds = TMs.stream()
+    public void deleteTeamMateCaches(List<TeamMate> teamMates) {
+        List<Long> eliminatorUserIds = teamMates.stream()
                 .map(TeamMate::getUserId)
                 .collect(Collectors.toList());
 
-        redisTemplate.delete(RedisKey.getRedisKeyList(RedisKey.ONGOING_GOALS, eliminatorUserIds));
-        redisTemplate.delete(RedisKey.getRedisKeyList(RedisKey.TODAY_GOALS, eliminatorUserIds));
-        redisTemplate.delete(RedisKey.getHistoryKeyList(eliminatorUserIds));
+        redisTemplate.delete(CacheKey.getRedisKeyList(CacheKey.ONGOING_GOALS, eliminatorUserIds));
+        redisTemplate.delete(CacheKey.getRedisKeyList(CacheKey.TODAY_GOALS, eliminatorUserIds));
+        redisTemplate.delete(CacheKey.getRedisKeyList(CacheKey.HISTORY_GOALS, eliminatorUserIds));
     }
 }

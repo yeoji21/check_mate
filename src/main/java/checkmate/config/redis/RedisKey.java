@@ -18,7 +18,7 @@ public class RedisKey {
     public static List<String> getRedisKeyList(String redisKey, List<Long> userIdList) {
         String date = getToday();
         return userIdList.stream()
-                .map(id -> redisKey + "::" + id + "," + date)
+                .map(id -> redisKey + "::" + id + "::" + date)
                 .collect(Collectors.toList());
     }
 
@@ -31,6 +31,6 @@ public class RedisKey {
     private static String getToday() {
         LocalDate now = LocalDate.now();
         int year = now.getYear() % 100;
-        return year + ". " + now.getMonthValue() + ". " + now.getDayOfMonth() + ".";
+        return year + "." + now.getMonthValue() + "." + now.getDayOfMonth();
     }
 }

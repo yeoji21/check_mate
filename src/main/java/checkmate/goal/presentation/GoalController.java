@@ -33,6 +33,7 @@ public class GoalController {
     private final GoalQueryService goalQueryService;
     private final GoalDtoMapper mapper;
 
+    // "#{T(com.example.CacheName).MY_CACHE.key}"
     @Caching(evict = {
             @CacheEvict(
                     value = RedisKey.ONGOING_GOALS,
