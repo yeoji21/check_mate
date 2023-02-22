@@ -1,30 +1,40 @@
 package checkmate.common.cache;
 
-import lombok.RequiredArgsConstructor;
+import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: 2023/02/22 적용하려면 스프링의 @Cacheable같은 어노테이션과 포맷 맞춰야 함
-@RequiredArgsConstructor
-public enum CacheKey {
-    TODAY_GOALS("today_goals"),
-    ONGOING_GOALS("ongoing_goals"),
-    GOAL_PERIOD("goal_period"),
-    HISTORY_GOALS("history_goals");
-    private final String key;
 
-    public static List<String> getRedisKeyList(CacheKey key, List<Long> userIds) {
-        String date = getToday();
+@UtilityClass
+public class CacheKey {
+    public static final String TODAY_GOALS = "today_goals";
+    public static final String ONGOING_GOALS = "ongoing_goals";
+    public static final String GOAL_PERIOD = "goal_period";
+    public static final String HISTORY_GOALS = "history_goals";
+
+    public static List<String> ongoingGoalsKeys(List<Long> userIds) {
+        return getRedisKeyList(ONGOING_GOALS, userIds);
+    }
+
+    public static List<String> todayGoalsKeys(List<Long> userIds) {
+        return getRedisKeyList(TODAY_GOALS, userIds);
+    }
+
+    public static List<String> historyGoalsKeys(List<Long> userIds) {
+        return getRedisKeyList(HISTORY_GOALS, userIds);
+    }
+
+    private static List<String> getRedisKeyList(String key, List<Long> userIds) {
         return userIds.stream()
-                .map(id -> key.key + "::" + id + "::" + date)
+                .map(id -> key + "::" + id + "::" + getToday())
                 .collect(Collectors.toList());
     }
 
     private static String getToday() {
         LocalDate now = LocalDate.now();
-        int year = now.getYear() % 100;
-        return year + "." + now.getMonthValue() + "." + now.getDayOfMonth();
+        return now.format(DateTimeFormatter.ofPattern("yy.MM.dd"));
     }
 }

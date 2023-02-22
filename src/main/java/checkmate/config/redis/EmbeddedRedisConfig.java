@@ -24,7 +24,7 @@ public class EmbeddedRedisConfig {
 
     @PreDestroy
     public void stopRedis() {
-        if(redisServer != null && redisServer.isActive())
+        if (redisServer != null && redisServer.isActive())
             redisServer.stop();
     }
 }

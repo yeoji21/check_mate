@@ -1,7 +1,7 @@
 package checkmate.post.presentation;
 
+import checkmate.common.cache.CacheKey;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.config.redis.RedisKey;
 import checkmate.post.application.PostCommandService;
 import checkmate.post.application.PostQueryService;
 import checkmate.post.application.dto.response.PostInfoListResult;
@@ -24,7 +24,7 @@ public class PostController {
     private final PostQueryService postQueryService;
     private final PostDtoMapper postDtoMapper;
 
-    @CacheEvict(value = RedisKey.TODAY_GOALS, key = "{#principal.userId, T(java.time.LocalDate).now()}")
+    @CacheEvict(value = CacheKey.TODAY_GOALS, key = "{#principal.userId, T(java.time.LocalDate).now()}")
     @PostMapping("/post")
     public long uploadPost(@ModelAttribute PostUploadDto dto,
                            @AuthenticationPrincipal JwtUserDetails principal) {
@@ -45,7 +45,7 @@ public class PostController {
     }
 
     @DeleteMapping("/post/{postId}/unlike")
-    public void unlike(@AuthenticationPrincipal JwtUserDetails principal, @PathVariable long postId){
+    public void unlike(@AuthenticationPrincipal JwtUserDetails principal, @PathVariable long postId) {
         postCommandService.unlike(principal.getUserId(), postId);
     }
 }

@@ -1,9 +1,9 @@
 package checkmate.goal.presentation;
 
+import checkmate.common.cache.CacheKey;
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.application.dto.response.GoalDetailResult;
@@ -38,7 +38,7 @@ public class TeamMateController {
         return teamMateQueryService.findGoalDetailResult(goalId, details.getUserId());
     }
 
-    @Cacheable(value = RedisKey.HISTORY_GOALS, key = "{#details.userId}")
+    @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#details.userId}")
     @GetMapping("/goal/history")
     public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
         return teamMateQueryService.findHistoryGoalInfo(details.getUserId());
@@ -53,10 +53,10 @@ public class TeamMateController {
 
     @Caching(evict = {
             @CacheEvict(
-                    value = RedisKey.ONGOING_GOALS,
+                    value = CacheKey.ONGOING_GOALS,
                     key = "{#principal.userId, T(java.time.LocalDate).now()}"),
             @CacheEvict(value =
-                    RedisKey.TODAY_GOALS,
+                    CacheKey.TODAY_GOALS,
                     key = "{#principal.userId, T(java.time.LocalDate).now()}")
     })
     @PatchMapping("/mate/accept")

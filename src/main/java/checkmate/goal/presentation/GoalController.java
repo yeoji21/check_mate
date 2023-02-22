@@ -1,9 +1,9 @@
 package checkmate.goal.presentation;
 
+import checkmate.common.cache.CacheKey;
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.config.redis.RedisKey;
 import checkmate.goal.application.GoalCommandService;
 import checkmate.goal.application.GoalQueryService;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
@@ -33,13 +33,12 @@ public class GoalController {
     private final GoalQueryService goalQueryService;
     private final GoalDtoMapper mapper;
 
-    // "#{T(com.example.CacheName).MY_CACHE.key}"
     @Caching(evict = {
             @CacheEvict(
-                    value = RedisKey.ONGOING_GOALS,
+                    value = CacheKey.ONGOING_GOALS,
                     key = "{#details.userId, T(java.time.LocalDate).now()}"),
             @CacheEvict(
-                    value = RedisKey.TODAY_GOALS,
+                    value = CacheKey.TODAY_GOALS,
                     key = "{#details.userId, T(java.time.LocalDate).now()}")
     })
     @PostMapping("/goal")
@@ -57,7 +56,7 @@ public class GoalController {
     }
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
-    @CacheEvict(value = RedisKey.GOAL_PERIOD, key = "{#goalId}")
+    @CacheEvict(value = CacheKey.GOAL_PERIOD, key = "{#goalId}")
     @PatchMapping("/goal/{goalId}")
     public void goalModify(@PathVariable long goalId,
                            @RequestBody GoalModifyDto dto,
@@ -71,19 +70,19 @@ public class GoalController {
         return goalQueryService.findGoalDetail(goalId, userDetails.getUserId());
     }
 
-    @Cacheable(value = RedisKey.GOAL_PERIOD, key = "{#goalId}")
+    @Cacheable(value = CacheKey.GOAL_PERIOD, key = "{#goalId}")
     @GetMapping("/goal/{goalId}/period")
     public GoalScheduleInfo goalPeriodFind(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
-    @Cacheable(value = RedisKey.ONGOING_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
+    @Cacheable(value = CacheKey.ONGOING_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
     @GetMapping("/goal/ongoing")
     public GoalSimpleInfoResult ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findOngoingSimpleInfo(details.getUserId());
     }
 
-    @Cacheable(value = RedisKey.TODAY_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
+    @Cacheable(value = CacheKey.TODAY_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
     @GetMapping("/goal/today")
     public TodayGoalInfoResult todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());

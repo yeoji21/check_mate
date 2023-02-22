@@ -12,6 +12,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 
 @RequiredArgsConstructor
 @EnableCaching
@@ -31,5 +32,10 @@ public class RedisCachingConfiguration {
                 .fromConnectionFactory(redisConnectionFactory)
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
+    }
+
+    @Bean
+    public DateTimeFormatter dateFormatter() {
+        return DateTimeFormatter.ofPattern("yy.MM.dd");
     }
 }

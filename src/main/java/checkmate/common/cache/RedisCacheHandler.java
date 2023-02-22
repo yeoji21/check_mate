@@ -19,8 +19,8 @@ public class RedisCacheHandler implements CacheHandler {
                 .map(TeamMate::getUserId)
                 .collect(Collectors.toList());
 
-        redisTemplate.delete(CacheKey.getRedisKeyList(CacheKey.ONGOING_GOALS, eliminatorUserIds));
-        redisTemplate.delete(CacheKey.getRedisKeyList(CacheKey.TODAY_GOALS, eliminatorUserIds));
-        redisTemplate.delete(CacheKey.getRedisKeyList(CacheKey.HISTORY_GOALS, eliminatorUserIds));
+        redisTemplate.delete(CacheKey.ongoingGoalsKeys(eliminatorUserIds));
+        redisTemplate.delete(CacheKey.todayGoalsKeys(eliminatorUserIds));
+        redisTemplate.delete(CacheKey.historyGoalsKeys(eliminatorUserIds));
     }
 }
