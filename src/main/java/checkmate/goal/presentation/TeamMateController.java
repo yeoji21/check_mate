@@ -38,7 +38,10 @@ public class TeamMateController {
         return teamMateQueryService.findGoalDetailResult(goalId, details.getUserId());
     }
 
-    @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#details.userId}")
+    @Cacheable(
+            value = CacheKey.HISTORY_GOALS,
+            key = "{#details.userId}"
+    )
     @GetMapping("/goal/history")
     public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
         return teamMateQueryService.findHistoryGoalInfo(details.getUserId());
@@ -54,10 +57,10 @@ public class TeamMateController {
     @Caching(evict = {
             @CacheEvict(
                     value = CacheKey.ONGOING_GOALS,
-                    key = "{#principal.userId, T(java.time.LocalDate).now()}"),
+                    key = "{#principal.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
             @CacheEvict(value =
                     CacheKey.TODAY_GOALS,
-                    key = "{#principal.userId, T(java.time.LocalDate).now()}")
+                    key = "{#principal.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @PatchMapping("/mate/accept")
     public TeamMateAcceptResult inviteAccept(@RequestBody TeamMateInviteReplyDto dto,

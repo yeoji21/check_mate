@@ -24,7 +24,10 @@ public class PostController {
     private final PostQueryService postQueryService;
     private final PostDtoMapper postDtoMapper;
 
-    @CacheEvict(value = CacheKey.TODAY_GOALS, key = "{#principal.userId, T(java.time.LocalDate).now()}")
+    @CacheEvict(
+            value = CacheKey.TODAY_GOALS,
+            key = "{#principal.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
+    )
     @PostMapping("/post")
     public long uploadPost(@ModelAttribute PostUploadDto dto,
                            @AuthenticationPrincipal JwtUserDetails principal) {

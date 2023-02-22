@@ -36,10 +36,10 @@ public class GoalController {
     @Caching(evict = {
             @CacheEvict(
                     value = CacheKey.ONGOING_GOALS,
-                    key = "{#details.userId, T(java.time.LocalDate).now()}"),
+                    key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
             @CacheEvict(
                     value = CacheKey.TODAY_GOALS,
-                    key = "{#details.userId, T(java.time.LocalDate).now()}")
+                    key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @PostMapping("/goal")
     public long create(@RequestBody @Valid GoalCreateDto dto,
@@ -55,8 +55,11 @@ public class GoalController {
         goalCommandService.addLikeCountCondition(command);
     }
 
+    @CacheEvict(
+            value = CacheKey.GOAL_PERIOD,
+            key = "{#goalId}"
+    )
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
-    @CacheEvict(value = CacheKey.GOAL_PERIOD, key = "{#goalId}")
     @PatchMapping("/goal/{goalId}")
     public void goalModify(@PathVariable long goalId,
                            @RequestBody GoalModifyDto dto,
@@ -70,19 +73,28 @@ public class GoalController {
         return goalQueryService.findGoalDetail(goalId, userDetails.getUserId());
     }
 
-    @Cacheable(value = CacheKey.GOAL_PERIOD, key = "{#goalId}")
+    @Cacheable(
+            value = CacheKey.GOAL_PERIOD,
+            key = "{#goalId}"
+    )
     @GetMapping("/goal/{goalId}/period")
     public GoalScheduleInfo goalPeriodFind(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
-    @Cacheable(value = CacheKey.ONGOING_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
+    @Cacheable(
+            value = CacheKey.ONGOING_GOALS,
+            key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
+    )
     @GetMapping("/goal/ongoing")
     public GoalSimpleInfoResult ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findOngoingSimpleInfo(details.getUserId());
     }
 
-    @Cacheable(value = CacheKey.TODAY_GOALS, key = "{#details.userId, T(java.time.LocalDate).now()}")
+    @Cacheable(
+            value = CacheKey.TODAY_GOALS,
+            key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
+    )
     @GetMapping("/goal/today")
     public TodayGoalInfoResult todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());
