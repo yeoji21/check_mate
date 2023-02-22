@@ -1,6 +1,5 @@
 package checkmate.goal.presentation;
 
-import checkmate.common.cache.CacheKey;
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
@@ -15,9 +14,6 @@ import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
 import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,10 +34,6 @@ public class TeamMateController {
         return teamMateQueryService.findGoalDetailResult(goalId, details.getUserId());
     }
 
-    @Cacheable(
-            value = CacheKey.HISTORY_GOALS,
-            key = "{#details.userId}"
-    )
     @GetMapping("/goal/history")
     public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
         return teamMateQueryService.findHistoryGoalInfo(details.getUserId());
@@ -54,14 +46,6 @@ public class TeamMateController {
         teamMateCommandService.inviteTeamMate(mapper.toCommand(inviteDto, principal.getUserId()));
     }
 
-    @Caching(evict = {
-            @CacheEvict(
-                    value = CacheKey.ONGOING_GOALS,
-                    key = "{#principal.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
-            @CacheEvict(value =
-                    CacheKey.TODAY_GOALS,
-                    key = "{#principal.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
-    })
     @PatchMapping("/mate/accept")
     public TeamMateAcceptResult inviteAccept(@RequestBody TeamMateInviteReplyDto dto,
                                              @AuthenticationPrincipal JwtUserDetails principal) {

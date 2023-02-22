@@ -1,6 +1,7 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheHandler;
+import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.TeamMateCommandMapper;
@@ -21,6 +22,8 @@ import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,6 +54,14 @@ public class TeamMateCommandService {
                 getInviteGoalNotificationDto(command, invitee.getUserId())));
     }
 
+    @Caching(evict = {
+            @CacheEvict(
+                    value = CacheKey.ONGOING_GOALS,
+                    key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
+            @CacheEvict(value =
+                    CacheKey.TODAY_GOALS,
+                    key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
+    })
     @Transactional
     public TeamMateAcceptResult inviteAccept(TeamMateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());

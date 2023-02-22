@@ -1,6 +1,5 @@
 package checkmate.post.presentation;
 
-import checkmate.common.cache.CacheKey;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.post.application.PostCommandService;
 import checkmate.post.application.PostQueryService;
@@ -10,7 +9,6 @@ import checkmate.post.presentation.dto.PostDtoMapper;
 import checkmate.post.presentation.dto.PostUploadDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +22,12 @@ public class PostController {
     private final PostQueryService postQueryService;
     private final PostDtoMapper postDtoMapper;
 
-    @CacheEvict(
-            value = CacheKey.TODAY_GOALS,
-            key = "{#principal.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
-    )
     @PostMapping("/post")
     public long uploadPost(@ModelAttribute PostUploadDto dto,
                            @AuthenticationPrincipal JwtUserDetails principal) {
         if (dto.getImages() == null && dto.getContent() == null)
             throw new IllegalArgumentException("빈 목표인증 요청");
-        return postCommandService.upload(postDtoMapper.toCommand(dto));
+        return postCommandService.upload(postDtoMapper.toCommand(dto, principal.getUserId()));
     }
 
     @GetMapping("/post")

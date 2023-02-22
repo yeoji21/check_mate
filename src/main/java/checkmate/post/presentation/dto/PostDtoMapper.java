@@ -8,5 +8,5 @@ import org.mapstruct.factory.Mappers;
 public interface PostDtoMapper {
     PostDtoMapper INSTANCE = Mappers.getMapper(PostDtoMapper.class);
 
-    PostUploadCommand toCommand(PostUploadDto dto);
+    PostUploadCommand toCommand(PostUploadDto dto, long userId);
 }

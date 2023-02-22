@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -38,13 +39,14 @@ class PostControllerTest extends ControllerTest {
         MockMultipartFile firstFile = getMockMultipartFile("imageFile1");
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
         PostUploadCommand command = PostUploadCommand.builder()
-                .teamMateId(1L)
+                .userId(1L)
+                .teamMateId(2L)
                 .content("~~~")
                 .images(List.of(new MockMultipartFile("file1", new byte[10]),
                         new MockMultipartFile("file1", new byte[10])))
                 .build();
 
-        given(postDtoMapper.toCommand(any())).willReturn(command);
+        given(postDtoMapper.toCommand(any(), anyLong())).willReturn(command);
         given(postCommandService.upload(any(PostUploadCommand.class))).willReturn(1L);
 
         mockMvc.perform(fileUpload("/post")

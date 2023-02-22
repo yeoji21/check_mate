@@ -1,7 +1,10 @@
 package checkmate.post.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.domain.TeamMate;
+import checkmate.goal.domain.TeamMateRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.post.application.dto.request.PostUploadCommand;
 import checkmate.post.domain.Likes;
@@ -30,15 +33,21 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class PostCommandServiceTest {
-    @InjectMocks private PostCommandService postCommandService;
-    @Mock private PostRepository postRepository;
-    @Mock private UserRepository userRepository;
-    @Mock private GoalRepository goalRepository;
-    @Mock private TeamMateRepository teamMateRepository;
-    @Mock private ApplicationEventPublisher eventPublisher;
+    @InjectMocks
+    private PostCommandService postCommandService;
+    @Mock
+    private PostRepository postRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private GoalRepository goalRepository;
+    @Mock
+    private TeamMateRepository teamMateRepository;
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
 
     @Test
-    void 목표인증_저장_테스트() throws Exception{
+    void 목표인증_저장_테스트() throws Exception {
         //given
         PostUploadCommand dto = getPostRegisterDto();
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
@@ -57,7 +66,7 @@ class PostCommandServiceTest {
     }
 
     @Test
-    void 좋아요_테스트() throws Exception{
+    void 좋아요_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
@@ -76,7 +85,7 @@ class PostCommandServiceTest {
     }
 
     @Test
-    void 좋아요_취소_테스트() throws Exception{
+    void 좋아요_취소_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
@@ -97,6 +106,7 @@ class PostCommandServiceTest {
 
     private PostUploadCommand getPostRegisterDto() throws IOException {
         return new PostUploadCommand(1L,
+                2L,
                 List.of(new MockMultipartFile("originalName", InputStream.nullInputStream())),
                 "posting content");
     }

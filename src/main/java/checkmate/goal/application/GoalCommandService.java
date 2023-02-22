@@ -1,6 +1,7 @@
 package checkmate.goal.application;
 
 import checkmate.common.cache.CacheHandler;
+import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.GoalCommandMapper;
@@ -14,6 +15,8 @@ import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +38,14 @@ public class GoalCommandService {
     private final CacheHandler cacheHandler;
     private final GoalCommandMapper mapper;
 
+    @Caching(evict = {
+            @CacheEvict(
+                    value = CacheKey.ONGOING_GOALS,
+                    key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
+            @CacheEvict(
+                    value = CacheKey.TODAY_GOALS,
+                    key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
+    })
     @Transactional
     public long create(GoalCreateCommand command) {
         Goal goal = goalRepository.save(mapper.toEntity(command));
@@ -42,6 +53,7 @@ public class GoalCommandService {
         return goal.getId();
     }
 
+    @CacheEvict(value = CacheKey.GOAL_PERIOD, key = "{#command.goalId}")
     @Transactional
     public void modifyGoal(GoalModifyCommand command) {
         Goal goal = findGoalForUpdate(command.goalId());

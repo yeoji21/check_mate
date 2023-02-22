@@ -1,5 +1,6 @@
 package checkmate.goal.application;
 
+import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
@@ -9,6 +10,7 @@ import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +47,7 @@ public class TeamMateQueryService {
                 teamMateQueryDao.findTeamMateInfo(goalId));
     }
 
+    @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
     public GoalHistoryInfoResult findHistoryGoalInfo(long userId) {
         List<TeamMate> successTeamMates = teamMateQueryDao.findSuccessTeamMates(userId);

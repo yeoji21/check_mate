@@ -1,5 +1,6 @@
 package checkmate.post.application;
 
+import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
@@ -19,6 +20,7 @@ import checkmate.user.domain.UserRepository;
 import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +41,10 @@ public class PostCommandService {
     private final TeamMateRepository teamMateRepository;
     private final ApplicationEventPublisher eventPublisher;
 
+    @CacheEvict(
+            value = CacheKey.TODAY_GOALS,
+            key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
+    )
     @Transactional
     public Long upload(PostUploadCommand command) {
         TeamMate uploader = findTeamMate(command.teamMateId());
@@ -64,6 +70,7 @@ public class PostCommandService {
         verifyGoalConditions(goalId, post);
     }
 
+    // TODO: 2023/02/23 공통 관심사
     private void verifyGoalConditions(Long goalId, Post post) {
         Goal goal = goalRepository.findWithConditions(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));

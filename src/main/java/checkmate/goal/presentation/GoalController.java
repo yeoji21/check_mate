@@ -1,6 +1,5 @@
 package checkmate.goal.presentation;
 
-import checkmate.common.cache.CacheKey;
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
@@ -17,9 +16,6 @@ import checkmate.goal.presentation.dto.request.GoalModifyDto;
 import checkmate.goal.presentation.dto.request.LikeCountCreateDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,14 +29,6 @@ public class GoalController {
     private final GoalQueryService goalQueryService;
     private final GoalDtoMapper mapper;
 
-    @Caching(evict = {
-            @CacheEvict(
-                    value = CacheKey.ONGOING_GOALS,
-                    key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
-            @CacheEvict(
-                    value = CacheKey.TODAY_GOALS,
-                    key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
-    })
     @PostMapping("/goal")
     public long create(@RequestBody @Valid GoalCreateDto dto,
                        @AuthenticationPrincipal JwtUserDetails details) {
@@ -55,10 +43,6 @@ public class GoalController {
         goalCommandService.addLikeCountCondition(command);
     }
 
-    @CacheEvict(
-            value = CacheKey.GOAL_PERIOD,
-            key = "{#goalId}"
-    )
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
     @PatchMapping("/goal/{goalId}")
     public void goalModify(@PathVariable long goalId,
@@ -73,28 +57,16 @@ public class GoalController {
         return goalQueryService.findGoalDetail(goalId, userDetails.getUserId());
     }
 
-    @Cacheable(
-            value = CacheKey.GOAL_PERIOD,
-            key = "{#goalId}"
-    )
     @GetMapping("/goal/{goalId}/period")
     public GoalScheduleInfo goalPeriodFind(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
-    @Cacheable(
-            value = CacheKey.ONGOING_GOALS,
-            key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
-    )
     @GetMapping("/goal/ongoing")
     public GoalSimpleInfoResult ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findOngoingSimpleInfo(details.getUserId());
     }
 
-    @Cacheable(
-            value = CacheKey.TODAY_GOALS,
-            key = "{#details.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
-    )
     @GetMapping("/goal/today")
     public TodayGoalInfoResult todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());
