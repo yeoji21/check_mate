@@ -6,8 +6,8 @@ import checkmate.config.WithMockAuthUser;
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
-import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
-import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import checkmate.mate.presentation.dto.MateInviteDto;
+import checkmate.mate.presentation.dto.MateInviteReplyDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -31,7 +31,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class TeamMateControllerTest extends ControllerTest {
+class MateControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
@@ -60,7 +60,7 @@ class TeamMateControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 팀원_초대_테스트() throws Exception {
-        TeamMateInviteDto request = new TeamMateInviteDto(1L, "yeoz1");
+        MateInviteDto request = new MateInviteDto(1L, "yeoz1");
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/mate")
                         .with(csrf())
@@ -74,7 +74,7 @@ class TeamMateControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 초대_응답_수락() throws Exception {
-        TeamMateInviteReplyDto dto = new TeamMateInviteReplyDto(1L);
+        MateInviteReplyDto dto = new MateInviteReplyDto(1L);
         TeamMateAcceptResult result = new TeamMateAcceptResult(1L, 1L);
 
         given(teamMateCommandService.inviteAccept(any())).willReturn(result);
@@ -99,7 +99,7 @@ class TeamMateControllerTest extends ControllerTest {
     @Test
     @DisplayName("초대 응답 거절")
     void inviteReject() throws Exception {
-        TeamMateInviteReplyDto request = new TeamMateInviteReplyDto(1L);
+        MateInviteReplyDto request = new MateInviteReplyDto(1L);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/reject")
                         .with(csrf())

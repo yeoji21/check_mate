@@ -1,4 +1,4 @@
-package checkmate.goal.presentation;
+package checkmate.mate.presentation;
 
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
@@ -9,9 +9,9 @@ import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
 import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.presentation.dto.TeamMateDtoMapper;
-import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
-import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import checkmate.mate.presentation.dto.MateDtoMapper;
+import checkmate.mate.presentation.dto.MateInviteDto;
+import checkmate.mate.presentation.dto.MateInviteReplyDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,10 +22,10 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-public class TeamMateController {
+public class MateController {
     private final TeamMateCommandService teamMateCommandService;
     private final TeamMateQueryService teamMateQueryService;
-    private final TeamMateDtoMapper mapper;
+    private final MateDtoMapper mapper;
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
     @GetMapping("/goal/detail/{goalId}")
@@ -41,19 +41,19 @@ public class TeamMateController {
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)
     @PostMapping("/mate")
-    public void inviteToGoal(@RequestBody @Valid TeamMateInviteDto inviteDto,
+    public void inviteToGoal(@RequestBody @Valid MateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
         teamMateCommandService.inviteTeamMate(mapper.toCommand(inviteDto, principal.getUserId()));
     }
 
     @PatchMapping("/mate/accept")
-    public TeamMateAcceptResult inviteAccept(@RequestBody TeamMateInviteReplyDto dto,
+    public TeamMateAcceptResult inviteAccept(@RequestBody MateInviteReplyDto dto,
                                              @AuthenticationPrincipal JwtUserDetails principal) {
         return teamMateCommandService.inviteAccept(mapper.toCommand(dto, principal.getUserId()));
     }
 
     @PatchMapping("/mate/reject")
-    public void inviteReject(@RequestBody TeamMateInviteReplyDto dto,
+    public void inviteReject(@RequestBody MateInviteReplyDto dto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
         teamMateCommandService.inviteReject(mapper.toCommand(dto, principal.getUserId()));
     }

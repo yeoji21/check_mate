@@ -3,7 +3,7 @@ package checkmate;
 import checkmate.config.WebSecurityConfig;
 import checkmate.config.WithMockAuthUser;
 import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.presentation.dto.request.GoalCreateDto;
+import checkmate.goal.presentation.dto.GoalCreateDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
@@ -31,8 +31,10 @@ import static io.restassured.RestAssured.given;
 @Transactional
 @Disabled
 public class GoalIntegrationTest {
-    @LocalServerPort private int port;
-    @Autowired private ObjectMapper objectMapper;
+    @LocalServerPort
+    private int port;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
@@ -40,17 +42,18 @@ public class GoalIntegrationTest {
         RestAssured.defaultParser = Parser.JSON;
     }
 
-    @Test @WithMockAuthUser
-    void test() throws Exception{
+    @Test
+    @WithMockAuthUser
+    void test() throws Exception {
         //given
 
         //when
         given()
                 .accept(ContentType.JSON)
                 .contentType(ContentType.JSON)
-        .when()
+                .when()
                 .get("/test")
-        .then()
+                .then()
                 .log().body()
                 .statusCode(HttpStatus.OK.value());
 
@@ -72,9 +75,9 @@ public class GoalIntegrationTest {
                 .accept(ContentType.JSON)
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(request))
-        .when()
+                .when()
                 .post("/goal")
-        .then()
+                .then()
                 .log().body()
                 .statusCode(HttpStatus.OK.value());
 

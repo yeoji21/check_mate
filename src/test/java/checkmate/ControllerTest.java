@@ -6,9 +6,9 @@ import checkmate.goal.application.GoalQueryService;
 import checkmate.goal.application.TeamMateCommandService;
 import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.presentation.GoalController;
-import checkmate.goal.presentation.TeamMateController;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
-import checkmate.goal.presentation.dto.TeamMateDtoMapper;
+import checkmate.mate.presentation.MateController;
+import checkmate.mate.presentation.dto.MateDtoMapper;
 import checkmate.notification.application.NotificationQueryService;
 import checkmate.notification.presentation.NotificationController;
 import checkmate.notification.presentation.dto.NotificationDtoMapper;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @WebMvcTest({
         ErrorCodeController.class,
         GoalController.class,
-        TeamMateController.class,
+        MateController.class,
         NotificationController.class,
         PostController.class,
         LoginController.class,
@@ -82,7 +82,7 @@ public abstract class ControllerTest {
     @MockBean
     protected GoalDtoMapper goalDtoMapper;
     @MockBean
-    protected TeamMateDtoMapper teamMateDtoMapper;
+    protected MateDtoMapper mateDtoMapper;
     @MockBean
     protected PostDtoMapper postDtoMapper;
     @MockBean

@@ -3,17 +3,18 @@ package checkmate.goal.presentation.dto;
 import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.TeamMateInviteCommand;
 import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
-import checkmate.goal.presentation.dto.request.TeamMateInviteDto;
-import checkmate.goal.presentation.dto.request.TeamMateInviteReplyDto;
+import checkmate.mate.presentation.dto.MateDtoMapper;
+import checkmate.mate.presentation.dto.MateInviteDto;
+import checkmate.mate.presentation.dto.MateInviteReplyDto;
 import org.junit.jupiter.api.Test;
 
-class TeamMateDtoMapperTest extends MapperTest {
-    private static final TeamMateDtoMapper mapper = TeamMateDtoMapper.INSTANCE;
+class MateDtoMapperTest extends MapperTest {
+    private static final MateDtoMapper mapper = MateDtoMapper.INSTANCE;
 
     @Test
-    void teamMateInviteCommand() throws Exception{
+    void teamMateInviteCommand() throws Exception {
         //given
-        TeamMateInviteDto dto = new TeamMateInviteDto(1L, "nickname");
+        MateInviteDto dto = new MateInviteDto(1L, "nickname");
         long inviterUserId = 2L;
 
         //when
@@ -26,9 +27,9 @@ class TeamMateDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void teamMateInviteReplyCommand() throws Exception{
+    void teamMateInviteReplyCommand() throws Exception {
         //given
-        TeamMateInviteReplyDto dto = new TeamMateInviteReplyDto(1L);
+        MateInviteReplyDto dto = new MateInviteReplyDto(1L);
         long userId = 2L;
 
         //when

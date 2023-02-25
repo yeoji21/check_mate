@@ -1,4 +1,4 @@
-package checkmate.goal.presentation.dto.request;
+package checkmate.goal.presentation.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

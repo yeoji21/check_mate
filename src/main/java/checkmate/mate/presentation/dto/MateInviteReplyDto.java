@@ -1,14 +1,14 @@
-package checkmate.goal.presentation.dto.request;
+package checkmate.mate.presentation.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TeamMateInviteReplyDto {
+public class MateInviteReplyDto {
     private long notificationId;
 
-    public TeamMateInviteReplyDto(long notificationId) {
+    public MateInviteReplyDto(long notificationId) {
         this.notificationId = notificationId;
     }
 }
