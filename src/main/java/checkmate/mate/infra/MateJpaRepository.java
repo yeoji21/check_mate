@@ -1,4 +1,4 @@
-package checkmate.goal.infrastructure;
+package checkmate.mate.infra;
 
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.mate.domain.Mate;
@@ -25,7 +25,7 @@ public class MateJpaRepository implements MateRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Optional<Mate> findTeamMateWithGoal(long mateId) {
+    public Optional<Mate> findMateWithGoal(long mateId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(mate)
@@ -35,7 +35,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public Optional<Mate> findTeamMateWithGoal(long goalId, long userId) {
+    public Optional<Mate> findMateWithGoal(long goalId, long userId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(mate)
@@ -47,7 +47,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Mate> updateYesterdayHookyTMs() {
+    public List<Mate> updateYesterdayHookyMates() {
         // bit
 //        List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
 //                        "select tm.* from team_mate as tm" +
@@ -86,7 +86,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Mate> eliminateOveredTMs(List<Mate> hookyTMs) {
+    public List<Mate> eliminateOveredMates(List<Mate> hookyTMs) {
         // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
         List<Mate> eliminators = hookyTMs.stream()
                 .filter(tm -> tm.getHookyDays() >= tm.getGoal().getHookyDayLimit())
@@ -101,7 +101,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Long> findTeamMateUserIds(Long goalId) {
+    public List<Long> findMateUserIds(Long goalId) {
         return queryFactory
                 .select(mate.userId)
                 .from(mate)
@@ -111,7 +111,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Mate> findTeamMates(List<Long> goalIds) {
+    public List<Mate> findMateInGoals(List<Long> goalIds) {
         return queryFactory.select(mate)
                 .from(mate)
                 .where(mate.goal.id.in(goalIds))
@@ -119,7 +119,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public boolean isExistTeamMate(long goalId, long userId) {
+    public boolean isExistMate(long goalId, long userId) {
         Long teamMateId = queryFactory.select(mate.id)
                 .from(mate)
                 .where(mate.goal.id.eq(goalId),

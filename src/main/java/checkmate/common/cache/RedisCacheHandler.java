@@ -14,7 +14,7 @@ public class RedisCacheHandler implements CacheHandler {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public void deleteTeamMateCaches(List<Mate> mates) {
+    public void deleteMateCaches(List<Mate> mates) {
         List<Long> eliminatorUserIds = mates.stream()
                 .map(Mate::getUserId)
                 .collect(Collectors.toList());

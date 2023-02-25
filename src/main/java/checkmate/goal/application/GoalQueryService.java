@@ -7,7 +7,7 @@ import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.GoalSimpleInfoResult;
 import checkmate.goal.application.dto.response.TodayGoalInfoResult;
-import checkmate.goal.infrastructure.GoalQueryDao;
+import checkmate.goal.infra.GoalQueryDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;

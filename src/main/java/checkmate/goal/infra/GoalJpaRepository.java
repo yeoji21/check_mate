@@ -1,4 +1,4 @@
-package checkmate.goal.infrastructure;
+package checkmate.goal.infra;
 
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;

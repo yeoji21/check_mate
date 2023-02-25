@@ -68,7 +68,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
-        given(mateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -87,7 +87,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_BODY);
-        given(mateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -107,7 +107,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.PATH_VARIABLE);
-        given(mateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);

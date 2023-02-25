@@ -1,4 +1,4 @@
-package checkmate.goal.infrastructure;
+package checkmate.goal.infra;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
@@ -34,7 +34,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        boolean existTeamMate = mateRepository.isExistTeamMate(goal.getId(), user.getId());
+        boolean existTeamMate = mateRepository.isExistMate(goal.getId(), user.getId());
 
         //then
         assertThat(existTeamMate).isTrue();
@@ -55,7 +55,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        boolean existTeamMate = mateRepository.isExistTeamMate(goal.getId(), user.getId());
+        boolean existTeamMate = mateRepository.isExistMate(goal.getId(), user.getId());
 
         //then
         assertThat(existTeamMate).isFalse();
@@ -71,7 +71,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        boolean existTeamMate = mateRepository.isExistTeamMate(goal.getId(), 22L);
+        boolean existTeamMate = mateRepository.isExistMate(goal.getId(), 22L);
 
         //then
         assertThat(existTeamMate).isFalse();
@@ -92,8 +92,8 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Mate findMate = mateRepository.findTeamMateWithGoal(mate.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, mate.getId()));
+        Mate findMate = mateRepository.findMateWithGoal(mate.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()));
 
         //then
         assertThat(findMate.getGoal().getId()).isEqualTo(goal.getId());
@@ -147,7 +147,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        List<Mate> hookyMates = mateRepository.updateYesterdayHookyTMs();
+        List<Mate> hookyMates = mateRepository.updateYesterdayHookyMates();
 
         //then
         assertThat(hookyMates.size()).isEqualTo(2);
@@ -193,7 +193,7 @@ class MateRepositoryTest extends RepositoryTest {
                 .execute();
 
         //when
-        List<Mate> eliminators = mateRepository.eliminateOveredTMs(queryFactory.selectFrom(mate).fetch());
+        List<Mate> eliminators = mateRepository.eliminateOveredMates(queryFactory.selectFrom(mate).fetch());
 
         //then
         assertThat(eliminators.size()).isEqualTo(2);

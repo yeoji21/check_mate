@@ -78,8 +78,8 @@ public class PostCommandService {
     }
 
     private long validateUserInGoal(long userId, Post post) {
-        return mateRepository.findTeamMateWithGoal(post.getMate().getGoal().getId(), userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, post.getMate().getId()))
+        return mateRepository.findMateWithGoal(post.getMate().getGoal().getId(), userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, post.getMate().getId()))
                 .getGoal()
                 .getId();
     }
@@ -97,7 +97,7 @@ public class PostCommandService {
     }
 
     private List<Long> getTeamMateUserIds(Mate uploader) {
-        return mateRepository.findTeamMateUserIds(uploader.getGoal().getId())
+        return mateRepository.findMateUserIds(uploader.getGoal().getId())
                 .stream()
                 .filter(userId -> !userId.equals(uploader.getUserId()))
                 .collect(Collectors.toList());
@@ -133,7 +133,7 @@ public class PostCommandService {
     }
 
     private Mate findTeamMate(long teamMateId) {
-        return mateRepository.findTeamMateWithGoal(teamMateId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMateId));
+        return mateRepository.findMateWithGoal(teamMateId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, teamMateId));
     }
 }

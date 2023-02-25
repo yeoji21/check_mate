@@ -3,13 +3,9 @@ package checkmate.goal.presentation;
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
-import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
-import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
 import checkmate.goal.domain.Goal;
-import checkmate.mate.application.dto.response.MateAcceptResult;
-import checkmate.mate.application.dto.response.MateScheduleInfo;
-import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.application.dto.response.*;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
@@ -38,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class MateControllerTest extends ControllerTest {
 
+    @DisplayName("목표 상세 정보")
     @WithMockAuthUser
     @Test
     void goalDetailResultFind() throws Exception {
@@ -73,7 +70,7 @@ class MateControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(document("invite-team mate", getInviteTeamMateRequest()));
-        verify(mateCommandService).inviteTeamMate(any());
+        verify(mateCommandService).inviteMate(any());
     }
 
     @WithMockAuthUser
@@ -201,7 +198,7 @@ class MateControllerTest extends ControllerTest {
     private ResponseFieldsSnippet goalDetailResultResponseFieldsSnippet() {
         return responseFields(
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("ID 값"),
-                fieldWithPath("teamMates").description("목표에 속한 팀원들"),
+                fieldWithPath("mates").description("목표에 속한 팀원들"),
                 fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
                 fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
                 fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
@@ -210,16 +207,16 @@ class MateControllerTest extends ControllerTest {
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
                 fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("teamMates[].mateId").description("팀메이트 id"),
-                fieldWithPath("teamMates[].userId").description("유저 id"),
-                fieldWithPath("teamMates[].nickname").description("유저의 닉네임"),
-                fieldWithPath("teamMates[].uploaded").description("이미 업로드했는지"),
+                fieldWithPath("mates[].mateId").description("팀메이트 id"),
+                fieldWithPath("mates[].userId").description("유저 id"),
+                fieldWithPath("mates[].nickname").description("유저의 닉네임"),
+                fieldWithPath("mates[].uploaded").description("이미 업로드했는지"),
                 fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 업로드했는지"),
                 fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 업로드할 수 있는지"),
                 fieldWithPath("uploadable.workingDay").description("업로드하는 날이 맞는지"),
                 fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지"),
                 fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
-                fieldWithPath("teamMateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
+                fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
                 fieldWithPath("progress").type(JsonFieldType.NUMBER).description("팀원의 목표 수행 진행률")
         );
     }

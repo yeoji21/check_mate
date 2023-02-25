@@ -33,7 +33,7 @@ public enum ErrorCode {
     GOAL_NOT_FOUND(GoalCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 목표"),
     POST_NOT_FOUND(PostCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 게시글"),
     IMAGE_NOT_FOUND(PostCode.IMAGE_NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 이미지"),
-    TEAM_MATE_NOT_FOUND(TeamMateCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 팀원"),
+    MATE_NOT_FOUND(TeamMateCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 팀원"),
     NOTIFICATION_NOT_FOUND(NotificationCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 알림"),
     REFRESH_TOKEN_NOT_FOUND(TokenCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 토큰"),
 

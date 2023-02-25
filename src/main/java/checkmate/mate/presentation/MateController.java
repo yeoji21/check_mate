@@ -3,10 +3,10 @@ package checkmate.mate.presentation;
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.goal.application.dto.response.GoalDetailResult;
-import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
 import checkmate.mate.application.MateCommandService;
 import checkmate.mate.application.MateQueryService;
+import checkmate.mate.application.dto.response.GoalDetailResult;
+import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.presentation.dto.MateDtoMapper;
@@ -43,7 +43,7 @@ public class MateController {
     @PostMapping("/mate")
     public void inviteToGoal(@RequestBody @Valid MateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
-        mateCommandService.inviteTeamMate(mapper.toCommand(inviteDto, principal.getUserId()));
+        mateCommandService.inviteMate(mapper.toCommand(inviteDto, principal.getUserId()));
     }
 
     @PatchMapping("/mate/accept")
@@ -58,13 +58,13 @@ public class MateController {
         mateCommandService.inviteReject(mapper.toCommand(dto, principal.getUserId()));
     }
 
-    @GetMapping("/mate/{teamMateId}/calendar")
-    public MateScheduleInfo teamMateGoalCalender(@PathVariable long teamMateId) {
-        return mateQueryService.getCalenderInfo(teamMateId);
+    @GetMapping("/mate/{mateId}/calendar")
+    public MateScheduleInfo teamMateGoalCalender(@PathVariable long mateId) {
+        return mateQueryService.getCalenderInfo(mateId);
     }
 
-    @GetMapping("/mate/{teamMateId}/progress")
-    public double progressPercent(@PathVariable Long teamMateId) {
-        return mateQueryService.getProgressPercent(teamMateId);
+    @GetMapping("/mate/{mateId}/progress")
+    public double progressPercent(@PathVariable Long mateId) {
+        return mateQueryService.getProgressPercent(mateId);
     }
 }

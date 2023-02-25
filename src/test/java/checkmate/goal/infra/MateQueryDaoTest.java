@@ -1,4 +1,4 @@
-package checkmate.goal.infrastructure;
+package checkmate.goal.infra;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
@@ -35,7 +35,7 @@ class MateQueryDaoTest extends RepositoryTest {
         em.persist(post);
 
         //when
-        MateScheduleInfo info = teamMateQueryDao.getTeamMateCalendar(mate.getId())
+        MateScheduleInfo info = mateQueryDao.getMateCalendar(mate.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
@@ -61,7 +61,7 @@ class MateQueryDaoTest extends RepositoryTest {
         em.persist(todayPost);
 
         //when
-        List<LocalDate> uploadedDates = teamMateQueryDao.findUploadedDates(mate.getId());
+        List<LocalDate> uploadedDates = mateQueryDao.findUploadedDates(mate.getId());
 
         //then
         assertThat(uploadedDates.size()).isEqualTo(2);
@@ -83,7 +83,7 @@ class MateQueryDaoTest extends RepositoryTest {
         }
 
         //when
-        List<MateUploadInfo> uploadInfos = teamMateQueryDao.findTeamMateInfo(goal.getId());
+        List<MateUploadInfo> uploadInfos = mateQueryDao.findMateInfo(goal.getId());
 
         //then
         assertThat(uploadInfos.size()).isEqualTo(10);
@@ -96,7 +96,7 @@ class MateQueryDaoTest extends RepositoryTest {
         User user = setSuccessedTeamMates();
 
         //when
-        List<Mate> successMates = teamMateQueryDao.findSuccessTeamMates(user.getId());
+        List<Mate> successMates = mateQueryDao.findSuccessMates(user.getId());
 
         //then
         assertThat(successMates.size()).isEqualTo(2);
@@ -126,7 +126,7 @@ class MateQueryDaoTest extends RepositoryTest {
         em.clear();
 
         //when
-        Map<Long, List<String>> teamMateNicknames = teamMateQueryDao.findTeamMateNicknames(goalIds);
+        Map<Long, List<String>> teamMateNicknames = mateQueryDao.findMateNicknames(goalIds);
 
         //then
         assertThat(teamMateNicknames.keySet().size()).isEqualTo(3);

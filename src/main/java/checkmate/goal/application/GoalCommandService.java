@@ -81,13 +81,13 @@ public class GoalCommandService {
     @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
-        List<Mate> mates = mateRepository.findTeamMates(overedGoalIds)
+        List<Mate> mates = mateRepository.findMateInGoals(overedGoalIds)
                 .stream()
                 .filter(tm -> tm.getStatus() == MateStatus.ONGOING)
                 .toList();
 
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toDtos(mates)));
-        cacheHandler.deleteTeamMateCaches(mates);
+        cacheHandler.deleteMateCaches(mates);
     }
 
     private List<CompleteGoalNotificationDto> toDtos(List<Mate> mates) {

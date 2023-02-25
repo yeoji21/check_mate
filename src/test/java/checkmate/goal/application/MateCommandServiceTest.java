@@ -76,11 +76,11 @@ public class MateCommandServiceTest {
 
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
-        given(mateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(inviter.getNickname()));
 
         //when
-        mateCommandService.inviteTeamMate(command);
+        mateCommandService.inviteMate(command);
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.WAITING);
@@ -101,7 +101,7 @@ public class MateCommandServiceTest {
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
-        given(mateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
         doAnswer((invocation) -> {
             Mate argument = (Mate) invocation.getArgument(0);
@@ -132,7 +132,7 @@ public class MateCommandServiceTest {
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
-        given(mateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
 
         //when
@@ -150,14 +150,14 @@ public class MateCommandServiceTest {
     void updateHookyTeamMate() throws Exception {
         //given
         List<Mate> hookyMates = getHookyTeamMates();
-        given(mateRepository.updateYesterdayHookyTMs()).willReturn(hookyMates);
-        given(mateRepository.eliminateOveredTMs(hookyMates)).willReturn(Collections.EMPTY_LIST);
+        given(mateRepository.updateYesterdayHookyMates()).willReturn(hookyMates);
+        given(mateRepository.eliminateOveredMates(hookyMates)).willReturn(Collections.EMPTY_LIST);
 
         //when
         mateCommandService.updateHookyTeamMate();
 
         //then
-        verify(cacheHandler).deleteTeamMateCaches(any(List.class));
+        verify(cacheHandler).deleteMateCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
 

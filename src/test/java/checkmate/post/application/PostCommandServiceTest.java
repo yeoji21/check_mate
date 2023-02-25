@@ -53,7 +53,7 @@ class PostCommandServiceTest {
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
 
-        given(mateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
+        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "tester")));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
@@ -74,7 +74,7 @@ class PostCommandServiceTest {
         ReflectionTestUtils.setField(post, "id", 1L);
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(mateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
+        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
@@ -94,7 +94,7 @@ class PostCommandServiceTest {
         post.addLikes(new Likes(mate.getUserId()));
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(mateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
+        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when

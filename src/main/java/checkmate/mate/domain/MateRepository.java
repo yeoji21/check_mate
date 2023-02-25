@@ -4,19 +4,19 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MateRepository {
-    Optional<Mate> findTeamMateWithGoal(long teamMateId);
+    Optional<Mate> findMateWithGoal(long mateId);
 
-    Optional<Mate> findTeamMateWithGoal(long goalId, long userId);
+    Optional<Mate> findMateWithGoal(long goalId, long userId);
 
-    List<Mate> updateYesterdayHookyTMs();
+    List<Mate> updateYesterdayHookyMates();
 
-    List<Mate> eliminateOveredTMs(List<Mate> hookyTMs);
+    List<Mate> eliminateOveredMates(List<Mate> hookyTMs);
 
-    List<Long> findTeamMateUserIds(Long goalId);
+    List<Long> findMateUserIds(Long goalId);
 
-    List<Mate> findTeamMates(List<Long> goalIds);
+    List<Mate> findMateInGoals(List<Long> goalIds);
 
-    boolean isExistTeamMate(long goalId, long userId);
+    boolean isExistMate(long goalId, long userId);
 
     Mate save(Mate mate);
 }

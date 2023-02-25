@@ -1,4 +1,4 @@
-package checkmate.goal.infrastructure;
+package checkmate.mate.infra;
 
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
@@ -24,10 +24,10 @@ import static com.querydsl.core.group.GroupBy.list;
 
 @RequiredArgsConstructor
 @Repository
-public class TeamMateQueryDao {
+public class MateQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    public List<Mate> findSuccessTeamMates(long userId) {
+    public List<Mate> findSuccessMates(long userId) {
         return queryFactory.select(mate)
                 .from(mate)
                 .join(mate.goal, goal).fetchJoin()
@@ -35,7 +35,7 @@ public class TeamMateQueryDao {
                 .fetch();
     }
 
-    public Map<Long, List<String>> findTeamMateNicknames(List<Long> goalIds) {
+    public Map<Long, List<String>> findMateNicknames(List<Long> goalIds) {
         return queryFactory
                 .from(goal)
                 .leftJoin(mate).on(mate.goal.eq(goal))
@@ -44,7 +44,7 @@ public class TeamMateQueryDao {
                 .transform(groupBy(goal.id).as(list(user.nickname)));
     }
 
-    public Optional<MateScheduleInfo> getTeamMateCalendar(long mateId) {
+    public Optional<MateScheduleInfo> getMateCalendar(long mateId) {
         Map<Long, MateScheduleInfo> scheduleInfoMap = queryFactory
                 .from(mate)
                 .innerJoin(mate.goal, goal)
@@ -68,7 +68,7 @@ public class TeamMateQueryDao {
                 .fetch();
     }
 
-    public List<MateUploadInfo> findTeamMateInfo(long goalId) {
+    public List<MateUploadInfo> findMateInfo(long goalId) {
         return queryFactory
                 .select(new QMateUploadInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
                 .from(mate)

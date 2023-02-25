@@ -66,14 +66,14 @@ public class GoalCommandServiceTest {
         Mate mate3 = getTeamMate(goal2, 3L);
 
         given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
-        given(mateRepository.findTeamMates(anyList())).willReturn(List.of(mate1, mate2, mate3));
+        given(mateRepository.findMateInGoals(anyList())).willReturn(List.of(mate1, mate2, mate3));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
 
         //then
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(cacheHandler).deleteTeamMateCaches(any(List.class));
+        verify(cacheHandler).deleteMateCaches(any(List.class));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package checkmate.goal.infrastructure;
+package checkmate.goal.infra;
 
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.CheckDaysConverter;
