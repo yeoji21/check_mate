@@ -5,9 +5,6 @@ import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.presentation.dto.request.GoalCreateDto;
-import checkmate.goal.presentation.dto.request.GoalModifyDto;
-import checkmate.goal.presentation.dto.request.LikeCountCreateDto;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -17,7 +14,7 @@ class GoalDtoMapperTest extends MapperTest {
     private static final GoalDtoMapper mapper = GoalDtoMapper.INSTANCE;
 
     @Test
-    void goalCreateCommand() throws Exception{
+    void goalCreateCommand() throws Exception {
         //given
         GoalCreateDto dto = GoalCreateDto.builder()
                 .category(GoalCategory.ETC)
@@ -42,7 +39,7 @@ class GoalDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void goalModifyCommand() throws Exception{
+    void goalModifyCommand() throws Exception {
         //given
         GoalModifyDto dto = GoalModifyDto.builder()
                 .endDate(LocalDate.now().plusDays(10))
@@ -64,7 +61,7 @@ class GoalDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void likeCountCreateCommand() throws Exception{
+    void likeCountCreateCommand() throws Exception {
         //given
         LikeCountCreateDto dto = LikeCountCreateDto.builder()
                 .goalId(1L)

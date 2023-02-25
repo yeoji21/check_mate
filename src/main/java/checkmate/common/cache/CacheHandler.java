@@ -1,9 +1,9 @@
 package checkmate.common.cache;
 
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 
 import java.util.List;
 
 public interface CacheHandler {
-    void deleteTeamMateCaches(List<TeamMate> teamMates);
+    void deleteMateCaches(List<Mate> mates);
 }

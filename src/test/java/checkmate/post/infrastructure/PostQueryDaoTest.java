@@ -3,7 +3,7 @@ package checkmate.post.infrastructure;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 import checkmate.post.application.dto.response.PostInfo;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.Likes;
@@ -19,18 +19,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PostQueryDaoTest extends RepositoryTest {
 
     @Test
-    void 타임라인_게시글_조회_테스트() throws Exception{
+    void 타임라인_게시글_조회_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
-        TeamMate teamMate = goal.join(user);
-        em.persist(teamMate);
+        Mate mate = goal.join(user);
+        em.persist(mate);
 
-        Post post1 = TestEntityFactory.post(teamMate);
-        Post post2 = TestEntityFactory.post(teamMate);
-        Post post3 = TestEntityFactory.post(teamMate);
+        Post post1 = TestEntityFactory.post(mate);
+        Post post2 = TestEntityFactory.post(mate);
+        Post post3 = TestEntityFactory.post(mate);
         em.persist(post1);
         em.persist(post2);
         em.persist(post3);

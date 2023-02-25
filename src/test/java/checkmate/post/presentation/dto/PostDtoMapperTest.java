@@ -23,7 +23,7 @@ class PostDtoMapperTest extends MapperTest {
         PostUploadCommand command = mapper.toCommand(dto, userId);
 
         //then
-        isEqualTo(command.teamMateId(), dto.getTeamMateId());
+        isEqualTo(command.mateId(), dto.getMateId());
         isEqualTo(command.images(), dto.getImages());
         isEqualTo(command.content(), dto.getContent());
     }

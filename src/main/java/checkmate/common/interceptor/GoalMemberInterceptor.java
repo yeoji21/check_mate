@@ -4,7 +4,7 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.exception.BusinessException;
 import checkmate.exception.JsonConvertingException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.domain.TeamMateRepository;
+import checkmate.mate.domain.MateRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Component
 public class GoalMemberInterceptor implements HandlerInterceptor {
     private final ObjectMapper objectMapper;
-    private final TeamMateRepository teamMateRepository;
+    private final MateRepository mateRepository;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -38,7 +38,7 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
 
         long goalId = getGoalIdInRequest(handlerMethod, request);
         long userId = getRequestUserId();
-        boolean existTeamMate = teamMateRepository.isExistTeamMate(goalId, userId);
+        boolean existTeamMate = mateRepository.isExistMate(goalId, userId);
         if (!existTeamMate) throw new IllegalArgumentException("존재하지 않는 팀원");
         return true;
     }
@@ -56,7 +56,7 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
             case REQUEST_BODY -> getFromMessageBody(request);
             case PATH_VARIABLE -> getFromPathVariable(request);
         };
-        if (goalId == null) throw new BusinessException(ErrorCode.TEAM_MATE_NOT_FOUND);
+        if (goalId == null) throw new BusinessException(ErrorCode.MATE_NOT_FOUND);
         return goalId;
     }
 

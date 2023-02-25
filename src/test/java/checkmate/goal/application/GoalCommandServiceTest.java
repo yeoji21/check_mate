@@ -5,7 +5,13 @@ import checkmate.common.cache.CacheHandler;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.GoalRepository;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateInitiateManager;
+import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.MateStatus;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
@@ -37,9 +43,9 @@ public class GoalCommandServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private TeamMateRepository teamMateRepository;
+    private MateRepository mateRepository;
     @Mock
-    private TeamMateInitiateManager teamMateInitiateManager;
+    private MateInitiateManager mateInitiateManager;
     @Mock
     private CacheHandler cacheHandler;
     @Mock
@@ -55,19 +61,19 @@ public class GoalCommandServiceTest {
         Goal goal1 = TestEntityFactory.goal(1L, "testGoal1");
         Goal goal2 = TestEntityFactory.goal(3L, "testGoal3");
 
-        TeamMate teamMate1 = getTeamMate(goal1, 1L);
-        TeamMate teamMate2 = getTeamMate(goal1, 2L);
-        TeamMate teamMate3 = getTeamMate(goal2, 3L);
+        Mate mate1 = getTeamMate(goal1, 1L);
+        Mate mate2 = getTeamMate(goal1, 2L);
+        Mate mate3 = getTeamMate(goal2, 3L);
 
         given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
-        given(teamMateRepository.findTeamMates(anyList())).willReturn(List.of(teamMate1, teamMate2, teamMate3));
+        given(mateRepository.findMateInGoals(anyList())).willReturn(List.of(mate1, mate2, mate3));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
 
         //then
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(cacheHandler).deleteTeamMateCaches(any(List.class));
+        verify(cacheHandler).deleteMateCaches(any(List.class));
     }
 
     @Test
@@ -109,8 +115,8 @@ public class GoalCommandServiceTest {
 
         //then
         assertThat(goalId).isGreaterThan(0L);
-        verify(teamMateRepository).save(any(TeamMate.class));
-        verify(teamMateInitiateManager).initiate(any(TeamMate.class));
+        verify(mateRepository).save(any(Mate.class));
+        verify(mateInitiateManager).initiate(any(Mate.class));
     }
 
     private GoalCreateCommand getGoalCreateCommand() {
@@ -124,11 +130,11 @@ public class GoalCommandServiceTest {
                 .build();
     }
 
-    private TeamMate getTeamMate(Goal goal, long userId) {
+    private Mate getTeamMate(Goal goal, long userId) {
         User user = TestEntityFactory.user(userId, "user1");
-        TeamMate teamMate1 = goal.join(user);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        return teamMate1;
+        Mate mate1 = goal.join(user);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
+        return mate1;
     }
 
     private GoalModifyCommand getGoalModifyCommand(Goal goal) {

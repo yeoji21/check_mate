@@ -3,8 +3,8 @@ package checkmate.post.application;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateRepository;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.post.application.dto.request.PostUploadCommand;
 import checkmate.post.domain.Likes;
@@ -42,7 +42,7 @@ class PostCommandServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
-    private TeamMateRepository teamMateRepository;
+    private MateRepository mateRepository;
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
@@ -51,9 +51,9 @@ class PostCommandServiceTest {
         //given
         PostUploadCommand dto = getPostRegisterDto();
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
 
-        given(teamMateRepository.findTeamMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(teamMate));
+        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "tester")));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
@@ -69,16 +69,16 @@ class PostCommandServiceTest {
     void 좋아요_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(mate);
         ReflectionTestUtils.setField(post, "id", 1L);
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
+        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
-        postCommandService.like(teamMate.getUserId(), post.getId());
+        postCommandService.like(mate.getUserId(), post.getId());
 
         //then
         assertThat(post.getLikes().size()).isEqualTo(1);
@@ -88,17 +88,17 @@ class PostCommandServiceTest {
     void 좋아요_취소_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = Post.builder().teamMate(teamMate).content("post body content").build();
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(mate);
         ReflectionTestUtils.setField(post, "id", 1L);
-        post.addLikes(new Likes(teamMate.getUserId()));
+        post.addLikes(new Likes(mate.getUserId()));
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(teamMateRepository.findTeamMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(teamMate));
+        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
-        postCommandService.unlike(teamMate.getUserId(), post.getId());
+        postCommandService.unlike(mate.getUserId(), post.getId());
 
         //then
         assertThat(post.getLikes().size()).isEqualTo(0);

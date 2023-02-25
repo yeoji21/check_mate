@@ -3,12 +3,12 @@ package checkmate;
 import checkmate.exception.ErrorCodeController;
 import checkmate.goal.application.GoalCommandService;
 import checkmate.goal.application.GoalQueryService;
-import checkmate.goal.application.TeamMateCommandService;
-import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.presentation.GoalController;
-import checkmate.goal.presentation.TeamMateController;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
-import checkmate.goal.presentation.dto.TeamMateDtoMapper;
+import checkmate.mate.application.MateCommandService;
+import checkmate.mate.application.MateQueryService;
+import checkmate.mate.presentation.MateController;
+import checkmate.mate.presentation.dto.MateDtoMapper;
 import checkmate.notification.application.NotificationQueryService;
 import checkmate.notification.presentation.NotificationController;
 import checkmate.notification.presentation.dto.NotificationDtoMapper;
@@ -18,7 +18,7 @@ import checkmate.post.presentation.PostController;
 import checkmate.post.presentation.dto.PostDtoMapper;
 import checkmate.user.application.LoginService;
 import checkmate.user.application.UserCommandService;
-import checkmate.user.application.UserFindService;
+import checkmate.user.application.UserQueryService;
 import checkmate.user.presentation.LoginController;
 import checkmate.user.presentation.UserController;
 import checkmate.user.presentation.dto.LoginDtoMapper;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 @WebMvcTest({
         ErrorCodeController.class,
         GoalController.class,
-        TeamMateController.class,
+        MateController.class,
         NotificationController.class,
         PostController.class,
         LoginController.class,
@@ -58,9 +58,9 @@ public abstract class ControllerTest {
     protected GoalQueryService goalQueryService;
 
     @MockBean
-    protected TeamMateCommandService teamMateCommandService;
+    protected MateCommandService mateCommandService;
     @MockBean
-    protected TeamMateQueryService teamMateQueryService;
+    protected MateQueryService mateQueryService;
     @MockBean
     protected NotificationQueryService notificationQueryService;
     @MockBean
@@ -75,14 +75,14 @@ public abstract class ControllerTest {
     protected LoginService loginService;
 
     @MockBean
-    protected UserFindService userFindService;
+    protected UserQueryService userQueryService;
     @MockBean
     protected UserCommandService userCommandService;
 
     @MockBean
     protected GoalDtoMapper goalDtoMapper;
     @MockBean
-    protected TeamMateDtoMapper teamMateDtoMapper;
+    protected MateDtoMapper mateDtoMapper;
     @MockBean
     protected PostDtoMapper postDtoMapper;
     @MockBean

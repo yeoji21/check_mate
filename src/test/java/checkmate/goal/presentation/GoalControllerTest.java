@@ -6,10 +6,11 @@ import checkmate.config.WithMockAuthUser;
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.presentation.dto.request.GoalCreateDto;
-import checkmate.goal.presentation.dto.request.GoalModifyDto;
-import checkmate.goal.presentation.dto.request.LikeCountCreateDto;
+import checkmate.goal.presentation.dto.GoalCreateDto;
+import checkmate.goal.presentation.dto.GoalModifyDto;
+import checkmate.goal.presentation.dto.LikeCountCreateDto;
+import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -233,7 +234,7 @@ public class GoalControllerTest extends ControllerTest {
     private ResponseFieldsSnippet setGoalInformationResponseFields() {
         return responseFields(
                 fieldWithPath("id").type(JsonFieldType.NUMBER).description("ID 값"),
-                fieldWithPath("teamMates").description("목표에 속한 팀원들"),
+                fieldWithPath("mates").description("목표에 속한 팀원들"),
                 fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
                 fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
                 fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
@@ -242,10 +243,10 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
                 fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("teamMates[].teamMateId").description("팀메이트 id"),
-                fieldWithPath("teamMates[].userId").description("유저 id"),
-                fieldWithPath("teamMates[].nickname").description("유저의 닉네임"),
-                fieldWithPath("teamMates[].uploaded").description("이미 업로드했는지"),
+                fieldWithPath("mates[].mateId").description("팀메이트 id"),
+                fieldWithPath("mates[].userId").description("유저 id"),
+                fieldWithPath("mates[].nickname").description("유저의 닉네임"),
+                fieldWithPath("mates[].uploaded").description("이미 업로드했는지"),
                 fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 업로드했는지"),
                 fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 업로드할 수 있는지"),
                 fieldWithPath("uploadable.workingDay").description("업로드하는 날이 맞는지"),
@@ -255,17 +256,17 @@ public class GoalControllerTest extends ControllerTest {
 
     private GoalDetailInfo getGoalInformationResponse() {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        TeamMate selector = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate selector = goal.join(TestEntityFactory.user(1L, "user"));
         ReflectionTestUtils.setField(selector, "id", 1L);
 
-        TeamMateUploadInfo teamMateUploadInfo = TeamMateUploadInfo.builder()
-                .teamMateId(selector.getId())
+        MateUploadInfo mateUploadInfo = MateUploadInfo.builder()
+                .mateId(selector.getId())
                 .userId(selector.getUserId())
                 .lastUploadDate(LocalDate.now().minusDays(1))
                 .nickname("tester")
                 .build();
         GoalDetailInfo info = new GoalDetailInfo(goal, selector);
-        info.setTeamMates(List.of(teamMateUploadInfo));
+        info.setMates(List.of(mateUploadInfo));
         return info;
     }
 }

@@ -6,8 +6,8 @@ import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateRepository;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
@@ -38,7 +38,7 @@ public class PostCommandService {
     private final PostRepository postRepository;
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
-    private final TeamMateRepository teamMateRepository;
+    private final MateRepository mateRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(
@@ -47,7 +47,7 @@ public class PostCommandService {
     )
     @Transactional
     public Long upload(PostUploadCommand command) {
-        TeamMate uploader = findTeamMate(command.teamMateId());
+        Mate uploader = findMate(command.mateId());
         Post post = save(command, uploader);
         verifyGoalConditions(uploader.getGoal().getId(), post);
         publishNotificationEvent(uploader);
@@ -56,7 +56,8 @@ public class PostCommandService {
 
     @Transactional
     public void like(long userId, long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
         post.addLikes(new Likes(userId));
         verifyGoalConditions(goalId, post);
@@ -64,7 +65,8 @@ public class PostCommandService {
 
     @Transactional
     public void unlike(long userId, long postId) {
-        Post post = postRepository.findById(postId).orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
         post.removeLikes(userId);
         verifyGoalConditions(goalId, post);
@@ -78,35 +80,35 @@ public class PostCommandService {
     }
 
     private long validateUserInGoal(long userId, Post post) {
-        return teamMateRepository.findTeamMateWithGoal(post.getTeamMate().getGoal().getId(), userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, post.getTeamMate().getId()))
+        return mateRepository.findMateWithGoal(post.getMate().getGoal().getId(), userId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, post.getMate().getId()))
                 .getGoal()
                 .getId();
     }
 
-    private void publishNotificationEvent(TeamMate uploader) {
+    private void publishNotificationEvent(Mate uploader) {
         User user = findUser(uploader);
         PostUploadNotificationDto notificationDto = PostUploadNotificationDto.builder()
                 .uploaderUserId(user.getId())
                 .uploaderNickname(user.getNickname())
                 .goalId(uploader.getGoal().getId())
                 .goalTitle(uploader.getGoal().getTitle())
-                .teamMateUserIds(getTeamMateUserIds(uploader))
+                .mateUserIds(getTeamMateUserIds(uploader))
                 .build();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, notificationDto));
     }
 
-    private List<Long> getTeamMateUserIds(TeamMate uploader) {
-        return teamMateRepository.findTeamMateUserIds(uploader.getGoal().getId())
+    private List<Long> getTeamMateUserIds(Mate uploader) {
+        return mateRepository.findMateUserIds(uploader.getGoal().getId())
                 .stream()
                 .filter(userId -> !userId.equals(uploader.getUserId()))
                 .collect(Collectors.toList());
     }
 
-    private Post save(PostUploadCommand command, TeamMate uploader) {
+    private Post save(PostUploadCommand command, Mate uploader) {
         Assert.isTrue(uploader.getUploadable().isUploadable(), "uploadable");
         Post post = Post.builder()
-                .teamMate(uploader)
+                .mate(uploader)
                 .content(command.content())
                 .build();
         postRepository.save(post);
@@ -127,13 +129,13 @@ public class PostCommandService {
         }
     }
 
-    private User findUser(TeamMate uploader) {
+    private User findUser(Mate uploader) {
         return userRepository.findById(uploader.getUserId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, uploader.getUserId()));
     }
 
-    private TeamMate findTeamMate(long teamMateId) {
-        return teamMateRepository.findTeamMateWithGoal(teamMateId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMateId));
+    private Mate findMate(long mateId) {
+        return mateRepository.findMateWithGoal(mateId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
     }
 }

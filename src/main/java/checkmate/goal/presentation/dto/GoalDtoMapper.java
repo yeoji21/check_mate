@@ -3,9 +3,6 @@ package checkmate.goal.presentation.dto;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
-import checkmate.goal.presentation.dto.request.GoalCreateDto;
-import checkmate.goal.presentation.dto.request.GoalModifyDto;
-import checkmate.goal.presentation.dto.request.LikeCountCreateDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -25,8 +22,8 @@ public interface GoalDtoMapper {
     GoalModifyCommand toCommand(GoalModifyDto dto, long goalId, long userId);
 
     @Mappings({
-        @Mapping(source = "dto.goalId", target = "goalId"),
-        @Mapping(source = "dto.likeCount", target = "likeCount")
+            @Mapping(source = "dto.goalId", target = "goalId"),
+            @Mapping(source = "dto.likeCount", target = "likeCount")
     })
     LikeCountCreateCommand toCommand(LikeCountCreateDto dto, long userId);
 }

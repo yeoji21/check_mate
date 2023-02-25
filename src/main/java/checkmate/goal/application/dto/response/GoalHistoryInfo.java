@@ -3,7 +3,7 @@ package checkmate.goal.application.dto.response;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -20,9 +20,9 @@ public class GoalHistoryInfo {
     private LocalTime appointmentTime;
     private String checkDays;
     private double achievementRate;
-    private List<String> teamMateNicknames;
+    private List<String> mateNicknames;
 
-    public GoalHistoryInfo(TeamMate finder, List<String> teamMateNicknames) {
+    public GoalHistoryInfo(Mate finder, List<String> mateNicknames) {
         Goal goal = finder.getGoal();
         this.goalId = goal.getId();
         this.category = goal.getCategory();
@@ -32,6 +32,6 @@ public class GoalHistoryInfo {
         this.appointmentTime = goal.getAppointmentTime();
         this.checkDays = CheckDaysConverter.toDays(goal.getCheckDays().intValue());
         this.achievementRate = finder.calcProgressPercent();
-        this.teamMateNicknames = teamMateNicknames;
+        this.mateNicknames = mateNicknames;
     }
 }

@@ -8,7 +8,13 @@ import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.domain.LikeCountCondition;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateInitiateManager;
+import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.MateStatus;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
@@ -32,8 +38,8 @@ import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 public class GoalCommandService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
-    private final TeamMateRepository teamMateRepository;
-    private final TeamMateInitiateManager teamMateInitiateManager;
+    private final MateRepository mateRepository;
+    private final MateInitiateManager mateInitiateManager;
     private final ApplicationEventPublisher eventPublisher;
     private final CacheHandler cacheHandler;
     private final GoalCommandMapper mapper;
@@ -49,7 +55,7 @@ public class GoalCommandService {
     @Transactional
     public long create(GoalCreateCommand command) {
         Goal goal = goalRepository.save(mapper.toEntity(command));
-        teamMateRepository.save(joinToGoal(goal, command.userId()));
+        mateRepository.save(joinToGoal(goal, command.userId()));
         return goal.getId();
     }
 
@@ -75,17 +81,17 @@ public class GoalCommandService {
     @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
-        List<TeamMate> teamMates = teamMateRepository.findTeamMates(overedGoalIds)
+        List<Mate> mates = mateRepository.findMateInGoals(overedGoalIds)
                 .stream()
-                .filter(tm -> tm.getStatus() == TeamMateStatus.ONGOING)
+                .filter(tm -> tm.getStatus() == MateStatus.ONGOING)
                 .toList();
 
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toDtos(teamMates)));
-        cacheHandler.deleteTeamMateCaches(teamMates);
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toDtos(mates)));
+        cacheHandler.deleteMateCaches(mates);
     }
 
-    private List<CompleteGoalNotificationDto> toDtos(List<TeamMate> teamMates) {
-        return teamMates.stream().map(
+    private List<CompleteGoalNotificationDto> toDtos(List<Mate> mates) {
+        return mates.stream().map(
                 tm -> CompleteGoalNotificationDto.builder()
                         .goalId(tm.getGoal().getId())
                         .goalTitle(tm.getGoal().getTitle())
@@ -94,13 +100,12 @@ public class GoalCommandService {
         ).toList();
     }
 
-    private TeamMate joinToGoal(Goal goal, long userId) {
+    private Mate joinToGoal(Goal goal, long userId) {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
-        TeamMate teamMate = goal.join(creator);
-        teamMateInitiateManager.initiate(teamMate);
-//        teamMate.initiateGoal(userRepository.countOngoingGoals(userId));
-        return teamMate;
+        Mate mate = goal.join(creator);
+        mateInitiateManager.initiate(mate);
+        return mate;
     }
 
     private Goal findGoalForUpdate(long goalId) {

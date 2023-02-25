@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
-    void 카카오_회원가입_테스트() throws Exception{
+    void 카카오_회원가입_테스트() throws Exception {
         KakaoSignUpDto dto = KakaoSignUpDto.builder()
                 .providerId("providerId")
                 .username("여지원")
@@ -53,7 +53,7 @@ class UserControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 구글_회원가입_테스트() throws Exception{
+    void 구글_회원가입_테스트() throws Exception {
         GoogleSignUpDto dto = GoogleSignUpDto.builder()
                 .providerId("providerId")
                 .username("여지원")
@@ -78,7 +78,7 @@ class UserControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 네이버_회원가입_테스트() throws Exception{
+    void 네이버_회원가입_테스트() throws Exception {
         NaverSignUpDto dto = NaverSignUpDto.builder()
                 .providerId("providerId")
                 .username("여지원")
@@ -103,7 +103,7 @@ class UserControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 닉네임_변경_테스트() throws Exception{
+    void 닉네임_변경_테스트() throws Exception {
         UserNicknameModifyDto request = new UserNicknameModifyDto("새로운 닉네임");
 
         given(userDtoMapper.toCommand(any(Long.class), any(UserNicknameModifyDto.class)))
@@ -122,7 +122,7 @@ class UserControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 닉네임_중복_통과_테스트() throws Exception{
+    void 닉네임_중복_통과_테스트() throws Exception {
         mockMvc.perform(get("/user/exists")
                         .queryParam("nickname", "uniqueNickname")
                         .contentType(APPLICATION_JSON))
@@ -130,7 +130,7 @@ class UserControllerTest extends ControllerTest {
                 .andDo(document("nickname-dup",
                         requestParameters(parameterWithName("nickname").description("중복 확인을 하고자하는 닉네임"))
                 ));
-        verify(userFindService).existsNicknameCheck(any(String.class));
+        verify(userQueryService).existsNicknameCheck(any(String.class));
     }
 
     private RequestFieldsSnippet setUserRegisterRequestFields() {

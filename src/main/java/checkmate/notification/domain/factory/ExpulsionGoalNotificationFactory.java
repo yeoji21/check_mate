@@ -27,6 +27,6 @@ public class ExpulsionGoalNotificationFactory extends NotificationFactory<Expuls
 
     @Override
     void setAttributes(Notification notification, ExpulsionGoalNotificationDto dto) {
-        notification.addAttribute("teamMateId", dto.teamMateId());
+        notification.addAttribute("mateId", dto.mateId());
     }
 }

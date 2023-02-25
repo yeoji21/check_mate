@@ -1,7 +1,7 @@
 package checkmate.post.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 import com.mysema.commons.lang.Assert;
 import lombok.*;
 
@@ -18,11 +18,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Post extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
     @NotNull
-    @Column(name="content")
+    @Column(name = "content")
     private String content;
     @Column(name = "uploaded_date")
     private LocalDate uploadedDate = LocalDate.now();
@@ -31,20 +32,20 @@ public class Post extends BaseTimeEntity {
     @Embedded
     private Images images;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_mate_id")
-    private TeamMate teamMate;
+    @JoinColumn(name = "mate_id")
+    private Mate mate;
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Likes> likes = new ArrayList<>();
 
     @Builder
-    protected Post(TeamMate teamMate, String content) {
-        this.teamMate = teamMate;
+    protected Post(Mate mate, String content) {
+        this.mate = mate;
         this.content = content;
         images = new Images();
     }
 
     public boolean isLikeable() {
-        return ! uploadedDate.plusDays(1).isBefore(LocalDate.now());
+        return !uploadedDate.plusDays(1).isBefore(LocalDate.now());
     }
 
     void addImage(Image image) {
@@ -52,7 +53,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public void addLikes(Likes like) {
-        if(!isLikeable()) throw new IllegalArgumentException();
+        if (!isLikeable()) throw new IllegalArgumentException();
         likes.add(like);
         like.setPost(this);
     }
@@ -64,12 +65,12 @@ public class Post extends BaseTimeEntity {
 
     public void check() {
         checked = true;
-        teamMate.plusWorkingDay();
+        mate.plusWorkingDay();
     }
 
     public void uncheck() {
         checked = false;
-        teamMate.minusWorkingDay();
+        mate.minusWorkingDay();
     }
 
     public List<Image> getImages() {

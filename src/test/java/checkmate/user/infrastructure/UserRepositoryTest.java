@@ -3,8 +3,8 @@ package checkmate.user.infrastructure;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateStatus;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -103,17 +103,17 @@ class UserRepositoryTest extends RepositoryTest {
         Goal goal3 = TestEntityFactory.goal(null, "goal3");
         em.persist(goal3);
 
-        TeamMate teamMate1 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate1);
+        Mate mate1 = goal1.join(user);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
+        em.persist(mate1);
 
-        TeamMate teamMate2 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate2);
+        Mate mate2 = goal1.join(user);
+        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
+        em.persist(mate2);
 
-        TeamMate teamMate3 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate3);
+        Mate mate3 = goal1.join(user);
+        ReflectionTestUtils.setField(mate3, "status", MateStatus.ONGOING);
+        em.persist(mate3);
 
         //when
         int count = userRepository.countOngoingGoals(user.getId());

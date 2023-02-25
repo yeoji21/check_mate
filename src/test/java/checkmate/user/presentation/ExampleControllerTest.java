@@ -4,7 +4,7 @@ import checkmate.ExampleSimpleRestDocsTest;
 import checkmate.config.WithMockAuthUser;
 import checkmate.user.application.LoginService;
 import checkmate.user.application.UserCommandService;
-import checkmate.user.application.UserFindService;
+import checkmate.user.application.UserQueryService;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.presentation.dto.UserDtoMapper;
 import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
@@ -32,11 +32,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ExampleControllerTest extends ExampleSimpleRestDocsTest {
     private MockMvc mockMvc;
 
-    @Mock private UserFindService userFindService;
-    @Mock private UserCommandService userCommandService;
-    @Mock private LoginService loginService;
-    @Mock private UserDtoMapper userDtoMapper;
-    @InjectMocks private UserController userController;
+    @Mock
+    private UserQueryService userQueryService;
+    @Mock
+    private UserCommandService userCommandService;
+    @Mock
+    private LoginService loginService;
+    @Mock
+    private UserDtoMapper userDtoMapper;
+    @InjectMocks
+    private UserController userController;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +50,7 @@ public class ExampleControllerTest extends ExampleSimpleRestDocsTest {
 
     @WithMockAuthUser
     @Test
-    void 닉네임_변경_테스트() throws Exception{
+    void 닉네임_변경_테스트() throws Exception {
         UserNicknameModifyDto request = new UserNicknameModifyDto("새로운 닉네임");
 
         mockMvc.perform(patch("/user/nickname")

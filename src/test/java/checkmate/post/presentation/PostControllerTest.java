@@ -40,7 +40,7 @@ class PostControllerTest extends ControllerTest {
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
         PostUploadCommand command = PostUploadCommand.builder()
                 .userId(1L)
-                .teamMateId(2L)
+                .mateId(2L)
                 .content("~~~")
                 .images(List.of(new MockMultipartFile("file1", new byte[10]),
                         new MockMultipartFile("file1", new byte[10])))
@@ -51,7 +51,7 @@ class PostControllerTest extends ControllerTest {
 
         mockMvc.perform(fileUpload("/post")
                         .file(firstFile).file(secondFile)
-                        .param("teamMateId", "1")
+                        .param("mateId", "1")
                         .param("text", "posting content data")
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -111,7 +111,7 @@ class PostControllerTest extends ControllerTest {
     private RequestParametersSnippet getRequestParameters() {
         return requestParameters(
 //                parameterWithName("goalId").description("목표의 id"),
-                parameterWithName("teamMateId").description("목표를 인증하는 팀 메이트의 id"),
+                parameterWithName("mateId").description("목표를 인증하는 팀 메이트의 id"),
                 parameterWithName("text").description("목표 인증 게시글 본문"),
                 parameterWithName("_csrf").description("csrf 토큰")
         );
@@ -132,7 +132,7 @@ class PostControllerTest extends ControllerTest {
     private ResponseFieldsSnippet getFindPostsResponseFields() {
         return responseFields(
                 fieldWithPath("posts[].postId").type(JsonFieldType.NUMBER).description("postId"),
-                fieldWithPath("posts[].teamMateId").type(JsonFieldType.NUMBER).description("업로더의 teamMateId"),
+                fieldWithPath("posts[].mateId").type(JsonFieldType.NUMBER).description("업로더의 mateId"),
                 fieldWithPath("posts[].uploaderNickname").type(JsonFieldType.STRING).description("업로더의 닉네임"),
                 fieldWithPath("posts[].uploadAt").type(JsonFieldType.STRING).description("업로드 시간"),
                 fieldWithPath("posts[].imageUrls").type(JsonFieldType.ARRAY).description("이미지 파일 접근 주소"),

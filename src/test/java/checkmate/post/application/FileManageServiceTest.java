@@ -2,7 +2,7 @@ package checkmate.post.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 import checkmate.post.domain.FileStore;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.ImageRepository;
@@ -21,16 +21,19 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class FileManageServiceTest {
-    @Mock private ImageRepository imageRepository;
-    @Mock private FileStore fileStore;
-    @InjectMocks private FileManageService fileManageService;
+    @Mock
+    private ImageRepository imageRepository;
+    @Mock
+    private FileStore fileStore;
+    @InjectMocks
+    private FileManageService fileManageService;
 
     @Test
-    void 파일_업로드_테스트() throws Exception{
+    void 파일_업로드_테스트() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(teamMate);
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(mate);
         MockMultipartFile file = new MockMultipartFile("filename", new byte[]{});
 
         //when
