@@ -40,7 +40,7 @@ class PostControllerTest extends ControllerTest {
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
         PostUploadCommand command = PostUploadCommand.builder()
                 .userId(1L)
-                .teamMateId(2L)
+                .mateId(2L)
                 .content("~~~")
                 .images(List.of(new MockMultipartFile("file1", new byte[10]),
                         new MockMultipartFile("file1", new byte[10])))

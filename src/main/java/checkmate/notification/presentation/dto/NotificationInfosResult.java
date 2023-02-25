@@ -1,4 +1,4 @@
-package checkmate.notification.presentation.dto.response;
+package checkmate.notification.presentation.dto;
 
 import checkmate.notification.application.dto.response.NotificationInfo;
 import lombok.Getter;

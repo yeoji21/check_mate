@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum TeamMateCode {
-    NOT_FOUND("TM-001"),
-    ALREADY_IN_GOAL("TM-002"),
-    DUPLICATED_INVITE("TM-003"),
-    INVALID_STATUS("TM-004");
+public enum MateCode {
+    NOT_FOUND("MATE-001"),
+    ALREADY_IN_GOAL("MATE-002"),
+    DUPLICATED_INVITE("MATE-003"),
+    INVALID_STATUS("MATE-004");
 
     private final String code;
 }

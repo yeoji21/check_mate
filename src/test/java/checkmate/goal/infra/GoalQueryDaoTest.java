@@ -140,14 +140,14 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(info.getTitle()).isEqualTo(goal.getTitle());
-        for (int i = 0; i < info.getTeamMates().size(); i++) {
-            MateUploadInfo tm = info.getTeamMates().get(i);
+        for (int i = 0; i < info.getMates().size(); i++) {
+            MateUploadInfo tm = info.getMates().get(i);
             assertThat(tm.getNickname()).isEqualTo("tester" + (i + 1));
             assertThat(tm.isUploaded()).isFalse();
             assertThat(tm.getMateId()).isNotNull();
             assertThat(tm.getUserId()).isNotNull();
         }
-        assertThat(info.getTeamMates().size()).isEqualTo(3);
+        assertThat(info.getMates().size()).isEqualTo(3);
         assertThat(info.isInviteable()).isTrue();
     }
 

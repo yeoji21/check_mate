@@ -154,7 +154,7 @@ public class MateCommandServiceTest {
         given(mateRepository.eliminateOveredMates(hookyMates)).willReturn(Collections.EMPTY_LIST);
 
         //when
-        mateCommandService.updateHookyTeamMate();
+        mateCommandService.updateHookyMates();
 
         //then
         verify(cacheHandler).deleteMateCaches(any(List.class));

@@ -9,7 +9,7 @@ import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributes;
 import checkmate.notification.domain.NotificationType;
-import checkmate.notification.presentation.dto.response.NotificationInfosResult;
+import checkmate.notification.presentation.dto.NotificationInfosResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class NotificationControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
-    void 목표수행_완료_알림_조회_테스트() throws Exception{
+    void 목표수행_완료_알림_조회_테스트() throws Exception {
         List<NotificationInfo> notifications = getNotificationDetailResponseList();
         NotificationInfosResult response = new NotificationInfosResult(notifications);
 
@@ -54,7 +54,7 @@ class NotificationControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 유저별_알림_목록_조회_테스트() throws Exception{
+    void 유저별_알림_목록_조회_테스트() throws Exception {
         NotificationDetailsResult result = new NotificationDetailsResult(
                 List.of(NotificationDetails.builder()
                                 .notificationId(1L)
@@ -99,7 +99,7 @@ class NotificationControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 단건_알림_조회_테스트() throws Exception{
+    void 단건_알림_조회_테스트() throws Exception {
         Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.POST_UPLOAD);
         NotificationInfo responseDto = toNotificationInfo(notification);
 

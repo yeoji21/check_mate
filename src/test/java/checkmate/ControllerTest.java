@@ -18,7 +18,7 @@ import checkmate.post.presentation.PostController;
 import checkmate.post.presentation.dto.PostDtoMapper;
 import checkmate.user.application.LoginService;
 import checkmate.user.application.UserCommandService;
-import checkmate.user.application.UserFindService;
+import checkmate.user.application.UserQueryService;
 import checkmate.user.presentation.LoginController;
 import checkmate.user.presentation.UserController;
 import checkmate.user.presentation.dto.LoginDtoMapper;
@@ -75,7 +75,7 @@ public abstract class ControllerTest {
     protected LoginService loginService;
 
     @MockBean
-    protected UserFindService userFindService;
+    protected UserQueryService userQueryService;
     @MockBean
     protected UserCommandService userCommandService;
 

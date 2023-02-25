@@ -27,7 +27,7 @@ public class PostJpaRepository implements PostRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Map<Post, List<Image>> findByTeamMateIdsAndDate(List<Long> mateIds, LocalDate uploadDate) {
+    public Map<Post, List<Image>> findByMateIdsAndDate(List<Long> mateIds, LocalDate uploadDate) {
         return queryFactory
                 .from(post)
                 .leftJoin(post.images.images, image)

@@ -105,7 +105,6 @@ public class GoalCommandService {
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         Mate mate = goal.join(creator);
         mateInitiateManager.initiate(mate);
-//        teamMate.initiateGoal(userRepository.countOngoingGoals(userId));
         return mate;
     }
 

@@ -88,7 +88,7 @@ public class MateCommandService {
     }
 
     @Transactional
-    public void updateHookyTeamMate() {
+    public void updateHookyMates() {
         List<Mate> hookyMates = mateRepository.updateYesterdayHookyMates();
         List<Mate> eliminators = mateRepository.eliminateOveredMates(hookyMates);
         List<ExpulsionGoalNotificationDto> notificationDtos =

@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface PostRepository {
-    Map<Post, List<Image>> findByTeamMateIdsAndDate(List<Long> teamMateIds, LocalDate uploadDate);
+    Map<Post, List<Image>> findByMateIdsAndDate(List<Long> mateIds, LocalDate uploadDate);
+
     Optional<Post> findById(long postId);
+
     void save(Post post);
 }

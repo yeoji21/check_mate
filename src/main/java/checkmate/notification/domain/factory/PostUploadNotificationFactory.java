@@ -24,7 +24,7 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
 
     @Override
     List<NotificationReceiver> getReceivers(PostUploadNotificationDto dto) {
-        return dto.teamMateUserIds()
+        return dto.mateUserIds()
                 .stream()
                 .map(NotificationReceiver::new)
                 .collect(Collectors.toList());

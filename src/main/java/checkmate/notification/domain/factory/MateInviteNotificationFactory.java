@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class TeamMateInviteNotificationFactory extends NotificationFactory<MateInviteNotificationDto> {
+public class MateInviteNotificationFactory extends NotificationFactory<MateInviteNotificationDto> {
     @Override
     public NotificationType getType() {
         return NotificationType.INVITE_GOAL;

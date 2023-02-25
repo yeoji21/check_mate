@@ -168,7 +168,7 @@ class MateControllerTest extends ControllerTest {
                 fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
                 fieldWithPath("info[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("info[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
-                fieldWithPath("info[].teamMateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
+                fieldWithPath("info[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
         );
     }
 

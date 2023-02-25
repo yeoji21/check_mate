@@ -59,7 +59,7 @@ public class GoalQueryDao {
                                 mate.goal.id.eq(goalId))
                         .fetchOne()
         );
-        goalDetailInfo.ifPresent(info -> info.setTeamMates(findTeamMateInfo(goalId)));
+        goalDetailInfo.ifPresent(info -> info.setMates(findTeamMateInfo(goalId)));
         return goalDetailInfo;
     }
 

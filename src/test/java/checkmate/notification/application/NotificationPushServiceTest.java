@@ -31,13 +31,17 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class NotificationPushServiceTest {
-    @Mock private NotificationRepository notificationRepository;
-    @Mock private NotificationGenerator notificationGenerator;
-    @Mock private PushNotificationSender pushNotificationSender;
-    @InjectMocks private NotificationPushService notificationPushService;
+    @Mock
+    private NotificationRepository notificationRepository;
+    @Mock
+    private NotificationGenerator notificationGenerator;
+    @Mock
+    private PushNotificationSender pushNotificationSender;
+    @InjectMocks
+    private NotificationPushService notificationPushService;
 
     @Test
-    void 전송_알림_테스트() throws Exception{
+    void 전송_알림_테스트() throws Exception {
         //given
         PostUploadNotificationDto dto = getNotificationCommand();
         Notification notification = TestEntityFactory.notification(1L, 1L, POST_UPLOAD);
@@ -59,7 +63,7 @@ class NotificationPushServiceTest {
     }
 
     @Test
-    void 전송하지_않는_알림_테스트() throws Exception{
+    void 전송하지_않는_알림_테스트() throws Exception {
         //given
         List<ExpulsionGoalNotificationDto> dto = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -84,7 +88,7 @@ class NotificationPushServiceTest {
                 .uploaderNickname(user.getNickname())
                 .goalId(goal.getId())
                 .goalTitle(goal.getTitle())
-                .teamMateUserIds(List.of(1L, 2L))
+                .mateUserIds(List.of(1L, 2L))
                 .build();
     }
 }

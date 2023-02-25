@@ -76,6 +76,6 @@ class MateInitiateManagerTest {
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> mateInitiateManager.initiate(mate));
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_TEAM_MATE_STATUS);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 }

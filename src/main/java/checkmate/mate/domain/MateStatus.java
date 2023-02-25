@@ -3,7 +3,7 @@ package checkmate.mate.domain;
 import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 
-import static checkmate.exception.code.ErrorCode.INVALID_TEAM_MATE_STATUS;
+import static checkmate.exception.code.ErrorCode.INVALID_MATE_STATUS;
 
 public enum MateStatus {
     WAITING, ONGOING, REJECT, OUT, SUCCESS;
@@ -16,6 +16,6 @@ public enum MateStatus {
     }
 
     void initiateableCheck() {
-        if (this != WAITING) throw new BusinessException(INVALID_TEAM_MATE_STATUS);
+        if (this != WAITING) throw new BusinessException(INVALID_MATE_STATUS);
     }
 }

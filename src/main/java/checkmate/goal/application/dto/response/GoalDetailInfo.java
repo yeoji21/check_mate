@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 public class GoalDetailInfo {
     private long id;
-    private List<MateUploadInfo> teamMates;
+    private List<MateUploadInfo> mates;
     private GoalCategory category;
     private String title;
     private LocalDate startDate;
@@ -44,7 +44,7 @@ public class GoalDetailInfo {
         this.uploadable = selector.getUploadable();
     }
 
-    public void setTeamMates(List<MateUploadInfo> teamMates) {
-        this.teamMates = teamMates;
+    public void setMates(List<MateUploadInfo> mates) {
+        this.mates = mates;
     }
 }

@@ -42,7 +42,7 @@ class PostRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Map<Post, List<Image>> postListMap = postRepository.findByTeamMateIdsAndDate(List.of(mate.getId()), LocalDate.now());
+        Map<Post, List<Image>> postListMap = postRepository.findByMateIdsAndDate(List.of(mate.getId()), LocalDate.now());
 
         //then
         assertThat(postListMap.size()).isEqualTo(3);

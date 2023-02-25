@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 public record PostUploadCommand(
         long userId,
-        long teamMateId,
+        long mateId,
         List<MultipartFile> images,
         String content) {
 }

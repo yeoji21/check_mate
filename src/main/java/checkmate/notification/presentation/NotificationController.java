@@ -5,7 +5,7 @@ import checkmate.notification.application.NotificationQueryService;
 import checkmate.notification.application.dto.response.NotificationDetailsResult;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.presentation.dto.NotificationDtoMapper;
-import checkmate.notification.presentation.dto.response.NotificationInfosResult;
+import checkmate.notification.presentation.dto.NotificationInfosResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

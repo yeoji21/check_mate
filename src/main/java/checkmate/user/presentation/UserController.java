@@ -2,7 +2,7 @@ package checkmate.user.presentation;
 
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.UserCommandService;
-import checkmate.user.application.UserFindService;
+import checkmate.user.application.UserQueryService;
 import checkmate.user.presentation.dto.UserDtoMapper;
 import checkmate.user.presentation.dto.request.GoogleSignUpDto;
 import checkmate.user.presentation.dto.request.KakaoSignUpDto;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 @RestController
 public class UserController {
-    private final UserFindService userFindService;
+    private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
     private final UserDtoMapper userDtoMapper;
 
@@ -40,12 +40,12 @@ public class UserController {
 
     @PatchMapping("/user/nickname")
     public void updateNickname(@RequestBody @Valid UserNicknameModifyDto userNicknameModifyDto,
-                               @AuthenticationPrincipal JwtUserDetails userDetails){
+                               @AuthenticationPrincipal JwtUserDetails userDetails) {
         userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
     }
 
     @GetMapping("/user/exists")
     public void nicknameDuplicateCheck(@RequestParam String nickname) {
-        userFindService.existsNicknameCheck(nickname);
+        userQueryService.existsNicknameCheck(nickname);
     }
 }
