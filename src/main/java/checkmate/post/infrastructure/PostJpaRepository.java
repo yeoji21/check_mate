@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QImage.image;
 import static checkmate.post.domain.QPost.post;
 import static com.querydsl.core.group.GroupBy.list;
@@ -27,12 +27,12 @@ public class PostJpaRepository implements PostRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Map<Post, List<Image>> findByTeamMateIdsAndDate(List<Long> teamMateIds, LocalDate uploadDate) {
+    public Map<Post, List<Image>> findByTeamMateIdsAndDate(List<Long> mateIds, LocalDate uploadDate) {
         return queryFactory
                 .from(post)
                 .leftJoin(post.images.images, image)
-                .join(post.teamMate, teamMate).fetchJoin()
-                .where(post.teamMate.id.in(teamMateIds),
+                .join(post.mate, mate).fetchJoin()
+                .where(post.mate.id.in(mateIds),
                         post.createdDateTime.between(uploadDate.atStartOfDay(), uploadDate.plusDays(1).atStartOfDay()))
                 .transform(GroupBy.groupBy(post).as(list(image)));
     }
@@ -40,8 +40,8 @@ public class PostJpaRepository implements PostRepository {
     @Override
     public Optional<Post> findById(long postId) {
         return Optional.ofNullable(queryFactory.selectFrom(post)
-                .join(post.teamMate, teamMate).fetchJoin()
-                .join(teamMate.goal, goal).fetchJoin()
+                .join(post.mate, mate).fetchJoin()
+                .join(mate.goal, goal).fetchJoin()
                 .where(post.id.eq(postId))
                 .fetchOne());
     }

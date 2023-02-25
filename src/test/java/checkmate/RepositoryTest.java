@@ -3,11 +3,11 @@ package checkmate;
 import checkmate.config.jpa.ApplicationAuditingConfig;
 import checkmate.config.jpa.JpaQueryFactoryConfig;
 import checkmate.goal.domain.GoalRepository;
-import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.infrastructure.GoalJpaRepository;
 import checkmate.goal.infrastructure.GoalQueryDao;
-import checkmate.goal.infrastructure.TeamMateJpaRepository;
+import checkmate.goal.infrastructure.MateJpaRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
+import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.infrastructure.NotificationJpaRepository;
 import checkmate.notification.infrastructure.NotificationQueryDao;
@@ -31,7 +31,7 @@ import javax.persistence.EntityManager;
 @Transactional
 @Import({ApplicationAuditingConfig.class, JpaQueryFactoryConfig.class,
         GoalQueryDao.class,
-        TeamMateJpaRepository.class,
+        MateJpaRepository.class,
         TeamMateQueryDao.class,
         NotificationJpaRepository.class,
         ImageJpaRepository.class,
@@ -51,7 +51,7 @@ public abstract class RepositoryTest {
     @Autowired
     protected GoalRepository goalRepository;
     @Autowired
-    protected TeamMateRepository teamMateRepository;
+    protected MateRepository mateRepository;
     @Autowired
     protected NotificationRepository notificationRepository;
     @Autowired

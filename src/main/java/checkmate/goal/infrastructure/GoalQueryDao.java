@@ -4,9 +4,9 @@ import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
-import checkmate.goal.domain.TeamMateStatus;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
+import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static checkmate.user.domain.QUser.user;
 
 @RequiredArgsConstructor
@@ -29,12 +29,12 @@ public class GoalQueryDao {
     // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
         List<Object[]> resultList = entityManager.createNativeQuery(
-                        "select g.id, g.category, g.title, g.check_days, tm.last_upload_date" +
-                                " from team_mate as tm" +
-                                " join goal as g on g.id = tm.goal_id" +
-                                " where tm.user_id = :userId" +
+                        "select g.id, g.category, g.title, g.check_days, m.last_upload_date" +
+                                " from mate as m" +
+                                " join goal as g on g.id = m.goal_id" +
+                                " where m.user_id = :userId" +
                                 " and g.check_days in :values" +
-                                " and tm.status = 'ONGOING' and g.status = 'ONGOING'")
+                                " and m.status = 'ONGOING' and g.status = 'ONGOING'")
                 .setParameter("userId", userId)
                 .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now()))
                 .getResultList();
@@ -52,11 +52,11 @@ public class GoalQueryDao {
     public Optional<GoalDetailInfo> findDetailInfo(long goalId, long userId) {
         Optional<GoalDetailInfo> goalDetailInfo = Optional.ofNullable(
                 queryFactory
-                        .select(new QGoalDetailInfo(goal, teamMate))
-                        .from(teamMate)
-                        .innerJoin(teamMate.goal, goal)
-                        .where(teamMate.userId.eq(userId),
-                                teamMate.goal.id.eq(goalId))
+                        .select(new QGoalDetailInfo(goal, mate))
+                        .from(mate)
+                        .innerJoin(mate.goal, goal)
+                        .where(mate.userId.eq(userId),
+                                mate.goal.id.eq(goalId))
                         .fetchOne()
         );
         goalDetailInfo.ifPresent(info -> info.setTeamMates(findTeamMateInfo(goalId)));
@@ -77,20 +77,20 @@ public class GoalQueryDao {
     // 진행중인 목표들 정보 조회
     public List<GoalSimpleInfo> findOngoingSimpleInfo(long userId) {
         return queryFactory.select(new QGoalSimpleInfo(goal.id, goal.category, goal.title, goal.checkDays.checkDays.stringValue()))
-                .from(teamMate)
-                .join(teamMate.goal, goal)
-                .where(teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
+                .from(mate)
+                .join(mate.goal, goal)
+                .where(mate.userId.eq(userId),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
 
     private List<MateUploadInfo> findTeamMateInfo(long goalId) {
         return queryFactory
-                .select(new QMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
-                .from(teamMate)
-                .join(user).on(teamMate.userId.eq(user.id))
-                .where(teamMate.goal.id.eq(goalId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
+                .select(new QMateUploadInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
+                .from(mate)
+                .join(user).on(mate.userId.eq(user.id))
+                .where(mate.goal.id.eq(goalId),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
 }

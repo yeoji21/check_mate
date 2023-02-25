@@ -1,4 +1,4 @@
-package checkmate.goal.domain;
+package checkmate.mate.domain;
 
 import lombok.Builder;
 import lombok.Getter;

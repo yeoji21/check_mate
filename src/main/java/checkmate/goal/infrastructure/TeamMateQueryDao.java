@@ -1,11 +1,11 @@
 package checkmate.goal.infrastructure;
 
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateStatus;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateScheduleInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QPost.post;
 import static checkmate.user.domain.QUser.user;
 import static com.querydsl.core.group.GroupBy.groupBy;
@@ -27,54 +27,54 @@ import static com.querydsl.core.group.GroupBy.list;
 public class TeamMateQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    public List<TeamMate> findSuccessTeamMates(long userId) {
-        return queryFactory.select(teamMate)
-                .from(teamMate)
-                .join(teamMate.goal, goal).fetchJoin()
-                .where(teamMate.userId.eq(userId))
+    public List<Mate> findSuccessTeamMates(long userId) {
+        return queryFactory.select(mate)
+                .from(mate)
+                .join(mate.goal, goal).fetchJoin()
+                .where(mate.userId.eq(userId))
                 .fetch();
     }
 
     public Map<Long, List<String>> findTeamMateNicknames(List<Long> goalIds) {
         return queryFactory
                 .from(goal)
-                .leftJoin(teamMate).on(teamMate.goal.eq(goal))
-                .join(user).on(teamMate.userId.eq(user.id))
+                .leftJoin(mate).on(mate.goal.eq(goal))
+                .join(user).on(mate.userId.eq(user.id))
                 .where(goal.id.in(goalIds))
                 .transform(groupBy(goal.id).as(list(user.nickname)));
     }
 
-    public Optional<MateScheduleInfo> getTeamMateCalendar(long teamMateId) {
+    public Optional<MateScheduleInfo> getTeamMateCalendar(long mateId) {
         Map<Long, MateScheduleInfo> scheduleInfoMap = queryFactory
-                .from(teamMate)
-                .innerJoin(teamMate.goal, goal)
-                .leftJoin(post).on(post.teamMate.id.eq(teamMateId))
-                .where(teamMate.id.eq(teamMateId))
+                .from(mate)
+                .innerJoin(mate.goal, goal)
+                .leftJoin(post).on(post.mate.id.eq(mateId))
+                .where(mate.id.eq(mateId))
                 .transform(
-                        groupBy(teamMate.id).as(
+                        groupBy(mate.id).as(
                                 new QMateScheduleInfo(goal.period.startDate, goal.period.endDate,
                                         goal.checkDays.checkDays, list(post.uploadedDate))
                         )
                 );
-        return Optional.ofNullable(scheduleInfoMap.get(teamMateId));
+        return Optional.ofNullable(scheduleInfoMap.get(mateId));
     }
 
-    public List<LocalDate> findUploadedDates(long teamMateId) {
+    public List<LocalDate> findUploadedDates(long mateId) {
         return queryFactory
                 .select(post.uploadedDate)
-                .from(teamMate)
-                .leftJoin(post).on(post.teamMate.id.eq(teamMateId))
-                .where(teamMate.id.eq(teamMateId))
+                .from(mate)
+                .leftJoin(post).on(post.mate.id.eq(mateId))
+                .where(mate.id.eq(mateId))
                 .fetch();
     }
 
     public List<MateUploadInfo> findTeamMateInfo(long goalId) {
         return queryFactory
-                .select(new QMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
-                .from(teamMate)
-                .join(user).on(teamMate.userId.eq(user.id))
-                .where(teamMate.goal.id.eq(goalId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
+                .select(new QMateUploadInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
+                .from(mate)
+                .join(user).on(mate.userId.eq(user.id))
+                .where(mate.goal.id.eq(goalId),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
 }

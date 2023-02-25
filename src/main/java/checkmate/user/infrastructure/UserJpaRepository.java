@@ -1,7 +1,7 @@
 package checkmate.user.infrastructure;
 
 import checkmate.goal.domain.GoalStatus;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.domain.MateStatus;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static checkmate.user.domain.QUser.user;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
@@ -63,10 +63,10 @@ public class UserJpaRepository implements UserRepository {
     @Override
     public int countOngoingGoals(long userId) {
         return queryFactory.select(count(goal.id))
-                .from(teamMate)
-                .join(teamMate.goal, goal)
-                .where(teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING),
+                .from(mate)
+                .join(mate.goal, goal)
+                .where(mate.userId.eq(userId),
+                        mate.status.eq(MateStatus.ONGOING),
                         goal.status.eq(GoalStatus.ONGOING))
                 .fetchOne()
                 .intValue();

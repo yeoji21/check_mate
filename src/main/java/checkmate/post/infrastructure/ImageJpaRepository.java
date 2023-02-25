@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QImage.image;
 import static checkmate.post.domain.QPost.post;
 
@@ -28,8 +28,8 @@ public class ImageJpaRepository implements ImageRepository {
     public List<Image> findAllByUserId(long userId) {
         return queryFactory.selectFrom(image)
                 .join(image.post, post)
-                .join(post.teamMate, teamMate)
-                .where(post.teamMate.userId.eq(userId))
+                .join(post.mate, mate)
+                .where(post.mate.userId.eq(userId))
                 .fetch();
     }
 }

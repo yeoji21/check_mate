@@ -3,6 +3,9 @@ package checkmate.goal.domain;
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateInitiateManager;
+import checkmate.mate.domain.MateStatus;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -19,11 +22,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class TeamMateInitiateManagerTest {
+class MateInitiateManagerTest {
     @Mock
     private UserRepository userRepository;
     @InjectMocks
-    private TeamMateInitiateManager teamMateInitiateManager;
+    private MateInitiateManager mateInitiateManager;
 
     @Test
     @DisplayName("목표 시작 성공")
@@ -31,18 +34,18 @@ class TeamMateInitiateManagerTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "title");
         User user = TestEntityFactory.user(2L, "user");
-        TeamMate teamMate = goal.join(user);
+        Mate mate = goal.join(user);
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
 
-        TeamMateStatus before = teamMate.getStatus();
+        MateStatus before = mate.getStatus();
 
         //when
-        teamMateInitiateManager.initiate(teamMate);
+        mateInitiateManager.initiate(mate);
 
         //then
-        TeamMateStatus after = teamMate.getStatus();
-        assertThat(before).isEqualTo(TeamMateStatus.WAITING);
-        assertThat(after).isEqualTo(TeamMateStatus.ONGOING);
+        MateStatus after = mate.getStatus();
+        assertThat(before).isEqualTo(MateStatus.WAITING);
+        assertThat(after).isEqualTo(MateStatus.ONGOING);
     }
 
     @Test
@@ -51,12 +54,12 @@ class TeamMateInitiateManagerTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "title");
         User user = TestEntityFactory.user(2L, "user");
-        TeamMate teamMate = goal.join(user);
+        Mate mate = goal.join(user);
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(10);
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> teamMateInitiateManager.initiate(teamMate));
+                () -> mateInitiateManager.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 
@@ -66,13 +69,13 @@ class TeamMateInitiateManagerTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "title");
         User user = TestEntityFactory.user(2L, "user");
-        TeamMate teamMate = goal.join(user);
-        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
+        Mate mate = goal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> teamMateInitiateManager.initiate(teamMate));
+                () -> mateInitiateManager.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_TEAM_MATE_STATUS);
     }
 }

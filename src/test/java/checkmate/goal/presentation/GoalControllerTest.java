@@ -6,11 +6,11 @@ import checkmate.config.WithMockAuthUser;
 import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
 import checkmate.goal.presentation.dto.GoalCreateDto;
 import checkmate.goal.presentation.dto.GoalModifyDto;
 import checkmate.goal.presentation.dto.LikeCountCreateDto;
 import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -256,7 +256,7 @@ public class GoalControllerTest extends ControllerTest {
 
     private GoalDetailInfo getGoalInformationResponse() {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        TeamMate selector = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate selector = goal.join(TestEntityFactory.user(1L, "user"));
         ReflectionTestUtils.setField(selector, "id", 1L);
 
         MateUploadInfo mateUploadInfo = MateUploadInfo.builder()

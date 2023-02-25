@@ -7,10 +7,10 @@ import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
 import org.junit.jupiter.api.DisplayName;
@@ -42,9 +42,9 @@ class MateControllerTest extends ControllerTest {
     @Test
     void goalDetailResultFind() throws Exception {
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
 
-        GoalDetailResult result = new GoalDetailResult(teamMate,
+        GoalDetailResult result = new GoalDetailResult(mate,
                 List.of(LocalDate.now().minusDays(1), LocalDate.now()),
                 List.of(new MateUploadInfo(1L, 1L, LocalDate.now(), "user")));
 
@@ -152,13 +152,13 @@ class MateControllerTest extends ControllerTest {
     }
 
     private List<GoalHistoryInfo> getGoalHistoryInfoList() {
-        TeamMate teamMate1 = TestEntityFactory.goal(1L, "goal1")
+        Mate mate1 = TestEntityFactory.goal(1L, "goal1")
                 .join(TestEntityFactory.user(1L, "user1"));
-        TeamMate teamMate2 = TestEntityFactory.goal(2L, "goal2")
+        Mate mate2 = TestEntityFactory.goal(2L, "goal2")
                 .join(TestEntityFactory.user(2L, "user2"));
 
-        return List.of(new GoalHistoryInfo(teamMate1, List.of("nickname")),
-                new GoalHistoryInfo(teamMate2, List.of("nickname")));
+        return List.of(new GoalHistoryInfo(mate1, List.of("nickname")),
+                new GoalHistoryInfo(mate2, List.of("nickname")));
     }
 
     private ResponseFieldsSnippet historyResponseFieldsSnippet() {

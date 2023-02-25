@@ -4,7 +4,7 @@ import checkmate.IntegrationTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -34,9 +34,9 @@ public class PostUploadIntegrationTest extends IntegrationTest {
 
         User user = TestEntityFactory.user(null, "tester");
         entityManager.persist(user);
-        TeamMate teamMate = goal.join(user);
-        entityManager.persist(teamMate);
-        int beforeWorkingDays = teamMate.getWorkingDays();
+        Mate mate = goal.join(user);
+        entityManager.persist(mate);
+        int beforeWorkingDays = mate.getWorkingDays();
 
         entityManager.flush();
         entityManager.clear();
@@ -44,7 +44,7 @@ public class PostUploadIntegrationTest extends IntegrationTest {
         //when
         mockMvc.perform(fileUpload("/post")
                         .file(firstFile).file(secondFile)
-                        .param("mateId", String.valueOf(teamMate.getId()))
+                        .param("mateId", String.valueOf(mate.getId()))
                         .param("text", "test")
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -58,8 +58,8 @@ public class PostUploadIntegrationTest extends IntegrationTest {
 //        TestTransaction.flagForCommit();
 //        TestTransaction.end();
 
-        TeamMate findTeamMate = entityManager.find(TeamMate.class, teamMate.getId());
-        assertThat(findTeamMate.getWorkingDays()).isGreaterThan(beforeWorkingDays);
+        Mate findMate = entityManager.find(Mate.class, mate.getId());
+        assertThat(findMate.getWorkingDays()).isGreaterThan(beforeWorkingDays);
     }
 
     private MockMultipartFile getMockMultipartFile(String filename) {

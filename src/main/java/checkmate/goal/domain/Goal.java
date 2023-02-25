@@ -4,6 +4,7 @@ import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import lombok.*;
@@ -86,13 +87,9 @@ public class Goal extends BaseTimeEntity {
         else return appointmentTime.isBefore(LocalTime.now());
     }
 
-    /*
-     User가 Goal에 참여
-     생성된 TeamMate의 status는 waiting이므로 목표 인증을 시작하지 않은 상태
-     */
-    public TeamMate join(User user) {
+    public Mate join(User user) {
         inviteableCheck();
-        return new TeamMate(this, user);
+        return new Mate(this, user);
     }
 
     public boolean isInviteable() {
@@ -120,7 +117,7 @@ public class Goal extends BaseTimeEntity {
         return checkDays.calcWorkingDayCount(period.fromStartToToday());
     }
 
-    int totalWorkingDaysCount() {
+    public int totalWorkingDaysCount() {
         return checkDays.calcWorkingDayCount(period.fromStartToEndDate());
     }
 

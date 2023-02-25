@@ -3,7 +3,7 @@ package checkmate.goal.application.dto.response;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
-import checkmate.goal.domain.TeamMate;
+import checkmate.mate.domain.Mate;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -22,7 +22,7 @@ public class GoalHistoryInfo {
     private double achievementRate;
     private List<String> teamMateNicknames;
 
-    public GoalHistoryInfo(TeamMate finder, List<String> teamMateNicknames) {
+    public GoalHistoryInfo(Mate finder, List<String> teamMateNicknames) {
         Goal goal = finder.getGoal();
         this.goalId = goal.getId();
         this.category = goal.getCategory();

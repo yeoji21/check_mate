@@ -3,7 +3,7 @@ package checkmate.goal.infrastructure;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.GoalStatus;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
-import static checkmate.goal.domain.QTeamMate.teamMate;
 import static checkmate.goal.domain.QVerificationCondition.verificationCondition;
+import static checkmate.mate.domain.QMate.mate;
 
 
 @RequiredArgsConstructor
@@ -35,11 +35,11 @@ public class GoalJpaRepository implements GoalRepository {
     public Optional<Goal> findByIdForUpdate(long goalId) {
         return Optional.ofNullable(
                 queryFactory.select(goal)
-                        .from(teamMate)
-                        .join(teamMate.goal, goal)
+                        .from(mate)
+                        .join(mate.goal, goal)
                         .where(goal.id.eq(goalId),
-                                teamMate.status.eq(TeamMateStatus.ONGOING)
-                                        .or(teamMate.status.eq(TeamMateStatus.SUCCESS)))
+                                mate.status.eq(MateStatus.ONGOING)
+                                        .or(mate.status.eq(MateStatus.SUCCESS)))
                         .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne());
     }

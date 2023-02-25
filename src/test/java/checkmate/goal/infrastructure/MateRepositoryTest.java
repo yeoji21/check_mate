@@ -5,8 +5,8 @@ import checkmate.TestEntityFactory;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -14,10 +14,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TeamMateRepositoryTest extends RepositoryTest {
+class MateRepositoryTest extends RepositoryTest {
     @Test
     void isExistTeamMate() throws Exception {
         //given
@@ -26,15 +26,15 @@ class TeamMateRepositoryTest extends RepositoryTest {
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
 
-        TeamMate teamMate = goal.join(user);
-        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate);
+        Mate mate = goal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
 
         em.flush();
         em.clear();
 
         //when
-        boolean existTeamMate = teamMateRepository.isExistTeamMate(goal.getId(), user.getId());
+        boolean existTeamMate = mateRepository.isExistTeamMate(goal.getId(), user.getId());
 
         //then
         assertThat(existTeamMate).isTrue();
@@ -48,14 +48,14 @@ class TeamMateRepositoryTest extends RepositoryTest {
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
 
-        TeamMate teamMate = goal.join(user);
-        em.persist(teamMate);
+        Mate mate = goal.join(user);
+        em.persist(mate);
 
         em.flush();
         em.clear();
 
         //when
-        boolean existTeamMate = teamMateRepository.isExistTeamMate(goal.getId(), user.getId());
+        boolean existTeamMate = mateRepository.isExistTeamMate(goal.getId(), user.getId());
 
         //then
         assertThat(existTeamMate).isFalse();
@@ -71,7 +71,7 @@ class TeamMateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        boolean existTeamMate = teamMateRepository.isExistTeamMate(goal.getId(), 22L);
+        boolean existTeamMate = mateRepository.isExistTeamMate(goal.getId(), 22L);
 
         //then
         assertThat(existTeamMate).isFalse();
@@ -85,19 +85,19 @@ class TeamMateRepositoryTest extends RepositoryTest {
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
 
-        TeamMate teamMate = goal.join(user);
-        em.persist(teamMate);
+        Mate mate = goal.join(user);
+        em.persist(mate);
 
         em.flush();
         em.clear();
 
         //when
-        TeamMate findTeamMate = teamMateRepository.findTeamMateWithGoal(teamMate.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, teamMate.getId()));
+        Mate findMate = mateRepository.findTeamMateWithGoal(mate.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_MATE_NOT_FOUND, mate.getId()));
 
         //then
-        assertThat(findTeamMate.getGoal().getId()).isEqualTo(goal.getId());
-        assertThat(findTeamMate.getId()).isEqualTo(teamMate.getId());
+        assertThat(findMate.getGoal().getId()).isEqualTo(goal.getId());
+        assertThat(findMate.getId()).isEqualTo(mate.getId());
     }
 
     @Test
@@ -110,48 +110,48 @@ class TeamMateRepositoryTest extends RepositoryTest {
 
         User user1 = TestEntityFactory.user(null, "user1");
         em.persist(user1);
-        TeamMate teamMate1 = goal1.join(user1);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate1);
+        Mate mate1 = goal1.join(user1);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
+        em.persist(mate1);
 
         User user2 = TestEntityFactory.user(null, "user2");
         em.persist(user2);
-        TeamMate teamMate2 = goal1.join(user2);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate2);
+        Mate mate2 = goal1.join(user2);
+        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
+        em.persist(mate2);
 
         User user3 = TestEntityFactory.user(null, "user3");
         em.persist(user3);
-        TeamMate notUploadedTm = goal1.join(user3);
-        ReflectionTestUtils.setField(notUploadedTm, "status", TeamMateStatus.ONGOING);
+        Mate notUploadedTm = goal1.join(user3);
+        ReflectionTestUtils.setField(notUploadedTm, "status", MateStatus.ONGOING);
         em.persist(notUploadedTm);
 
         User user4 = TestEntityFactory.user(null, "user4");
         em.persist(user4);
-        TeamMate notCheckedTm = goal1.join(user4);
-        ReflectionTestUtils.setField(notCheckedTm, "status", TeamMateStatus.ONGOING);
+        Mate notCheckedTm = goal1.join(user4);
+        ReflectionTestUtils.setField(notCheckedTm, "status", MateStatus.ONGOING);
         em.persist(notCheckedTm);
 
-        Post post1 = Post.builder().teamMate(teamMate1).content("test").build();
+        Post post1 = TestEntityFactory.post(mate1);
         post1.check();
         em.persist(post1);
 
-        Post post2 = Post.builder().teamMate(teamMate2).content("test").build();
+        Post post2 = TestEntityFactory.post(mate2);
         post2.check();
         em.persist(post2);
 
-        Post post3 = Post.builder().teamMate(notCheckedTm).content("test").build();
+        Post post3 = TestEntityFactory.post(notCheckedTm);
         em.persist(post3);
 
         em.flush();
         em.clear();
 
         //when
-        List<TeamMate> hookyTeamMates = teamMateRepository.updateYesterdayHookyTMs();
+        List<Mate> hookyMates = mateRepository.updateYesterdayHookyTMs();
 
         //then
-        assertThat(hookyTeamMates.size()).isEqualTo(2);
-        assertThat(hookyTeamMates).contains(notUploadedTm, notCheckedTm);
+        assertThat(hookyMates.size()).isEqualTo(2);
+        assertThat(hookyMates).contains(notUploadedTm, notCheckedTm);
     }
 
     @Test
@@ -162,41 +162,41 @@ class TeamMateRepositoryTest extends RepositoryTest {
 
         User user1 = TestEntityFactory.user(null, "user1");
         em.persist(user1);
-        TeamMate teamMate1 = goal.join(user1);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate1);
+        Mate mate1 = goal.join(user1);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
+        em.persist(mate1);
 
         User user2 = TestEntityFactory.user(null, "user2");
         em.persist(user2);
-        TeamMate teamMate2 = goal.join(user2);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate2);
+        Mate mate2 = goal.join(user2);
+        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
+        em.persist(mate2);
 
         User user3 = TestEntityFactory.user(null, "user3");
         em.persist(user3);
-        TeamMate teamMate3 = goal.join(user3);
-        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate3);
+        Mate mate3 = goal.join(user3);
+        ReflectionTestUtils.setField(mate3, "status", MateStatus.ONGOING);
+        em.persist(mate3);
 
         User user4 = TestEntityFactory.user(null, "user4");
         em.persist(user4);
-        TeamMate teamMate4 = goal.join(user4);
-        ReflectionTestUtils.setField(teamMate4, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate4);
+        Mate mate4 = goal.join(user4);
+        ReflectionTestUtils.setField(mate4, "status", MateStatus.ONGOING);
+        em.persist(mate4);
 
         em.flush();
         em.clear();
 
-        queryFactory.update(teamMate)
-                .where(teamMate.id.in(teamMate1.getId(), teamMate2.getId()))
-                .set(teamMate.progress.skippedDayCount, 50)
+        queryFactory.update(mate)
+                .where(mate.id.in(mate1.getId(), mate2.getId()))
+                .set(mate.progress.skippedDayCount, 50)
                 .execute();
 
         //when
-        List<TeamMate> eliminators = teamMateRepository.eliminateOveredTMs(queryFactory.selectFrom(teamMate).fetch());
+        List<Mate> eliminators = mateRepository.eliminateOveredTMs(queryFactory.selectFrom(mate).fetch());
 
         //then
         assertThat(eliminators.size()).isEqualTo(2);
-        assertThat(eliminators).contains(teamMate1, teamMate2);
+        assertThat(eliminators).contains(mate1, mate2);
     }
 }

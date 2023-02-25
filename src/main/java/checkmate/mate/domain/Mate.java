@@ -1,7 +1,8 @@
-package checkmate.goal.domain;
+package checkmate.mate.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.common.util.ProgressCalculator;
+import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -16,9 +17,9 @@ import java.time.LocalDate;
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "team_mate")
+@Table(name = "mate")
 @Entity
-public class TeamMate extends BaseTimeEntity {
+public class Mate extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -33,16 +34,16 @@ public class TeamMate extends BaseTimeEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private TeamMateStatus status;
+    private MateStatus status;
     @NotNull
     @Embedded
-    private TeamMateProgress progress;
+    private MateProgress progress;
     private LocalDate lastUploadDate;
 
-    TeamMate(Goal goal, User user) {
+    public Mate(Goal goal, User user) {
         this.userId = user.getId();
-        this.status = TeamMateStatus.WAITING;
-        this.progress = new TeamMateProgress();
+        this.status = MateStatus.WAITING;
+        this.progress = new MateProgress();
         this.goal = goal;
     }
 
@@ -53,14 +54,14 @@ public class TeamMate extends BaseTimeEntity {
     void toOngoingStatus() {
         goal.inviteableCheck();
         status.initiateableCheck();
-        status = TeamMateStatus.ONGOING;
-        progress = new TeamMateProgress(goal.progressedWorkingDaysCount(), 0);
+        status = MateStatus.ONGOING;
+        progress = new MateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
     public void toWaitingStatus() {
         goal.inviteableCheck();
         status.inviteableCheck();
-        status = TeamMateStatus.WAITING;
+        status = MateStatus.WAITING;
     }
 
     public double calcProgressPercent() {
@@ -84,7 +85,7 @@ public class TeamMate extends BaseTimeEntity {
     }
 
     public void toRejectStatus() {
-        status = TeamMateStatus.REJECT;
+        status = MateStatus.REJECT;
     }
 
     public void plusWorkingDay() {

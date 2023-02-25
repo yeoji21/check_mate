@@ -1,7 +1,12 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.CheckDaysConverter;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.Uploadable;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -27,10 +32,10 @@ public class GoalDetailResult {
 
     private final List<MateUploadInfo> teamMates;
 
-    public GoalDetailResult(TeamMate teamMate,
+    public GoalDetailResult(Mate mate,
                             List<LocalDate> uploadedDates,
                             List<MateUploadInfo> teamMates) {
-        Goal goal = teamMate.getGoal();
+        Goal goal = mate.getGoal();
 
         this.id = goal.getId();
         this.category = goal.getCategory();
@@ -44,8 +49,8 @@ public class GoalDetailResult {
         this.goalSchedule = goal.getSchedule();
         this.teamMateSchedule = goal.getSchedule(uploadedDates);
 
-        this.uploadable = teamMate.getUploadable();
-        this.progress = teamMate.calcProgressPercent();
+        this.uploadable = mate.getUploadable();
+        this.progress = mate.calcProgressPercent();
 
         this.teamMates = teamMates;
     }

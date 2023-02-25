@@ -4,6 +4,7 @@ import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import org.junit.jupiter.api.DisplayName;
@@ -179,8 +180,8 @@ class GoalTest {
     void 기본_인증_조건_확인() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(teamMate);
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(mate);
 
         //when
         goal.checkConditions(post);
@@ -194,8 +195,8 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         goal.addCondition(new LikeCountCondition(5));
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(teamMate);
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(mate);
 
         //when
         goal.checkConditions(post);
@@ -209,8 +210,8 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         goal.addCondition(new LikeCountCondition(5));
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(teamMate);
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = TestEntityFactory.post(mate);
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(1L));
@@ -230,8 +231,8 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         goal.addCondition(new LikeCountCondition(3));
-        TeamMate teamMate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = getCheckedPost(teamMate);
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Post post = getCheckedPost(mate);
 
         //when
         goal.checkConditions(post);
@@ -240,8 +241,8 @@ class GoalTest {
         assertThat(post.isChecked()).isFalse();
     }
 
-    private Post getCheckedPost(TeamMate teamMate) {
-        Post post = TestEntityFactory.post(teamMate);
+    private Post getCheckedPost(Mate mate) {
+        Post post = TestEntityFactory.post(mate);
         ReflectionTestUtils.setField(post, "checked", true);
         return post;
     }

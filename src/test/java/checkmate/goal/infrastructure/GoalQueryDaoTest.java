@@ -8,6 +8,8 @@ import checkmate.goal.application.dto.response.GoalSimpleInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.*;
 import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateStatus;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,15 +40,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(goal2);
         em.persist(goal3);
 
-        TeamMate teamMate1 = goal1.join(user);
-        TeamMate teamMate2 = goal2.join(user);
-        TeamMate teamMate3 = goal3.join(user);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate1);
-        em.persist(teamMate2);
-        em.persist(teamMate3);
+        Mate mate1 = goal1.join(user);
+        Mate mate2 = goal2.join(user);
+        Mate mate3 = goal3.join(user);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
+        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
+        ReflectionTestUtils.setField(mate3, "status", MateStatus.ONGOING);
+        em.persist(mate1);
+        em.persist(mate2);
+        em.persist(mate3);
 
         //when
         List<GoalSimpleInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
@@ -119,15 +121,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         Goal goal = TestEntityFactory.goal(null, "goal");
         em.persist(goal);
 
-        TeamMate teamMate1 = goal.join(user1);
-        TeamMate teamMate2 = goal.join(user2);
-        TeamMate teamMate3 = goal.join(user3);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.ONGOING);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.ONGOING);
-        ReflectionTestUtils.setField(teamMate3, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate1);
-        em.persist(teamMate2);
-        em.persist(teamMate3);
+        Mate mate1 = goal.join(user1);
+        Mate mate2 = goal.join(user2);
+        Mate mate3 = goal.join(user3);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
+        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
+        ReflectionTestUtils.setField(mate3, "status", MateStatus.ONGOING);
+        em.persist(mate1);
+        em.persist(mate2);
+        em.persist(mate3);
 
         em.flush();
         em.clear();
@@ -158,9 +160,9 @@ class GoalQueryDaoTest extends RepositoryTest {
                 .build();
         em.persist(todayStartGoal);
 
-        TeamMate teamMate = todayStartGoal.join(user);
-        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate);
+        Mate mate = todayStartGoal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
     }
 
     private void setFutureStartGoal(User user) {
@@ -172,8 +174,8 @@ class GoalQueryDaoTest extends RepositoryTest {
                 .build();
         em.persist(futureGoal);
 
-        TeamMate teamMate = futureGoal.join(user);
-        ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-        em.persist(teamMate);
+        Mate mate = futureGoal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
     }
 }

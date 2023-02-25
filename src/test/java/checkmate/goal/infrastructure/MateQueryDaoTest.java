@@ -4,10 +4,10 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalStatus;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateStatus;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TeamMateQueryDaoTest extends RepositoryTest {
+class MateQueryDaoTest extends RepositoryTest {
 
     @Test
     void 팀원의_목표캘린더_조회() throws Exception {
@@ -29,13 +29,13 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         em.persist(goal);
         User user = TestEntityFactory.user(null, "user");
         em.persist(user);
-        TeamMate teamMate = goal.join(user);
-        em.persist(teamMate);
-        Post post = TestEntityFactory.post(teamMate);
+        Mate mate = goal.join(user);
+        em.persist(mate);
+        Post post = TestEntityFactory.post(mate);
         em.persist(post);
 
         //when
-        MateScheduleInfo info = teamMateQueryDao.getTeamMateCalendar(teamMate.getId())
+        MateScheduleInfo info = teamMateQueryDao.getTeamMateCalendar(mate.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
@@ -51,17 +51,17 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         em.persist(goal);
         User user = TestEntityFactory.user(null, "user");
         em.persist(user);
-        TeamMate teamMate = goal.join(user);
-        em.persist(teamMate);
+        Mate mate = goal.join(user);
+        em.persist(mate);
 
-        Post yesterDayPost = TestEntityFactory.post(teamMate);
+        Post yesterDayPost = TestEntityFactory.post(mate);
         ReflectionTestUtils.setField(yesterDayPost, "uploadedDate", LocalDate.now().minusDays(1));
         em.persist(yesterDayPost);
-        Post todayPost = TestEntityFactory.post(teamMate);
+        Post todayPost = TestEntityFactory.post(mate);
         em.persist(todayPost);
 
         //when
-        List<LocalDate> uploadedDates = teamMateQueryDao.findUploadedDates(teamMate.getId());
+        List<LocalDate> uploadedDates = teamMateQueryDao.findUploadedDates(mate.getId());
 
         //then
         assertThat(uploadedDates.size()).isEqualTo(2);
@@ -77,9 +77,9 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         for (int i = 0; i < 10; i++) {
             User user = TestEntityFactory.user(null, "user" + i);
             em.persist(user);
-            TeamMate teamMate = goal.join(user);
-            em.persist(teamMate);
-            ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
+            Mate mate = goal.join(user);
+            em.persist(mate);
+            ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         }
 
         //when
@@ -96,12 +96,12 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         User user = setSuccessedTeamMates();
 
         //when
-        List<TeamMate> successTeamMates = teamMateQueryDao.findSuccessTeamMates(user.getId());
+        List<Mate> successMates = teamMateQueryDao.findSuccessTeamMates(user.getId());
 
         //then
-        assertThat(successTeamMates.size()).isEqualTo(2);
-        successTeamMates.forEach(teamMate -> {
-            assertThat(teamMate.getStatus()).isEqualTo(TeamMateStatus.SUCCESS);
+        assertThat(successMates.size()).isEqualTo(2);
+        successMates.forEach(teamMate -> {
+            assertThat(teamMate.getStatus()).isEqualTo(MateStatus.SUCCESS);
             assertThat(teamMate.getGoal().getStatus()).isEqualTo(GoalStatus.OVER);
         });
     }
@@ -117,9 +117,9 @@ class TeamMateQueryDaoTest extends RepositoryTest {
             for (int j = 0; j < 10; j++) {
                 User user = TestEntityFactory.user(null, i + "user" + j);
                 em.persist(user);
-                TeamMate teamMate = goal.join(user);
-                ReflectionTestUtils.setField(teamMate, "status", TeamMateStatus.ONGOING);
-                em.persist(teamMate);
+                Mate mate = goal.join(user);
+                ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+                em.persist(mate);
             }
         }
         em.flush();
@@ -148,13 +148,13 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         ReflectionTestUtils.setField(goal2, "status", GoalStatus.OVER);
         em.persist(goal2);
 
-        TeamMate teamMate1 = goal1.join(user);
-        ReflectionTestUtils.setField(teamMate1, "status", TeamMateStatus.SUCCESS);
-        em.persist(teamMate1);
+        Mate mate1 = goal1.join(user);
+        ReflectionTestUtils.setField(mate1, "status", MateStatus.SUCCESS);
+        em.persist(mate1);
 
-        TeamMate teamMate2 = goal2.join(user);
-        ReflectionTestUtils.setField(teamMate2, "status", TeamMateStatus.SUCCESS);
-        em.persist(teamMate2);
+        Mate mate2 = goal2.join(user);
+        ReflectionTestUtils.setField(mate2, "status", MateStatus.SUCCESS);
+        em.persist(mate2);
 
         em.flush();
         em.clear();

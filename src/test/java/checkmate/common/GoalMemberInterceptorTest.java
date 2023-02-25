@@ -4,7 +4,7 @@ import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.common.interceptor.GoalMemberInterceptor;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.goal.domain.TeamMateRepository;
+import checkmate.mate.domain.MateRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,7 @@ class GoalMemberInterceptorTest {
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
     @Mock
-    private TeamMateRepository teamMateRepository;
+    private MateRepository mateRepository;
     private GoalMember mockAnnotation;
 
     @InjectMocks
@@ -68,7 +68,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
-        given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -87,7 +87,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_BODY);
-        given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -107,7 +107,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.PATH_VARIABLE);
-        given(teamMateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.isExistTeamMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);

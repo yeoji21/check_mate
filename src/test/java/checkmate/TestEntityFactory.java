@@ -1,6 +1,10 @@
 package checkmate;
 
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalPeriod;
+import checkmate.mate.domain.Mate;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
 import checkmate.post.domain.Post;
@@ -37,9 +41,9 @@ public class TestEntityFactory {
         return user;
     }
 
-    public static Post post(TeamMate uploader) {
+    public static Post post(Mate uploader) {
         return Post.builder()
-                .teamMate(uploader)
+                .mate(uploader)
                 .content("test post")
                 .build();
     }

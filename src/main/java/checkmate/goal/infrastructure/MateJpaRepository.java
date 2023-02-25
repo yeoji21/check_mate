@@ -1,9 +1,9 @@
 package checkmate.goal.infrastructure;
 
 import checkmate.goal.domain.CheckDaysConverter;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateRepository;
-import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -15,39 +15,39 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static checkmate.goal.domain.QGoal.goal;
-import static checkmate.goal.domain.QTeamMate.teamMate;
+import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QPost.post;
 
 @RequiredArgsConstructor
 @Repository
-public class TeamMateJpaRepository implements TeamMateRepository {
+public class MateJpaRepository implements MateRepository {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
     @Override
-    public Optional<TeamMate> findTeamMateWithGoal(long teamMateId) {
+    public Optional<Mate> findTeamMateWithGoal(long mateId) {
         return Optional.ofNullable(
                 queryFactory
-                        .selectFrom(teamMate)
-                        .join(teamMate.goal, goal).fetchJoin()
-                        .where(teamMate.id.eq(teamMateId))
+                        .selectFrom(mate)
+                        .join(mate.goal, goal).fetchJoin()
+                        .where(mate.id.eq(mateId))
                         .fetchOne());
     }
 
     @Override
-    public Optional<TeamMate> findTeamMateWithGoal(long goalId, long userId) {
+    public Optional<Mate> findTeamMateWithGoal(long goalId, long userId) {
         return Optional.ofNullable(
                 queryFactory
-                        .selectFrom(teamMate)
-                        .join(teamMate.goal, goal).fetchJoin()
-                        .where(teamMate.goal.id.eq(goalId),
-                                teamMate.userId.eq(userId))
+                        .selectFrom(mate)
+                        .join(mate.goal, goal).fetchJoin()
+                        .where(mate.goal.id.eq(goalId),
+                                mate.userId.eq(userId))
                         .fetchOne()
         );
     }
 
     @Override
-    public List<TeamMate> updateYesterdayHookyTMs() {
+    public List<Mate> updateYesterdayHookyTMs() {
         // bit
 //        List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
 //                        "select tm.* from team_mate as tm" +
@@ -58,43 +58,43 @@ public class TeamMateJpaRepository implements TeamMateRepository {
 //                .getResultList();
 
         // in
-        List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
-                        "select tm.* from team_mate as tm" +
-                                " join goal as g on g.id = tm.goal_id " +
+        List<Mate> yesterdayTMs = entityManager.createNativeQuery(
+                        "select m.* from mate as m" +
+                                " join goal as g on g.id = m.goal_id " +
                                 " where g.check_days in :values" +
-                                " and g.status = 'ONGOING' and tm.status = 'ONGOING'"
-                        , TeamMate.class)
+                                " and g.status = 'ONGOING' and m.status = 'ONGOING'"
+                        , Mate.class)
                 .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now().minusDays(1)))
                 .getResultList();
 
         List<Long> checkedTeamMateIds = queryFactory
-                .select(post.teamMate.id)
+                .select(post.mate.id)
                 .from(post)
                 .where(
-                        post.teamMate.in(yesterdayTMs),
+                        post.mate.in(yesterdayTMs),
                         post.uploadedDate.eq(LocalDate.now()),
                         post.checked.isTrue())
                 .fetch();
         yesterdayTMs.removeIf(tm -> checkedTeamMateIds.contains(tm.getId()));
 
-        queryFactory.update(teamMate)
-                .where(teamMate.in(yesterdayTMs))
-                .set(teamMate.progress.skippedDayCount, teamMate.progress.skippedDayCount.add(1))
+        queryFactory.update(mate)
+                .where(mate.in(yesterdayTMs))
+                .set(mate.progress.skippedDayCount, mate.progress.skippedDayCount.add(1))
                 .execute();
 
         return yesterdayTMs;
     }
 
     @Override
-    public List<TeamMate> eliminateOveredTMs(List<TeamMate> hookyTMs) {
+    public List<Mate> eliminateOveredTMs(List<Mate> hookyTMs) {
         // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
-        List<TeamMate> eliminators = hookyTMs.stream()
+        List<Mate> eliminators = hookyTMs.stream()
                 .filter(tm -> tm.getHookyDays() >= tm.getGoal().getHookyDayLimit())
                 .collect(Collectors.toList());
 
-        queryFactory.update(teamMate)
-                .where(teamMate.in(eliminators))
-                .set(teamMate.status, TeamMateStatus.OUT)
+        queryFactory.update(mate)
+                .where(mate.in(eliminators))
+                .set(mate.status, MateStatus.OUT)
                 .execute();
 
         return eliminators;
@@ -103,36 +103,36 @@ public class TeamMateJpaRepository implements TeamMateRepository {
     @Override
     public List<Long> findTeamMateUserIds(Long goalId) {
         return queryFactory
-                .select(teamMate.userId)
-                .from(teamMate)
-                .where(teamMate.goal.id.eq(goalId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
+                .select(mate.userId)
+                .from(mate)
+                .where(mate.goal.id.eq(goalId),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
 
     @Override
-    public List<TeamMate> findTeamMates(List<Long> goalIds) {
-        return queryFactory.select(teamMate)
-                .from(teamMate)
-                .where(teamMate.goal.id.in(goalIds))
+    public List<Mate> findTeamMates(List<Long> goalIds) {
+        return queryFactory.select(mate)
+                .from(mate)
+                .where(mate.goal.id.in(goalIds))
                 .fetch();
     }
 
     @Override
     public boolean isExistTeamMate(long goalId, long userId) {
-        Long teamMateId = queryFactory.select(teamMate.id)
-                .from(teamMate)
-                .where(teamMate.goal.id.eq(goalId),
-                        teamMate.userId.eq(userId),
-                        teamMate.status.eq(TeamMateStatus.ONGOING))
+        Long teamMateId = queryFactory.select(mate.id)
+                .from(mate)
+                .where(mate.goal.id.eq(goalId),
+                        mate.userId.eq(userId),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetchOne();
         return teamMateId != null;
     }
 
     @Override
-    public TeamMate save(TeamMate teamMate) {
-        entityManager.persist(teamMate);
-        return teamMate;
+    public Mate save(Mate mate) {
+        entityManager.persist(mate);
+        return mate;
     }
 
 }

@@ -127,15 +127,15 @@ include::{snippets}/find-posts/http-response.adoc[]
 
 === Path Parameter
 
-include::{snippets}/teamMate-calendar/path-parameters.adoc[]
+include::{snippets}/mate-calendar/path-parameters.adoc[]
 
 === Response Field
 
-include::{snippets}/teamMate-calendar/response-fields.adoc[]
+include::{snippets}/mate-calendar/response-fields.adoc[]
 
 === HTTP Response
 
-include::{snippets}/teamMate-calendar/http-response.adoc[]
+include::{snippets}/mate-calendar/http-response.adoc[]
 
 == 개별 알림 조회
 

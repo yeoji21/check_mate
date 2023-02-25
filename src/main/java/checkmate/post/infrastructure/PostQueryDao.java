@@ -24,13 +24,13 @@ public class PostQueryDao {
     public List<PostInfo> findTimelinePosts(long goalId, LocalDate date) {
         return queryFactory
                 .from(post)
-                .join(user).on(user.id.eq(post.teamMate.userId))
+                .join(user).on(user.id.eq(post.mate.userId))
                 .leftJoin(post.images.images, image)
                 .leftJoin(post.likes, likes)
-                .where(post.teamMate.goal.id.eq(goalId),
+                .where(post.mate.goal.id.eq(goalId),
                         post.uploadedDate.eq(date))
                 .orderBy(post.createdDateTime.desc())
-                .transform(GroupBy.groupBy(post).list(new QPostInfo(post.id, post.teamMate.id, user.nickname,
+                .transform(GroupBy.groupBy(post).list(new QPostInfo(post.id, post.mate.id, user.nickname,
                         post.createdDateTime, list(image.storedName), post.content, list(likes.userId))));
     }
 }

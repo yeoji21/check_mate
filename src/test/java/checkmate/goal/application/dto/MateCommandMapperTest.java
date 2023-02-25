@@ -3,9 +3,9 @@ package checkmate.goal.application.dto;
 import checkmate.MapperTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.TeamMate;
 import checkmate.mate.application.dto.MateCommandMapper;
 import checkmate.mate.application.dto.response.MateAcceptResult;
+import checkmate.mate.domain.Mate;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
@@ -23,7 +23,7 @@ class MateCommandMapperTest extends MapperTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
         User receiver = TestEntityFactory.user(3L, "receiver");
-        TeamMate invitee = goal.join(receiver);
+        Mate invitee = goal.join(receiver);
 
         //when
         InviteAcceptNotificationDto dto =
@@ -43,7 +43,7 @@ class MateCommandMapperTest extends MapperTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
         User receiver = TestEntityFactory.user(3L, "receiver");
-        TeamMate invitee = goal.join(receiver);
+        Mate invitee = goal.join(receiver);
 
         //when
         InviteRejectNotificationDto dto =
@@ -63,7 +63,7 @@ class MateCommandMapperTest extends MapperTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
         User receiver = TestEntityFactory.user(3L, "receiver");
-        TeamMate invitee = goal.join(receiver);
+        Mate invitee = goal.join(receiver);
         ReflectionTestUtils.setField(invitee, "id", 4L);
 
         //when
@@ -81,15 +81,15 @@ class MateCommandMapperTest extends MapperTest {
     void expulsionGoalNotificationDto() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(2L, "receiver"));
-        ReflectionTestUtils.setField(teamMate, "id", 3L);
+        Mate mate = goal.join(TestEntityFactory.user(2L, "receiver"));
+        ReflectionTestUtils.setField(mate, "id", 3L);
 
         //when
-        ExpulsionGoalNotificationDto dto = mapper.toNotificationDto(teamMate);
+        ExpulsionGoalNotificationDto dto = mapper.toNotificationDto(mate);
 
         //then
-        isEqualTo(dto.userId(), teamMate.getUserId());
-        isEqualTo(dto.mateId(), teamMate.getId());
+        isEqualTo(dto.userId(), mate.getUserId());
+        isEqualTo(dto.mateId(), mate.getId());
         isEqualTo(dto.goalTitle(), goal.getTitle());
     }
 
@@ -97,14 +97,14 @@ class MateCommandMapperTest extends MapperTest {
     void teamMateAcceptResult() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        TeamMate teamMate = goal.join(TestEntityFactory.user(2L, "receiver"));
-        ReflectionTestUtils.setField(teamMate, "id", 3L);
+        Mate mate = goal.join(TestEntityFactory.user(2L, "receiver"));
+        ReflectionTestUtils.setField(mate, "id", 3L);
 
         //when
-        MateAcceptResult result = mapper.toResult(teamMate);
+        MateAcceptResult result = mapper.toResult(mate);
 
         //then
-        isEqualTo(result.mateId(), teamMate.getId());
+        isEqualTo(result.mateId(), mate.getId());
         isEqualTo(result.goalId(), goal.getId());
     }
 

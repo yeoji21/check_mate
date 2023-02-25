@@ -1,17 +1,17 @@
-package checkmate.goal.domain;
+package checkmate.mate.domain;
 
 import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 
 import static checkmate.exception.code.ErrorCode.INVALID_TEAM_MATE_STATUS;
 
-public enum TeamMateStatus {
+public enum MateStatus {
     WAITING, ONGOING, REJECT, OUT, SUCCESS;
 
     void inviteableCheck() {
-        if (this == TeamMateStatus.ONGOING || this == TeamMateStatus.SUCCESS)
+        if (this == MateStatus.ONGOING || this == MateStatus.SUCCESS)
             throw UnInviteableGoalException.ALREADY_IN_GOAL;
-        else if (this == TeamMateStatus.WAITING)
+        else if (this == MateStatus.WAITING)
             throw UnInviteableGoalException.DUPLICATED_INVITE_REQUEST;
     }
 

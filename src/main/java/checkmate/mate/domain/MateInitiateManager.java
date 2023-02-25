@@ -1,17 +1,18 @@
-package checkmate.goal.domain;
+package checkmate.mate.domain;
 
+import checkmate.goal.domain.GoalJoiningPolicy;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class TeamMateInitiateManager {
+public class MateInitiateManager {
     private final UserRepository userRepository;
 
-    public void initiate(TeamMate teamMate) {
-        int ongoingGoalCount = userRepository.countOngoingGoals(teamMate.getUserId());
+    public void initiate(Mate mate) {
+        int ongoingGoalCount = userRepository.countOngoingGoals(mate.getUserId());
         GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
-        teamMate.toOngoingStatus();
+        mate.toOngoingStatus();
     }
 }

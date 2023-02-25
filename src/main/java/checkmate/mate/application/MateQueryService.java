@@ -5,10 +5,10 @@ import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
-import checkmate.goal.domain.TeamMate;
-import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.MateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import static checkmate.exception.code.ErrorCode.TEAM_MATE_NOT_FOUND;
 @Service
 public class MateQueryService {
     private final TeamMateQueryDao teamMateQueryDao;
-    private final TeamMateRepository teamMateRepository;
+    private final MateRepository mateRepository;
 
     @Transactional(readOnly = true)
     public MateScheduleInfo getCalenderInfo(long teamMateId) {
@@ -33,36 +33,36 @@ public class MateQueryService {
 
     @Transactional(readOnly = true)
     public double getProgressPercent(long teamMateId) {
-        TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(teamMateId)
+        Mate mate = mateRepository.findTeamMateWithGoal(teamMateId)
                 .orElseThrow(() -> new NotFoundException(TEAM_MATE_NOT_FOUND, teamMateId));
-        return teamMate.calcProgressPercent();
+        return mate.calcProgressPercent();
     }
 
     @Transactional(readOnly = true)
     public GoalDetailResult findGoalDetailResult(long goalId, long userId) {
-        TeamMate teamMate = teamMateRepository.findTeamMateWithGoal(goalId, userId)
+        Mate mate = mateRepository.findTeamMateWithGoal(goalId, userId)
                 .orElseThrow(() -> new NotFoundException(TEAM_MATE_NOT_FOUND));
-        return new GoalDetailResult(teamMate,
-                teamMateQueryDao.findUploadedDates(teamMate.getId()),
+        return new GoalDetailResult(mate,
+                teamMateQueryDao.findUploadedDates(mate.getId()),
                 teamMateQueryDao.findTeamMateInfo(goalId));
     }
 
     @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
     public GoalHistoryInfoResult findHistoryGoalInfo(long userId) {
-        List<TeamMate> successTeamMates = teamMateQueryDao.findSuccessTeamMates(userId);
-        return new GoalHistoryInfoResult(mapToGoalHistoryInfo(successTeamMates));
+        List<Mate> successMates = teamMateQueryDao.findSuccessTeamMates(userId);
+        return new GoalHistoryInfoResult(mapToGoalHistoryInfo(successMates));
     }
 
-    private List<GoalHistoryInfo> mapToGoalHistoryInfo(List<TeamMate> successTeamMates) {
-        Map<Long, List<String>> teamMateNicknames = teamMateQueryDao.findTeamMateNicknames(getGoalIds(successTeamMates));
-        return successTeamMates.stream()
+    private List<GoalHistoryInfo> mapToGoalHistoryInfo(List<Mate> successMates) {
+        Map<Long, List<String>> teamMateNicknames = teamMateQueryDao.findTeamMateNicknames(getGoalIds(successMates));
+        return successMates.stream()
                 .map(teamMate -> new GoalHistoryInfo(teamMate, teamMateNicknames.get(teamMate.getGoal().getId())))
                 .toList();
     }
 
-    private List<Long> getGoalIds(List<TeamMate> successTeamMates) {
-        return successTeamMates.stream()
+    private List<Long> getGoalIds(List<Mate> successMates) {
+        return successMates.stream()
                 .map(teamMate -> teamMate.getGoal().getId())
                 .toList();
     }
