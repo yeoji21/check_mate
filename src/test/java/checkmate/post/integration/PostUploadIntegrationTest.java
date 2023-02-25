@@ -22,8 +22,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Disabled
 public class PostUploadIntegrationTest extends IntegrationTest {
 
-    @Test @WithMockAuthUser
-    void 목표_인증_테스트() throws Exception{
+    @Test
+    @WithMockAuthUser
+    void 목표_인증_테스트() throws Exception {
         //given
         MockMultipartFile firstFile = getMockMultipartFile("imageFile1");
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
@@ -43,7 +44,7 @@ public class PostUploadIntegrationTest extends IntegrationTest {
         //when
         mockMvc.perform(fileUpload("/post")
                         .file(firstFile).file(secondFile)
-                        .param("teamMateId", String.valueOf(teamMate.getId()))
+                        .param("mateId", String.valueOf(teamMate.getId()))
                         .param("text", "test")
                         .with(csrf()))
                 .andExpect(status().isOk())

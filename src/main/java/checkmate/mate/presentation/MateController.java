@@ -3,12 +3,12 @@ package checkmate.mate.presentation;
 import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.goal.application.TeamMateCommandService;
-import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
-import checkmate.goal.application.dto.response.TeamMateAcceptResult;
-import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
+import checkmate.mate.application.MateCommandService;
+import checkmate.mate.application.MateQueryService;
+import checkmate.mate.application.dto.response.MateAcceptResult;
+import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.presentation.dto.MateDtoMapper;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
@@ -23,48 +23,48 @@ import javax.validation.Valid;
 @Slf4j
 @RestController
 public class MateController {
-    private final TeamMateCommandService teamMateCommandService;
-    private final TeamMateQueryService teamMateQueryService;
+    private final MateCommandService mateCommandService;
+    private final MateQueryService mateQueryService;
     private final MateDtoMapper mapper;
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
     @GetMapping("/goal/detail/{goalId}")
     public GoalDetailResult goalDetailResultFind(@PathVariable long goalId,
                                                  @AuthenticationPrincipal JwtUserDetails details) {
-        return teamMateQueryService.findGoalDetailResult(goalId, details.getUserId());
+        return mateQueryService.findGoalDetailResult(goalId, details.getUserId());
     }
 
     @GetMapping("/goal/history")
     public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
-        return teamMateQueryService.findHistoryGoalInfo(details.getUserId());
+        return mateQueryService.findHistoryGoalInfo(details.getUserId());
     }
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)
     @PostMapping("/mate")
     public void inviteToGoal(@RequestBody @Valid MateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
-        teamMateCommandService.inviteTeamMate(mapper.toCommand(inviteDto, principal.getUserId()));
+        mateCommandService.inviteTeamMate(mapper.toCommand(inviteDto, principal.getUserId()));
     }
 
     @PatchMapping("/mate/accept")
-    public TeamMateAcceptResult inviteAccept(@RequestBody MateInviteReplyDto dto,
-                                             @AuthenticationPrincipal JwtUserDetails principal) {
-        return teamMateCommandService.inviteAccept(mapper.toCommand(dto, principal.getUserId()));
+    public MateAcceptResult inviteAccept(@RequestBody MateInviteReplyDto dto,
+                                         @AuthenticationPrincipal JwtUserDetails principal) {
+        return mateCommandService.inviteAccept(mapper.toCommand(dto, principal.getUserId()));
     }
 
     @PatchMapping("/mate/reject")
     public void inviteReject(@RequestBody MateInviteReplyDto dto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
-        teamMateCommandService.inviteReject(mapper.toCommand(dto, principal.getUserId()));
+        mateCommandService.inviteReject(mapper.toCommand(dto, principal.getUserId()));
     }
 
     @GetMapping("/mate/{teamMateId}/calendar")
-    public TeamMateScheduleInfo teamMateGoalCalender(@PathVariable long teamMateId) {
-        return teamMateQueryService.getCalenderInfo(teamMateId);
+    public MateScheduleInfo teamMateGoalCalender(@PathVariable long teamMateId) {
+        return mateQueryService.getCalenderInfo(teamMateId);
     }
 
     @GetMapping("/mate/{teamMateId}/progress")
     public double progressPercent(@PathVariable Long teamMateId) {
-        return teamMateQueryService.getProgressPercent(teamMateId);
+        return mateQueryService.getProgressPercent(teamMateId);
     }
 }

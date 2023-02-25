@@ -2,19 +2,20 @@ package checkmate.goal.application.dto;
 
 import checkmate.MapperTest;
 import checkmate.TestEntityFactory;
-import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
+import checkmate.mate.application.dto.MateCommandMapper;
+import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
-import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
+import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class TeamMateCommandMapperTest extends MapperTest {
-    private static final TeamMateCommandMapper mapper = TeamMateCommandMapper.INSTANCE;
+class MateCommandMapperTest extends MapperTest {
+    private static final MateCommandMapper mapper = MateCommandMapper.INSTANCE;
 
     @Test
     void toAcceptNotificationDto() throws Exception {
@@ -66,11 +67,11 @@ class TeamMateCommandMapperTest extends MapperTest {
         ReflectionTestUtils.setField(invitee, "id", 4L);
 
         //when
-        TeamMateInviteNotificationDto dto = mapper.toNotificationDto(inviter.getId(), inviter.getNickname(), invitee);
+        MateInviteNotificationDto dto = mapper.toNotificationDto(inviter.getId(), inviter.getNickname(), invitee);
 
         //then
         isEqualTo(dto.inviterUserId(), inviter.getId());
-        isEqualTo(dto.inviteeTeamMateId(), invitee.getId());
+        isEqualTo(dto.inviteeMateId(), invitee.getId());
         isEqualTo(dto.inviterNickname(), inviter.getNickname());
         isEqualTo(dto.goalTitle(), goal.getTitle());
         isEqualTo(dto.inviteeUserId(), invitee.getUserId());
@@ -88,7 +89,7 @@ class TeamMateCommandMapperTest extends MapperTest {
 
         //then
         isEqualTo(dto.userId(), teamMate.getUserId());
-        isEqualTo(dto.teamMateId(), teamMate.getId());
+        isEqualTo(dto.mateId(), teamMate.getId());
         isEqualTo(dto.goalTitle(), goal.getTitle());
     }
 
@@ -100,10 +101,10 @@ class TeamMateCommandMapperTest extends MapperTest {
         ReflectionTestUtils.setField(teamMate, "id", 3L);
 
         //when
-        TeamMateAcceptResult result = mapper.toResult(teamMate);
+        MateAcceptResult result = mapper.toResult(teamMate);
 
         //then
-        isEqualTo(result.teamMateId(), teamMate.getId());
+        isEqualTo(result.mateId(), teamMate.getId());
         isEqualTo(result.goalId(), goal.getId());
     }
 

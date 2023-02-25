@@ -3,9 +3,14 @@ package checkmate.goal.presentation;
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
-import checkmate.goal.application.dto.response.*;
+import checkmate.goal.application.dto.response.GoalDetailResult;
+import checkmate.goal.application.dto.response.GoalHistoryInfo;
+import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.TeamMate;
+import checkmate.mate.application.dto.response.MateAcceptResult;
+import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
 import org.junit.jupiter.api.DisplayName;
@@ -41,9 +46,9 @@ class MateControllerTest extends ControllerTest {
 
         GoalDetailResult result = new GoalDetailResult(teamMate,
                 List.of(LocalDate.now().minusDays(1), LocalDate.now()),
-                List.of(new TeamMateUploadInfo(1L, 1L, LocalDate.now(), "user")));
+                List.of(new MateUploadInfo(1L, 1L, LocalDate.now(), "user")));
 
-        given(teamMateQueryService.findGoalDetailResult(any(Long.class), any(Long.class)))
+        given(mateQueryService.findGoalDetailResult(any(Long.class), any(Long.class)))
                 .willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders
@@ -68,16 +73,16 @@ class MateControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(document("invite-team mate", getInviteTeamMateRequest()));
-        verify(teamMateCommandService).inviteTeamMate(any());
+        verify(mateCommandService).inviteTeamMate(any());
     }
 
     @WithMockAuthUser
     @Test
     void 초대_응답_수락() throws Exception {
         MateInviteReplyDto dto = new MateInviteReplyDto(1L);
-        TeamMateAcceptResult result = new TeamMateAcceptResult(1L, 1L);
+        MateAcceptResult result = new MateAcceptResult(1L, 1L);
 
-        given(teamMateCommandService.inviteAccept(any())).willReturn(result);
+        given(mateCommandService.inviteAccept(any())).willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/accept")
                         .with(csrf())
@@ -91,7 +96,7 @@ class MateControllerTest extends ControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("goalId"),
-                                fieldWithPath("teamMateId").type(JsonFieldType.NUMBER).description("teamMateId")
+                                fieldWithPath("mateId").type(JsonFieldType.NUMBER).description("mateId")
                         )));
     }
 
@@ -117,15 +122,15 @@ class MateControllerTest extends ControllerTest {
     @Test
     void 목표_진행률_조회_테스트() throws Exception {
         double result = 20.0;
-        given(teamMateQueryService.getProgressPercent(1L)).willReturn(result);
+        given(mateQueryService.getProgressPercent(1L)).willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{teamMateId}/progress", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{mateId}/progress", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(String.valueOf(result)))
                 .andDo(document("progress-percent",
-                        pathParameters(parameterWithName("teamMateId").description("teamMateId"))
+                        pathParameters(parameterWithName("mateId").description("mateId"))
                 ));
     }
 
@@ -135,7 +140,7 @@ class MateControllerTest extends ControllerTest {
         List<GoalHistoryInfo> goalHistoryInfoList = getGoalHistoryInfoList();
         GoalHistoryInfoResult result = new GoalHistoryInfoResult(goalHistoryInfoList);
 
-        given(teamMateQueryService.findHistoryGoalInfo(any(Long.class))).willReturn(result);
+        given(mateQueryService.findHistoryGoalInfo(any(Long.class))).willReturn(result);
 
         mockMvc.perform(get("/goal/history")
                         .contentType(APPLICATION_JSON))
@@ -173,22 +178,22 @@ class MateControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
     void 팀원의_목표_수행_캘린더_조회() throws Exception {
-        TeamMateScheduleInfo calendarInfo = TeamMateScheduleInfo.builder()
+        MateScheduleInfo calendarInfo = MateScheduleInfo.builder()
                 .startDate(LocalDate.now())
                 .endDate(LocalDate.now().plusDays(10))
                 .weekDays(1111111)
                 .uploadedDates(List.of(LocalDate.now()))
                 .build();
 
-        given(teamMateQueryService.getCalenderInfo(1L)).willReturn(calendarInfo);
+        given(mateQueryService.getCalenderInfo(1L)).willReturn(calendarInfo);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{teamMateId}/calendar", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{mateId}/calendar", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(calendarInfo)))
-                .andDo(document("teamMate-calendar",
-                        pathParameters(parameterWithName("teamMateId").description("teamMateId")),
+                .andDo(document("mate-calendar",
+                        pathParameters(parameterWithName("mateId").description("mateId")),
                         teamMateCalendarResponseFieldsSnippet()
                 ));
     }
@@ -205,7 +210,7 @@ class MateControllerTest extends ControllerTest {
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
                 fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("teamMates[].teamMateId").description("팀메이트 id"),
+                fieldWithPath("teamMates[].mateId").description("팀메이트 id"),
                 fieldWithPath("teamMates[].userId").description("유저 id"),
                 fieldWithPath("teamMates[].nickname").description("유저의 닉네임"),
                 fieldWithPath("teamMates[].uploaded").description("이미 업로드했는지"),
@@ -224,7 +229,7 @@ class MateControllerTest extends ControllerTest {
                 fieldWithPath("startDate").type(JsonFieldType.STRING).description("목표 수행 시작일"),
                 fieldWithPath("endDate").type(JsonFieldType.STRING).description("목표 수행 종료일"),
                 fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
-                fieldWithPath("teamMateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정")
+                fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정")
         );
     }
 

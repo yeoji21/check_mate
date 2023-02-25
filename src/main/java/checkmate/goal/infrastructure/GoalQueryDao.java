@@ -5,6 +5,8 @@ import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.application.dto.response.QMateUploadInfo;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -82,9 +84,9 @@ public class GoalQueryDao {
                 .fetch();
     }
 
-    private List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
+    private List<MateUploadInfo> findTeamMateInfo(long goalId) {
         return queryFactory
-                .select(new QTeamMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
+                .select(new QMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
                 .from(teamMate)
                 .join(user).on(teamMate.userId.eq(user.id))
                 .where(teamMate.goal.id.eq(goalId),

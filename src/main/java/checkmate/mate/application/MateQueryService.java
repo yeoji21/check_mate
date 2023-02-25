@@ -1,14 +1,14 @@
-package checkmate.goal.application;
+package checkmate.mate.application;
 
 import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.response.GoalDetailResult;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalHistoryInfoResult;
-import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateRepository;
 import checkmate.goal.infrastructure.TeamMateQueryDao;
+import checkmate.mate.application.dto.response.MateScheduleInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ import static checkmate.exception.code.ErrorCode.TEAM_MATE_NOT_FOUND;
 
 @RequiredArgsConstructor
 @Service
-public class TeamMateQueryService {
+public class MateQueryService {
     private final TeamMateQueryDao teamMateQueryDao;
     private final TeamMateRepository teamMateRepository;
 
     @Transactional(readOnly = true)
-    public TeamMateScheduleInfo getCalenderInfo(long teamMateId) {
+    public MateScheduleInfo getCalenderInfo(long teamMateId) {
         return teamMateQueryDao.getTeamMateCalendar(teamMateId)
                 .orElseThrow(IllegalArgumentException::new);
     }

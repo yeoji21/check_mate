@@ -1,4 +1,4 @@
-package checkmate.goal.application.dto.response;
+package checkmate.mate.application.dto.response;
 
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
@@ -11,24 +11,24 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-public class TeamMateScheduleInfo {
+public class MateScheduleInfo {
     private LocalDate startDate;
     private LocalDate endDate;
     private String goalSchedule;
-    private String teamMateSchedule;
+    private String mateSchedule;
 
     @QueryProjection
     @Builder
-    public TeamMateScheduleInfo(LocalDate startDate,
-                                LocalDate endDate,
-                                int weekDays,
-                                List<LocalDate> uploadedDates) {
+    public MateScheduleInfo(LocalDate startDate,
+                            LocalDate endDate,
+                            int weekDays,
+                            List<LocalDate> uploadedDates) {
         Goal goal = createGoal(startDate, endDate, weekDays);
         this.startDate = startDate;
         this.endDate = endDate;
         this.goalSchedule = goal.getSchedule();
-        this.teamMateSchedule = goal.getSchedule(uploadedDates);
-        if (goalSchedule.length() != teamMateSchedule.length())
+        this.mateSchedule = goal.getSchedule(uploadedDates);
+        if (goalSchedule.length() != mateSchedule.length())
             throw new IllegalArgumentException();
     }
 

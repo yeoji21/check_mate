@@ -1,11 +1,11 @@
 package checkmate.goal.infrastructure;
 
-import checkmate.goal.application.dto.response.QTeamMateScheduleInfo;
-import checkmate.goal.application.dto.response.QTeamMateUploadInfo;
-import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.application.dto.response.TeamMateUploadInfo;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.application.dto.response.QMateScheduleInfo;
+import checkmate.mate.application.dto.response.QMateUploadInfo;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -44,15 +44,15 @@ public class TeamMateQueryDao {
                 .transform(groupBy(goal.id).as(list(user.nickname)));
     }
 
-    public Optional<TeamMateScheduleInfo> getTeamMateCalendar(long teamMateId) {
-        Map<Long, TeamMateScheduleInfo> scheduleInfoMap = queryFactory
+    public Optional<MateScheduleInfo> getTeamMateCalendar(long teamMateId) {
+        Map<Long, MateScheduleInfo> scheduleInfoMap = queryFactory
                 .from(teamMate)
                 .innerJoin(teamMate.goal, goal)
                 .leftJoin(post).on(post.teamMate.id.eq(teamMateId))
                 .where(teamMate.id.eq(teamMateId))
                 .transform(
                         groupBy(teamMate.id).as(
-                                new QTeamMateScheduleInfo(goal.period.startDate, goal.period.endDate,
+                                new QMateScheduleInfo(goal.period.startDate, goal.period.endDate,
                                         goal.checkDays.checkDays, list(post.uploadedDate))
                         )
                 );
@@ -68,9 +68,9 @@ public class TeamMateQueryDao {
                 .fetch();
     }
 
-    public List<TeamMateUploadInfo> findTeamMateInfo(long goalId) {
+    public List<MateUploadInfo> findTeamMateInfo(long goalId) {
         return queryFactory
-                .select(new QTeamMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
+                .select(new QMateUploadInfo(teamMate.id, user.id, teamMate.lastUploadDate, user.nickname))
                 .from(teamMate)
                 .join(user).on(teamMate.userId.eq(user.id))
                 .where(teamMate.goal.id.eq(goalId),

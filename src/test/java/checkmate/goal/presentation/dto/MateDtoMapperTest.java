@@ -1,8 +1,8 @@
 package checkmate.goal.presentation.dto;
 
 import checkmate.MapperTest;
-import checkmate.goal.application.dto.request.TeamMateInviteCommand;
-import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
+import checkmate.mate.application.dto.request.MateInviteCommand;
+import checkmate.mate.application.dto.request.MateInviteReplyCommand;
 import checkmate.mate.presentation.dto.MateDtoMapper;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
@@ -18,7 +18,7 @@ class MateDtoMapperTest extends MapperTest {
         long inviterUserId = 2L;
 
         //when
-        TeamMateInviteCommand command = mapper.toCommand(dto, inviterUserId);
+        MateInviteCommand command = mapper.toCommand(dto, inviterUserId);
 
         //then
         isEqualTo(command.goalId(), dto.getGoalId());
@@ -33,7 +33,7 @@ class MateDtoMapperTest extends MapperTest {
         long userId = 2L;
 
         //when
-        TeamMateInviteReplyCommand command = mapper.toCommand(dto, userId);
+        MateInviteReplyCommand command = mapper.toCommand(dto, userId);
 
         //then
         isEqualTo(command.notificationId(), dto.getNotificationId());

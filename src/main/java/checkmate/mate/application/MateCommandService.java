@@ -1,14 +1,14 @@
-package checkmate.goal.application;
+package checkmate.mate.application;
 
 import checkmate.common.cache.CacheHandler;
 import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.request.TeamMateInviteCommand;
-import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
-import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.*;
+import checkmate.mate.application.dto.MateCommandMapper;
+import checkmate.mate.application.dto.request.MateInviteCommand;
+import checkmate.mate.application.dto.request.MateInviteReplyCommand;
+import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
@@ -16,8 +16,8 @@ import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
+import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
-import checkmate.notification.domain.factory.dto.TeamMateInviteNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ import static checkmate.notification.domain.NotificationType.*;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class TeamMateCommandService {
+public class MateCommandService {
     private final UserRepository userRepository;
     private final GoalRepository goalRepository;
     private final TeamMateRepository teamMateRepository;
@@ -44,10 +44,10 @@ public class TeamMateCommandService {
     private final TeamMateInitiateManager teamMateInitiateManager;
     private final CacheHandler cacheHandler;
     private final ApplicationEventPublisher eventPublisher;
-    private final TeamMateCommandMapper mapper;
+    private final MateCommandMapper mapper;
 
     @Transactional
-    public void inviteTeamMate(TeamMateInviteCommand command) {
+    public void inviteTeamMate(MateInviteCommand command) {
         TeamMate invitee = findOrCreateInvitee(command.goalId(), command.inviteeNickname());
         invitee.toWaitingStatus();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
@@ -63,9 +63,9 @@ public class TeamMateCommandService {
                     key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @Transactional
-    public TeamMateAcceptResult inviteAccept(TeamMateInviteReplyCommand command) {
+    public MateAcceptResult inviteAccept(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        TeamMate teamMate = applyToTeamMate(notification.getLongAttribute("teamMateId"),
+        TeamMate teamMate = applyToTeamMate(notification.getLongAttribute("mateId"),
                 teamMateInitiateManager::initiate);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
@@ -74,9 +74,9 @@ public class TeamMateCommandService {
     }
 
     @Transactional
-    public void inviteReject(TeamMateInviteReplyCommand command) {
+    public void inviteReject(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        TeamMate teamMate = applyToTeamMate(notification.getLongAttribute("teamMateId"),
+        TeamMate teamMate = applyToTeamMate(notification.getLongAttribute("mateId"),
                 TeamMate::toRejectStatus);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,
@@ -116,7 +116,7 @@ public class TeamMateCommandService {
         return receiver.getNotification();
     }
 
-    private TeamMateInviteNotificationDto getInviteGoalNotificationDto(TeamMateInviteCommand command, Long inviteeUserId) {
+    private MateInviteNotificationDto getInviteGoalNotificationDto(MateInviteCommand command, Long inviteeUserId) {
         TeamMate inviteeTeamMate = findTeamMateWithGoal(command.goalId(), inviteeUserId);
         return mapper.toNotificationDto(command.inviterUserId(), findNickname(command.inviterUserId()), inviteeTeamMate);
     }

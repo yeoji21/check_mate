@@ -3,10 +3,10 @@ package checkmate;
 import checkmate.exception.ErrorCodeController;
 import checkmate.goal.application.GoalCommandService;
 import checkmate.goal.application.GoalQueryService;
-import checkmate.goal.application.TeamMateCommandService;
-import checkmate.goal.application.TeamMateQueryService;
 import checkmate.goal.presentation.GoalController;
 import checkmate.goal.presentation.dto.GoalDtoMapper;
+import checkmate.mate.application.MateCommandService;
+import checkmate.mate.application.MateQueryService;
 import checkmate.mate.presentation.MateController;
 import checkmate.mate.presentation.dto.MateDtoMapper;
 import checkmate.notification.application.NotificationQueryService;
@@ -58,9 +58,9 @@ public abstract class ControllerTest {
     protected GoalQueryService goalQueryService;
 
     @MockBean
-    protected TeamMateCommandService teamMateCommandService;
+    protected MateCommandService mateCommandService;
     @MockBean
-    protected TeamMateQueryService teamMateQueryService;
+    protected MateQueryService mateQueryService;
     @MockBean
     protected NotificationQueryService notificationQueryService;
     @MockBean

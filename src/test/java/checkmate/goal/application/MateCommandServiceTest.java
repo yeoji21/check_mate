@@ -2,11 +2,12 @@ package checkmate.goal.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheHandler;
-import checkmate.goal.application.dto.TeamMateCommandMapper;
-import checkmate.goal.application.dto.request.TeamMateInviteCommand;
-import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
-import checkmate.goal.application.dto.response.TeamMateAcceptResult;
 import checkmate.goal.domain.*;
+import checkmate.mate.application.MateCommandService;
+import checkmate.mate.application.dto.MateCommandMapper;
+import checkmate.mate.application.dto.request.MateInviteCommand;
+import checkmate.mate.application.dto.request.MateInviteReplyCommand;
+import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class TeamMateCommandServiceTest {
+public class MateCommandServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
@@ -53,9 +54,9 @@ public class TeamMateCommandServiceTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Spy
-    private TeamMateCommandMapper commandMapper = TeamMateCommandMapper.INSTANCE;
+    private MateCommandMapper commandMapper = MateCommandMapper.INSTANCE;
     @InjectMocks
-    private TeamMateCommandService teamMateCommandService;
+    private MateCommandService mateCommandService;
 
     @Test
     @DisplayName("초대를 거절한 적이 있는 유저에게 초대")
@@ -66,7 +67,7 @@ public class TeamMateCommandServiceTest {
         User invitee = TestEntityFactory.user(5L, "invitee");
         TeamMate inviteeTeamMate = getRejectStatusTeamMate(goal, invitee);
 
-        TeamMateInviteCommand command = getTeamMateInviteCommand(goal, inviter, invitee);
+        MateInviteCommand command = getTeamMateInviteCommand(goal, inviter, invitee);
 
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
@@ -74,7 +75,7 @@ public class TeamMateCommandServiceTest {
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(inviter.getNickname()));
 
         //when
-        teamMateCommandService.inviteTeamMate(command);
+        mateCommandService.inviteTeamMate(command);
 
         //then
         assertThat(inviteeTeamMate.getStatus()).isEqualTo(TeamMateStatus.WAITING);
@@ -90,7 +91,7 @@ public class TeamMateCommandServiceTest {
         TeamMate inviteeTeamMate = getTeamMate(invitee);
         Notification notification = getInviteNotification(inviteeTeamMate);
 
-        TeamMateInviteReplyCommand command = new TeamMateInviteReplyCommand(invitee.getId(), notification.getId());
+        MateInviteReplyCommand command = new MateInviteReplyCommand(invitee.getId(), notification.getId());
         NotificationReceiver receiver = notification.getReceivers().get(0);
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
@@ -104,11 +105,11 @@ public class TeamMateCommandServiceTest {
         }).when(teamMateInitiateManager).initiate(any(TeamMate.class));
 
         //when
-        TeamMateAcceptResult result = teamMateCommandService.inviteAccept(command);
+        MateAcceptResult result = mateCommandService.inviteAccept(command);
 
         //then
         assertThat(result.goalId()).isEqualTo(inviteeTeamMate.getGoal().getId());
-        assertThat(result.teamMateId()).isEqualTo(inviteeTeamMate.getId());
+        assertThat(result.mateId()).isEqualTo(inviteeTeamMate.getId());
         assertThat(inviteeTeamMate.getStatus()).isEqualTo(TeamMateStatus.ONGOING);
 
         verify(teamMateInitiateManager).initiate(any(TeamMate.class));
@@ -130,7 +131,7 @@ public class TeamMateCommandServiceTest {
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
 
         //when
-        teamMateCommandService.inviteReject(new TeamMateInviteReplyCommand(invitee.getId(), notification.getId()));
+        mateCommandService.inviteReject(new MateInviteReplyCommand(invitee.getId(), notification.getId()));
 
         //then
         assertThat(inviteeTeamMate.getStatus()).isEqualTo(TeamMateStatus.REJECT);
@@ -148,7 +149,7 @@ public class TeamMateCommandServiceTest {
         given(teamMateRepository.eliminateOveredTMs(hookyTeamMates)).willReturn(Collections.EMPTY_LIST);
 
         //when
-        teamMateCommandService.updateHookyTeamMate();
+        mateCommandService.updateHookyTeamMate();
 
         //then
         verify(cacheHandler).deleteTeamMateCaches(any(List.class));
@@ -165,7 +166,7 @@ public class TeamMateCommandServiceTest {
                 .content("content")
                 .receivers(List.of(receiver))
                 .build();
-        notification.addAttribute("teamMateId", teamMate.getId());
+        notification.addAttribute("mateId", teamMate.getId());
         ReflectionTestUtils.setField(notification, "id", 1L);
         return notification;
     }
@@ -191,8 +192,8 @@ public class TeamMateCommandServiceTest {
         return inviteeTeamMate;
     }
 
-    private TeamMateInviteCommand getTeamMateInviteCommand(Goal goal, User inviter, User invitee) {
-        return TeamMateInviteCommand.builder()
+    private MateInviteCommand getTeamMateInviteCommand(Goal goal, User inviter, User invitee) {
+        return MateInviteCommand.builder()
                 .goalId(goal.getId())
                 .inviterUserId(inviter.getId())
                 .inviteeNickname(invitee.getNickname())

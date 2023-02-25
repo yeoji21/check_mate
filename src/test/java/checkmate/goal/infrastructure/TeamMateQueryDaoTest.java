@@ -2,12 +2,12 @@ package checkmate.goal.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.goal.application.dto.response.TeamMateScheduleInfo;
-import checkmate.goal.application.dto.response.TeamMateUploadInfo;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalStatus;
 import checkmate.goal.domain.TeamMate;
 import checkmate.goal.domain.TeamMateStatus;
+import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -35,13 +35,13 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         em.persist(post);
 
         //when
-        TeamMateScheduleInfo info = teamMateQueryDao.getTeamMateCalendar(teamMate.getId())
+        MateScheduleInfo info = teamMateQueryDao.getTeamMateCalendar(teamMate.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(info.getStartDate()).isEqualTo(goal.getStartDate());
         assertThat(info.getGoalSchedule()).isEqualTo(goal.getSchedule());
-        assertThat(info.getTeamMateSchedule().length()).isEqualTo(info.getGoalSchedule().length());
+        assertThat(info.getMateSchedule().length()).isEqualTo(info.getGoalSchedule().length());
     }
 
     @Test
@@ -83,7 +83,7 @@ class TeamMateQueryDaoTest extends RepositoryTest {
         }
 
         //when
-        List<TeamMateUploadInfo> uploadInfos = teamMateQueryDao.findTeamMateInfo(goal.getId());
+        List<MateUploadInfo> uploadInfos = teamMateQueryDao.findTeamMateInfo(goal.getId());
 
         //then
         assertThat(uploadInfos.size()).isEqualTo(10);

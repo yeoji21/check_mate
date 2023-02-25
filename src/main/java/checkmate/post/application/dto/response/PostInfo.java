@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PostInfo {
     private long postId;
-    private long teamMateId;
+    private long mateId;
     private String uploaderNickname;
     private LocalDateTime uploadAt;
     private List<String> imageUrls;
@@ -22,14 +22,14 @@ public class PostInfo {
 
     @QueryProjection
     public PostInfo(long postId,
-                    long teamMateId,
+                    long mateId,
                     String uploaderNickname,
                     LocalDateTime uploadAt,
                     List<String> imageUrls,
                     String content,
                     List<Long> likedUserIds) {
         this.postId = postId;
-        this.teamMateId = teamMateId;
+        this.mateId = mateId;
         this.uploaderNickname = uploaderNickname;
         this.uploadAt = uploadAt;
         this.imageUrls = imageUrls;

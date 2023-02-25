@@ -1,7 +1,7 @@
 package checkmate.mate.presentation.dto;
 
-import checkmate.goal.application.dto.request.TeamMateInviteCommand;
-import checkmate.goal.application.dto.request.TeamMateInviteReplyCommand;
+import checkmate.mate.application.dto.request.MateInviteCommand;
+import checkmate.mate.application.dto.request.MateInviteReplyCommand;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -10,8 +10,8 @@ import org.mapstruct.factory.Mappers;
 public interface MateDtoMapper {
     MateDtoMapper INSTANCE = Mappers.getMapper(MateDtoMapper.class);
 
-    TeamMateInviteCommand toCommand(MateInviteDto inviteDto, long inviterUserId);
+    MateInviteCommand toCommand(MateInviteDto inviteDto, long inviterUserId);
 
     @Mapping(target = "notificationId", source = "dto.notificationId")
-    TeamMateInviteReplyCommand toCommand(MateInviteReplyDto dto, long userId);
+    MateInviteReplyCommand toCommand(MateInviteReplyDto dto, long userId);
 }

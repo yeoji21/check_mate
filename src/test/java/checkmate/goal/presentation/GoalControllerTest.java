@@ -10,6 +10,7 @@ import checkmate.goal.domain.TeamMate;
 import checkmate.goal.presentation.dto.GoalCreateDto;
 import checkmate.goal.presentation.dto.GoalModifyDto;
 import checkmate.goal.presentation.dto.LikeCountCreateDto;
+import checkmate.mate.application.dto.response.MateUploadInfo;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -242,7 +243,7 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
                 fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
                 fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("teamMates[].teamMateId").description("팀메이트 id"),
+                fieldWithPath("teamMates[].mateId").description("팀메이트 id"),
                 fieldWithPath("teamMates[].userId").description("유저 id"),
                 fieldWithPath("teamMates[].nickname").description("유저의 닉네임"),
                 fieldWithPath("teamMates[].uploaded").description("이미 업로드했는지"),
@@ -258,14 +259,14 @@ public class GoalControllerTest extends ControllerTest {
         TeamMate selector = goal.join(TestEntityFactory.user(1L, "user"));
         ReflectionTestUtils.setField(selector, "id", 1L);
 
-        TeamMateUploadInfo teamMateUploadInfo = TeamMateUploadInfo.builder()
-                .teamMateId(selector.getId())
+        MateUploadInfo mateUploadInfo = MateUploadInfo.builder()
+                .mateId(selector.getId())
                 .userId(selector.getUserId())
                 .lastUploadDate(LocalDate.now().minusDays(1))
                 .nickname("tester")
                 .build();
         GoalDetailInfo info = new GoalDetailInfo(goal, selector);
-        info.setTeamMates(List.of(teamMateUploadInfo));
+        info.setTeamMates(List.of(mateUploadInfo));
         return info;
     }
 }

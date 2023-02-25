@@ -1,6 +1,7 @@
 package checkmate.goal.application.dto.response;
 
 import checkmate.goal.domain.*;
+import checkmate.mate.application.dto.response.MateUploadInfo;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -24,11 +25,11 @@ public class GoalDetailResult {
     private final String teamMateSchedule;
     private final double progress;
 
-    private final List<TeamMateUploadInfo> teamMates;
+    private final List<MateUploadInfo> teamMates;
 
     public GoalDetailResult(TeamMate teamMate,
                             List<LocalDate> uploadedDates,
-                            List<TeamMateUploadInfo> teamMates) {
+                            List<MateUploadInfo> teamMates) {
         Goal goal = teamMate.getGoal();
 
         this.id = goal.getId();

@@ -2,8 +2,12 @@ package checkmate.goal.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.goal.application.dto.response.*;
+import checkmate.goal.application.dto.response.GoalDetailInfo;
+import checkmate.goal.application.dto.response.GoalScheduleInfo;
+import checkmate.goal.application.dto.response.GoalSimpleInfo;
+import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.*;
+import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -135,10 +139,10 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(info.getTitle()).isEqualTo(goal.getTitle());
         for (int i = 0; i < info.getTeamMates().size(); i++) {
-            TeamMateUploadInfo tm = info.getTeamMates().get(i);
+            MateUploadInfo tm = info.getTeamMates().get(i);
             assertThat(tm.getNickname()).isEqualTo("tester" + (i + 1));
             assertThat(tm.isUploaded()).isFalse();
-            assertThat(tm.getTeamMateId()).isNotNull();
+            assertThat(tm.getMateId()).isNotNull();
             assertThat(tm.getUserId()).isNotNull();
         }
         assertThat(info.getTeamMates().size()).isEqualTo(3);
