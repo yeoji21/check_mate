@@ -10,10 +10,7 @@ import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.GoalSimpleInfoResult;
 import checkmate.goal.application.dto.response.TodayGoalInfoResult;
-import checkmate.goal.presentation.dto.GoalCreateDto;
-import checkmate.goal.presentation.dto.GoalDtoMapper;
-import checkmate.goal.presentation.dto.GoalModifyDto;
-import checkmate.goal.presentation.dto.LikeCountCreateDto;
+import checkmate.goal.presentation.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,9 +27,10 @@ public class GoalController {
     private final GoalDtoMapper mapper;
 
     @PostMapping("/goal")
-    public long create(@RequestBody @Valid GoalCreateDto dto,
-                       @AuthenticationPrincipal JwtUserDetails details) {
-        return goalCommandService.create(mapper.toCommand(dto, details.getUserId()));
+    public GoalCreateResponse create(@RequestBody @Valid GoalCreateDto dto,
+                                     @AuthenticationPrincipal JwtUserDetails details) {
+        long goalId = goalCommandService.create(mapper.toCommand(dto, details.getUserId()));
+        return new GoalCreateResponse(goalId);
     }
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)

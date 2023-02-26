@@ -43,6 +43,8 @@ public class Goal extends BaseTimeEntity {
     @NotNull
     @Column(name = "status")
     private GoalStatus status;
+
+    // TODO: 2023/02/27 목표 인증 조건으로 분리 가능
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
     @Getter(value = AccessLevel.PRIVATE)

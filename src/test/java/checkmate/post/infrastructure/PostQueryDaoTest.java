@@ -21,28 +21,16 @@ class PostQueryDaoTest extends RepositoryTest {
     @Test
     void 타임라인_게시글_조회_테스트() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
-        User user = TestEntityFactory.user(null, "tester");
-        em.persist(user);
-        Mate mate = goal.join(user);
-        em.persist(mate);
+        Goal goal = getGoal();
+        Mate mate = getMate(goal);
 
-        Post post1 = TestEntityFactory.post(mate);
-        Post post2 = TestEntityFactory.post(mate);
-        Post post3 = TestEntityFactory.post(mate);
-        em.persist(post1);
-        em.persist(post2);
-        em.persist(post3);
+        Post post1 = getPost(mate);
+        Post post2 = getPost(mate);
+        Post post3 = getPost(mate);
 
         post3.addLikes(new Likes(1L));
         post3.addLikes(new Likes(2L));
-
-        em.persist(Image.builder()
-                .post(post2)
-                .originalName("filename")
-                .storedName("filename")
-                .build());
+        em.persist(getImage(post2));
 
         em.flush();
         em.clear();
@@ -54,5 +42,33 @@ class PostQueryDaoTest extends RepositoryTest {
         assertThat(postInfos.size()).isEqualTo(3);
         assertThat(postInfos.get(0).getLikedUserIds().size()).isEqualTo(2);
         assertThat(postInfos.get(1).getImageUrls().size()).isEqualTo(1);
+    }
+
+    private Goal getGoal() {
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+        return goal;
+    }
+
+    private Image getImage(Post post2) {
+        return Image.builder()
+                .post(post2)
+                .originalName("filename")
+                .storedName("filename")
+                .build();
+    }
+
+    private Post getPost(Mate mate) {
+        Post post = TestEntityFactory.post(mate);
+        em.persist(post);
+        return post;
+    }
+
+    private Mate getMate(Goal goal) {
+        User user = TestEntityFactory.user(null, "tester");
+        em.persist(user);
+        Mate mate = goal.join(user);
+        em.persist(mate);
+        return mate;
     }
 }

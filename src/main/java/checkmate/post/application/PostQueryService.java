@@ -16,13 +16,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class PostQueryService {
     private final GoalRepository goalRepository;
     private final PostQueryDao postQueryDao;
 
-    // TODO: 2023/02/26 쿼리 개선 가능한지
+    @Transactional(readOnly = true)
     public PostInfoListResult findPostByGoalIdAndDate(long goalId, String date) {
         Goal goal = goalRepository.findById(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));

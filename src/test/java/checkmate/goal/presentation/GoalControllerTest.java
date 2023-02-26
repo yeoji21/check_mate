@@ -7,10 +7,12 @@ import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.presentation.dto.GoalCreateDto;
+import checkmate.goal.presentation.dto.GoalCreateResponse;
 import checkmate.goal.presentation.dto.GoalModifyDto;
 import checkmate.goal.presentation.dto.LikeCountCreateDto;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.domain.Mate;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -40,6 +42,41 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GoalControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
+    @DisplayName("목표 생성 API")
+    void create() throws Exception {
+        long goalId = 1L;
+        when(goalCommandService.create(any())).thenReturn(goalId);
+        GoalCreateResponse response = new GoalCreateResponse(goalId);
+
+        mockMvc.perform(post("/goal")
+                        .contentType(APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(getGoalCreateDto())))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(document("goal-create",
+                        createRequestFieldsSnippet(),
+                        createResponseFieldSnippet())
+                );
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("좋아요 확인 조건 할당 API")
+    void confirmLikeCondition() throws Exception {
+        LikeCountCreateDto dto = new LikeCountCreateDto(1L, 5);
+
+        mockMvc.perform(RestDocumentationRequestBuilders
+                        .post("/goal/confirm-like")
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto))
+                        .with(csrf()))
+                .andExpect(status().isOk());
+        verify(goalCommandService).addLikeCountCondition(any());
+    }
+
+    @WithMockAuthUser
+    @Test
     void 목표_수정_테스트() throws Exception {
         GoalModifyDto request = GoalModifyDto.builder()
                 .endDate(LocalDate.of(2022, 5, 30))
@@ -58,20 +95,6 @@ public class GoalControllerTest extends ControllerTest {
                                 fieldWithPath("appointmentTime").description("변경할 인증 시간"),
                                 fieldWithPath("timeReset").description("인증 시간 삭제 여부")
                         )));
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 좋아요_확인_조건_할당_테스트() throws Exception {
-        LikeCountCreateDto dto = new LikeCountCreateDto(1L, 5);
-
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .post("/goal/confirm-like")
-                .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto))
-                .with(csrf())
-        ).andExpect(status().isOk());
-        verify(goalCommandService).addLikeCountCondition(any());
     }
 
     @WithMockAuthUser
@@ -105,33 +128,6 @@ public class GoalControllerTest extends ControllerTest {
                 .andDo(document("find-goalinfo",
                         pathParameters(parameterWithName("goalId").description("goalId")),
                         setGoalInformationResponseFields()));
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 목표_생성_테스트() throws Exception {
-        //given
-        GoalCreateDto request = GoalCreateDto.builder()
-                .category(GoalCategory.LEARNING).title("자바의 정석 스터디")
-                .startDate(LocalDate.of(2021, 12, 20))
-                .endDate(LocalDate.of(2021, 12, 31))
-                .appointmentTime(LocalTime.of(19, 30))
-                .checkDays("월수금")
-                .build();
-
-        //when
-        when(goalCommandService.create(any())).thenReturn(1L);
-
-        //then
-        mockMvc.perform(post("/goal")
-                        .contentType(APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(1L)))
-                .andDo(document("create-goal",
-                        setSaveGoalRequestField())
-                );
     }
 
     @WithMockAuthUser
@@ -194,6 +190,21 @@ public class GoalControllerTest extends ControllerTest {
         );
     }
 
+    private GoalCreateDto getGoalCreateDto() {
+        return GoalCreateDto.builder()
+                .category(GoalCategory.LEARNING)
+                .title("자바의 정석 스터디")
+                .startDate(LocalDate.of(2021, 12, 20))
+                .endDate(LocalDate.of(2021, 12, 31))
+                .appointmentTime(LocalTime.of(19, 30))
+                .checkDays("월수금")
+                .build();
+    }
+
+    private ResponseFieldsSnippet createResponseFieldSnippet() {
+        return responseFields(fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("생성된 목표 ID"));
+    }
+
     private GoalSimpleInfo simpleGoalInfo(Goal goal) {
         return GoalSimpleInfo.builder()
                 .id(goal.getId())
@@ -211,7 +222,7 @@ public class GoalControllerTest extends ControllerTest {
                 .build();
     }
 
-    private RequestFieldsSnippet setSaveGoalRequestField() {
+    private RequestFieldsSnippet createRequestFieldsSnippet() {
         return requestFields(
                 fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
                 fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
