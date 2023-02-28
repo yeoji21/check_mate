@@ -1,4 +1,4 @@
-package checkmate.goal.infra;
+package checkmate.mate.infra;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;

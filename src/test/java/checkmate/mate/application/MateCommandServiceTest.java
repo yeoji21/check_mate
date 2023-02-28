@@ -1,10 +1,9 @@
-package checkmate.goal.application;
+package checkmate.mate.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheHandler;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
-import checkmate.mate.application.MateCommandService;
 import checkmate.mate.application.dto.MateCommandMapper;
 import checkmate.mate.application.dto.request.MateInviteCommand;
 import checkmate.mate.application.dto.request.MateInviteReplyCommand;

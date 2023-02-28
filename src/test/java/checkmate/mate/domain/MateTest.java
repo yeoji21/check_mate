@@ -1,9 +1,8 @@
-package checkmate.goal.domain;
+package checkmate.mate.domain;
 
 import checkmate.TestEntityFactory;
-import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateStatus;
-import checkmate.mate.domain.Uploadable;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalCheckDays;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 

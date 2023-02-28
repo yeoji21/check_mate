@@ -1,11 +1,9 @@
-package checkmate.goal.domain;
+package checkmate.mate.domain;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateInitiateManager;
-import checkmate.mate.domain.MateStatus;
+import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;

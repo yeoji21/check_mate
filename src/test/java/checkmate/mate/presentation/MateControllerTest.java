@@ -1,4 +1,4 @@
-package checkmate.goal.presentation;
+package checkmate.mate.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;

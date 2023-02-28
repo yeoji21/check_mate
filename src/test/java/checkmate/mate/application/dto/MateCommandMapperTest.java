@@ -1,9 +1,8 @@
-package checkmate.goal.application.dto;
+package checkmate.mate.application.dto;
 
 import checkmate.MapperTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.mate.application.dto.MateCommandMapper;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.domain.Mate;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;

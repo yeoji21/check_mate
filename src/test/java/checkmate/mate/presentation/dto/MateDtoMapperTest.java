@@ -1,11 +1,8 @@
-package checkmate.goal.presentation.dto;
+package checkmate.mate.presentation.dto;
 
 import checkmate.MapperTest;
 import checkmate.mate.application.dto.request.MateInviteCommand;
 import checkmate.mate.application.dto.request.MateInviteReplyCommand;
-import checkmate.mate.presentation.dto.MateDtoMapper;
-import checkmate.mate.presentation.dto.MateInviteDto;
-import checkmate.mate.presentation.dto.MateInviteReplyDto;
 import org.junit.jupiter.api.Test;
 
 class MateDtoMapperTest extends MapperTest {
