@@ -18,6 +18,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.restdocs.request.PathParametersSnippet;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
@@ -62,25 +63,32 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    @DisplayName("좋아요 확인 조건 할당 API")
-    void confirmLikeCondition() throws Exception {
+    @DisplayName("좋아요 확인 조건 추가 API")
+    void addLikeCondition() throws Exception {
         LikeCountCreateDto dto = new LikeCountCreateDto(1L, 5);
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                        .post("/goal/confirm-like")
+                        .post("/goal/like-condition")
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document("goal-like-condition",
+                        likeConditionRequestFieldsSnippet()
+                ));
+
         verify(goalCommandService).addLikeCountCondition(any());
     }
 
     @WithMockAuthUser
     @Test
-    void 목표_수정_테스트() throws Exception {
+    @DisplayName("목표 수정 API")
+    void modify() throws Exception {
         GoalModifyDto request = GoalModifyDto.builder()
                 .endDate(LocalDate.of(2022, 5, 30))
-                .appointmentTime(LocalTime.now()).build();
+                .appointmentTime(LocalTime.now())
+                .timeReset(false)
+                .build();
 
         mockMvc.perform(RestDocumentationRequestBuilders
                         .patch("/goal/{goalId}", 1L)
@@ -89,12 +97,9 @@ public class GoalControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(document("goal-modify",
-                        pathParameters(parameterWithName("goalId").description("수정할 목표의 goalId")),
-                        requestFields(
-                                fieldWithPath("endDate").description("연장할 목표의 종료일"),
-                                fieldWithPath("appointmentTime").description("변경할 인증 시간"),
-                                fieldWithPath("timeReset").description("인증 시간 삭제 여부")
-                        )));
+                        modifyPathParametersSnippet(),
+                        modifyRequestFieldsSnippet()
+                ));
     }
 
     @WithMockAuthUser
@@ -179,6 +184,25 @@ public class GoalControllerTest extends ControllerTest {
                 .andDo(document("find-todayGoal",
                         todayGoalInfoResponseFieldsSnippet()
                 ));
+    }
+
+    private RequestFieldsSnippet modifyRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("endDate").description("연정된 목표의 종료일"),
+                fieldWithPath("timeReset").description("인증 시간 삭제 여부"),
+                fieldWithPath("appointmentTime").description("변경할 인증 시간")
+        );
+    }
+
+    private PathParametersSnippet modifyPathParametersSnippet() {
+        return pathParameters(parameterWithName("goalId").description("수정할 목표의 ID"));
+    }
+
+    private RequestFieldsSnippet likeConditionRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("likeCount").type(JsonFieldType.NUMBER).description("최소 좋아요 수")
+        );
     }
 
     private ResponseFieldsSnippet setGoalFindResponseFields() {

@@ -34,18 +34,18 @@ public class GoalController {
     }
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)
-    @PostMapping("/goal/confirm-like")
-    public void confirmLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
-                                     @AuthenticationPrincipal JwtUserDetails details) {
+    @PostMapping("/goal/like-condition")
+    public void addLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
+                                 @AuthenticationPrincipal JwtUserDetails details) {
         LikeCountCreateCommand command = mapper.toCommand(dto, details.getUserId());
         goalCommandService.addLikeCountCondition(command);
     }
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
     @PatchMapping("/goal/{goalId}")
-    public void goalModify(@PathVariable long goalId,
-                           @RequestBody GoalModifyDto dto,
-                           @AuthenticationPrincipal JwtUserDetails details) {
+    public void modify(@PathVariable long goalId,
+                       @RequestBody GoalModifyDto dto,
+                       @AuthenticationPrincipal JwtUserDetails details) {
         goalCommandService.modifyGoal(mapper.toCommand(dto, goalId, details.getUserId()));
     }
 

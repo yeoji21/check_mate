@@ -14,15 +14,57 @@ endif::[]
 
 === Request Fields
 
-include::{snippets}/save-goal/request-fields.adoc[]
+include::{snippets}/goal-create/request-fields.adoc[]
 
 === HTTP Request
 
-include::{snippets}/save-goal/http-request.adoc[]
+include::{snippets}/goal-create/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-create/response-fields.adoc[]
 
 === HTTP Response
 
-include::{snippets}/save-goal/http-response.adoc[]
+include::{snippets}/goal-create/http-response.adoc[]
+
+// =============================================================
+
+== 좋아요 확인 조건 추가
+
+=== Request Fields
+
+include::{snippets}/goal-like-condition/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/goal-like-condition/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-modify/http-response.adoc[]
+
+// =============================================================
+
+== 목표 수정
+
+=== Path Parameter
+
+include::{snippets}/goal-modify/path-parameters.adoc[]
+
+=== Request Fields
+
+include::{snippets}/goal-modify/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/goal-modify/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-modify/http-response.adoc[]
+
+// =============================================================
 
 == 팀원 초대
 
@@ -176,16 +218,6 @@ include::{snippets}/unlike-post/path-parameters.adoc[]
 === HTTP Response
 
 include::{snippets}/unlike-post/http-response.adoc[]
-
-== 목표 수정
-
-=== Path Parameter
-
-include::{snippets}/goal-modify/path-parameters.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/goal-modify/http-response.adoc[]
 
 == 닉네임 변경
 
