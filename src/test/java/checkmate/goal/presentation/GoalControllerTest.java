@@ -148,7 +148,7 @@ public class GoalControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-ongoing-info",
+                .andDo(document("goal-ongoing-goals",
                         ongoingInfoResponseFieldsSnippet()));
         verify(goalQueryService).findOngoingGoalInfo(any(Long.class));
     }
@@ -164,7 +164,7 @@ public class GoalControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-today-info",
+                .andDo(document("goal-today-goals",
                         todayInfoResponseFieldsSnippet()
                 ));
     }

@@ -3,9 +3,9 @@ package checkmate.mate.application;
 import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
-import checkmate.mate.application.dto.response.GoalDetailResult;
 import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.application.dto.response.SpecifiedGoalDetailInfo;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.MateQueryDao;
@@ -39,17 +39,17 @@ public class MateQueryService {
     }
 
     @Transactional(readOnly = true)
-    public GoalDetailResult findGoalDetailResult(long goalId, long userId) {
+    public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(long goalId, long userId) {
         Mate mate = mateRepository.findMateWithGoal(goalId, userId)
                 .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND));
-        return new GoalDetailResult(mate,
+        return new SpecifiedGoalDetailInfo(mate,
                 mateQueryDao.findUploadedDates(mate.getId()),
                 mateQueryDao.findMateInfo(goalId));
     }
 
     @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
-    public GoalHistoryInfoResult findHistoryGoalInfo(long userId) {
+    public GoalHistoryInfoResult findGoalHistoryResult(long userId) {
         List<Mate> successMates = mateQueryDao.findSuccessMates(userId);
         return new GoalHistoryInfoResult(mapToGoalHistoryInfo(successMates));
     }

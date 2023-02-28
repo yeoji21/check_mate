@@ -5,10 +5,10 @@ import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.mate.application.MateCommandService;
 import checkmate.mate.application.MateQueryService;
-import checkmate.mate.application.dto.response.GoalDetailResult;
 import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.application.dto.response.SpecifiedGoalDetailInfo;
 import checkmate.mate.presentation.dto.MateDtoMapper;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
@@ -29,14 +29,14 @@ public class MateController {
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
     @GetMapping("/goal/detail/{goalId}")
-    public GoalDetailResult goalDetailResultFind(@PathVariable long goalId,
-                                                 @AuthenticationPrincipal JwtUserDetails details) {
-        return mateQueryService.findGoalDetailResult(goalId, details.getUserId());
+    public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(@PathVariable long goalId,
+                                                               @AuthenticationPrincipal JwtUserDetails details) {
+        return mateQueryService.findSpecifiedGoalDetailInfo(goalId, details.getUserId());
     }
 
     @GetMapping("/goal/history")
-    public GoalHistoryInfoResult successGoalHistoryFind(@AuthenticationPrincipal JwtUserDetails details) {
-        return mateQueryService.findHistoryGoalInfo(details.getUserId());
+    public GoalHistoryInfoResult findGoalHistoryResult(@AuthenticationPrincipal JwtUserDetails details) {
+        return mateQueryService.findGoalHistoryResult(details.getUserId());
     }
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)

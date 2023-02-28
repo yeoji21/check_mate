@@ -13,15 +13,15 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Getter
-public class GoalDetailResult {
-    private final long id;
+public class SpecifiedGoalDetailInfo {
+    private final long goalId;
     private final GoalCategory category;
     private final String title;
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final LocalTime appointmentTime;
     private final String weekDays;
-    private final GoalStatus goalStatus;
+    private final GoalStatus status;
     private final boolean inviteable;
     private final Uploadable uploadable;
     private final String goalSchedule;
@@ -30,19 +30,19 @@ public class GoalDetailResult {
 
     private final List<MateUploadInfo> mates;
 
-    public GoalDetailResult(Mate mate,
-                            List<LocalDate> uploadedDates,
-                            List<MateUploadInfo> mates) {
+    public SpecifiedGoalDetailInfo(Mate mate,
+                                   List<LocalDate> uploadedDates,
+                                   List<MateUploadInfo> mates) {
         Goal goal = mate.getGoal();
 
-        this.id = goal.getId();
+        this.goalId = goal.getId();
         this.category = goal.getCategory();
         this.title = goal.getTitle();
         this.startDate = goal.getStartDate();
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
         this.weekDays = CheckDaysConverter.toDays(goal.getCheckDays().intValue());
-        this.goalStatus = goal.getStatus();
+        this.status = goal.getStatus();
         this.inviteable = goal.isInviteable();
         this.goalSchedule = goal.getSchedule();
         this.mateSchedule = goal.getSchedule(uploadedDates);

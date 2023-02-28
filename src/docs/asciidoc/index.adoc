@@ -137,6 +137,43 @@ include::{snippets}/goal-today-info/response-fields.adoc[]
 include::{snippets}/goal-today-info/http-response.adoc[]
 
 // =============================================================
+
+== 조회를 요청한 유저 특화 목표 상세 정보 조회
+
+=== Path Parameter
+
+include::{snippets}/goal-specified-info/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/goal-specified-info/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-specified-info/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-specified-info/http-response.adoc[]
+
+// =============================================================
+
+== 성공한 목표 상세 정보 조회
+
+=== HTTP Request
+
+include::{snippets}/goal-history/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-history/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-history/http-response.adoc[]
+
+// =============================================================
+
 == 팀원 초대
 
 === Request Fields

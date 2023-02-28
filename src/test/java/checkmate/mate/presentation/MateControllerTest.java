@@ -15,6 +15,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.restdocs.request.PathParametersSnippet;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,18 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class MateControllerTest extends ControllerTest {
 
-    @DisplayName("목표 상세 정보")
     @WithMockAuthUser
     @Test
-    void goalDetailResultFind() throws Exception {
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-
-        GoalDetailResult result = new GoalDetailResult(mate,
-                List.of(LocalDate.now().minusDays(1), LocalDate.now()),
-                List.of(new MateUploadInfo(1L, 1L, LocalDate.now(), "user")));
-
-        given(mateQueryService.findGoalDetailResult(any(Long.class), any(Long.class)))
+    @DisplayName("유저 특화 목표 상세 정보 조회 API")
+    void findSpecifiedGoalDetailInfo() throws Exception {
+        SpecifiedGoalDetailInfo result = getSpecifiedGoalDetailInfo();
+        given(mateQueryService.findSpecifiedGoalDetailInfo(any(Long.class), any(Long.class)))
                 .willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders
@@ -54,9 +49,26 @@ class MateControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-detail-result",
-                        goalDetailResultResponseFieldsSnippet()
+                .andDo(document("goal-specified-goals",
+                        goalIdPathParametersSnippet(),
+                        specifiedGoalDetailResponseFieldsSnippet()
                 ));
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("성공한 목표 목록 조회 API")
+    void findGoalHistoryResult() throws Exception {
+        GoalHistoryInfoResult result = new GoalHistoryInfoResult(getGoalHistoryInfoList());
+        given(mateQueryService.findGoalHistoryResult(any(Long.class))).willReturn(result);
+
+        mockMvc.perform(get("/goal/history")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("goal-history",
+                        historyResultResponseFieldsSnippet())
+                );
     }
 
     @WithMockAuthUser
@@ -131,21 +143,58 @@ class MateControllerTest extends ControllerTest {
                 ));
     }
 
-    @WithMockAuthUser
-    @Test
-    void 유저의_성공한_목표_목록_조회_테스트() throws Exception {
-        List<GoalHistoryInfo> goalHistoryInfoList = getGoalHistoryInfoList();
-        GoalHistoryInfoResult result = new GoalHistoryInfoResult(goalHistoryInfoList);
+    private ResponseFieldsSnippet historyResultResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goals[].goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].startDate").type(JsonFieldType.STRING).description("목표 시작일"),
+                fieldWithPath("goals[].endDate").type(JsonFieldType.STRING).description("목표 종료일"),
+                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
+                fieldWithPath("goals[].appointmentTime").type(JsonFieldType.STRING).description("목표 인증 시간").optional(),
+                fieldWithPath("goals[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
+                fieldWithPath("goals[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
+        );
+    }
 
-        given(mateQueryService.findHistoryGoalInfo(any(Long.class))).willReturn(result);
+    private ResponseFieldsSnippet specifiedGoalDetailResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
+                fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
+                fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
+                fieldWithPath("weekDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
+                fieldWithPath("status").type(JsonFieldType.STRING).description("목표 상태"),
+                fieldWithPath("mates").description("목표에 속한 팀원들"),
+                fieldWithPath("mates[].mateId").description("팀원 ID"),
+                fieldWithPath("mates[].userId").description("유저 ID"),
+                fieldWithPath("mates[].nickname").description("유저의 닉네임"),
+                fieldWithPath("mates[].uploaded").description("이미 업로드했는지"),
+                fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
+                fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 인증했는지"),
+                fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 인증할 수 있는지"),
+                fieldWithPath("uploadable.workingDay").description("인증하는 날이 맞는지"),
+                fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지"),
+                fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
+                fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
+                fieldWithPath("progress").type(JsonFieldType.NUMBER).description("팀원의 목표 수행 진행률")
+        );
+    }
 
-        mockMvc.perform(get("/goal/history")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-history",
-                        historyResponseFieldsSnippet())
-                );
+    private PathParametersSnippet goalIdPathParametersSnippet() {
+        return pathParameters(parameterWithName("goalId").description("목표 ID"));
+    }
+
+    private SpecifiedGoalDetailInfo getSpecifiedGoalDetailInfo() {
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        return new SpecifiedGoalDetailInfo(mate,
+                List.of(LocalDate.now().minusDays(1), LocalDate.now()),
+                List.of(new MateUploadInfo(1L, 2L, LocalDate.now(), "nickname1"),
+                        new MateUploadInfo(3L, 4L, LocalDate.now().minusDays(1), "nickname2"))
+        );
     }
 
     private List<GoalHistoryInfo> getGoalHistoryInfoList() {
@@ -154,21 +203,21 @@ class MateControllerTest extends ControllerTest {
         Mate mate2 = TestEntityFactory.goal(2L, "goal2")
                 .join(TestEntityFactory.user(2L, "user2"));
 
-        return List.of(new GoalHistoryInfo(mate1, List.of("nickname")),
-                new GoalHistoryInfo(mate2, List.of("nickname")));
+        return List.of(new GoalHistoryInfo(mate1, List.of("nickname1", "nickname2", "nickname3")),
+                new GoalHistoryInfo(mate2, List.of("nickname4", "nickname5")));
     }
 
     private ResponseFieldsSnippet historyResponseFieldsSnippet() {
         return responseFields(
-                fieldWithPath("info[].goalId").description("목표 id").type(JsonFieldType.NUMBER),
-                fieldWithPath("info[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("info[].startDate").type(JsonFieldType.STRING).description("시작일"),
-                fieldWithPath("info[].endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("info[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
-                fieldWithPath("info[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
-                fieldWithPath("info[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
+                fieldWithPath("goals[].goalId").description("목표 id").type(JsonFieldType.NUMBER),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("카테고리"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].startDate").type(JsonFieldType.STRING).description("시작일"),
+                fieldWithPath("goals[].endDate").type(JsonFieldType.STRING).description("종료일"),
+                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("goals[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
+                fieldWithPath("goals[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
+                fieldWithPath("goals[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
         );
     }
 
