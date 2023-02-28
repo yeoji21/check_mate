@@ -50,9 +50,8 @@ public class GoalController {
     }
 
     @GetMapping("/goal/{goalId}")
-    public GoalDetailInfo goalDetailFind(@PathVariable long goalId,
-                                         @AuthenticationPrincipal JwtUserDetails userDetails) {
-        return goalQueryService.findGoalDetail(goalId, userDetails.getUserId());
+    public GoalDetailInfo findGoalDetail(@PathVariable long goalId) {
+        return goalQueryService.findGoalDetail(goalId);
     }
 
     @GetMapping("/goal/{goalId}/period")

@@ -21,8 +21,8 @@ public class GoalQueryService {
     private final GoalQueryDao goalQueryDao;
 
     @Transactional(readOnly = true)
-    public GoalDetailInfo findGoalDetail(long goalId, long userId) {
-        return goalQueryDao.findDetailInfo(goalId, userId)
+    public GoalDetailInfo findGoalDetail(long goalId) {
+        return goalQueryDao.findDetailInfo(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 

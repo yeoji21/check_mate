@@ -23,9 +23,8 @@ public class GoalDetailResult {
     private final String weekDays;
     private final GoalStatus goalStatus;
     private final boolean inviteable;
-    private final String goalSchedule;
-
     private final Uploadable uploadable;
+    private final String goalSchedule;
     private final String mateSchedule;
     private final double progress;
 

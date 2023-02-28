@@ -4,6 +4,7 @@ import checkmate.goal.application.dto.response.*;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
 import checkmate.mate.domain.MateStatus;
@@ -45,18 +46,13 @@ public class GoalQueryDao {
                 .toList();
     }
 
-    /*
-    목표 상세 정보 조회
-    selector : 조회를 요청한 TeamMate
-     */
-    public Optional<GoalDetailInfo> findDetailInfo(long goalId, long userId) {
+    public Optional<GoalDetailInfo> findDetailInfo(long goalId) {
         Optional<GoalDetailInfo> goalDetailInfo = Optional.ofNullable(
                 queryFactory
-                        .select(new QGoalDetailInfo(goal, mate))
-                        .from(mate)
-                        .innerJoin(mate.goal, goal)
-                        .where(mate.userId.eq(userId),
-                                mate.goal.id.eq(goalId))
+                        .select(new QGoalDetailInfo(goal))
+                        .from(goal)
+                        .where(goal.id.eq(goalId),
+                                goal.status.eq(GoalStatus.ONGOING))
                         .fetchOne()
         );
         goalDetailInfo.ifPresent(info -> info.setMates(findTeamMateInfo(goalId)));

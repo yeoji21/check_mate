@@ -66,6 +66,26 @@ include::{snippets}/goal-modify/http-response.adoc[]
 
 // =============================================================
 
+== 목표 상세 정보 조회
+
+=== Path Parameter
+
+include::{snippets}/goal-detail/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/goal-detail/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-detail/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-detail/http-response.adoc[]
+
+// =============================================================
+
 == 팀원 초대
 
 === Request Fields
@@ -99,16 +119,6 @@ include::{snippets}/find-todayGoal/http-request.adoc[]
 === HTTP Response
 
 include::{snippets}/find-todayGoal/http-response.adoc[]
-
-== 개별 목표 정보 조회
-
-=== HTTP Request
-
-include::{snippets}/find-goalinfo/http-request.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/find-goalinfo/http-response.adoc[]
 
 == 유저별 목표 진행률 조회
 

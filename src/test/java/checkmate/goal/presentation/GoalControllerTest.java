@@ -11,7 +11,6 @@ import checkmate.goal.presentation.dto.GoalCreateResponse;
 import checkmate.goal.presentation.dto.GoalModifyDto;
 import checkmate.goal.presentation.dto.LikeCountCreateDto;
 import checkmate.mate.application.dto.response.MateUploadInfo;
-import checkmate.mate.domain.Mate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -19,7 +18,6 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.PathParametersSnippet;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -97,9 +95,26 @@ public class GoalControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(document("goal-modify",
-                        modifyPathParametersSnippet(),
+                        goalIdPathParametersSnippet(),
                         modifyRequestFieldsSnippet()
                 ));
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("목표 상세 조회 API")
+    void findGoalDetail() throws Exception {
+        GoalDetailInfo info = getGoalDetailInfo();
+        given(goalQueryService.findGoalDetail(any(Long.class))).willReturn(info);
+        
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}", 1L)
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(info)))
+                .andDo(document("goal-detail",
+                        goalIdPathParametersSnippet(),
+                        goalDetailResponseFieldsSnippet()));
     }
 
     @WithMockAuthUser
@@ -121,22 +136,6 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 개별_목표조회_테스트() throws Exception {
-        GoalDetailInfo info = getGoalInformationResponse();
-        given(goalQueryService.findGoalDetail(any(Long.class), any(Long.class))).willReturn(info);
-
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}", 1L)
-                        .with(csrf())
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(info)))
-                .andDo(document("find-goalinfo",
-                        pathParameters(parameterWithName("goalId").description("goalId")),
-                        setGoalInformationResponseFields()));
-    }
-
-    @WithMockAuthUser
-    @Test
     void 유저의_진행중인_목표_조회_테스트() throws Exception {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         GoalSimpleInfoResult result = new GoalSimpleInfoResult(List.of(simpleGoalInfo(goal), simpleGoalInfo(goal)));
@@ -151,7 +150,6 @@ public class GoalControllerTest extends ControllerTest {
                         setGoalFindResponseFields()));
         verify(goalQueryService).findOngoingSimpleInfo(any(Long.class));
     }
-
 
     @WithMockAuthUser
     @Test
@@ -186,6 +184,25 @@ public class GoalControllerTest extends ControllerTest {
                 ));
     }
 
+    private ResponseFieldsSnippet goalDetailResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("category").type(JsonFieldType.STRING).description("목표 카테고리"),
+                fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("startDate").type(JsonFieldType.STRING).description("목표 시작일"),
+                fieldWithPath("endDate").type(JsonFieldType.STRING).description("목표 종료일"),
+                fieldWithPath("weekDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
+                fieldWithPath("status").type(JsonFieldType.STRING).description("목표 진행 상태"),
+                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("목표 인증 시간").optional(),
+                fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("목표 초대 가능 여부"),
+                fieldWithPath("mates").description("목표에 속한 팀원들"),
+                fieldWithPath("mates[].mateId").description("팀원 ID"),
+                fieldWithPath("mates[].userId").description("유저 ID"),
+                fieldWithPath("mates[].nickname").description("유저 닉네임"),
+                fieldWithPath("mates[].uploaded").description("해당 팀원이 목표를 인증했는지")
+        );
+    }
+
     private RequestFieldsSnippet modifyRequestFieldsSnippet() {
         return requestFields(
                 fieldWithPath("endDate").description("연정된 목표의 종료일"),
@@ -194,8 +211,8 @@ public class GoalControllerTest extends ControllerTest {
         );
     }
 
-    private PathParametersSnippet modifyPathParametersSnippet() {
-        return pathParameters(parameterWithName("goalId").description("수정할 목표의 ID"));
+    private PathParametersSnippet goalIdPathParametersSnippet() {
+        return pathParameters(parameterWithName("goalId").description("목표 ID"));
     }
 
     private RequestFieldsSnippet likeConditionRequestFieldsSnippet() {
@@ -266,42 +283,22 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("info[].checked").type(JsonFieldType.BOOLEAN).description("오늘 이미 인증을 수행했는지 여부"));
     }
 
-    private ResponseFieldsSnippet setGoalInformationResponseFields() {
-        return responseFields(
-                fieldWithPath("id").type(JsonFieldType.NUMBER).description("ID 값"),
-                fieldWithPath("mates").description("목표에 속한 팀원들"),
-                fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
-                fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("weekDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
-                fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
-                fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("mates[].mateId").description("팀메이트 id"),
-                fieldWithPath("mates[].userId").description("유저 id"),
-                fieldWithPath("mates[].nickname").description("유저의 닉네임"),
-                fieldWithPath("mates[].uploaded").description("이미 업로드했는지"),
-                fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 업로드했는지"),
-                fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 업로드할 수 있는지"),
-                fieldWithPath("uploadable.workingDay").description("업로드하는 날이 맞는지"),
-                fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지")
-        );
-    }
-
-    private GoalDetailInfo getGoalInformationResponse() {
+    private GoalDetailInfo getGoalDetailInfo() {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        Mate selector = goal.join(TestEntityFactory.user(1L, "user"));
-        ReflectionTestUtils.setField(selector, "id", 1L);
-
-        MateUploadInfo mateUploadInfo = MateUploadInfo.builder()
-                .mateId(selector.getId())
-                .userId(selector.getUserId())
-                .lastUploadDate(LocalDate.now().minusDays(1))
-                .nickname("tester")
-                .build();
-        GoalDetailInfo info = new GoalDetailInfo(goal, selector);
-        info.setMates(List.of(mateUploadInfo));
+        GoalDetailInfo info = new GoalDetailInfo(goal);
+        info.setMates(List.of(
+                MateUploadInfo.builder()
+                        .mateId(1L)
+                        .userId(2L)
+                        .lastUploadDate(LocalDate.now().minusDays(1))
+                        .nickname("tester1")
+                        .build(),
+                MateUploadInfo.builder()
+                        .mateId(3L)
+                        .userId(4L)
+                        .lastUploadDate(LocalDate.now())
+                        .nickname("tester2")
+                        .build()));
         return info;
     }
 }

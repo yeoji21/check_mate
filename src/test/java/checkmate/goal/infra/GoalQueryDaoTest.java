@@ -135,7 +135,7 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.clear();
 
         //when
-        GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId(), user1.getId())
+        GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
