@@ -4,7 +4,7 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
-import checkmate.goal.application.dto.response.GoalSimpleInfo;
+import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.*;
 import checkmate.mate.application.dto.response.MateUploadInfo;
@@ -51,12 +51,12 @@ class GoalQueryDaoTest extends RepositoryTest {
         em.persist(mate3);
 
         //when
-        List<GoalSimpleInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
+        List<OngoingGoalInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
 
         //then
         assertThat(ongoingGoals.size()).isEqualTo(3);
         for (int i = 0; i < ongoingGoals.size(); i++) {
-            GoalSimpleInfo info = ongoingGoals.get(i);
+            OngoingGoalInfo info = ongoingGoals.get(i);
             assertThat(info.id()).isGreaterThan(0L);
             assertThat(info.title()).isEqualTo("goal" + (i + 1));
             assertThat(info.category()).isNotNull();

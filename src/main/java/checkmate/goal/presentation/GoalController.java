@@ -8,7 +8,7 @@ import checkmate.goal.application.GoalQueryService;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
-import checkmate.goal.application.dto.response.GoalSimpleInfoResult;
+import checkmate.goal.application.dto.response.OngoingGoalInfoResult;
 import checkmate.goal.application.dto.response.TodayGoalInfoResult;
 import checkmate.goal.presentation.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -55,17 +55,17 @@ public class GoalController {
     }
 
     @GetMapping("/goal/{goalId}/period")
-    public GoalScheduleInfo goalPeriodFind(@PathVariable long goalId) {
+    public GoalScheduleInfo findGoalPeriod(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
     @GetMapping("/goal/ongoing")
-    public GoalSimpleInfoResult ongoingGoalSimpleInfoFind(@AuthenticationPrincipal JwtUserDetails details) {
-        return goalQueryService.findOngoingSimpleInfo(details.getUserId());
+    public OngoingGoalInfoResult findOngoingInfo(@AuthenticationPrincipal JwtUserDetails details) {
+        return goalQueryService.findOngoingGoalInfo(details.getUserId());
     }
 
     @GetMapping("/goal/today")
-    public TodayGoalInfoResult todayGoalFind(@AuthenticationPrincipal JwtUserDetails details) {
+    public TodayGoalInfoResult findTodayGoalInfo(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());
     }
 }

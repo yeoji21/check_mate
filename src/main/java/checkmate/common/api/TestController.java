@@ -19,7 +19,7 @@ public class TestController {
     @GetMapping("/test/log")
     public String testLogging() {
         log.warn("test warn log");
-        log.info("test info log");
+        log.info("test goals log");
         log.debug("test dedug log");
         return "ok";
     }

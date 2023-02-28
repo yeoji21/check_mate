@@ -86,6 +86,57 @@ include::{snippets}/goal-detail/http-response.adoc[]
 
 // =============================================================
 
+== 목표 인증일 조회
+
+=== Path Parameter
+
+include::{snippets}/goal-period/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/goal-period/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-period/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-period/http-response.adoc[]
+
+// =============================================================
+
+== 진행 중인 목표 정보 조회
+
+=== HTTP Request
+
+include::{snippets}/goal-ongoing-info/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-ongoing-info/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-ongoing-info/http-response.adoc[]
+
+// =============================================================
+
+== 오늘 인증해야 할 목표 정보 조회
+
+=== HTTP Request
+
+include::{snippets}/goal-today-info/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/goal-today-info/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/goal-today-info/http-response.adoc[]
+
+// =============================================================
 == 팀원 초대
 
 === Request Fields
@@ -99,26 +150,6 @@ include::{snippets}/invite-team mate/http-request.adoc[]
 === HTTP Response
 
 include::{snippets}/invite-team mate/http-response.adoc[]
-
-== 유저의 목표 조회
-
-=== HTTP Request
-
-include::{snippets}/find-userGoal/http-request.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/find-userGoal/http-response.adoc[]
-
-== 유저의 오늘 해야 할 목표 조회
-
-=== HTTP Request
-
-include::{snippets}/find-todayGoal/http-request.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/find-todayGoal/http-response.adoc[]
 
 == 유저별 목표 진행률 조회
 

@@ -18,6 +18,7 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.PathParametersSnippet;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -106,7 +107,7 @@ public class GoalControllerTest extends ControllerTest {
     void findGoalDetail() throws Exception {
         GoalDetailInfo info = getGoalDetailInfo();
         given(goalQueryService.findGoalDetail(any(Long.class))).willReturn(info);
-        
+
         mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
@@ -119,9 +120,9 @@ public class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 목표의_전체_인증일_조회() throws Exception {
-        Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        GoalScheduleInfo goalScheduleInfo = goalPeriodResponseDto(goal);
+    @DisplayName("목표의 인증일 조회 API")
+    void findGoalPeriod() throws Exception {
+        GoalScheduleInfo goalScheduleInfo = getGoalScheduleInfo();
         given(goalQueryService.findGoalPeriodInfo(any(Long.class))).willReturn(goalScheduleInfo);
 
         mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}/period", 1L)
@@ -130,32 +131,63 @@ public class GoalControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(goalScheduleInfo)))
                 .andDo(document("goal-period",
-                        pathParameters(parameterWithName("goalId").description("goalId"))
+                        goalIdPathParametersSnippet(),
+                        periodResponseFieldsSnippet()
                 ));
     }
 
     @WithMockAuthUser
     @Test
-    void 유저의_진행중인_목표_조회_테스트() throws Exception {
-        Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        GoalSimpleInfoResult result = new GoalSimpleInfoResult(List.of(simpleGoalInfo(goal), simpleGoalInfo(goal)));
+    @DisplayName("진행중인 목표 정보 조회 API")
+    void findOngoingSimpleInfo() throws Exception {
+        OngoingGoalInfoResult result = getOngoingGoalInfoResult();
 
-        when(goalQueryService.findOngoingSimpleInfo(any(Long.class))).thenReturn(result);
+        when(goalQueryService.findOngoingGoalInfo(any(Long.class))).thenReturn(result);
 
         mockMvc.perform(get("/goal/ongoing")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("find-userGoal",
-                        setGoalFindResponseFields()));
-        verify(goalQueryService).findOngoingSimpleInfo(any(Long.class));
+                .andDo(document("goal-ongoing-info",
+                        ongoingInfoResponseFieldsSnippet()));
+        verify(goalQueryService).findOngoingGoalInfo(any(Long.class));
     }
 
     @WithMockAuthUser
     @Test
-    void 유저가_오늘해야할_목표_조회_테스트() throws Exception {
-        Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        TodayGoalInfo checked = TodayGoalInfo
+    @DisplayName("오늘 인증해야할 목표 정보 조회 API")
+    void findTodayGoalInfo() throws Exception {
+        TodayGoalInfoResult result = getTodayGoalInfoResult();
+        when(goalQueryService.findTodayGoalInfo(any(Long.class))).thenReturn(result);
+
+        mockMvc.perform(get("/goal/today")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("goal-today-info",
+                        todayInfoResponseFieldsSnippet()
+                ));
+    }
+
+    private ResponseFieldsSnippet todayInfoResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goals[].id").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
+                fieldWithPath("goals[].checked").type(JsonFieldType.BOOLEAN).description("인증 완료 여부"));
+    }
+
+    private TodayGoalInfoResult getTodayGoalInfoResult() {
+        TodayGoalInfo checked = getTodayGoalInfo(TestEntityFactory.goal(1L, "goal1"));
+        ReflectionTestUtils.setField(checked, "checked", true);
+        TodayGoalInfo notChecked = getTodayGoalInfo(TestEntityFactory.goal(2L, "goal2"));
+        ReflectionTestUtils.setField(notChecked, "checked", false);
+        return new TodayGoalInfoResult(List.of(checked, notChecked));
+    }
+
+    private TodayGoalInfo getTodayGoalInfo(Goal goal) {
+        return TodayGoalInfo
                 .builder()
                 .id(goal.getId())
                 .category(goal.getCategory())
@@ -163,25 +195,39 @@ public class GoalControllerTest extends ControllerTest {
                 .checkDays(goal.getCheckDays())
                 .lastUploadDate(LocalDate.now())
                 .build();
-        TodayGoalInfo notChecked = TodayGoalInfo
-                .builder()
-                .id(goal.getId())
-                .category(goal.getCategory())
-                .title(goal.getTitle())
-                .checkDays(goal.getCheckDays())
-                .lastUploadDate(LocalDate.now().minusDays(1))
+    }
+
+    private ResponseFieldsSnippet ongoingInfoResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goals[].id").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
+                fieldWithPath("goals[].weekDays").type(JsonFieldType.STRING).description("목표 인증 요일")
+        );
+    }
+
+    private OngoingGoalInfoResult getOngoingGoalInfoResult() {
+        return new OngoingGoalInfoResult(List.of(
+                simpleGoalInfo(TestEntityFactory.goal(1L, "goal1")),
+                simpleGoalInfo(TestEntityFactory.goal(2L, "goal2")))
+        );
+    }
+
+    private ResponseFieldsSnippet periodResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
+                fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
+                fieldWithPath("schedule").type(JsonFieldType.STRING).description("인증일 (1이면 인증 요일, 0이면 해당없음)")
+        );
+    }
+
+    private GoalScheduleInfo getGoalScheduleInfo() {
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        return GoalScheduleInfo.builder()
+                .weekDays(goal.getCheckDays().intValue())
+                .startDate(goal.getStartDate())
+                .endDate(goal.getEndDate())
                 .build();
-
-        TodayGoalInfoResult result = new TodayGoalInfoResult(List.of(checked, notChecked));
-        when(goalQueryService.findTodayGoalInfo(any(Long.class))).thenReturn(result);
-
-        mockMvc.perform(get("/goal/today")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("find-todayGoal",
-                        todayGoalInfoResponseFieldsSnippet()
-                ));
     }
 
     private ResponseFieldsSnippet goalDetailResponseFieldsSnippet() {
@@ -195,11 +241,11 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("status").type(JsonFieldType.STRING).description("목표 진행 상태"),
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("목표 인증 시간").optional(),
                 fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("목표 초대 가능 여부"),
-                fieldWithPath("mates").description("목표에 속한 팀원들"),
-                fieldWithPath("mates[].mateId").description("팀원 ID"),
-                fieldWithPath("mates[].userId").description("유저 ID"),
-                fieldWithPath("mates[].nickname").description("유저 닉네임"),
-                fieldWithPath("mates[].uploaded").description("해당 팀원이 목표를 인증했는지")
+                fieldWithPath("mates").type(JsonFieldType.ARRAY).description("목표에 속한 팀원들"),
+                fieldWithPath("mates[].mateId").type(JsonFieldType.NUMBER).description("팀원 ID"),
+                fieldWithPath("mates[].userId").type(JsonFieldType.NUMBER).description("유저 ID"),
+                fieldWithPath("mates[].nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                fieldWithPath("mates[].uploaded").type(JsonFieldType.BOOLEAN).description("해당 팀원이 목표를 인증했는지")
         );
     }
 
@@ -224,10 +270,10 @@ public class GoalControllerTest extends ControllerTest {
 
     private ResponseFieldsSnippet setGoalFindResponseFields() {
         return responseFields(
-                fieldWithPath("info[].id").description("goal id").type(JsonFieldType.NUMBER),
-                fieldWithPath("info[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("info[].weekDays").type(JsonFieldType.STRING).description("인증요일")
+                fieldWithPath("goals[].id").description("goal id").type(JsonFieldType.NUMBER),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("카테고리"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].weekDays").type(JsonFieldType.STRING).description("인증요일")
         );
     }
 
@@ -246,8 +292,8 @@ public class GoalControllerTest extends ControllerTest {
         return responseFields(fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("생성된 목표 ID"));
     }
 
-    private GoalSimpleInfo simpleGoalInfo(Goal goal) {
-        return GoalSimpleInfo.builder()
+    private OngoingGoalInfo simpleGoalInfo(Goal goal) {
+        return OngoingGoalInfo.builder()
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
@@ -255,7 +301,8 @@ public class GoalControllerTest extends ControllerTest {
                 .build();
     }
 
-    private GoalScheduleInfo goalPeriodResponseDto(Goal goal) {
+    private GoalScheduleInfo goalPeriodResponseDto() {
+        Goal goal = TestEntityFactory.goal(1L, "goal");
         return GoalScheduleInfo.builder()
                 .weekDays(goal.getCheckDays().intValue())
                 .startDate(goal.getStartDate())
@@ -276,11 +323,11 @@ public class GoalControllerTest extends ControllerTest {
 
     private ResponseFieldsSnippet todayGoalInfoResponseFieldsSnippet() {
         return responseFields(
-                fieldWithPath("info[].id").description("목표 id").type(JsonFieldType.NUMBER),
-                fieldWithPath("info[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("info[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("info[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("info[].checked").type(JsonFieldType.BOOLEAN).description("오늘 이미 인증을 수행했는지 여부"));
+                fieldWithPath("goals[].id").description("목표 id").type(JsonFieldType.NUMBER),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("카테고리"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
+                fieldWithPath("goals[].checked").type(JsonFieldType.BOOLEAN).description("오늘 이미 인증을 수행했는지 여부"));
     }
 
     private GoalDetailInfo getGoalDetailInfo() {

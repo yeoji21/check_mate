@@ -5,7 +5,7 @@ import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
-import checkmate.goal.application.dto.response.GoalSimpleInfoResult;
+import checkmate.goal.application.dto.response.OngoingGoalInfoResult;
 import checkmate.goal.application.dto.response.TodayGoalInfoResult;
 import checkmate.goal.infra.GoalQueryDao;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +31,8 @@ public class GoalQueryService {
             key = "{#userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional(readOnly = true)
-    public GoalSimpleInfoResult findOngoingSimpleInfo(long userId) {
-        return new GoalSimpleInfoResult(goalQueryDao.findOngoingSimpleInfo(userId));
+    public OngoingGoalInfoResult findOngoingGoalInfo(long userId) {
+        return new OngoingGoalInfoResult(goalQueryDao.findOngoingSimpleInfo(userId));
     }
 
     @Cacheable(value = CacheKey.GOAL_PERIOD, key = "{#goalId}")
