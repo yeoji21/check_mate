@@ -1,15 +1,16 @@
 package checkmate.notification.application;
 
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.request.NotificationDetailsCriteria;
-import checkmate.notification.application.dto.response.NotificationDetailsResult;
+import checkmate.notification.application.dto.response.NotificationDetailResult;
 import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.infrastructure.NotificationQueryDao;
+import checkmate.notification.presentation.dto.NotificationInfoResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class NotificationQueryService {
     }
 
     @Transactional(readOnly = true)
-    public NotificationDetailsResult findNotificationDetails(NotificationDetailsCriteria criteria) {
+    public NotificationDetailResult findNotificationDetails(NotificationDetailsCriteria criteria) {
         return notificationQueryDao.findNotificationDetailResult(
                 criteria.userId(),
                 criteria.cursorId(),
@@ -43,18 +44,19 @@ public class NotificationQueryService {
     }
 
     @Transactional
-    public List<NotificationInfo> findGoalCompleteNotifications(long userId) {
-        return notificationRepository.findGoalCompleteNotificationReceivers(userId)
+    public NotificationInfoResult findGoalCompleteNotifications(long userId) {
+        List<NotificationInfo> notifications = notificationRepository.findGoalCompleteNotificationReceivers(userId)
                 .stream()
                 .map(receiver -> {
                     receiver.read();
                     return mapper.toInfo(receiver.getNotification());
                 })
                 .collect(Collectors.toList());
+        return new NotificationInfoResult(notifications);
     }
 
     private void read(NotificationReceiver receiver) {
-        if(receiver.getNotification().getType() != NotificationType.INVITE_GOAL)
+        if (receiver.getNotification().getType() != NotificationType.INVITE_GOAL)
             receiver.read();
     }
 }

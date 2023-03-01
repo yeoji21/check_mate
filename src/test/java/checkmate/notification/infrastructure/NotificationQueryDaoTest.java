@@ -2,7 +2,7 @@ package checkmate.notification.infrastructure;
 
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.notification.application.dto.response.NotificationDetailsResult;
+import checkmate.notification.application.dto.response.NotificationDetailResult;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
@@ -47,21 +47,21 @@ class NotificationQueryDaoTest extends RepositoryTest {
         em.clear();
 
         //when
-        NotificationDetailsResult result =
+        NotificationDetailResult result =
                 notificationQueryDao.findNotificationDetailResult(receiver1.getId(), null, PageRequest.of(0, 10));
 
-        result.getNotificationDetails()
+        result.getNotifications()
                 .forEach(n -> System.out.println(n.getNotificationId()));
 
         //then
-        assertThat(result.getNotificationDetails().size()).isEqualTo(2);
-        assertThat(result.getNotificationDetails().get(0).getNotificationId()).isGreaterThan(result.getNotificationDetails().get(1).getNotificationId());
-        assertThat(result.getNotificationDetails().get(0).getType()).isEqualTo(NotificationType.POST_UPLOAD.toString());
-        assertThat(result.getNotificationDetails().get(1).getBody()).contains("body");
+        assertThat(result.getNotifications().size()).isEqualTo(2);
+        assertThat(result.getNotifications().get(0).getNotificationId()).isGreaterThan(result.getNotifications().get(1).getNotificationId());
+        assertThat(result.getNotifications().get(0).getType()).isEqualTo(NotificationType.POST_UPLOAD.toString());
+        assertThat(result.getNotifications().get(1).getBody()).contains("body");
     }
 
     @Test
-    void findGoalCompleteByUserId() throws Exception{
+    void findGoalCompleteByUserId() throws Exception {
         //given
         User sender = TestEntityFactory.user(null, "sender");
         em.persist(sender);

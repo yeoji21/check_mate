@@ -1,7 +1,7 @@
 package checkmate.notification.infrastructure;
 
-import checkmate.notification.application.dto.response.NotificationDetails;
-import checkmate.notification.application.dto.response.NotificationDetailsResult;
+import checkmate.notification.application.dto.response.NotificationDetailInfo;
+import checkmate.notification.application.dto.response.NotificationDetailResult;
 import checkmate.notification.application.dto.response.QNotificationDetails;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,8 +19,8 @@ import static checkmate.notification.domain.QNotificationReceiver.notificationRe
 public class NotificationQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    public NotificationDetailsResult findNotificationDetailResult(long userId, Long cursorId, Pageable pageable) {
-        List<NotificationDetails> notificationDetails = queryFactory
+    public NotificationDetailResult findNotificationDetailResult(long userId, Long cursorId, Pageable pageable) {
+        List<NotificationDetailInfo> notificationDetails = queryFactory
                 .select(new QNotificationDetails(notification.id, notification.title, notification.content,
                         notificationReceiver.checked, notification.createdDateTime, notification.type.stringValue()))
                 .from(notificationReceiver)
@@ -30,10 +30,10 @@ public class NotificationQueryDao {
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
         boolean hasNext = hasNext(pageable.getPageSize(), notificationDetails);
-        return new NotificationDetailsResult(notificationDetails, hasNext);
+        return new NotificationDetailResult(notificationDetails, hasNext);
     }
 
-    private boolean hasNext(int size, List<NotificationDetails> notificationDetails) {
+    private boolean hasNext(int size, List<NotificationDetailInfo> notificationDetails) {
         boolean hasNext = false;
         if (notificationDetails.size() > size) {
             notificationDetails.remove(size);

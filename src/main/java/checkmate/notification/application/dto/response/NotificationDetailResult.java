@@ -8,13 +8,13 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class NotificationDetailsResult {
-    private List<NotificationDetails> notificationDetails;
+public class NotificationDetailResult {
+    private List<NotificationDetailInfo> notifications;
     private boolean hasNext;
 
     @Builder
-    public NotificationDetailsResult(List<NotificationDetails> notificationDetails, boolean hasNext) {
-        this.notificationDetails = notificationDetails;
+    public NotificationDetailResult(List<NotificationDetailInfo> notifications, boolean hasNext) {
+        this.notifications = notifications;
         this.hasNext = hasNext;
     }
 }

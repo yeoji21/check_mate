@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class NotificationDetails {
+public class NotificationDetailInfo {
     private long notificationId;
     private String title;
     private String body;
@@ -17,13 +17,14 @@ public class NotificationDetails {
     private String sendAt;
     private String type;
 
-    @Builder @QueryProjection
-    public NotificationDetails(long notificationId,
-                               String title,
-                               String body,
-                               boolean checked,
-                               LocalDateTime sendAt,
-                               String type) {
+    @Builder
+    @QueryProjection
+    public NotificationDetailInfo(long notificationId,
+                                  String title,
+                                  String body,
+                                  boolean checked,
+                                  LocalDateTime sendAt,
+                                  String type) {
         this.notificationId = notificationId;
         this.title = title;
         this.body = body;

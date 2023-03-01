@@ -8,10 +8,10 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class NotificationInfosResult {
+public class NotificationInfoResult {
     List<NotificationInfo> notifications;
 
-    public NotificationInfosResult(List<NotificationInfo> notifications) {
+    public NotificationInfoResult(List<NotificationInfo> notifications) {
         this.notifications = notifications;
     }
 }

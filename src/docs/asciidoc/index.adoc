@@ -246,11 +246,61 @@ include::{snippets}/mate-calender/http-response.adoc[]
 
 // =============================================================
 
-== 유저별 목표 진행률 조회
+== 단건 알림 조회
 
-=== Request Fields
+=== Path Parameter
 
-include::{snippets}/progress-percent/path-parameters.adoc[]
+include::{snippets}/notification-info/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/notification-info/http-request.adoc[]
+
+=== Response Field
+
+include::{snippets}/notification-info/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/notification-info/http-response.adoc[]
+
+// =============================================================
+
+== 목표 수행 완료 알림 조회
+
+=== HTTP Request
+
+include::{snippets}/notification-goal-complete/http-request.adoc[]
+
+=== Response Field
+
+include::{snippets}/notification-goal-complete/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/notification-goal-complete/http-response.adoc[]
+
+// =============================================================
+
+== 유저별 알림 조회
+
+=== HTTP Request
+
+include::{snippets}/notifications/http-request.adoc[]
+
+=== Request Param
+
+include::{snippets}/notifications/request-parameters.adoc[]
+
+=== Response Field
+
+include::{snippets}/notifications/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/notifications/http-response.adoc[]
+
+// =============================================================
 
 == 닉네임 중복 검사
 
@@ -294,26 +344,6 @@ include::{snippets}/find-posts/response-fields.adoc[]
 === HTTP Response
 
 include::{snippets}/find-posts/http-response.adoc[]
-
-== 개별 알림 조회
-
-=== Response Field
-
-include::{snippets}/read-notification/response-fields.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/read-notification/http-response.adoc[]
-
-== 유저별 알림 조회
-
-=== Response Field
-
-include::{snippets}/find-notifications/response-fields.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/find-notifications/http-response.adoc[]
 
 == 좋아요
 
