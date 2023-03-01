@@ -268,15 +268,6 @@ public class GoalControllerTest extends ControllerTest {
         );
     }
 
-    private ResponseFieldsSnippet setGoalFindResponseFields() {
-        return responseFields(
-                fieldWithPath("goals[].id").description("goal id").type(JsonFieldType.NUMBER),
-                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("goals[].weekDays").type(JsonFieldType.STRING).description("인증요일")
-        );
-    }
-
     private GoalCreateDto getGoalCreateDto() {
         return GoalCreateDto.builder()
                 .category(GoalCategory.LEARNING)
@@ -301,15 +292,6 @@ public class GoalControllerTest extends ControllerTest {
                 .build();
     }
 
-    private GoalScheduleInfo goalPeriodResponseDto() {
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        return GoalScheduleInfo.builder()
-                .weekDays(goal.getCheckDays().intValue())
-                .startDate(goal.getStartDate())
-                .endDate(goal.getEndDate())
-                .build();
-    }
-
     private RequestFieldsSnippet createRequestFieldsSnippet() {
         return requestFields(
                 fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
@@ -319,15 +301,6 @@ public class GoalControllerTest extends ControllerTest {
                 fieldWithPath("checkDays").type(JsonFieldType.STRING).description("인증요일"),
                 fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional()
         );
-    }
-
-    private ResponseFieldsSnippet todayGoalInfoResponseFieldsSnippet() {
-        return responseFields(
-                fieldWithPath("goals[].id").description("목표 id").type(JsonFieldType.NUMBER),
-                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("goals[].checked").type(JsonFieldType.BOOLEAN).description("오늘 이미 인증을 수행했는지 여부"));
     }
 
     private GoalDetailInfo getGoalDetailInfo() {

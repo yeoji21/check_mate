@@ -59,12 +59,7 @@ public class MateController {
     }
 
     @GetMapping("/mate/{mateId}/calendar")
-    public MateScheduleInfo teamMateGoalCalender(@PathVariable long mateId) {
-        return mateQueryService.getCalenderInfo(mateId);
-    }
-
-    @GetMapping("/mate/{mateId}/progress")
-    public double progressPercent(@PathVariable Long mateId) {
-        return mateQueryService.getProgressPercent(mateId);
+    public MateScheduleInfo findMateCalender(@PathVariable long mateId) {
+        return mateQueryService.findCalenderInfo(mateId);
     }
 }

@@ -174,19 +174,77 @@ include::{snippets}/goal-history/http-response.adoc[]
 
 // =============================================================
 
-== 팀원 초대
+== 팀원 초대 요청
 
 === Request Fields
 
-include::{snippets}/invite-team mate/request-fields.adoc[]
+include::{snippets}/mate-invite/request-fields.adoc[]
 
 === HTTP Request
 
-include::{snippets}/invite-team mate/http-request.adoc[]
+include::{snippets}/mate-invite/http-request.adoc[]
 
 === HTTP Response
 
-include::{snippets}/invite-team mate/http-response.adoc[]
+include::{snippets}/mate-invite/http-response.adoc[]
+
+// =============================================================
+
+== 팀원 초대 수락
+
+=== Request Fields
+
+include::{snippets}/mate-invite-accept/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/mate-invite-accept/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/mate-invite-accept/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/mate-invite-accept/http-response.adoc[]
+
+// =============================================================
+
+== 팀원 초대 거절
+
+=== Request Fields
+
+include::{snippets}/mate-invite-reject/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/mate-invite-reject/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/mate-invite-reject/http-response.adoc[]
+
+// =============================================================
+
+== 팀원의 목표 캘린더 조회
+
+=== Path Parameter
+
+include::{snippets}/mate-calender/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/mate-calender/http-request.adoc[]
+
+=== Response Field
+
+include::{snippets}/mate-calender/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/mate-calender/http-response.adoc[]
+
+// =============================================================
 
 == 유저별 목표 진행률 조회
 
@@ -226,12 +284,6 @@ include::{snippets}/save-post/http-request.adoc[]
 
 include::{snippets}/save-post/http-response.adoc[]
 
-== 팀원 초대 응답
-
-=== HTTP Response
-
-include::{snippets}/invite-reply/http-response.adoc[]
-
 == 목표의 해당 날짜 게시글 조회
 
 operation::find-posts[snippets='curl-request,http-response,response-fields']
@@ -242,20 +294,6 @@ include::{snippets}/find-posts/response-fields.adoc[]
 === HTTP Response
 
 include::{snippets}/find-posts/http-response.adoc[]
-
-== 팀원의 목표 캘린더 조회
-
-=== Path Parameter
-
-include::{snippets}/mate-calendar/path-parameters.adoc[]
-
-=== Response Field
-
-include::{snippets}/mate-calendar/response-fields.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/mate-calendar/http-response.adoc[]
 
 == 개별 알림 조회
 

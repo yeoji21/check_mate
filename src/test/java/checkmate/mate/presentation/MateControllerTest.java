@@ -73,7 +73,8 @@ class MateControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 팀원_초대_테스트() throws Exception {
+    @DisplayName("팀원 초대 API")
+    void inviteToGoal() throws Exception {
         MateInviteDto request = new MateInviteDto(1L, "yeoz1");
 
         mockMvc.perform(RestDocumentationRequestBuilders.post("/mate")
@@ -81,16 +82,18 @@ class MateControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andDo(document("invite-team mate", getInviteTeamMateRequest()));
+                .andDo(document("mate-invite",
+                        inviteRequestFieldsSnippet()
+                ));
         verify(mateCommandService).inviteMate(any());
     }
 
     @WithMockAuthUser
     @Test
-    void 초대_응답_수락() throws Exception {
+    @DisplayName("초대 수락 API")
+    void inviteAccept() throws Exception {
         MateInviteReplyDto dto = new MateInviteReplyDto(1L);
         MateAcceptResult result = new MateAcceptResult(1L, 1L);
-
         given(mateCommandService.inviteAccept(any())).willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/accept")
@@ -99,14 +102,9 @@ class MateControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("invite-accept",
-                        requestFields(
-                                fieldWithPath("notificationId").type(JsonFieldType.NUMBER).description("notificationId")
-                        ),
-                        responseFields(
-                                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("goalId"),
-                                fieldWithPath("mateId").type(JsonFieldType.NUMBER).description("mateId")
-                        )));
+                .andDo(document("mate-invite-accept",
+                        inviteReplyRequestFieldsSnippet(),
+                        inviteAcceptResponseFieldsSnippet()));
     }
 
     @WithMockAuthUser
@@ -120,27 +118,69 @@ class MateControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andDo(document("invite-reject",
-                        requestFields(
-                                fieldWithPath("notificationId").type(JsonFieldType.NUMBER).description("notificationId")
-                        )
+                .andDo(document("mate-invite-reject",
+                        inviteReplyRequestFieldsSnippet()
                 ));
     }
 
     @WithMockAuthUser
     @Test
-    void 목표_진행률_조회_테스트() throws Exception {
-        double result = 20.0;
-        given(mateQueryService.getProgressPercent(1L)).willReturn(result);
+    @DisplayName("목표 수행 캘린더 조회 API")
+    void findMateCalender() throws Exception {
+        MateScheduleInfo calendarInfo = getMateScheduleInfo();
+        given(mateQueryService.findCalenderInfo(1L)).willReturn(calendarInfo);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{mateId}/progress", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{mateId}/calendar", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(String.valueOf(result)))
-                .andDo(document("progress-percent",
-                        pathParameters(parameterWithName("mateId").description("mateId"))
+                .andExpect(content().json(objectMapper.writeValueAsString(calendarInfo)))
+                .andDo(document("mate-calender",
+                        mateCalenderPathParametersSnippet(),
+                        nateCalenderResponseFieldsSnippet()
                 ));
+    }
+
+    private ResponseFieldsSnippet nateCalenderResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("startDate").type(JsonFieldType.STRING).description("목표 수행 시작일"),
+                fieldWithPath("endDate").type(JsonFieldType.STRING).description("목표 수행 종료일"),
+                fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
+                fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정")
+        );
+    }
+
+    private PathParametersSnippet mateCalenderPathParametersSnippet() {
+        return pathParameters(parameterWithName("mateId").description("팀원 ID"));
+    }
+
+    private MateScheduleInfo getMateScheduleInfo() {
+        return MateScheduleInfo.builder()
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(10))
+                .weekDays(1111010101)
+                .uploadedDates(List.of(LocalDate.now()))
+                .build();
+    }
+
+    private ResponseFieldsSnippet inviteAcceptResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("mateId").type(JsonFieldType.NUMBER).description("팀원 ID")
+        );
+    }
+
+    private RequestFieldsSnippet inviteReplyRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("notificationId").type(JsonFieldType.NUMBER).description("알림 ID")
+        );
+    }
+
+    private RequestFieldsSnippet inviteRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("inviteeNickname").type(JsonFieldType.STRING).description("초대할 유저의 닉네임")
+        );
     }
 
     private ResponseFieldsSnippet historyResultResponseFieldsSnippet() {
@@ -207,82 +247,4 @@ class MateControllerTest extends ControllerTest {
                 new GoalHistoryInfo(mate2, List.of("nickname4", "nickname5")));
     }
 
-    private ResponseFieldsSnippet historyResponseFieldsSnippet() {
-        return responseFields(
-                fieldWithPath("goals[].goalId").description("목표 id").type(JsonFieldType.NUMBER),
-                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("goals[].startDate").type(JsonFieldType.STRING).description("시작일"),
-                fieldWithPath("goals[].endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("goals[].appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
-                fieldWithPath("goals[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
-                fieldWithPath("goals[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
-        );
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 팀원의_목표_수행_캘린더_조회() throws Exception {
-        MateScheduleInfo calendarInfo = MateScheduleInfo.builder()
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(10))
-                .weekDays(1111111)
-                .uploadedDates(List.of(LocalDate.now()))
-                .build();
-
-        given(mateQueryService.getCalenderInfo(1L)).willReturn(calendarInfo);
-
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{mateId}/calendar", 1L)
-                        .with(csrf())
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(calendarInfo)))
-                .andDo(document("mate-calendar",
-                        pathParameters(parameterWithName("mateId").description("mateId")),
-                        teamMateCalendarResponseFieldsSnippet()
-                ));
-    }
-
-    private ResponseFieldsSnippet goalDetailResultResponseFieldsSnippet() {
-        return responseFields(
-                fieldWithPath("id").type(JsonFieldType.NUMBER).description("ID 값"),
-                fieldWithPath("mates").description("목표에 속한 팀원들"),
-                fieldWithPath("category").type(JsonFieldType.STRING).description("카테고리"),
-                fieldWithPath("title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("startDate").type(JsonFieldType.STRING).description("시작일"),
-                fieldWithPath("endDate").type(JsonFieldType.STRING).description("종료일"),
-                fieldWithPath("weekDays").type(JsonFieldType.STRING).description("인증요일"),
-                fieldWithPath("appointmentTime").type(JsonFieldType.STRING).description("인증 시간").optional(),
-                fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
-                fieldWithPath("goalStatus").type(JsonFieldType.STRING).description("목표 상태"),
-                fieldWithPath("mates[].mateId").description("팀메이트 id"),
-                fieldWithPath("mates[].userId").description("유저 id"),
-                fieldWithPath("mates[].nickname").description("유저의 닉네임"),
-                fieldWithPath("mates[].uploaded").description("이미 업로드했는지"),
-                fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 업로드했는지"),
-                fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 업로드할 수 있는지"),
-                fieldWithPath("uploadable.workingDay").description("업로드하는 날이 맞는지"),
-                fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지"),
-                fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
-                fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
-                fieldWithPath("progress").type(JsonFieldType.NUMBER).description("팀원의 목표 수행 진행률")
-        );
-    }
-
-    private ResponseFieldsSnippet teamMateCalendarResponseFieldsSnippet() {
-        return responseFields(
-                fieldWithPath("startDate").type(JsonFieldType.STRING).description("목표 수행 시작일"),
-                fieldWithPath("endDate").type(JsonFieldType.STRING).description("목표 수행 종료일"),
-                fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
-                fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정")
-        );
-    }
-
-    private RequestFieldsSnippet getInviteTeamMateRequest() {
-        return requestFields(
-                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("goalId"),
-                fieldWithPath("inviteeNickname").type(JsonFieldType.STRING).description("초대할 사람의 닉네임")
-        );
-    }
 }

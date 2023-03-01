@@ -26,16 +26,9 @@ public class MateQueryService {
     private final MateRepository mateRepository;
 
     @Transactional(readOnly = true)
-    public MateScheduleInfo getCalenderInfo(long teamMateId) {
+    public MateScheduleInfo findCalenderInfo(long teamMateId) {
         return mateQueryDao.getMateCalendar(teamMateId)
                 .orElseThrow(IllegalArgumentException::new);
-    }
-
-    @Transactional(readOnly = true)
-    public double getProgressPercent(long teamMateId) {
-        Mate mate = mateRepository.findMateWithGoal(teamMateId)
-                .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND, teamMateId));
-        return mate.calcProgressPercent();
     }
 
     @Transactional(readOnly = true)
