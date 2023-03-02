@@ -302,6 +302,82 @@ include::{snippets}/notifications/http-response.adoc[]
 
 // =============================================================
 
+== 목표 인증
+
+=== Request Parameters
+
+include::{snippets}/post-upload/request-parameters.adoc[]
+
+=== Request Parts
+
+include::{snippets}/post-upload/request-parts.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/post-upload/http-request.adoc[]
+
+=== Response Field
+
+include::{snippets}/post-upload/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/post-upload/http-response.adoc[]
+
+// =============================================================
+
+== 목표의 해당 날짜 게시글 조회
+
+=== Request Param
+
+include::{snippets}/posts-find/request-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/posts-find/http-request.adoc[]
+
+=== Response Field
+
+include::{snippets}/posts-find/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/posts-find/http-response.adoc[]
+
+// =============================================================
+
+== 좋아요
+
+=== Path Parameter
+
+include::{snippets}/post-like/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/post-like/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/post-like/http-response.adoc[]
+
+// =============================================================
+
+== 좋아요 취소
+
+=== Path Parameter
+
+include::{snippets}/post-unlike/path-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/post-unlike/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/post-unlike/http-response.adoc[]
+
+// =============================================================
+
 == 닉네임 중복 검사
 
 === Request Parameters
@@ -315,55 +391,6 @@ include::{snippets}/nickname-dup/http-request.adoc[]
 === HTTP Response
 
 include::{snippets}/nickname-dup/http-response.adoc[]
-
-== 목표 인증
-//operation::create-post[snippets='curl-request,request-parts,request-parameters,http-response']
-=== Request Parameters
-
-include::{snippets}/save-post/request-parameters.adoc[]
-
-=== Request Parts
-
-include::{snippets}/save-post/request-parts.adoc[]
-
-=== HTTP Request
-
-include::{snippets}/save-post/http-request.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/save-post/http-response.adoc[]
-
-== 목표의 해당 날짜 게시글 조회
-
-operation::find-posts[snippets='curl-request,http-response,response-fields']
-=== Response Field
-
-include::{snippets}/find-posts/response-fields.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/find-posts/http-response.adoc[]
-
-== 좋아요
-
-=== Path Parameter
-
-include::{snippets}/like-post/path-parameters.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/like-post/http-response.adoc[]
-
-== 좋아요 취소
-
-=== Path Parameter
-
-include::{snippets}/unlike-post/path-parameters.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/unlike-post/http-response.adoc[]
 
 == 닉네임 변경
 

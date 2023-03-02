@@ -1,6 +1,7 @@
 package checkmate.post.application.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class PostInfo {
     private List<Long> likedUserIds;
     private String content;
 
+    @Builder
     @QueryProjection
     public PostInfo(long postId,
                     long mateId,

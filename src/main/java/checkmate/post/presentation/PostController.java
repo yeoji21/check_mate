@@ -3,7 +3,8 @@ package checkmate.post.presentation;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.post.application.PostCommandService;
 import checkmate.post.application.PostQueryService;
-import checkmate.post.application.dto.response.PostInfoListResult;
+import checkmate.post.application.dto.response.PostInfoResult;
+import checkmate.post.application.dto.response.PostUploadResult;
 import checkmate.post.presentation.dto.PostDate;
 import checkmate.post.presentation.dto.PostDtoMapper;
 import checkmate.post.presentation.dto.PostUploadDto;
@@ -22,27 +23,30 @@ public class PostController {
     private final PostQueryService postQueryService;
     private final PostDtoMapper postDtoMapper;
 
-    @PostMapping("/post")
-    public long uploadPost(@ModelAttribute PostUploadDto dto,
-                           @AuthenticationPrincipal JwtUserDetails principal) {
+    @PostMapping("/posts")
+    public PostUploadResult upload(@ModelAttribute PostUploadDto dto,
+                                   @AuthenticationPrincipal JwtUserDetails principal) {
         if (dto.getImages() == null && dto.getContent() == null)
             throw new IllegalArgumentException("빈 목표인증 요청");
         return postCommandService.upload(postDtoMapper.toCommand(dto, principal.getUserId()));
     }
 
-    @GetMapping("/post")
-    public PostInfoListResult findPostListByDate(@RequestParam long goalId,
-                                                 @RequestParam @PostDate String date) {
+    // TODO: 2023/03/02 API 명세 변경 고려
+    @GetMapping("/posts")
+    public PostInfoResult findPostInfoByDate(@RequestParam long goalId,
+                                             @RequestParam @PostDate String date) {
         return postQueryService.findPostByGoalIdAndDate(goalId, date);
     }
 
-    @PostMapping("/post/{postId}/like")
-    public void like(@AuthenticationPrincipal JwtUserDetails principal, @PathVariable long postId) {
+    @PostMapping("/posts/{postId}/like")
+    public void like(@PathVariable long postId,
+                     @AuthenticationPrincipal JwtUserDetails principal) {
         postCommandService.like(principal.getUserId(), postId);
     }
 
-    @DeleteMapping("/post/{postId}/unlike")
-    public void unlike(@AuthenticationPrincipal JwtUserDetails principal, @PathVariable long postId) {
+    @DeleteMapping("/posts/{postId}/unlike")
+    public void unlike(@PathVariable long postId,
+                       @AuthenticationPrincipal JwtUserDetails principal) {
         postCommandService.unlike(principal.getUserId(), postId);
     }
 }

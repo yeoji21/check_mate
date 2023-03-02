@@ -11,6 +11,7 @@ import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
+import checkmate.post.application.dto.response.PostUploadResult;
 import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
@@ -46,12 +47,12 @@ public class PostCommandService {
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional
-    public Long upload(PostUploadCommand command) {
+    public PostUploadResult upload(PostUploadCommand command) {
         Mate uploader = findMate(command.mateId());
         Post post = save(command, uploader);
         verifyGoalConditions(uploader.getGoal().getId(), post);
         publishNotificationEvent(uploader);
-        return post.getId();
+        return new PostUploadResult(post.getId());
     }
 
     @Transactional
