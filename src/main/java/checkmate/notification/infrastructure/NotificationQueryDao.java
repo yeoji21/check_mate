@@ -2,7 +2,7 @@ package checkmate.notification.infrastructure;
 
 import checkmate.notification.application.dto.response.NotificationDetailInfo;
 import checkmate.notification.application.dto.response.NotificationDetailResult;
-import checkmate.notification.application.dto.response.QNotificationDetails;
+import checkmate.notification.application.dto.response.QNotificationDetailInfo;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class NotificationQueryDao {
 
     public NotificationDetailResult findNotificationDetailResult(long userId, Long cursorId, Pageable pageable) {
         List<NotificationDetailInfo> notificationDetails = queryFactory
-                .select(new QNotificationDetails(notification.id, notification.title, notification.content,
+                .select(new QNotificationDetailInfo(notification.id, notification.title, notification.content,
                         notificationReceiver.checked, notification.createdDateTime, notification.type.stringValue()))
                 .from(notificationReceiver)
                 .join(notificationReceiver.notification, notification)

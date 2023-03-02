@@ -8,9 +8,11 @@ import checkmate.user.presentation.dto.request.GoogleSignUpDto;
 import checkmate.user.presentation.dto.request.KakaoSignUpDto;
 import checkmate.user.presentation.dto.request.NaverSignUpDto;
 import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.request.RequestParametersSnippet;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -26,6 +28,46 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class UserControllerTest extends ControllerTest {
+    @WithMockAuthUser
+    @Test
+    @DisplayName("닉네임 변경 API")
+    void updateNickname() throws Exception {
+        given(userDtoMapper.toCommand(any(Long.class), any(UserNicknameModifyDto.class)))
+                .willReturn(new UserNicknameModifyCommand(0L, ""));
+
+        mockMvc.perform(patch("/user/nickname")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new UserNicknameModifyDto("새로운 닉네임"))))
+                .andExpect(status().isOk())
+                .andDo(document("user-nickname-update",
+                        nicknameUpdateRequestFieldsSnippet()
+                ));
+        verify(userCommandService).nicknameUpdate(any(UserNicknameModifyCommand.class));
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("닉네임 중복 확인 API")
+    void nicknameDuplicateCheck() throws Exception {
+        mockMvc.perform(get("/user/exists")
+                        .queryParam("nickname", "uniqueNickname")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document("user-nickname-check",
+                        nicknameCheckRequestParametersSnippet()
+                ));
+        verify(userQueryService).existsNicknameCheck(any(String.class));
+    }
+
+    private RequestParametersSnippet nicknameCheckRequestParametersSnippet() {
+        return requestParameters(parameterWithName("nickname").description("중복을 확인할 닉네임"));
+    }
+
+    private RequestFieldsSnippet nicknameUpdateRequestFieldsSnippet() {
+        return requestFields(fieldWithPath("nickname").description("새로운 닉네임"));
+    }
+
     @WithMockAuthUser
     @Test
     void 카카오_회원가입_테스트() throws Exception {
@@ -99,38 +141,6 @@ class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userCommandService).signUp(any(UserSignUpCommand.class));
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 닉네임_변경_테스트() throws Exception {
-        UserNicknameModifyDto request = new UserNicknameModifyDto("새로운 닉네임");
-
-        given(userDtoMapper.toCommand(any(Long.class), any(UserNicknameModifyDto.class)))
-                .willReturn(new UserNicknameModifyCommand(0L, ""));
-
-        mockMvc.perform(patch("/user/nickname")
-                        .with(csrf())
-                        .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andDo(document("nickname-modify",
-                        requestFields(fieldWithPath("nickname").description("새로운 닉네임"))
-                ));
-        verify(userCommandService).nicknameUpdate(any(UserNicknameModifyCommand.class));
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 닉네임_중복_통과_테스트() throws Exception {
-        mockMvc.perform(get("/user/exists")
-                        .queryParam("nickname", "uniqueNickname")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andDo(document("nickname-dup",
-                        requestParameters(parameterWithName("nickname").description("중복 확인을 하고자하는 닉네임"))
-                ));
-        verify(userQueryService).existsNicknameCheck(any(String.class));
     }
 
     private RequestFieldsSnippet setUserRegisterRequestFields() {

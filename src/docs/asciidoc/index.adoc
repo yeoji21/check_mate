@@ -378,27 +378,69 @@ include::{snippets}/post-unlike/http-response.adoc[]
 
 // =============================================================
 
+== 로그인 토큰 재발급
+
+=== Request Fields
+
+include::{snippets}/login-token-reissue/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/login-token-reissue/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/login-token-reissue/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/login-token-reissue/http-response.adoc[]
+
+// =============================================================
+
+== 로그아웃
+
+=== HTTP Request
+
+include::{snippets}/logout/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/logout/http-response.adoc[]
+
+// =============================================================
+
+== 닉네임 변경
+
+=== Request Field
+
+include::{snippets}/user-nickname-update/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/user-nickname-update/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/user-nickname-update/http-response.adoc[]
+
+// =============================================================
+
 == 닉네임 중복 검사
 
 === Request Parameters
 
-include::{snippets}/nickname-dup/request-parameters.adoc[]
+include::{snippets}/user-nickname-check/request-parameters.adoc[]
 
 === HTTP Request
 
-include::{snippets}/nickname-dup/http-request.adoc[]
+include::{snippets}/user-nickname-check/http-request.adoc[]
 
 === HTTP Response
 
-include::{snippets}/nickname-dup/http-response.adoc[]
+include::{snippets}/user-nickname-check/http-response.adoc[]
 
-== 닉네임 변경
-
-=== HTTP Response
-
-include::{snippets}/nickname-modify/http-response.adoc[]
-
-= 회원가입 & 로그인 API
+// =============================================================
 
 == 회원 가입
 

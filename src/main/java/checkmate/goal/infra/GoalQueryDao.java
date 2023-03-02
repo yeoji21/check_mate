@@ -72,7 +72,7 @@ public class GoalQueryDao {
 
     // 진행중인 목표들 정보 조회
     public List<OngoingGoalInfo> findOngoingSimpleInfo(long userId) {
-        return queryFactory.select(new QGoalSimpleInfo(goal.id, goal.category, goal.title, goal.checkDays.checkDays.stringValue()))
+        return queryFactory.select(new QOngoingGoalInfo(goal.id, goal.category, goal.title, goal.checkDays.checkDays.stringValue()))
                 .from(mate)
                 .join(mate.goal, goal)
                 .where(mate.userId.eq(userId),

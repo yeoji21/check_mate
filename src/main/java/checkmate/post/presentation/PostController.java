@@ -11,11 +11,9 @@ import checkmate.post.presentation.dto.PostUploadDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Validated
 @RequiredArgsConstructor
 @RestController
 public class PostController {

@@ -1,20 +1,23 @@
 package checkmate.user.presentation.dto.response;
 
 import checkmate.config.auth.AuthConstants;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginTokenResponse{
+public class LoginTokenResponse {
     private String refreshToken;
     private String accessToken;
 
     @Builder
     public LoginTokenResponse(String refreshToken, String accessToken) {
-        this.refreshToken = AuthConstants.TOKEN_PREFIX + refreshToken;
-        this.accessToken = AuthConstants.TOKEN_PREFIX + accessToken;
+        this.refreshToken = AuthConstants.TOKEN_PREFIX.getValue() + refreshToken;
+        this.accessToken = AuthConstants.TOKEN_PREFIX.getValue() + accessToken;
     }
 
     @Override

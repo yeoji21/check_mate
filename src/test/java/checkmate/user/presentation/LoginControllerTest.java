@@ -7,6 +7,7 @@ import checkmate.user.presentation.dto.request.KakaoLoginDto;
 import checkmate.user.presentation.dto.request.NaverLoginDto;
 import checkmate.user.presentation.dto.request.TokenReissueDto;
 import checkmate.user.presentation.dto.response.LoginTokenResponse;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
@@ -29,7 +30,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LoginControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
-    void 로그아웃_테스트() throws Exception{
+    @DisplayName("로그인 토큰 재발급 API")
+    void tokenReissue() throws Exception {
+        TokenReissueDto dto = getTokenReissueDto();
+        LoginTokenResponse response = getLoginTokenResponse();
+        given(loginService.reissueToken(any())).willReturn(response);
+
+        mockMvc.perform(post("/login/reissue")
+                        .contentType(APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsBytes(dto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(document("login-token-reissue",
+                        tokenReissueRequestFieldsSnippet(),
+                        tokenReissueResponseFieldsSnippet()
+                ));
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("로그아웃 API")
+    void logout() throws Exception {
         mockMvc.perform(delete("/login/logout")
                         .contentType(APPLICATION_JSON)
                         .with(csrf()))
@@ -38,43 +60,36 @@ class LoginControllerTest extends ControllerTest {
         verify(loginService).logout(any(Long.class));
     }
 
-    @WithMockAuthUser
-    @Test
-    void 토큰_재발급_테스트() throws Exception{
-        //given
-        TokenReissueDto dto = TokenReissueDto.builder()
-                .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2NTI2MTE2MTF9.Hj9kuCtbxEQSdXgtGhKf0PnaXBNw4vtzeZ49fm24dREbRF7mOOw634ykk6aO0VjeuinikNVMI0xP5zURZj93OA")
-                .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsl6zsp4Dsm5AiLCJhdXRoIjoiUk9MRV9VU0VSIiwicHJvdmlkZXJJZCI6IktBS0FPXzIwODcxNjM5NzUiLCJuaWNrbmFtZSI6IuynhOuLrOuemCIsImlkIjoxMiwiZXhwIjoxNjUxMjE4MjMzfQ.3_oRpdYdy4dHr9myPS8a032BNS0Acjt9SAqJ3E0yvWU19NFUN9nOQSZWge4cxX5kWucoZ-AAPKDnzcEzyfDEQA")
-                .build();
-        LoginTokenResponse response = LoginTokenResponse.builder()
+    private ResponseFieldsSnippet tokenReissueResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("새로운 refresh token"),
+                fieldWithPath("accessToken").type(JsonFieldType.STRING).description("새로운 access token")
+        );
+    }
+
+    private RequestFieldsSnippet tokenReissueRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("기존 refresh token"),
+                fieldWithPath("accessToken").type(JsonFieldType.STRING).description("기존 access token"));
+    }
+
+    private LoginTokenResponse getLoginTokenResponse() {
+        return LoginTokenResponse.builder()
                 .refreshToken("after refresh token")
                 .accessToken("after access token")
                 .build();
+    }
 
-        //when
-        given(loginService.reissueToken(any())).willReturn(response);
-
-        //then
-        mockMvc.perform(post("/login/reissue")
-                        .contentType(APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsBytes(dto)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(response)))
-                .andDo(document("token-reissue",
-                        requestFields(
-                                fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("기존 refresh token"),
-                                fieldWithPath("accessToken").type(JsonFieldType.STRING).description("기존 access token")),
-                        responseFields(
-                                fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("새로운 refresh token"),
-                                fieldWithPath("accessToken").type(JsonFieldType.STRING).description("새로운 access token")
-                        )
-                ));
+    private TokenReissueDto getTokenReissueDto() {
+        return TokenReissueDto.builder()
+                .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2NTI2MTE2MTF9.Hj9kuCtbxEQSdXgtGhKf0PnaXBNw4vtzeZ49fm24dREbRF7mOOw634ykk6aO0VjeuinikNVMI0xP5zURZj93OA")
+                .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsl6zsp4Dsm5AiLCJhdXRoIjoiUk9MRV9VU0VSIiwicHJvdmlkZXJJZCI6IktBS0FPXzIwODcxNjM5NzUiLCJuaWNrbmFtZSI6IuynhOuLrOuemCIsImlkIjoxMiwiZXhwIjoxNjUxMjE4MjMzfQ.3_oRpdYdy4dHr9myPS8a032BNS0Acjt9SAqJ3E0yvWU19NFUN9nOQSZWge4cxX5kWucoZ-AAPKDnzcEzyfDEQA")
+                .build();
     }
 
     @WithMockAuthUser
     @Test
-    void 구글_로그인_성공_테스트() throws Exception{
+    void 구글_로그인_성공_테스트() throws Exception {
         GoogleLoginDto googleLoginDto = new GoogleLoginDto("providerId", "test FcmToken");
         LoginTokenResponse response = LoginTokenResponse.builder()
                 .accessToken("test123dsadsajd12131")
@@ -97,7 +112,7 @@ class LoginControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 네이버_로그인_성공_테스트() throws Exception{
+    void 네이버_로그인_성공_테스트() throws Exception {
         NaverLoginDto naverLoginDto = new NaverLoginDto("providerId", "test FcmToken");
         LoginTokenResponse response = LoginTokenResponse.builder()
                 .accessToken("test123dsadsajd12131")
@@ -120,7 +135,7 @@ class LoginControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    void 카카오_로그인_성공_테스트() throws Exception{
+    void 카카오_로그인_성공_테스트() throws Exception {
         KakaoLoginDto kakaoLoginDto = new KakaoLoginDto("providerId", "testFcmToken");
         LoginTokenResponse response = LoginTokenResponse.builder()
                 .accessToken("test123dsadsajd12131")
