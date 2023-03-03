@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class MateControllerTest extends ControllerTest {
-
     @WithMockAuthUser
     @Test
     @DisplayName("유저 특화 목표 상세 정보 조회 API")
@@ -44,7 +43,7 @@ class MateControllerTest extends ControllerTest {
                 .willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                        .get("/goal/detail/{goalId}", 1L)
+                        .get("/goals/{goalId}/detail", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -62,7 +61,7 @@ class MateControllerTest extends ControllerTest {
         GoalHistoryInfoResult result = new GoalHistoryInfoResult(getGoalHistoryInfoList());
         given(mateQueryService.findGoalHistoryResult(any(Long.class))).willReturn(result);
 
-        mockMvc.perform(get("/goal/history")
+        mockMvc.perform(get("/goals/history")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
@@ -77,7 +76,7 @@ class MateControllerTest extends ControllerTest {
     void inviteToGoal() throws Exception {
         MateInviteDto request = new MateInviteDto(1L, "yeoz1");
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/mate")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/mates")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -96,7 +95,7 @@ class MateControllerTest extends ControllerTest {
         MateAcceptResult result = new MateAcceptResult(1L, 1L);
         given(mateCommandService.inviteAccept(any())).willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/accept")
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mates/accept")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -113,7 +112,7 @@ class MateControllerTest extends ControllerTest {
     void inviteReject() throws Exception {
         MateInviteReplyDto request = new MateInviteReplyDto(1L);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mate/reject")
+        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mates/reject")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -130,7 +129,7 @@ class MateControllerTest extends ControllerTest {
         MateScheduleInfo calendarInfo = getMateScheduleInfo();
         given(mateQueryService.findCalenderInfo(1L)).willReturn(calendarInfo);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/mate/{mateId}/calendar", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/mates/{mateId}/calendar", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())

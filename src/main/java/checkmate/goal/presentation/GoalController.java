@@ -26,7 +26,7 @@ public class GoalController {
     private final GoalQueryService goalQueryService;
     private final GoalDtoMapper mapper;
 
-    @PostMapping("/goal")
+    @PostMapping("/goals")
     public GoalCreateResponse create(@RequestBody @Valid GoalCreateDto dto,
                                      @AuthenticationPrincipal JwtUserDetails details) {
         long goalId = goalCommandService.create(mapper.toCommand(dto, details.getUserId()));
@@ -34,7 +34,7 @@ public class GoalController {
     }
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)
-    @PostMapping("/goal/like-condition")
+    @PostMapping("/goals/like-condition")
     public void addLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
                                  @AuthenticationPrincipal JwtUserDetails details) {
         LikeCountCreateCommand command = mapper.toCommand(dto, details.getUserId());
@@ -42,29 +42,29 @@ public class GoalController {
     }
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
-    @PatchMapping("/goal/{goalId}")
+    @PatchMapping("/goals/{goalId}")
     public void modify(@PathVariable long goalId,
                        @RequestBody GoalModifyDto dto,
                        @AuthenticationPrincipal JwtUserDetails details) {
         goalCommandService.modifyGoal(mapper.toCommand(dto, goalId, details.getUserId()));
     }
 
-    @GetMapping("/goal/{goalId}")
+    @GetMapping("/goals/{goalId}")
     public GoalDetailInfo findGoalDetail(@PathVariable long goalId) {
         return goalQueryService.findGoalDetail(goalId);
     }
 
-    @GetMapping("/goal/{goalId}/period")
+    @GetMapping("/goals/{goalId}/period")
     public GoalScheduleInfo findGoalPeriod(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
-    @GetMapping("/goal/ongoing")
+    @GetMapping("/goals/ongoing")
     public OngoingGoalInfoResult findOngoingInfo(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findOngoingGoalInfo(details.getUserId());
     }
 
-    @GetMapping("/goal/today")
+    @GetMapping("/goals/today")
     public TodayGoalInfoResult findTodayGoalInfo(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());
     }

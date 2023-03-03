@@ -48,7 +48,7 @@ public class GoalControllerTest extends ControllerTest {
         when(goalCommandService.create(any())).thenReturn(goalId);
         GoalCreateResponse response = new GoalCreateResponse(goalId);
 
-        mockMvc.perform(post("/goal")
+        mockMvc.perform(post("/goals")
                         .contentType(APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(getGoalCreateDto())))
@@ -67,7 +67,7 @@ public class GoalControllerTest extends ControllerTest {
         LikeCountCreateDto dto = new LikeCountCreateDto(1L, 5);
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                        .post("/goal/like-condition")
+                        .post("/goals/like-condition")
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf()))
@@ -90,7 +90,7 @@ public class GoalControllerTest extends ControllerTest {
                 .build();
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                        .patch("/goal/{goalId}", 1L)
+                        .patch("/goals/{goalId}", 1L)
                         .contentType(APPLICATION_JSON)
                         .with(csrf())
                         .content(objectMapper.writeValueAsString(request)))
@@ -108,7 +108,7 @@ public class GoalControllerTest extends ControllerTest {
         GoalDetailInfo info = getGoalDetailInfo();
         given(goalQueryService.findGoalDetail(any(Long.class))).willReturn(info);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/goals/{goalId}", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -125,7 +125,7 @@ public class GoalControllerTest extends ControllerTest {
         GoalScheduleInfo goalScheduleInfo = getGoalScheduleInfo();
         given(goalQueryService.findGoalPeriodInfo(any(Long.class))).willReturn(goalScheduleInfo);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/goal/{goalId}/period", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/goals/{goalId}/period", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -144,7 +144,7 @@ public class GoalControllerTest extends ControllerTest {
 
         when(goalQueryService.findOngoingGoalInfo(any(Long.class))).thenReturn(result);
 
-        mockMvc.perform(get("/goal/ongoing")
+        mockMvc.perform(get("/goals/ongoing")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
@@ -160,7 +160,7 @@ public class GoalControllerTest extends ControllerTest {
         TodayGoalInfoResult result = getTodayGoalInfoResult();
         when(goalQueryService.findTodayGoalInfo(any(Long.class))).thenReturn(result);
 
-        mockMvc.perform(get("/goal/today")
+        mockMvc.perform(get("/goals/today")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))

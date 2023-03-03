@@ -35,7 +35,7 @@ class UserControllerTest extends ControllerTest {
         given(userDtoMapper.toCommand(any(Long.class), any(UserNicknameModifyDto.class)))
                 .willReturn(new UserNicknameModifyCommand(0L, ""));
 
-        mockMvc.perform(patch("/user/nickname")
+        mockMvc.perform(patch("/users/nickname")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(new UserNicknameModifyDto("새로운 닉네임"))))
@@ -50,7 +50,7 @@ class UserControllerTest extends ControllerTest {
     @Test
     @DisplayName("닉네임 중복 확인 API")
     void nicknameDuplicateCheck() throws Exception {
-        mockMvc.perform(get("/user/exists")
+        mockMvc.perform(get("/users/exists")
                         .queryParam("nickname", "uniqueNickname")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -58,14 +58,6 @@ class UserControllerTest extends ControllerTest {
                         nicknameCheckRequestParametersSnippet()
                 ));
         verify(userQueryService).existsNicknameCheck(any(String.class));
-    }
-
-    private RequestParametersSnippet nicknameCheckRequestParametersSnippet() {
-        return requestParameters(parameterWithName("nickname").description("중복을 확인할 닉네임"));
-    }
-
-    private RequestFieldsSnippet nicknameUpdateRequestFieldsSnippet() {
-        return requestFields(fieldWithPath("nickname").description("새로운 닉네임"));
     }
 
     @WithMockAuthUser
@@ -81,7 +73,7 @@ class UserControllerTest extends ControllerTest {
 
         given(userDtoMapper.toCommand(any(KakaoSignUpDto.class))).willReturn(UserSignUpCommand.builder().build());
 
-        mockMvc.perform(post("/user/kakao")
+        mockMvc.perform(post("/users/kakao")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -106,7 +98,7 @@ class UserControllerTest extends ControllerTest {
 
         given(userDtoMapper.toCommand(any(GoogleSignUpDto.class))).willReturn(UserSignUpCommand.builder().build());
 
-        mockMvc.perform(post("/user/google")
+        mockMvc.perform(post("/users/google")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -131,7 +123,7 @@ class UserControllerTest extends ControllerTest {
 
         given(userDtoMapper.toCommand(any(NaverSignUpDto.class))).willReturn(UserSignUpCommand.builder().build());
 
-        mockMvc.perform(post("/user/naver")
+        mockMvc.perform(post("/users/naver")
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
@@ -141,6 +133,14 @@ class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userCommandService).signUp(any(UserSignUpCommand.class));
+    }
+
+    private RequestParametersSnippet nicknameCheckRequestParametersSnippet() {
+        return requestParameters(parameterWithName("nickname").description("중복을 확인할 닉네임"));
+    }
+
+    private RequestFieldsSnippet nicknameUpdateRequestFieldsSnippet() {
+        return requestFields(fieldWithPath("nickname").description("새로운 닉네임"));
     }
 
     private RequestFieldsSnippet setUserRegisterRequestFields() {

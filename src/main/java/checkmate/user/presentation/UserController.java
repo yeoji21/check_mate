@@ -24,28 +24,28 @@ public class UserController {
     private final UserCommandService userCommandService;
     private final UserDtoMapper userDtoMapper;
 
-    @PostMapping("/user/kakao")
+    @PostMapping("/users/kakao")
     public void kakaoSignUp(@RequestBody @Valid KakaoSignUpDto kakaoSignUpDto) {
         userCommandService.signUp(userDtoMapper.toCommand(kakaoSignUpDto));
     }
 
-    @PostMapping("/user/google")
+    @PostMapping("/users/google")
     public void googleSignUp(@RequestBody @Valid GoogleSignUpDto googleSignUpDto) {
         userCommandService.signUp(userDtoMapper.toCommand(googleSignUpDto));
     }
 
-    @PostMapping("/user/naver")
+    @PostMapping("/users/naver")
     public void naverSignUp(@RequestBody @Valid NaverSignUpDto naverSignUpDto) {
         userCommandService.signUp(userDtoMapper.toCommand(naverSignUpDto));
     }
 
-    @PatchMapping("/user/nickname")
+    @PatchMapping("/users/nickname")
     public void updateNickname(@RequestBody @Valid UserNicknameModifyDto userNicknameModifyDto,
                                @AuthenticationPrincipal JwtUserDetails userDetails) {
         userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
     }
 
-    @GetMapping("/user/exists")
+    @GetMapping("/users/exists")
     public void nicknameDuplicateCheck(@RequestParam String nickname) {
         userQueryService.existsNicknameCheck(nickname);
     }

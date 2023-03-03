@@ -28,37 +28,37 @@ public class MateController {
     private final MateDtoMapper mapper;
 
     @GoalMember(GoalIdRoute.PATH_VARIABLE)
-    @GetMapping("/goal/detail/{goalId}")
+    @GetMapping("/goals/{goalId}/detail")
     public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(@PathVariable long goalId,
                                                                @AuthenticationPrincipal JwtUserDetails details) {
         return mateQueryService.findSpecifiedGoalDetailInfo(goalId, details.getUserId());
     }
 
-    @GetMapping("/goal/history")
+    @GetMapping("/goals/history")
     public GoalHistoryInfoResult findGoalHistoryResult(@AuthenticationPrincipal JwtUserDetails details) {
         return mateQueryService.findGoalHistoryResult(details.getUserId());
     }
 
     @GoalMember(GoalIdRoute.REQUEST_BODY)
-    @PostMapping("/mate")
+    @PostMapping("/mates")
     public void inviteToGoal(@RequestBody @Valid MateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
         mateCommandService.inviteMate(mapper.toCommand(inviteDto, principal.getUserId()));
     }
 
-    @PatchMapping("/mate/accept")
+    @PatchMapping("/mates/accept")
     public MateAcceptResult inviteAccept(@RequestBody MateInviteReplyDto dto,
                                          @AuthenticationPrincipal JwtUserDetails principal) {
         return mateCommandService.inviteAccept(mapper.toCommand(dto, principal.getUserId()));
     }
 
-    @PatchMapping("/mate/reject")
+    @PatchMapping("/mates/reject")
     public void inviteReject(@RequestBody MateInviteReplyDto dto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
         mateCommandService.inviteReject(mapper.toCommand(dto, principal.getUserId()));
     }
 
-    @GetMapping("/mate/{mateId}/calendar")
+    @GetMapping("/mates/{mateId}/calendar")
     public MateScheduleInfo findMateCalender(@PathVariable long mateId) {
         return mateQueryService.findCalenderInfo(mateId);
     }
