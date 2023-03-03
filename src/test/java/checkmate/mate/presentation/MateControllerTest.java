@@ -48,7 +48,7 @@ class MateControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-specified-goals",
+                .andDo(document("goal-specified-info",
                         goalIdPathParametersSnippet(),
                         specifiedGoalDetailResponseFieldsSnippet()
                 ));

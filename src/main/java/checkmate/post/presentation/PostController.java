@@ -29,10 +29,9 @@ public class PostController {
         return postCommandService.upload(postDtoMapper.toCommand(dto, principal.getUserId()));
     }
 
-    // TODO: 2023/03/02 API 명세 변경 고려
-    @GetMapping("/posts")
-    public PostInfoResult findPostInfoByDate(@RequestParam long goalId,
-                                             @RequestParam @PostDate String date) {
+    @GetMapping("/goals/{goalId}/posts/{date}")
+    public PostInfoResult findPostInfoByDate(@PathVariable long goalId,
+                                             @PathVariable @PostDate String date) {
         return postQueryService.findPostByGoalIdAndDate(goalId, date);
     }
 

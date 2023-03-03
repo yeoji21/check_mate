@@ -330,7 +330,7 @@ include::{snippets}/post-upload/http-response.adoc[]
 
 === Request Param
 
-include::{snippets}/posts-find/request-parameters.adoc[]
+include::{snippets}/posts-find/path-parameters.adoc[]
 
 === HTTP Request
 

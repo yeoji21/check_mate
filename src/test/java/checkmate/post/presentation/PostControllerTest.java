@@ -69,12 +69,13 @@ class PostControllerTest extends ControllerTest {
         PostInfoResult result = new PostInfoResult("goalTitle", getPostInfoList());
         given(postQueryService.findPostByGoalIdAndDate(any(Long.class), any(String.class))).willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/posts?goalId=1&date=20210412")
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/goals/{goalId}/posts/{date}",
+                                1L, "20220315")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
                 .andDo(document("posts-find",
-                        findPostRequestParametersSnippet(),
+                        findPostPathParametersSnippet(),
                         findPostResponseFieldsSnippet()
                 ));
     }
@@ -107,6 +108,13 @@ class PostControllerTest extends ControllerTest {
                 ));
     }
 
+    private PathParametersSnippet findPostPathParametersSnippet() {
+        return pathParameters(
+                parameterWithName("goalId").description("목표 ID"),
+                parameterWithName("date").description("날짜 (ex. 20220217)")
+        );
+    }
+
     private PathParametersSnippet postIdPathParametersSnippet() {
         return pathParameters(parameterWithName("postId").description("포스트 ID"));
     }
@@ -121,13 +129,6 @@ class PostControllerTest extends ControllerTest {
                 fieldWithPath("posts[].content").type(JsonFieldType.STRING).description("텍스트 인증 내용"),
                 fieldWithPath("posts[].likedUserIds").type(JsonFieldType.ARRAY).description("좋아요 누른 유저 ID"),
                 fieldWithPath("goalTitle").type(JsonFieldType.STRING).description("해당 목표의 이름")
-        );
-    }
-
-    private RequestParametersSnippet findPostRequestParametersSnippet() {
-        return requestParameters(
-                parameterWithName("goalId").description("목표 ID"),
-                parameterWithName("date").description("날짜 (ex. 20220217)")
         );
     }
 
