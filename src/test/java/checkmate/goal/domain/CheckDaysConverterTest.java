@@ -8,8 +8,9 @@ import java.time.LocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CheckDaysConverterTest {
-    @Test @DisplayName("단일 요일 변환 테스트")
-    void test_v1() throws Exception{
+    @Test
+    @DisplayName("단일 요일 변환 테스트")
+    void test_v1() throws Exception {
         isEqualTo("월", 1);
         isEqualTo("화", 2);
         isEqualTo("수", 4);
@@ -19,8 +20,9 @@ public class CheckDaysConverterTest {
         isEqualTo("일", 64);
     }
 
-    @Test @DisplayName("여러 요일 변환 테스트")
-    void test_v2() throws Exception{
+    @Test
+    @DisplayName("여러 요일 변환 테스트")
+    void test_v2() throws Exception {
         isEqualTo("월화", 3);
         isEqualTo("월화수", 7);
         isEqualTo("월화수목금", 1 + 2 + 4 + 8 + 16);
@@ -29,8 +31,9 @@ public class CheckDaysConverterTest {
         isEqualTo("토일", 32 + 64);
     }
 
-    @Test @DisplayName("값에서 요일로 변환 테스트")
-    void test_v3() throws Exception{
+    @Test
+    @DisplayName("값에서 요일로 변환 테스트")
+    void test_v3() throws Exception {
         isEqualTo(1, "월");
         isEqualTo(2, "화");
         isEqualTo(4, "수");
@@ -47,8 +50,9 @@ public class CheckDaysConverterTest {
         isEqualTo(32 + 64, "토일");
     }
 
-    @Test @DisplayName("인증일 검사")
-    void test_V4() throws Exception{
+    @Test
+    @DisplayName("인증 요일 확인")
+    void test_V4() throws Exception {
         LocalDate monday = LocalDate.of(2022, 10, 31);
         LocalDate tuesday = LocalDate.of(2022, 11, 1);
         LocalDate wednesday = LocalDate.of(2022, 11, 2);

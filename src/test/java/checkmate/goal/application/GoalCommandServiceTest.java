@@ -15,6 +15,7 @@ import checkmate.mate.domain.MateStatus;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -56,17 +57,14 @@ public class GoalCommandServiceTest {
     private GoalCommandService goalCommandService;
 
     @Test
-    void 성공한_목표_처리_스케쥴러_테스트() throws Exception {
+    @DisplayName("성공한 목표_처리 스케쥴러")
+    void updateYesterdayOveredGoals() throws Exception {
         //given
         Goal goal1 = TestEntityFactory.goal(1L, "testGoal1");
         Goal goal2 = TestEntityFactory.goal(3L, "testGoal3");
 
-        Mate mate1 = getTeamMate(goal1, 1L);
-        Mate mate2 = getTeamMate(goal1, 2L);
-        Mate mate3 = getTeamMate(goal2, 3L);
-
         given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
-        given(mateRepository.findMateInGoals(anyList())).willReturn(List.of(mate1, mate2, mate3));
+        given(mateRepository.findMateInGoals(anyList())).willReturn(getTeamMates(goal1, goal2));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
@@ -77,16 +75,16 @@ public class GoalCommandServiceTest {
     }
 
     @Test
-    void 목표수정_테스트() throws Exception {
+    @DisplayName("목표 수정")
+    void modifyGoal() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        LocalDate beforeEndDate = goal.getEndDate();
-        LocalTime beforeTime = goal.getAppointmentTime();
         GoalModifyCommand command = getGoalModifyCommand(goal);
-
         given(goalRepository.findByIdForUpdate(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
+        LocalDate beforeEndDate = goal.getEndDate();
+        LocalTime beforeTime = goal.getAppointmentTime();
         goalCommandService.modifyGoal(command);
 
         //then
@@ -97,16 +95,15 @@ public class GoalCommandServiceTest {
     }
 
     @Test
-    void 목표저장_테스트() {
+    @DisplayName("새 목표 생성")
+    void create() {
         //given
         GoalCreateCommand command = getGoalCreateCommand();
-
         doAnswer((invocation) -> {
             Goal argument = (Goal) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "id", 1L);
             return argument;
         }).when(goalRepository).save(any(Goal.class));
-
         given(userRepository.findById(any(Long.class)))
                 .willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "user")));
 
@@ -117,6 +114,10 @@ public class GoalCommandServiceTest {
         assertThat(goalId).isGreaterThan(0L);
         verify(mateRepository).save(any(Mate.class));
         verify(mateInitiateManager).initiate(any(Mate.class));
+    }
+
+    private List<Mate> getTeamMates(Goal goal1, Goal goal2) {
+        return List.of(getTeamMate(goal1, 1L), getTeamMate(goal1, 2L), getTeamMate(goal2, 3L));
     }
 
     private GoalCreateCommand getGoalCreateCommand() {

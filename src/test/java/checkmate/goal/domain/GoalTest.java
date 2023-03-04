@@ -21,16 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GoalTest {
     @Test
-    @DisplayName("목표 종료일 업데이트 성공")
+    @DisplayName("목표 종료일 업데이트")
     void endDate_update() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        LocalDate beforeEndDate = goal.getEndDate();
-        GoalModifyRequest request = GoalModifyRequest.builder()
-                .endDate(beforeEndDate.plusDays(10))
-                .build();
+        GoalModifyRequest request = getEndDateModifyRequest(goal);
 
         //when
+        LocalDate beforeEndDate = goal.getEndDate();
         goal.update(request);
 
         //then
@@ -39,18 +37,17 @@ class GoalTest {
     }
 
     @Test
-    @DisplayName("목표 종료일 업데이트 실패")
+    @DisplayName("목표 종료일 업데이트 실패 - 기존 종료일 이전으로 변경할 수 없음")
     void endDate_update_fail() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        LocalDate beforeEndDate = goal.getEndDate();
-        GoalModifyRequest request = GoalModifyRequest.builder()
-                .endDate(beforeEndDate.minusDays(10))
-                .build();
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> goal.update(request));
+                () -> goal.update(GoalModifyRequest.builder()
+                        .endDate(goal.getEndDate().minusDays(1))
+                        .build())
+        );
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
@@ -239,6 +236,12 @@ class GoalTest {
 
         //then
         assertThat(post.isChecked()).isFalse();
+    }
+
+    private GoalModifyRequest getEndDateModifyRequest(Goal goal) {
+        return GoalModifyRequest.builder()
+                .endDate(goal.getEndDate().plusDays(10))
+                .build();
     }
 
     private Post getCheckedPost(Mate mate) {
