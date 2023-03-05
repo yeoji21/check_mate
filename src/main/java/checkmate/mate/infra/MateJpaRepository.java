@@ -12,7 +12,6 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.mate.domain.QMate.mate;
@@ -85,20 +84,13 @@ public class MateJpaRepository implements MateRepository {
         return yesterdayTMs;
     }
 
+    // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
     @Override
-    public List<Mate> eliminateOveredMates(List<Mate> hookyTMs) {
-        // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
-        // TODO: 2023/03/05 비즈니스 로직이 repository에 존재
-        List<Mate> eliminators = hookyTMs.stream()
-                .filter(tm -> tm.getHookyDays() >= tm.getGoal().getHookyDayLimit())
-                .collect(Collectors.toList());
-
+    public void eliminateOveredMates(List<Mate> eliminators) {
         queryFactory.update(mate)
                 .where(mate.in(eliminators))
                 .set(mate.status, MateStatus.OUT)
                 .execute();
-
-        return eliminators;
     }
 
     @Override

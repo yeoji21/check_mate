@@ -18,7 +18,6 @@ import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
-import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
 import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
@@ -87,15 +86,22 @@ public class MateCommandService {
                 getInviteRejectNotificationDto(mate, notification.getUserId())));
     }
 
+    // TODO: 2023/03/05 hooky -> skipped 용어 변경
     @Transactional
     public void updateHookyMates() {
         List<Mate> hookyMates = mateRepository.updateYesterdayHookyMates();
-        List<Mate> eliminators = mateRepository.eliminateOveredMates(hookyMates);
-        List<ExpulsionGoalNotificationDto> notificationDtos =
-                eliminators.stream().map(mapper::toNotificationDto).toList();
+        List<Mate> eliminatedMates = filterEliminateMates(hookyMates);
+        mateRepository.eliminateOveredMates(eliminatedMates);
 
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL, notificationDtos));
-        cacheHandler.deleteMateCaches(eliminators);
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
+                eliminatedMates.stream().map(mapper::toNotificationDto).toList()));
+        cacheHandler.deleteMateCaches(eliminatedMates);
+    }
+
+    private List<Mate> filterEliminateMates(List<Mate> hookyMates) {
+        return hookyMates.stream()
+                .filter(tm -> tm.getHookyDays() >= tm.getGoal().getHookyDayLimit())
+                .toList();
     }
 
     private Mate applyToMate(long teamMateId, Consumer<Mate> consumer) {

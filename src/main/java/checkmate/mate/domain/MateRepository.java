@@ -10,7 +10,7 @@ public interface MateRepository {
 
     List<Mate> updateYesterdayHookyMates();
 
-    List<Mate> eliminateOveredMates(List<Mate> hookyTMs);
+    void eliminateOveredMates(List<Mate> hookyTMs);
 
     List<Long> findMateUserIds(Long goalId);
 

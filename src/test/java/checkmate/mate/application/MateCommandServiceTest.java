@@ -31,7 +31,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -150,12 +149,12 @@ public class MateCommandServiceTest {
         //given
         List<Mate> hookyMates = getHookyTeamMates();
         given(mateRepository.updateYesterdayHookyMates()).willReturn(hookyMates);
-        given(mateRepository.eliminateOveredMates(hookyMates)).willReturn(Collections.EMPTY_LIST);
 
         //when
         mateCommandService.updateHookyMates();
 
         //then
+        verify(mateRepository).eliminateOveredMates(any(List.class));
         verify(cacheHandler).deleteMateCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
