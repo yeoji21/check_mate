@@ -86,11 +86,10 @@ public class MateCommandService {
                 getInviteRejectNotificationDto(mate, notification.getUserId())));
     }
 
-    // TODO: 2023/03/05 hooky -> skipped 용어 변경
     @Transactional
-    public void updateHookyMates() {
-        List<Mate> hookyMates = mateRepository.updateYesterdayHookyMates();
-        List<Mate> eliminatedMates = filterEliminateMates(hookyMates);
+    public void updateUploadSkippedMates() {
+        List<Mate> skippedMates = mateRepository.updateYesterdaySkippedMates();
+        List<Mate> eliminatedMates = filterEliminateMates(skippedMates);
         mateRepository.eliminateOveredMates(eliminatedMates);
 
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
@@ -100,7 +99,7 @@ public class MateCommandService {
 
     private List<Mate> filterEliminateMates(List<Mate> hookyMates) {
         return hookyMates.stream()
-                .filter(tm -> tm.getHookyDays() >= tm.getGoal().getHookyDayLimit())
+                .filter(tm -> tm.getHookyDays() >= tm.getGoal().getSkippedDayLimit())
                 .toList();
     }
 

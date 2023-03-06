@@ -145,13 +145,13 @@ public class MateCommandServiceTest {
 
     @Test
     @DisplayName("인증일에 인증하지 않은 팀원 업데이트")
-    void updateHookyTeamMate() throws Exception {
+    void updateUploadSkippedMate() throws Exception {
         //given
-        List<Mate> hookyMates = getHookyTeamMates();
-        given(mateRepository.updateYesterdayHookyMates()).willReturn(hookyMates);
+        List<Mate> uploadSkippedMates = getUploadSkippedMates();
+        given(mateRepository.updateYesterdaySkippedMates()).willReturn(uploadSkippedMates);
 
         //when
-        mateCommandService.updateHookyMates();
+        mateCommandService.updateUploadSkippedMates();
 
         //then
         verify(mateRepository).eliminateOveredMates(any(List.class));
@@ -174,13 +174,13 @@ public class MateCommandServiceTest {
         return notification;
     }
 
-    private List<Mate> getHookyTeamMates() {
+    private List<Mate> getUploadSkippedMates() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        List<Mate> hookyTms = new ArrayList<>();
+        List<Mate> skippedMates = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            hookyTms.add(goal.join(TestEntityFactory.user((long) i, "user" + i)));
+            skippedMates.add(goal.join(TestEntityFactory.user((long) i, "user" + i)));
         }
-        return hookyTms;
+        return skippedMates;
     }
 
     private Mate getTeamMate(User user) {

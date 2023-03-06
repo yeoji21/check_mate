@@ -76,7 +76,7 @@ public class Goal extends BaseTimeEntity {
         else if (!post.isChecked() && verified) post.check();
     }
 
-    public int getHookyDayLimit() {
+    public int getSkippedDayLimit() {
         return (int) (totalWorkingDaysCount() * 0.1 + 1);
     }
 

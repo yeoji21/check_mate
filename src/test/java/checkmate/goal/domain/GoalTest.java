@@ -118,11 +118,11 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
         //when
-        int hookyDayLimit = goal.getHookyDayLimit();
+        int skippedDayLimit = goal.getSkippedDayLimit();
         //then
-        assertThat(hookyDayLimit).isEqualTo(5);
-        assertThat(hookyDayLimit).isLessThan(goal.getSchedule().length());
-        assertThat(hookyDayLimit).isGreaterThan(goal.getSchedule().length() / 10);
+        assertThat(skippedDayLimit).isEqualTo(5);
+        assertThat(skippedDayLimit).isLessThan(goal.getSchedule().length());
+        assertThat(skippedDayLimit).isGreaterThan(goal.getSchedule().length() / 10);
     }
 
     @Test

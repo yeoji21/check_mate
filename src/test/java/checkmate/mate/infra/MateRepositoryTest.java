@@ -106,7 +106,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        List<Mate> hookyMates = mateRepository.updateYesterdayHookyMates();
+        List<Mate> hookyMates = mateRepository.updateYesterdaySkippedMates();
 
         //then
         assertThat(hookyMates.size()).isEqualTo(2);

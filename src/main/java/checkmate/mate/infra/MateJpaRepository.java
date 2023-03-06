@@ -46,18 +46,8 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Mate> updateYesterdayHookyMates() {
-        // bit
-//        List<TeamMate> yesterdayTMs = entityManager.createNativeQuery(
-//                        "select tm.* from team_mate as tm" +
-//                                " join goal as g on g.id = tm.goal_id " +
-//                                " where g.check_days & " + (1 << CheckDaysConverter.valueOf(LocalDate.now().minusDays(1).getDayOfWeek().toString()).getValue()) + " != 0" +
-//                                " and g.status = 'ONGOING' and tm.status = 'ONGOING'"
-//                        , TeamMate.class)
-//                .getResultList();
-
-        // in
-        List<Mate> yesterdayTMs = entityManager.createNativeQuery(
+    public List<Mate> updateYesterdaySkippedMates() {
+        List<Mate> yesterdayMates = entityManager.createNativeQuery(
                         "select m.* from mate as m" +
                                 " join goal as g on g.id = m.goal_id " +
                                 " where g.check_days in :values" +
@@ -66,25 +56,25 @@ public class MateJpaRepository implements MateRepository {
                 .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now().minusDays(1)))
                 .getResultList();
 
-        List<Long> checkedTeamMateIds = queryFactory
+        List<Long> uploadedMateIds = queryFactory
                 .select(post.mate.id)
                 .from(post)
                 .where(
-                        post.mate.in(yesterdayTMs),
+                        post.mate.in(yesterdayMates),
                         post.uploadedDate.eq(LocalDate.now()),
                         post.checked.isTrue())
                 .fetch();
-        yesterdayTMs.removeIf(tm -> checkedTeamMateIds.contains(tm.getId()));
+        yesterdayMates.removeIf(tm -> uploadedMateIds.contains(tm.getId()));
 
         queryFactory.update(mate)
-                .where(mate.in(yesterdayTMs))
+                .where(mate.in(yesterdayMates))
                 .set(mate.progress.skippedDayCount, mate.progress.skippedDayCount.add(1))
                 .execute();
 
-        return yesterdayTMs;
+        return yesterdayMates;
     }
 
-    // TODO: 2022/08/25 TM의 hookyCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
+    // TODO: 2022/08/25 TM의 skippedCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
     @Override
     public void eliminateOveredMates(List<Mate> eliminators) {
         queryFactory.update(mate)

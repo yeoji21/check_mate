@@ -8,7 +8,7 @@ public interface MateRepository {
 
     Optional<Mate> findMateWithGoal(long goalId, long userId);
 
-    List<Mate> updateYesterdayHookyMates();
+    List<Mate> updateYesterdaySkippedMates();
 
     void eliminateOveredMates(List<Mate> hookyTMs);
 
