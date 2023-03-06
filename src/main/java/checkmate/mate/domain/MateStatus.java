@@ -6,7 +6,7 @@ import checkmate.exception.UnInviteableGoalException;
 import static checkmate.exception.code.ErrorCode.INVALID_MATE_STATUS;
 
 public enum MateStatus {
-    WAITING, ONGOING, REJECT, OUT, SUCCESS;
+    CREATED, WAITING, ONGOING, REJECT, OUT, SUCCESS;
 
     void inviteableCheck() {
         if (this == MateStatus.ONGOING || this == MateStatus.SUCCESS)

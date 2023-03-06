@@ -33,6 +33,7 @@ class MateInitiateManagerTest {
         Goal goal = TestEntityFactory.goal(1L, "title");
         User user = TestEntityFactory.user(2L, "user");
         Mate mate = goal.join(user);
+        mate.toWaitingStatus();
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
 
         MateStatus before = mate.getStatus();

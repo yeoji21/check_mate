@@ -51,10 +51,10 @@ public class MateCommandService {
 
     @Transactional
     public void inviteMate(MateInviteCommand command) {
-        Mate invitee = findOrCreateInvitee(command.goalId(), command.inviteeNickname());
+        Mate invitee = findOrCreateMate(command.goalId(), command.inviteeNickname());
         invitee.toWaitingStatus();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
-                getInviteGoalNotificationDto(command, invitee.getUserId())));
+                getInviteGoalNotificationDto(invitee, command)));
     }
 
     @Caching(evict = {
@@ -109,13 +109,16 @@ public class MateCommandService {
         return mate;
     }
 
-    private Mate findOrCreateInvitee(long goalId, String inviteeNickname) {
-        Goal goal = goalRepository.findById(goalId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+    private Mate findOrCreateMate(long goalId, String inviteeNickname) {
         User invitee = userRepository.findByNickname(inviteeNickname)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-        return mateRepository.findMateWithGoal(goal.getId(), invitee.getId())
-                .orElseGet(() -> mateRepository.save(goal.join(invitee)));
+
+        return mateRepository.findMateWithGoal(goalId, invitee.getId())
+                .orElseGet(() -> {
+                    Goal goal = goalRepository.findById(goalId)
+                            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+                    return mateRepository.save(goal.join(invitee));
+                });
     }
 
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {
@@ -125,8 +128,7 @@ public class MateCommandService {
         return receiver.getNotification();
     }
 
-    private MateInviteNotificationDto getInviteGoalNotificationDto(MateInviteCommand command, Long inviteeUserId) {
-        Mate inviteeMate = findMateWithGoal(command.goalId(), inviteeUserId);
+    private MateInviteNotificationDto getInviteGoalNotificationDto(Mate inviteeMate, MateInviteCommand command) {
         return mapper.toNotificationDto(command.inviterUserId(), findNickname(command.inviterUserId()), inviteeMate);
     }
 

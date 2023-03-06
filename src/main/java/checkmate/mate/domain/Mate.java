@@ -42,7 +42,7 @@ public class Mate extends BaseTimeEntity {
 
     public Mate(Goal goal, User user) {
         this.userId = user.getId();
-        this.status = MateStatus.WAITING;
+        this.status = MateStatus.CREATED;
         this.progress = new MateProgress();
         this.goal = goal;
     }

@@ -55,20 +55,23 @@ class GoalMemberInterceptorTest {
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
         mockAnnotation = mock(GoalMember.class);
+
+        given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
+        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
+//        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
+        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
     }
+
 
     @Test
     @DisplayName("request param에 goalId가 존재하는 경우")
     void goalId_in_param() throws Exception {
         //given
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setParameter("goalId", "123");
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
-        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
+        request.setParameter("goalId", "123");
         given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
-        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -82,12 +85,10 @@ class GoalMemberInterceptorTest {
     void goalId_in_body() throws Exception {
         //given
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setContent("{\"goalId\": 123}".getBytes(StandardCharsets.UTF_8));
         MockHttpServletResponse response = new MockHttpServletResponse();
-        given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
-        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
+
+        request.setContent("{\"goalId\": 123}".getBytes(StandardCharsets.UTF_8));
         given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_BODY);
-        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -102,12 +103,10 @@ class GoalMemberInterceptorTest {
         //given
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
+
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
                 Collections.singletonMap("goalId", "1"));
-        given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
-        given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
         given(mockAnnotation.value()).willReturn(GoalIdRoute.PATH_VARIABLE);
-        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
