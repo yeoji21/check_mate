@@ -65,13 +65,12 @@ public class MateCommandServiceTest {
     @DisplayName("유저 초대")
     void inviteTeamMate() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         User invitee = TestEntityFactory.user(5L, "invitee");
-        Mate inviteeMate = goal.join(invitee);
+        Mate inviteeMate = TestEntityFactory.goal(1L, "goal").join(invitee);
 
-        MateInviteCommand command = getMateInviteCommand(invitee, inviteeMate);
+        MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
 
-        given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(goal));
+        given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate.getGoal()));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
         given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.empty());
         given(mateRepository.save(any(Mate.class))).willReturn(inviteeMate);
@@ -90,8 +89,8 @@ public class MateCommandServiceTest {
     void inviteTeamMate_rejected_status() throws Exception {
         //given
         User invitee = TestEntityFactory.user(1L, "invitee");
-        Mate inviteeMate = getRejectStatusMate(invitee);
-        MateInviteCommand command = getMateInviteCommand(invitee, inviteeMate);
+        Mate inviteeMate = createRejectStatusMate(invitee);
+        MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
 
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
         given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeMate));
@@ -109,17 +108,15 @@ public class MateCommandServiceTest {
     @DisplayName("팀원 초대 수락")
     void inviteAccpet() throws Exception {
         //given
-        User invitee = TestEntityFactory.user(2L, "invitee");
-        Mate inviteeMate = getTeamMate(invitee);
-        Notification notification = getInviteNotification(inviteeMate);
+        Mate inviteeMate = createMate();
+        Notification notification = createInviteNotification(inviteeMate);
 
-        MateInviteReplyCommand command = new MateInviteReplyCommand(invitee.getId(), notification.getId());
-        NotificationReceiver receiver = notification.getReceivers().get(0);
+        MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId());
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
-                .willReturn(Optional.of(receiver));
+                .willReturn(Optional.of(notification.getReceivers().get(0)));
         given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
-        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
         doAnswer((invocation) -> {
             Mate argument = (Mate) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "status", MateStatus.ONGOING);
@@ -130,9 +127,9 @@ public class MateCommandServiceTest {
         MateAcceptResult result = mateCommandService.inviteAccept(command);
 
         //then
+        assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.ONGOING);
         assertThat(result.goalId()).isEqualTo(inviteeMate.getGoal().getId());
         assertThat(result.mateId()).isEqualTo(inviteeMate.getId());
-        assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.ONGOING);
 
         verify(mateInitiateManager).initiate(any(Mate.class));
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
@@ -142,18 +139,17 @@ public class MateCommandServiceTest {
     @DisplayName("팀원 초대 거절")
     void inviteReject() throws Exception {
         //given
-        User invitee = TestEntityFactory.user(2L, "invitee");
-        Mate inviteeMate = getTeamMate(invitee);
-        Notification notification = getInviteNotification(inviteeMate);
+        Mate inviteeMate = createMate();
+        Notification notification = createInviteNotification(inviteeMate);
         NotificationReceiver receiver = notification.getReceivers().get(0);
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
         given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
-        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable(invitee.getNickname()));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
 
         //when
-        mateCommandService.inviteReject(new MateInviteReplyCommand(invitee.getId(), notification.getId()));
+        mateCommandService.inviteReject(new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId()));
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.REJECT);
@@ -166,7 +162,7 @@ public class MateCommandServiceTest {
     @DisplayName("인증일에 인증하지 않은 팀원 업데이트")
     void updateUploadSkippedMate() throws Exception {
         //given
-        List<Mate> uploadSkippedMates = getUploadSkippedMates();
+        List<Mate> uploadSkippedMates = createUploadSkippedMates();
         given(mateRepository.updateYesterdaySkippedMates()).willReturn(uploadSkippedMates);
 
         //when
@@ -178,7 +174,7 @@ public class MateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
 
-    private Notification getInviteNotification(Mate mate) {
+    private Notification createInviteNotification(Mate mate) {
         User inviter = TestEntityFactory.user(1L, "inviter");
         NotificationReceiver receiver = new NotificationReceiver(mate.getUserId());
         Notification notification = Notification.builder()
@@ -193,7 +189,7 @@ public class MateCommandServiceTest {
         return notification;
     }
 
-    private List<Mate> getUploadSkippedMates() {
+    private List<Mate> createUploadSkippedMates() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         List<Mate> skippedMates = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -202,23 +198,23 @@ public class MateCommandServiceTest {
         return skippedMates;
     }
 
-    private Mate getTeamMate(User user) {
-        Mate mate = TestEntityFactory.goal(1L, "자바의 정석 스터디").join(user);
+    private Mate createMate() {
+        Mate mate = TestEntityFactory.goal(1L, "자바의 정석 스터디").join(TestEntityFactory.user(1L, "invitee"));
         ReflectionTestUtils.setField(mate, "id", 1L);
         return mate;
     }
 
-    private Mate getRejectStatusMate(User user) {
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+    private Mate createRejectStatusMate(User user) {
+        Goal goal = TestEntityFactory.goal(1L, "goal");
         Mate inviteeMate = goal.join(user);
         ReflectionTestUtils.setField(inviteeMate, "status", MateStatus.REJECT);
         return inviteeMate;
     }
 
-    private MateInviteCommand getMateInviteCommand(User invitee, Mate inviteeMate) {
+    private MateInviteCommand createMateInviteCommand(User invitee, Mate inviteeMate, long inviterUserId) {
         return MateInviteCommand.builder()
                 .goalId(inviteeMate.getGoal().getId())
-                .inviterUserId(2L)
+                .inviterUserId(inviterUserId)
                 .inviteeNickname(invitee.getNickname())
                 .build();
     }

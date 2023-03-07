@@ -14,13 +14,15 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Notification extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
     @NotNull
     @Column(name = "user_id")
     private Long userId;
-    @NotNull @Enumerated(EnumType.STRING)
+    @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private NotificationType type;
     @NotNull
@@ -51,6 +53,7 @@ public class Notification extends BaseTimeEntity {
         attributes.addAttribute(key, value.toString());
     }
 
+    // TODO: 2023/03/08 상수 key 통일
     public Long getLongAttribute(String key) {
         return attributes.getLongValue(key);
     }

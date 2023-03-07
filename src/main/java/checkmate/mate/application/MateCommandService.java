@@ -32,7 +32,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.function.Consumer;
 
 import static checkmate.notification.domain.NotificationType.*;
 
@@ -54,7 +53,7 @@ public class MateCommandService {
         Mate invitee = findOrCreateMate(command.goalId(), command.inviteeNickname());
         invitee.toWaitingStatus();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
-                getInviteGoalNotificationDto(invitee, command)));
+                createInviteGoalNotificationDto(invitee, command)));
     }
 
     @Caching(evict = {
@@ -68,22 +67,22 @@ public class MateCommandService {
     @Transactional
     public MateAcceptResult inviteAccept(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        Mate mate = applyToMate(notification.getLongAttribute("mateId"),
-                mateInitiateManager::initiate);
+        Mate mate = findMateWithGoal(notification.getLongAttribute("mateId"));
+        mateInitiateManager.initiate(mate);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
-                getInviteAcceptNotificationDto(mate, notification.getUserId())));
+                createInviteAcceptNotificationDto(mate, notification.getUserId())));
         return mapper.toResult(mate);
     }
 
     @Transactional
     public void inviteReject(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        Mate mate = applyToMate(notification.getLongAttribute("mateId"),
-                Mate::toRejectStatus);
+        Mate mate = findMateWithGoal(notification.getLongAttribute("mateId"));
+        mate.toRejectStatus();
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,
-                getInviteRejectNotificationDto(mate, notification.getUserId())));
+                createInviteRejectNotificationDto(mate, notification.getUserId())));
     }
 
     @Transactional
@@ -101,12 +100,6 @@ public class MateCommandService {
         return hookyMates.stream()
                 .filter(tm -> tm.getHookyDays() >= tm.getGoal().getSkippedDayLimit())
                 .toList();
-    }
-
-    private Mate applyToMate(long teamMateId, Consumer<Mate> consumer) {
-        Mate mate = findMateWithGoal(teamMateId);
-        consumer.accept(mate);
-        return mate;
     }
 
     private Mate findOrCreateMate(long goalId, String inviteeNickname) {
@@ -128,26 +121,21 @@ public class MateCommandService {
         return receiver.getNotification();
     }
 
-    private MateInviteNotificationDto getInviteGoalNotificationDto(Mate inviteeMate, MateInviteCommand command) {
+    private MateInviteNotificationDto createInviteGoalNotificationDto(Mate inviteeMate, MateInviteCommand command) {
         return mapper.toNotificationDto(command.inviterUserId(), findNickname(command.inviterUserId()), inviteeMate);
     }
 
-    private NotificationCreateDto getInviteAcceptNotificationDto(Mate invitee, long inviterUserId) {
+    private NotificationCreateDto createInviteAcceptNotificationDto(Mate invitee, long inviterUserId) {
         return mapper.toAcceptNotificationDto(invitee, findNickname(invitee.getUserId()), inviterUserId);
     }
 
-    private InviteRejectNotificationDto getInviteRejectNotificationDto(Mate invitee, long inviterUserId) {
+    private InviteRejectNotificationDto createInviteRejectNotificationDto(Mate invitee, long inviterUserId) {
         return mapper.toRejectNotificationDto(invitee, findNickname(invitee.getUserId()), inviterUserId);
     }
 
     private String findNickname(long userId) {
         return userRepository.findNicknameById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
-    }
-
-    private Mate findMateWithGoal(long goalId, long userId) {
-        return mateRepository.findMateWithGoal(goalId, userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, userId));
     }
 
     private Mate findMateWithGoal(long teamMateId) {
