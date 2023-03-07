@@ -30,15 +30,12 @@ class MateInitiateManagerTest {
     @DisplayName("목표 시작 성공")
     void initiate_success() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "title");
-        User user = TestEntityFactory.user(2L, "user");
-        Mate mate = goal.join(user);
+        Mate mate = createMate();
         mate.toWaitingStatus();
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
 
-        MateStatus before = mate.getStatus();
-
         //when
+        MateStatus before = mate.getStatus();
         mateInitiateManager.initiate(mate);
 
         //then
@@ -51,9 +48,7 @@ class MateInitiateManagerTest {
     @DisplayName("목표 시작 실패 - 진행 중인 목표 개수 초과")
     void initiate_ongoing_count_fail() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "title");
-        User user = TestEntityFactory.user(2L, "user");
-        Mate mate = goal.join(user);
+        Mate mate = createMate();
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(10);
 
         //when then
@@ -66,9 +61,7 @@ class MateInitiateManagerTest {
     @DisplayName("목표 시작 실패 - 잘못된 팀원의 상태")
     void initiate_team_mate_status_fail() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "title");
-        User user = TestEntityFactory.user(2L, "user");
-        Mate mate = goal.join(user);
+        Mate mate = createMate();
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
 
@@ -76,5 +69,11 @@ class MateInitiateManagerTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> mateInitiateManager.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+    }
+
+    private Mate createMate() {
+        Goal goal = TestEntityFactory.goal(1L, "title");
+        User user = TestEntityFactory.user(2L, "user");
+        return goal.join(user);
     }
 }

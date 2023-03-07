@@ -59,7 +59,7 @@ class GoalMemberInterceptorTest {
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
 //        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
-        given(mateRepository.isExistMate(anyLong(), anyLong())).willReturn(true);
+        given(mateRepository.existOngoingMate(anyLong(), anyLong())).willReturn(true);
     }
 
 

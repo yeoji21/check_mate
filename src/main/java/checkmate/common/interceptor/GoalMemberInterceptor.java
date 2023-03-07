@@ -38,8 +38,8 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
 
         long goalId = getGoalIdInRequest(handlerMethod, request);
         long userId = getRequestUserId();
-        boolean existTeamMate = mateRepository.isExistMate(goalId, userId);
-        if (!existTeamMate) throw new IllegalArgumentException("존재하지 않는 팀원");
+        boolean exist = mateRepository.existOngoingMate(goalId, userId);
+        if (!exist) throw new IllegalArgumentException("존재하지 않는 팀원");
         return true;
     }
 

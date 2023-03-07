@@ -18,7 +18,7 @@ public interface MateRepository {
 
     List<Mate> findMateInGoals(List<Long> goalIds);
 
-    boolean isExistMate(long goalId, long userId);
+    boolean existOngoingMate(long goalId, long userId);
 
     Mate save(Mate mate);
 }

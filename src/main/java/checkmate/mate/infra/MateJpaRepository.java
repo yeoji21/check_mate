@@ -110,9 +110,8 @@ public class MateJpaRepository implements MateRepository {
                 .fetch();
     }
 
-    // TODO: 2023/03/08 findOngoingMate 등으로 수정
     @Override
-    public boolean isExistMate(long goalId, long userId) {
+    public boolean existOngoingMate(long goalId, long userId) {
         Long teamMateId = queryFactory.select(mate.id)
                 .from(mate)
                 .where(mate.goal.id.eq(goalId),

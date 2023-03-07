@@ -45,7 +45,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.flush();
         em.clear();
         //when
-        boolean existTeamMate = mateRepository.isExistMate(goal.getId(), mate.getUserId());
+        boolean existTeamMate = mateRepository.existOngoingMate(goal.getId(), mate.getUserId());
         //then
         assertThat(existTeamMate).isTrue();
     }
@@ -60,7 +60,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.flush();
         em.clear();
         //when
-        boolean existTeamMate = mateRepository.isExistMate(goal.getId(), mate.getUserId());
+        boolean existTeamMate = mateRepository.existOngoingMate(goal.getId(), mate.getUserId());
         //then
         assertThat(existTeamMate).isFalse();
     }
@@ -73,7 +73,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.flush();
         em.clear();
         //when
-        boolean existTeamMate = mateRepository.isExistMate(goal.getId(), 22L);
+        boolean existTeamMate = mateRepository.existOngoingMate(goal.getId(), 22L);
         //then
         assertThat(existTeamMate).isFalse();
     }
