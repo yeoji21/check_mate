@@ -67,7 +67,7 @@ public class MateCommandService {
     @Transactional
     public MateAcceptResult inviteAccept(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        Mate mate = findMateWithGoal(notification.getLongAttribute("mateId"));
+        Mate mate = find(notification.getLongAttribute("mateId"));
         mateInitiateManager.initiate(mate);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
@@ -78,7 +78,7 @@ public class MateCommandService {
     @Transactional
     public void inviteReject(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        Mate mate = findMateWithGoal(notification.getLongAttribute("mateId"));
+        Mate mate = find(notification.getLongAttribute("mateId"));
         mate.toRejectStatus();
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,
@@ -138,8 +138,8 @@ public class MateCommandService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
     }
 
-    private Mate findMateWithGoal(long teamMateId) {
-        return mateRepository.findMateWithGoal(teamMateId)
+    private Mate find(long teamMateId) {
+        return mateRepository.find(teamMateId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, teamMateId));
     }
 }

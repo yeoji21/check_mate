@@ -20,6 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MateRepositoryTest extends RepositoryTest {
     @Test
+    @DisplayName("팀원 조회")
+    void find() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate = createMate(goal);
+
+        em.flush();
+        em.clear();
+
+        //when
+        Mate foundMate = mateRepository.find(mate.getId()).orElseThrow(IllegalArgumentException::new);
+
+        //then
+        assertThat(foundMate).isEqualTo(mate);
+    }
+
+    @Test
     @DisplayName("존재하는 팀원인지 여부 조회 - 존재")
     void isExistMate() throws Exception {
         //given
@@ -38,10 +55,7 @@ class MateRepositoryTest extends RepositoryTest {
     void isExistMate_not_ongoing() throws Exception {
         //given
         Goal goal = createGoal();
-        User user = TestEntityFactory.user(null, "user");
-        em.persist(user);
-        Mate mate = goal.join(user);
-        em.persist(mate);
+        Mate mate = createMate(goal);
 
         em.flush();
         em.clear();
@@ -135,6 +149,14 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(mates.size()).isEqualTo(2);
         assertThat(mates).contains(mate1, mate2);
+    }
+
+    private Mate createMate(Goal goal) {
+        User user = TestEntityFactory.user(null, "user");
+        em.persist(user);
+        Mate mate = goal.join(user);
+        em.persist(mate);
+        return mate;
     }
 
     private Goal createGoal() {

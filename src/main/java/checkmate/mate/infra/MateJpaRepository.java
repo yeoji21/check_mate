@@ -24,6 +24,15 @@ public class MateJpaRepository implements MateRepository {
     private final EntityManager entityManager;
 
     @Override
+    public Optional<Mate> find(long mateId) {
+        return Optional.ofNullable(
+                queryFactory.selectFrom(mate)
+                        .where(mate.id.eq(mateId))
+                        .fetchOne()
+        );
+    }
+
+    @Override
     public Optional<Mate> findMateWithGoal(long mateId) {
         return Optional.ofNullable(
                 queryFactory
@@ -101,6 +110,7 @@ public class MateJpaRepository implements MateRepository {
                 .fetch();
     }
 
+    // TODO: 2023/03/08 findOngoingMate 등으로 수정
     @Override
     public boolean isExistMate(long goalId, long userId) {
         Long teamMateId = queryFactory.select(mate.id)

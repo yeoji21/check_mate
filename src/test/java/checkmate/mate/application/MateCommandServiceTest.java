@@ -115,7 +115,7 @@ public class MateCommandServiceTest {
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(notification.getReceivers().get(0)));
-        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.find(any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
         doAnswer((invocation) -> {
             Mate argument = (Mate) invocation.getArgument(0);
@@ -145,7 +145,7 @@ public class MateCommandServiceTest {
 
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
-        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.find(any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
 
         //when
