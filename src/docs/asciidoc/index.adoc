@@ -455,3 +455,23 @@ include::{snippets}/user-sign-in/http-request.adoc[]
 === HTTP Response
 
 include::{snippets}/user-sign-in/http-response.adoc[]
+
+// =============================================================
+
+== 로그인
+
+=== Request Fields
+
+include::{snippets}/login-google/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/login-google/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/login-google/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/login-google/http-response.adoc[]
