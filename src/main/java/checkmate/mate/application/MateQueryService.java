@@ -27,7 +27,7 @@ public class MateQueryService {
 
     @Transactional(readOnly = true)
     public MateScheduleInfo findCalenderInfo(long teamMateId) {
-        return mateQueryDao.getMateCalendar(teamMateId)
+        return mateQueryDao.findMateCalendar(teamMateId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 

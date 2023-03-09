@@ -27,11 +27,13 @@ import static com.querydsl.core.group.GroupBy.list;
 public class MateQueryDao {
     private final JPAQueryFactory queryFactory;
 
+    // TODO: 2023/03/09 status에 따른 조회 조건을 파라미터로 변경 고려
     public List<Mate> findSuccessMates(long userId) {
         return queryFactory.select(mate)
                 .from(mate)
                 .join(mate.goal, goal).fetchJoin()
-                .where(mate.userId.eq(userId))
+                .where(mate.userId.eq(userId),
+                        mate.status.eq(MateStatus.SUCCESS))
                 .fetch();
     }
 
@@ -44,7 +46,7 @@ public class MateQueryDao {
                 .transform(groupBy(goal.id).as(list(user.nickname)));
     }
 
-    public Optional<MateScheduleInfo> getMateCalendar(long mateId) {
+    public Optional<MateScheduleInfo> findMateCalendar(long mateId) {
         Map<Long, MateScheduleInfo> scheduleInfoMap = queryFactory
                 .from(mate)
                 .innerJoin(mate.goal, goal)

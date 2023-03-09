@@ -10,6 +10,7 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -21,21 +22,18 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MateQueryDaoTest extends RepositoryTest {
-
     @Test
-    void 팀원의_목표캘린더_조회() throws Exception {
+    @DisplayName("팀원의 목표 캘린더 조회")
+    void findMateCalendar() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
-        User user = TestEntityFactory.user(null, "user");
-        em.persist(user);
-        Mate mate = goal.join(user);
-        em.persist(mate);
-        Post post = TestEntityFactory.post(mate);
-        em.persist(post);
+        Goal goal = createGoal();
+        Mate mate = createMate(goal, "user");
+        savePost(mate);
+        em.flush();
+        em.clear();
 
         //when
-        MateScheduleInfo info = mateQueryDao.getMateCalendar(mate.getId())
+        MateScheduleInfo info = mateQueryDao.findMateCalendar(mate.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
@@ -45,99 +43,86 @@ class MateQueryDaoTest extends RepositoryTest {
     }
 
     @Test
+    @DisplayName("팀원의 목표 인증 날짜 목록 조회")
     void findUploadedDates() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
-        User user = TestEntityFactory.user(null, "user");
-        em.persist(user);
-        Mate mate = goal.join(user);
-        em.persist(mate);
-
-        Post yesterDayPost = TestEntityFactory.post(mate);
-        ReflectionTestUtils.setField(yesterDayPost, "uploadedDate", LocalDate.now().minusDays(1));
-        em.persist(yesterDayPost);
-        Post todayPost = TestEntityFactory.post(mate);
-        em.persist(todayPost);
+        Goal goal = createGoal();
+        Mate mate = createMate(goal, "user");
+        createYesterdayUploadedPost(mate);
+        savePost(mate);
+        em.flush();
+        em.clear();
 
         //when
         List<LocalDate> uploadedDates = mateQueryDao.findUploadedDates(mate.getId());
 
         //then
         assertThat(uploadedDates.size()).isEqualTo(2);
-        assertThat(uploadedDates.get(0)).isEqualTo(LocalDate.now().minusDays(1));
-        assertThat(uploadedDates.get(1)).isEqualTo(LocalDate.now());
+        assertThat(uploadedDates).contains(LocalDate.now().minusDays(1), LocalDate.now());
     }
 
     @Test
+    @DisplayName("팀원의 인증 정보 조회")
     void findTeamMateInfo() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
+        Goal goal = createGoal();
         for (int i = 0; i < 10; i++) {
-            User user = TestEntityFactory.user(null, "user" + i);
-            em.persist(user);
-            Mate mate = goal.join(user);
-            em.persist(mate);
-            ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+            createMate(goal, "user" + i);
         }
+        em.flush();
+        em.clear();
 
         //when
-        List<MateUploadInfo> uploadInfos = mateQueryDao.findMateInfo(goal.getId());
+        List<MateUploadInfo> uploadInfo = mateQueryDao.findMateInfo(goal.getId());
 
         //then
-        assertThat(uploadInfos.size()).isEqualTo(10);
-        uploadInfos.forEach(info -> assertThat(info.getNickname()).isNotNull());
+        assertThat(uploadInfo.size()).isEqualTo(10);
+        assertThat(uploadInfo).allMatch(info -> info.getNickname() != null);
     }
 
     @Test
+    @DisplayName("목표 수행 성공한 팀원 목록 조회")
     void findSuccessTeamMates() throws Exception {
         //given
-        User user = setSuccessedTeamMates();
+        User user = createSuccessedMates();
+        em.flush();
+        em.clear();
 
         //when
         List<Mate> successMates = mateQueryDao.findSuccessMates(user.getId());
 
         //then
         assertThat(successMates.size()).isEqualTo(2);
-        successMates.forEach(teamMate -> {
-            assertThat(teamMate.getStatus()).isEqualTo(MateStatus.SUCCESS);
-            assertThat(teamMate.getGoal().getStatus()).isEqualTo(GoalStatus.OVER);
-        });
+        assertThat(successMates).allMatch(mate ->
+                mate.getStatus() == MateStatus.SUCCESS &&
+                        mate.getGoal().getStatus() == GoalStatus.OVER);
     }
 
     @Test
+    @DisplayName("팀원들의 닉네임 조회")
     void findTeamMateNicknames() throws Exception {
         //given
         List<Long> goalIds = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            Goal goal = TestEntityFactory.goal(null, "goal" + i);
-            em.persist(goal);
+            Goal goal = createGoal();
             goalIds.add(goal.getId());
-            for (int j = 0; j < 10; j++) {
-                User user = TestEntityFactory.user(null, i + "user" + j);
-                em.persist(user);
-                Mate mate = goal.join(user);
-                ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
-                em.persist(mate);
-            }
+            for (int j = 0; j < 10; j++) createMate(goal, i + "user" + j);
         }
         em.flush();
         em.clear();
 
         //when
-        Map<Long, List<String>> teamMateNicknames = mateQueryDao.findMateNicknames(goalIds);
+        Map<Long, List<String>> mateNicknames = mateQueryDao.findMateNicknames(goalIds);
 
         //then
-        assertThat(teamMateNicknames.keySet().size()).isEqualTo(3);
-        teamMateNicknames.values()
-                .forEach(nicknameList -> {
-                    assertThat(nicknameList.size()).isEqualTo(10);
-                    nicknameList.forEach(nickname -> assertThat(nickname).isNotNull());
-                });
+        assertThat(mateNicknames.keySet().size()).isEqualTo(3);
+        mateNicknames.values().forEach(nicknames -> {
+            assertThat(nicknames.size()).isEqualTo(10);
+            assertThat(nicknames).allMatch(nickname -> nickname != null);
+        });
     }
 
-    private User setSuccessedTeamMates() {
+    private User createSuccessedMates() {
         User user = TestEntityFactory.user(null, "tester1");
         em.persist(user);
 
@@ -160,5 +145,31 @@ class MateQueryDaoTest extends RepositoryTest {
         em.clear();
 
         return user;
+    }
+
+    private void savePost(Mate mate) {
+        Post post = TestEntityFactory.post(mate);
+        em.persist(post);
+    }
+
+    private void createYesterdayUploadedPost(Mate mate) {
+        Post yesterDayPost = TestEntityFactory.post(mate);
+        ReflectionTestUtils.setField(yesterDayPost, "uploadedDate", LocalDate.now().minusDays(1));
+        em.persist(yesterDayPost);
+    }
+
+    private Mate createMate(Goal goal, String nickname) {
+        User user = TestEntityFactory.user(null, nickname);
+        em.persist(user);
+        Mate mate = goal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
+        return mate;
+    }
+
+    private Goal createGoal() {
+        Goal goal = TestEntityFactory.goal(null, "goal");
+        em.persist(goal);
+        return goal;
     }
 }
