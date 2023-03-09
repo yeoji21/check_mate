@@ -1,6 +1,8 @@
 package checkmate.mate.domain;
 
 import checkmate.TestEntityFactory;
+import checkmate.exception.BusinessException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +14,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MateTest {
     @Test
@@ -106,8 +109,58 @@ class MateTest {
         assertThat(mate.getStatus()).isEqualTo(MateStatus.REJECT);
     }
 
+    @Test
+    @DisplayName("ONGOING 상태로 변경 실패 - status")
+    void toOngoingStatus_fail_status() throws Exception {
+        //given
+        Mate created = createMate();
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> created.toOngoingStatus());
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+    }
+
+    @Test
+    @DisplayName("ONGOING 상태로 변경 성공")
+    void toOngoingStatus_success() throws Exception {
+        //given
+        Mate mate = createWaitingMate();
+
+        //when
+        mate.toOngoingStatus();
+
+        //then
+        assertThat(mate.getStatus()).isEqualTo(MateStatus.ONGOING);
+        assertThat(mate.calcProgressPercent()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("WAITING 상태로 변경")
+    void toWaitingStatus() throws Exception {
+        //given
+        Mate mate = createMate();
+
+        //when
+        mate.toWaitingStatus();
+
+        //then
+        assertThat(mate.getStatus()).isEqualTo(MateStatus.WAITING);
+    }
+
     private Mate createMate() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         return goal.join(TestEntityFactory.user(1L, "user"));
+    }
+
+    private Mate createWaitingMate() {
+        Goal goal = TestEntityFactory.goal(1L, "goal");
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
+                LocalDate.now().minusDays(10));
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        mate.toWaitingStatus();
+        return mate;
     }
 }

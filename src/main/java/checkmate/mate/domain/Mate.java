@@ -51,7 +51,6 @@ public class Mate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    // TODO: 2023/03/08 TEST
     void toOngoingStatus() {
         goal.inviteableCheck();
         status.initiateableCheck();
@@ -59,7 +58,6 @@ public class Mate extends BaseTimeEntity {
         progress = new MateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
-    // TODO: 2023/03/08 TEST
     public void toWaitingStatus() {
         goal.inviteableCheck();
         status.inviteableCheck();
