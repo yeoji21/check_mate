@@ -30,9 +30,9 @@ public class NotificationPushService {
     }
 
     @Transactional
-    public void notPush(NotificationType type, List<? extends NotificationCreateDto> dtoList) {
+    public void notPush(NotificationType type, List<? extends NotificationCreateDto> dtos) {
         notificationRepository.saveAll(
-                dtoList.stream()
+                dtos.stream()
                         .map(dto -> notificationGenerator.generate(type, dto))
                         .toList()
         );

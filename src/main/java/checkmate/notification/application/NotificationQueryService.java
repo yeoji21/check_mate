@@ -4,13 +4,13 @@ import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.request.NotificationDetailsCriteria;
+import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.application.dto.response.NotificationDetailResult;
-import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.infrastructure.NotificationQueryDao;
-import checkmate.notification.presentation.dto.NotificationInfoResult;
+import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class NotificationQueryService {
     private final NotificationQueryMapper mapper;
 
     @Transactional
-    public NotificationInfo findNotificationInfo(long notificationId, long userId) {
+    public NotificationAttributeInfo findNotificationInfo(long notificationId, long userId) {
         NotificationReceiver receiver = notificationRepository.findNotificationReceiver(notificationId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
         read(receiver);
@@ -35,15 +35,15 @@ public class NotificationQueryService {
     }
 
     @Transactional
-    public NotificationInfoResult findGoalCompleteNotifications(long userId) {
-        List<NotificationInfo> notifications = notificationRepository.findGoalCompleteNotificationReceivers(userId)
+    public NotificationAttributeInfoResult findGoalCompleteNotifications(long userId) {
+        List<NotificationAttributeInfo> notifications = notificationRepository.findGoalCompleteNotificationReceivers(userId)
                 .stream()
                 .map(receiver -> {
                     receiver.read();
                     return mapper.toInfo(receiver.getNotification());
                 })
                 .collect(Collectors.toList());
-        return new NotificationInfoResult(notifications);
+        return new NotificationAttributeInfoResult(notifications);
     }
 
     @Transactional(readOnly = true)

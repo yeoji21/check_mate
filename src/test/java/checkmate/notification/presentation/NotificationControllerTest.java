@@ -3,13 +3,13 @@ package checkmate.notification.presentation;
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
+import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.application.dto.response.NotificationDetailInfo;
 import checkmate.notification.application.dto.response.NotificationDetailResult;
-import checkmate.notification.application.dto.response.NotificationInfo;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributes;
 import checkmate.notification.domain.NotificationType;
-import checkmate.notification.presentation.dto.NotificationInfoResult;
+import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -38,13 +38,13 @@ class NotificationControllerTest extends ControllerTest {
     @Test
     @DisplayName("단건 알림 조회 API")
     void findNotificationInfo() throws Exception {
-        NotificationInfo notificationInfo = getNotificationInfo();
-        given(notificationQueryService.findNotificationInfo(any(Long.class), any(Long.class))).willReturn(notificationInfo);
+        NotificationAttributeInfo notificationAttributeInfo = getNotificationInfo();
+        given(notificationQueryService.findNotificationInfo(any(Long.class), any(Long.class))).willReturn(notificationAttributeInfo);
 
         mockMvc.perform(get("/notifications/{notificationId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(notificationInfo)))
+                .andExpect(content().json(objectMapper.writeValueAsString(notificationAttributeInfo)))
                 .andDo(document("notification-info",
                         notificationIdPathParametersSnippet(),
                         notificationInfoResponseFieldsSnippet()
@@ -55,7 +55,7 @@ class NotificationControllerTest extends ControllerTest {
     @Test
     @DisplayName("목표 수행 완료 알림 조회 API")
     void goalCompleteNotifications() throws Exception {
-        NotificationInfoResult result = new NotificationInfoResult(getNotificationDetailResponseList());
+        NotificationAttributeInfoResult result = new NotificationAttributeInfoResult(getNotificationDetailResponseList());
         given(notificationQueryService.findGoalCompleteNotifications(any(Long.class))).willReturn(result);
 
         mockMvc.perform(get("/notifications/goal-complete")
@@ -144,18 +144,18 @@ class NotificationControllerTest extends ControllerTest {
                 parameterWithName("notificationId").description("알림 ID"));
     }
 
-    private NotificationInfo getNotificationInfo() {
+    private NotificationAttributeInfo getNotificationInfo() {
         Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.POST_UPLOAD);
         return toNotificationInfo(notification);
     }
 
-    private List<NotificationInfo> getNotificationDetailResponseList() {
+    private List<NotificationAttributeInfo> getNotificationDetailResponseList() {
         Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.COMPLETE_GOAL);
         return List.of(toNotificationInfo(notification), toNotificationInfo(notification));
     }
 
-    private NotificationInfo toNotificationInfo(Notification notification) {
-        return NotificationInfo.builder()
+    private NotificationAttributeInfo toNotificationInfo(Notification notification) {
+        return NotificationAttributeInfo.builder()
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .type(notification.getType().toString())

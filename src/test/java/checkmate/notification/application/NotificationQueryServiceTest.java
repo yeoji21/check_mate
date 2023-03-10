@@ -1,10 +1,10 @@
 package checkmate.notification.application;
 
 import checkmate.notification.application.dto.NotificationQueryMapper;
-import checkmate.notification.application.dto.response.NotificationInfo;
+import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.domain.*;
 import checkmate.notification.infrastructure.NotificationQueryDao;
-import checkmate.notification.presentation.dto.NotificationInfoResult;
+import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +54,7 @@ class NotificationQueryServiceTest {
         given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
 
         //when
-        NotificationInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
+        NotificationAttributeInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
         HashMap<String, Long> attributes = objectMapper.readValue(info.getAttributes(), HashMap.class);
 
         //then
@@ -75,7 +75,7 @@ class NotificationQueryServiceTest {
                 .willReturn(Optional.of(receiver));
 
         //when
-        NotificationInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
+        NotificationAttributeInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
 
         //then
         assertThat(receiver.isChecked()).isFalse();
@@ -91,7 +91,7 @@ class NotificationQueryServiceTest {
         given(notificationRepository.findGoalCompleteNotificationReceivers(anyLong())).willReturn(receivers);
 
         //when
-        NotificationInfoResult result = notificationQueryService.findGoalCompleteNotifications(1L);
+        NotificationAttributeInfoResult result = notificationQueryService.findGoalCompleteNotifications(1L);
 
         //then
         assertThat(result.getNotifications().size()).isEqualTo(receivers.size());

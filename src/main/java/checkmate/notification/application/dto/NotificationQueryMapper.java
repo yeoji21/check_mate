@@ -1,6 +1,6 @@
 package checkmate.notification.application.dto;
 
-import checkmate.notification.application.dto.response.NotificationInfo;
+import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeConverter;
 import checkmate.notification.domain.NotificationType;
@@ -14,13 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE)
 public abstract class NotificationQueryMapper {
     public static NotificationQueryMapper INSTANCE = Mappers.getMapper(NotificationQueryMapper.class);
-    @Autowired NotificationAttributeConverter converter;
+    @Autowired
+    NotificationAttributeConverter converter;
 
     @Mappings({
             @Mapping(target = "type", source = "notification.type", qualifiedByName = "getNotificationType"),
             @Mapping(target = "attributes", source = "notification", qualifiedByName = "getAttributes")
     })
-    public abstract NotificationInfo toInfo(Notification notification);
+    public abstract NotificationAttributeInfo toInfo(Notification notification);
 
     @Named("getNotificationType")
     String getNotificationType(NotificationType type) {

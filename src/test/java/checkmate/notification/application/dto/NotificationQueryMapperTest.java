@@ -2,7 +2,7 @@ package checkmate.notification.application.dto;
 
 import checkmate.MapperTest;
 import checkmate.TestEntityFactory;
-import checkmate.notification.application.dto.response.NotificationInfo;
+import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeConverter;
 import checkmate.notification.domain.NotificationType;
@@ -20,13 +20,13 @@ class NotificationQueryMapperTest extends MapperTest {
     }
 
     @Test
-    void notificationInfo() throws Exception{
+    void notificationInfo() throws Exception {
         //given
         Notification notification = TestEntityFactory.notification(1L, 2L, NotificationType.POST_UPLOAD);
         notification.addAttribute("key", "value");
 
         //when
-        NotificationInfo info = mapper.toInfo(notification);
+        NotificationAttributeInfo info = mapper.toInfo(notification);
 
         //then
         isEqualTo(info.getTitle(), notification.getTitle());
