@@ -19,31 +19,35 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class PushNotificationSenderTest {
-    @Mock private FirebaseMessaging firebaseMessaging;
-    @InjectMocks private PushNotificationSender pushNotificationSender;
+class NotificationSenderTest {
+    @Mock
+    private FirebaseMessaging firebaseMessaging;
+    @InjectMocks
+    private NotificationSender notificationSender;
 
-    @Test @DisplayName("단일 푸쉬 알림 전송")
-    void sendAsync() throws Exception{
+    @Test
+    @DisplayName("단일 푸쉬 알림 전송")
+    void sendAsync() throws Exception {
         //given
         Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.INVITE_GOAL);
         List<String> tokens = List.of("FCM Token");
 
         //when
-        pushNotificationSender.send(notification, tokens);
+        notificationSender.send(notification, tokens);
 
         //then
         verify(firebaseMessaging).sendAsync(any(Message.class));
     }
 
-    @Test @DisplayName("다중 푸쉬 알림 전송")
-    void sendMulticastAsync() throws Exception{
+    @Test
+    @DisplayName("다중 푸쉬 알림 전송")
+    void sendMulticastAsync() throws Exception {
         //given
         Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.INVITE_GOAL);
         List<String> tokens = List.of("FCM Token1", "FCM Token2", "FCM Token3");
 
         //when
-        pushNotificationSender.send(notification, tokens);
+        notificationSender.send(notification, tokens);
 
         //then
         verify(firebaseMessaging).sendMulticastAsync(any(MulticastMessage.class));

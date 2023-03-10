@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @AllArgsConstructor
 @Component
-public class PushNotificationSender {
+public class NotificationSender {
     private final FirebaseMessaging firebaseMessaging;
 
     public void send(checkmate.notification.domain.Notification notification, List<String> tokens) {

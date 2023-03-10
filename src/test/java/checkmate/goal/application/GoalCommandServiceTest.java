@@ -57,7 +57,7 @@ public class GoalCommandServiceTest {
     private GoalCommandService goalCommandService;
 
     @Test
-    @DisplayName("성공한 목표_처리 스케쥴러")
+    @DisplayName("성공한 목표 처리 스케쥴러")
     void updateYesterdayOveredGoals() throws Exception {
         //given
         Goal goal1 = TestEntityFactory.goal(1L, "testGoal1");
