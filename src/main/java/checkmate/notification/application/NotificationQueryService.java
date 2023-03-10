@@ -34,15 +34,6 @@ public class NotificationQueryService {
         return mapper.toInfo(receiver.getNotification());
     }
 
-    @Transactional(readOnly = true)
-    public NotificationDetailResult findNotificationDetails(NotificationDetailsCriteria criteria) {
-        return notificationQueryDao.findNotificationDetailResult(
-                criteria.userId(),
-                criteria.cursorId(),
-                PageRequest.of(0, criteria.size())
-        );
-    }
-
     @Transactional
     public NotificationInfoResult findGoalCompleteNotifications(long userId) {
         List<NotificationInfo> notifications = notificationRepository.findGoalCompleteNotificationReceivers(userId)
@@ -53,6 +44,15 @@ public class NotificationQueryService {
                 })
                 .collect(Collectors.toList());
         return new NotificationInfoResult(notifications);
+    }
+
+    @Transactional(readOnly = true)
+    public NotificationDetailResult findNotificationDetails(NotificationDetailsCriteria criteria) {
+        return notificationQueryDao.findNotificationDetailResult(
+                criteria.userId(),
+                criteria.cursorId(),
+                PageRequest.of(0, criteria.size())
+        );
     }
 
     private void read(NotificationReceiver receiver) {

@@ -88,7 +88,7 @@ class NotificationControllerTest extends ControllerTest {
         return responseFields(
                 fieldWithPath("notifications[].notificationId").description("알림 ID"),
                 fieldWithPath("notifications[].title").description("알림 타이틀"),
-                fieldWithPath("notifications[].body").description("알림 내용"),
+                fieldWithPath("notifications[].content").description("알림 내용"),
                 fieldWithPath("notifications[].checked").description("알림 수신 여부"),
                 fieldWithPath("notifications[].sendAt").description("알림 전송 날짜, 시간"),
                 fieldWithPath("notifications[].type").description("알림 종류"),
@@ -114,7 +114,7 @@ class NotificationControllerTest extends ControllerTest {
         return NotificationDetailInfo.builder()
                 .notificationId(notificationId)
                 .title("title")
-                .body("body")
+                .content("body")
                 .checked(true)
                 .sendAt(LocalDateTime.now())
                 .type(type.name())

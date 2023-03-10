@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class NotificationDetailInfo {
     private long notificationId;
     private String title;
-    private String body;
+    private String content;
     private boolean checked;
     private String sendAt;
     private String type;
@@ -21,13 +21,13 @@ public class NotificationDetailInfo {
     @QueryProjection
     public NotificationDetailInfo(long notificationId,
                                   String title,
-                                  String body,
+                                  String content,
                                   boolean checked,
                                   LocalDateTime sendAt,
                                   String type) {
         this.notificationId = notificationId;
         this.title = title;
-        this.body = body;
+        this.content = content;
         this.checked = checked;
         this.sendAt = sendAt.toString();
         this.type = type;

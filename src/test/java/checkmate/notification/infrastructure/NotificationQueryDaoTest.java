@@ -57,7 +57,7 @@ class NotificationQueryDaoTest extends RepositoryTest {
         assertThat(result.getNotifications().size()).isEqualTo(2);
         assertThat(result.getNotifications().get(0).getNotificationId()).isGreaterThan(result.getNotifications().get(1).getNotificationId());
         assertThat(result.getNotifications().get(0).getType()).isEqualTo(NotificationType.POST_UPLOAD.toString());
-        assertThat(result.getNotifications().get(1).getBody()).contains("body");
+        assertThat(result.getNotifications().get(1).getContent()).contains("body");
     }
 
     @Test
