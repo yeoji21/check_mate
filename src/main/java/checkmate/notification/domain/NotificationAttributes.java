@@ -27,16 +27,4 @@ public class NotificationAttributes {
     Map<String, String> getAttributes() {
         return attributes;
     }
-
-    @Override
-    public String toString() {
-        StringBuilder attributeStr = new StringBuilder();
-        attributeStr.append("{");
-        for (String key : attributes.keySet()) {
-            attributeStr.append("\"").append(key).append("\"").append(":").append("\"").append(attributes.get(key)).append("\"").append(",");
-        }
-        attributeStr.deleteCharAt(attributeStr.length() - 1);
-        attributeStr.append("}");
-        return attributeStr.toString();
-    }
 }

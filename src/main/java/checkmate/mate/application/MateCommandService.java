@@ -139,7 +139,7 @@ public class MateCommandService {
     }
 
     private Mate find(long teamMateId) {
-        return mateRepository.find(teamMateId)
+        return mateRepository.findById(teamMateId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, teamMateId));
     }
 }

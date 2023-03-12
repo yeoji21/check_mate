@@ -30,7 +30,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Mate foundMate = mateRepository.find(mate.getId()).orElseThrow(IllegalArgumentException::new);
+        Mate foundMate = mateRepository.findById(mate.getId()).orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(foundMate).isEqualTo(mate);

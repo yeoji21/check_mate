@@ -38,13 +38,13 @@ class NotificationControllerTest extends ControllerTest {
     @Test
     @DisplayName("단건 알림 조회 API")
     void findNotificationInfo() throws Exception {
-        NotificationAttributeInfo notificationAttributeInfo = getNotificationInfo();
-        given(notificationQueryService.findNotificationInfo(any(Long.class), any(Long.class))).willReturn(notificationAttributeInfo);
+        NotificationAttributeInfo info = createNotificationAttributeInfo();
+        given(notificationQueryService.findNotificationInfo(any(Long.class), any(Long.class))).willReturn(info);
 
         mockMvc.perform(get("/notifications/{notificationId}", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(notificationAttributeInfo)))
+                .andExpect(content().json(objectMapper.writeValueAsString(info)))
                 .andDo(document("notification-info",
                         notificationIdPathParametersSnippet(),
                         notificationInfoResponseFieldsSnippet()
@@ -144,7 +144,7 @@ class NotificationControllerTest extends ControllerTest {
                 parameterWithName("notificationId").description("알림 ID"));
     }
 
-    private NotificationAttributeInfo getNotificationInfo() {
+    private NotificationAttributeInfo createNotificationAttributeInfo() {
         Notification notification = TestEntityFactory.notification(1L, 1L, NotificationType.POST_UPLOAD);
         return toNotificationInfo(notification);
     }

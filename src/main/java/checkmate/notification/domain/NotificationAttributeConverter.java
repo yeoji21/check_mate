@@ -10,7 +10,7 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Map;
 
-
+// TODO: 2023/03/12 Component로 관리해야 하는지 검토
 @Component
 @Converter
 public class NotificationAttributeConverter implements AttributeConverter<NotificationAttributes, String> {
@@ -22,7 +22,7 @@ public class NotificationAttributeConverter implements AttributeConverter<Notifi
         try {
             return objectMapper.writeValueAsString(attribute.getAttributes());
         } catch (JsonProcessingException e) {
-            throw new JsonConvertingException(e, attribute.toString());
+            throw new JsonConvertingException(e, e.getMessage());
         }
     }
 

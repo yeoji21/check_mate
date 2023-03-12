@@ -34,12 +34,12 @@ public class NotificationJpaRepository implements NotificationRepository {
     }
 
     @Override
-    public Optional<NotificationReceiver> findNotificationReceiver(long notificationId, long userId) {
+    public Optional<NotificationReceiver> findNotificationReceiver(long notificationId, long receiverUserId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(notificationReceiver)
                         .join(notificationReceiver.notification, notification).fetchJoin()
                         .where(notification.id.eq(notificationId),
-                                notificationReceiver.userId.eq(userId))
+                                notificationReceiver.userId.eq(receiverUserId))
                         .fetchOne()
         );
     }
@@ -53,6 +53,7 @@ public class NotificationJpaRepository implements NotificationRepository {
                 .fetch();
     }
 
+    // TODO: 2023/03/12 read == false인 Receiver만 가져와야 하는게 아닌지 테스트
     @Override
     public List<NotificationReceiver> findGoalCompleteNotificationReceivers(long userId) {
         return queryFactory

@@ -24,7 +24,7 @@ public class MateJpaRepository implements MateRepository {
     private final EntityManager entityManager;
 
     @Override
-    public Optional<Mate> find(long mateId) {
+    public Optional<Mate> findById(long mateId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(mate)
                         .where(mate.id.eq(mateId))
