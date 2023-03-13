@@ -2,7 +2,10 @@ package checkmate.notification.application;
 
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationAttributeInfo;
-import checkmate.notification.domain.*;
+import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationReceiver;
+import checkmate.notification.domain.NotificationRepository;
+import checkmate.notification.domain.NotificationType;
 import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +43,7 @@ class NotificationQueryServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(mapper, "converter", new NotificationAttributeConverter());
+        ReflectionTestUtils.setField(mapper, "objectMapper", objectMapper);
     }
 
     @Test

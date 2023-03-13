@@ -1,9 +1,11 @@
 package checkmate.notification.application.dto;
 
+import checkmate.exception.JsonConvertingException;
 import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.domain.Notification;
-import checkmate.notification.domain.NotificationAttributeConverter;
 import checkmate.notification.domain.NotificationType;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -15,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class NotificationQueryMapper {
     public static NotificationQueryMapper INSTANCE = Mappers.getMapper(NotificationQueryMapper.class);
     @Autowired
-    NotificationAttributeConverter converter;
+    private ObjectMapper objectMapper;
 
     @Mappings({
             @Mapping(target = "type", source = "notification.type", qualifiedByName = "getNotificationType"),
@@ -30,6 +32,10 @@ public abstract class NotificationQueryMapper {
 
     @Named("getAttributes")
     String getAttributes(Notification notification) {
-        return converter.convertToDatabaseColumn(notification.getAttributes());
+        try {
+            return objectMapper.writeValueAsString(notification.getAttributes());
+        } catch (JsonProcessingException e) {
+            throw new JsonConvertingException(e, e.getMessage());
+        }
     }
 }

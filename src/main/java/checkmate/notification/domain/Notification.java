@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @EqualsAndHashCode(of = "id")
@@ -66,8 +67,8 @@ public class Notification extends BaseTimeEntity {
         return receivers.getReceivers();
     }
 
-    public NotificationAttributes getAttributes() {
-        return new NotificationAttributes(Collections.unmodifiableMap(attributes.getAttributes()));
+    public Map<String, String> getAttributes() {
+        return Collections.unmodifiableMap(attributes.getAttributes());
     }
 
     private void setUpReceivers(List<NotificationReceiver> receivers) {

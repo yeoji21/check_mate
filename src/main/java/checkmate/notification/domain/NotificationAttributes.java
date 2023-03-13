@@ -1,9 +1,11 @@
 package checkmate.notification.domain;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.Map;
 
+@Getter
 @EqualsAndHashCode
 public class NotificationAttributes {
     private final Map<String, String> attributes;
@@ -22,9 +24,5 @@ public class NotificationAttributes {
 
     String getStringValue(String key) {
         return attributes.get(key);
-    }
-
-    Map<String, String> getAttributes() {
-        return attributes;
     }
 }
