@@ -53,13 +53,13 @@ public class NotificationJpaRepository implements NotificationRepository {
                 .fetch();
     }
 
-    // TODO: 2023/03/12 read == false인 Receiver만 가져와야 하는게 아닌지 테스트
     @Override
     public List<NotificationReceiver> findGoalCompleteNotificationReceivers(long userId) {
         return queryFactory
                 .select(notificationReceiver)
                 .from(notificationReceiver)
                 .where(notificationReceiver.userId.eq(userId),
+                        notificationReceiver.checked.isFalse(),
                         notification.type.eq(NotificationType.COMPLETE_GOAL))
                 .fetch();
     }

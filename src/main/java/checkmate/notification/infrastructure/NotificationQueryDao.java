@@ -20,7 +20,7 @@ public class NotificationQueryDao {
     private final JPAQueryFactory queryFactory;
 
     public NotificationDetailResult findNotificationDetailResult(long userId, Long cursorId, Pageable pageable) {
-        List<NotificationDetailInfo> notificationDetails = queryFactory
+        List<NotificationDetailInfo> notifications = queryFactory
                 .select(new QNotificationDetailInfo(notification.id, notification.title, notification.content,
                         notificationReceiver.checked, notification.createdDateTime, notification.type.stringValue()))
                 .from(notificationReceiver)
@@ -29,8 +29,8 @@ public class NotificationQueryDao {
                 .orderBy(notificationReceiver.notification.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
-        boolean hasNext = hasNext(pageable.getPageSize(), notificationDetails);
-        return new NotificationDetailResult(notificationDetails, hasNext);
+        boolean hasNext = hasNext(pageable.getPageSize(), notifications);
+        return new NotificationDetailResult(notifications, hasNext);
     }
 
     private boolean hasNext(int size, List<NotificationDetailInfo> notificationDetails) {
