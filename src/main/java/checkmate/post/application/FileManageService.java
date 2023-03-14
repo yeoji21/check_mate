@@ -15,11 +15,15 @@ public class FileManageService {
     public void upload(Post post, String imageName, InputStream inputStream) {
         String storedFilename = ImageFileUtil.getObjectNameByUUID(imageName);
         fileStore.upload(storedFilename, imageName, inputStream);
-        imageRepository.save(Image.builder()
+        saveImage(post, imageName, storedFilename);
+    }
+
+    private void saveImage(Post post, String imageName, String storedFilename) {
+        Image image = Image.builder()
                 .post(post)
                 .originalName(imageName)
                 .storedName(storedFilename)
-                .build()
-        );
+                .build();
+        imageRepository.save(image);
     }
 }

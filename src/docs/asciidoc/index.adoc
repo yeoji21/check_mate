@@ -330,19 +330,19 @@ include::{snippets}/post-upload/http-response.adoc[]
 
 === Request Param
 
-include::{snippets}/posts-find/path-parameters.adoc[]
+include::{snippets}/post-find/path-parameters.adoc[]
 
 === HTTP Request
 
-include::{snippets}/posts-find/http-request.adoc[]
+include::{snippets}/post-find/http-request.adoc[]
 
 === Response Field
 
-include::{snippets}/posts-find/response-fields.adoc[]
+include::{snippets}/post-find/response-fields.adoc[]
 
 === HTTP Response
 
-include::{snippets}/posts-find/http-response.adoc[]
+include::{snippets}/post-find/http-response.adoc[]
 
 // =============================================================
 

@@ -11,6 +11,7 @@ import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.user.domain.UserRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -47,18 +48,17 @@ class PostCommandServiceTest {
     private ApplicationEventPublisher eventPublisher;
 
     @Test
-    void 목표인증_저장_테스트() throws Exception {
+    @DisplayName("목표 인증 업로드")
+    void upload() throws Exception {
         //given
-        PostUploadCommand dto = getPostRegisterDto();
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-
+        Mate mate = createMate();
         given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
-        given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "tester")));
-        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
+        given(userRepository.findById(any(Long.class)))
+                .willReturn(Optional.ofNullable(TestEntityFactory.user(mate.getUserId(), "tester")));
+        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when
-        postCommandService.upload(dto);
+        postCommandService.upload(createPostUploadCommand(mate));
 
         //then
         verify(postRepository).save(any());
@@ -66,16 +66,15 @@ class PostCommandServiceTest {
     }
 
     @Test
-    void 좋아요_테스트() throws Exception {
+    @DisplayName("좋아요 추가")
+    void like() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
-        ReflectionTestUtils.setField(post, "id", 1L);
+        Mate mate = createMate();
+        Post post = createPost(mate);
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
         given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
-        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
+        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when
         postCommandService.like(mate.getUserId(), post.getId());
@@ -85,17 +84,16 @@ class PostCommandServiceTest {
     }
 
     @Test
-    void 좋아요_취소_테스트() throws Exception {
+    @DisplayName("좋아요 취소")
+    void unlike() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
-        ReflectionTestUtils.setField(post, "id", 1L);
+        Mate mate = createMate();
+        Post post = createPost(mate);
         post.addLikes(new Likes(mate.getUserId()));
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
         given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
-        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(goal));
+        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when
         postCommandService.unlike(mate.getUserId(), post.getId());
@@ -104,10 +102,23 @@ class PostCommandServiceTest {
         assertThat(post.getLikes().size()).isEqualTo(0);
     }
 
-    private PostUploadCommand getPostRegisterDto() throws IOException {
-        return new PostUploadCommand(1L,
-                2L,
-                List.of(new MockMultipartFile("originalName", InputStream.nullInputStream())),
-                "posting content");
+    private Post createPost(Mate mate) {
+        Post post = TestEntityFactory.post(mate);
+        ReflectionTestUtils.setField(post, "id", 1L);
+        return post;
+    }
+
+    private Mate createMate() {
+        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        ReflectionTestUtils.setField(mate, "id", 1L);
+        return mate;
+    }
+
+    private PostUploadCommand createPostUploadCommand(Mate mate) throws IOException {
+        return new PostUploadCommand(mate.getUserId(),
+                mate.getId(),
+                List.of(new MockMultipartFile("filename", InputStream.nullInputStream())),
+                "content");
     }
 }

@@ -74,7 +74,7 @@ class PostControllerTest extends ControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("posts-findById",
+                .andDo(document("post-find",
                         findPostPathParametersSnippet(),
                         findPostResponseFieldsSnippet()
                 ));

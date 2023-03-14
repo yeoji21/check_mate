@@ -7,6 +7,7 @@ import checkmate.post.domain.FileStore;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.ImageRepository;
 import checkmate.post.domain.Post;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,12 +30,11 @@ class FileManageServiceTest {
     private FileManageService fileManageService;
 
     @Test
-    void 파일_업로드_테스트() throws Exception {
+    @DisplayName("파일 업로드")
+    void upload() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
-        MockMultipartFile file = new MockMultipartFile("filename", new byte[]{});
+        Post post = createPost();
+        MockMultipartFile file = createMultipartFile();
 
         //when
         fileManageService.upload(post, file.getOriginalFilename(), file.getInputStream());
@@ -42,5 +42,19 @@ class FileManageServiceTest {
         //then
         verify(fileStore).upload(any(String.class), any(String.class), any(InputStream.class));
         verify(imageRepository).save(any(Image.class));
+    }
+
+    private MockMultipartFile createMultipartFile() {
+        return new MockMultipartFile("filename", new byte[]{});
+    }
+
+    private Post createPost() {
+        Mate mate = createMate();
+        return TestEntityFactory.post(mate);
+    }
+
+    private Mate createMate() {
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        return goal.join(TestEntityFactory.user(1L, "user"));
     }
 }
