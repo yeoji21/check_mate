@@ -63,14 +63,4 @@ public class NotificationJpaRepository implements NotificationRepository {
                         notification.type.eq(NotificationType.COMPLETE_GOAL))
                 .fetch();
     }
-
-    @Override
-    public Optional<Notification> findById(long notificationId) {
-        return Optional.ofNullable(
-                queryFactory
-                        .selectFrom(notification).distinct()
-                        .join(notification.receivers.receivers, notificationReceiver).fetchJoin()
-                        .where(notification.id.eq(notificationId))
-                        .fetchOne());
-    }
 }

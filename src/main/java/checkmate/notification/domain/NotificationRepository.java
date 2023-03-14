@@ -8,8 +8,6 @@ public interface NotificationRepository {
 
     void save(Notification notification);
 
-    Optional<Notification> findById(long notificationId);
-
     Optional<NotificationReceiver> findNotificationReceiver(long notificationId, long receiverUserId);
 
     List<String> findReceiversFcmToken(Long notificationId);
