@@ -3,6 +3,7 @@ package checkmate.user.application;
 import checkmate.config.auth.AuthConstants;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
+import checkmate.config.jwt.LoginToken;
 import checkmate.exception.BusinessException;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
@@ -18,14 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class LoginService {
     private final UserRepository userRepository;
@@ -33,35 +32,38 @@ public class LoginService {
     private final JwtDecoder jwtDecoder;
     private final RedisTemplate<String, String> redisTemplate;
 
+    @Transactional
     public LoginTokenResponse login(SnsLoginCommand snsLoginCommand) {
         User user = userRepository.findByProviderId(snsLoginCommand.providerId())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         fcmTokenUpdate(user, snsLoginCommand.fcmToken());
+        // TODO: 2023/03/16 닉네임이 없을 경우 처리해야 하는지 검토
         if (user.getNickname() == null) throw new BusinessException(ErrorCode.EMPTY_NICKNAME);
-        return getLoginTokenResponse(user);
+        return toLoginTokenResponse(jwtFactory.createLoginToken(user));
     }
 
+    @Transactional
     public LoginTokenResponse reissueToken(TokenReissueCommand command) {
         String providerId = jwtDecoder.getProviderId(command.accessToken());
         refreshTokenExistCheck(providerId, command.refreshToken());
         User user = userRepository.findByProviderId(providerId).orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
-        return getLoginTokenResponse(user);
+        return toLoginTokenResponse(jwtFactory.createLoginToken(user));
     }
 
-    private LoginTokenResponse getLoginTokenResponse(User user) {
-        LoginTokenResponse loginTokenResponse = LoginTokenResponse.builder()
-                .accessToken(jwtFactory.accessToken(user))
-                .refreshToken(jwtFactory.refreshToken())
-                .build();
-        redisTemplate.opsForValue().set(user.getProviderId(), loginTokenResponse.getRefreshToken(), 30, TimeUnit.DAYS);
-        return loginTokenResponse;
-    }
-
+    @Transactional
     public void logout(long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
         redisTemplate.delete(user.getProviderId());
     }
 
+    private LoginTokenResponse toLoginTokenResponse(LoginToken loginToken) {
+        return LoginTokenResponse.builder()
+                .accessToken(loginToken.accessToken())
+                .refreshToken(loginToken.refreshToken())
+                .build();
+    }
+
+    // TODO: 2023/03/16 json decoder로 이동 고려
     private void refreshTokenExistCheck(String providerId, String refreshToken) {
         Optional<String> findRefreshToken = Optional.ofNullable(redisTemplate.opsForValue().get(providerId));
         findRefreshToken.ifPresentOrElse(

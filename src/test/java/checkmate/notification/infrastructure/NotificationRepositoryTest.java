@@ -16,7 +16,7 @@ import static checkmate.notification.domain.NotificationType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NotificationRepositoryTest extends RepositoryTest {
-    @Test
+    @Test @DisplayName("알림 수신자 조회")
     void findNotificationReceiver() throws Exception {
         //given
         User sender = createUser("sender");

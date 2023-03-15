@@ -3,10 +3,11 @@ package checkmate.config.jwt;
 import checkmate.TestEntityFactory;
 import checkmate.user.domain.User;
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Date;
@@ -19,10 +20,12 @@ class JwtFactoryTest {
     private static final long REFRESH_TIME = TimeUnit.DAYS.toMillis(30);
     private User user;
     private JwtFactory jwtFactory;
+    @Mock
+    private RedisTemplate<String, String> redisTemplate;
 
     @BeforeEach
     void setUp() {
-        jwtFactory = new JwtFactory();
+        jwtFactory = new JwtFactory(redisTemplate);
         ReflectionTestUtils.setField(jwtFactory, "SECRET", "secret");
         ReflectionTestUtils.setField(jwtFactory, "ACCESS_EXPIRATION_TIME", ACCESS_TIME);
         ReflectionTestUtils.setField(jwtFactory, "REFRESH_EXPIRATION_TIME", REFRESH_TIME);
@@ -56,24 +59,5 @@ class JwtFactoryTest {
         assertThat(refreshToken).isNotNull();
         assertThat(decodedJWT.getExpiresAt()).isAfter(new Date(System.currentTimeMillis() + ACCESS_TIME));
         assertThat(decodedJWT.getExpiresAt()).isBefore(new Date(System.currentTimeMillis() + REFRESH_TIME));
-    }
-
-    @Test
-    void token() throws Exception {
-        User user = TestEntityFactory.user(1L, "hi");
-        ReflectionTestUtils.setField(user, "providerId", "testId");
-        ReflectionTestUtils.setField(user, "username", "tester");
-        String made = jwtFactory.accessToken(user);
-        System.out.println(made);
-
-        String sign = JWT.create()
-                .withSubject(this.user.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TIME))
-                .withClaim("id", 1L)
-                .withClaim("providerId", "user")
-                .withClaim("nickname", "user")
-                .withClaim("auth", this.user.getRole())
-                .sign(Algorithm.HMAC512("test"));
-        System.out.println(sign);
     }
 }

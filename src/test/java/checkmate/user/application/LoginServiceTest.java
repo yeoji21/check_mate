@@ -3,6 +3,7 @@ package checkmate.user.application;
 import checkmate.TestEntityFactory;
 import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
+import checkmate.config.jwt.LoginToken;
 import checkmate.exception.BusinessException;
 import checkmate.exception.NotFoundException;
 import checkmate.user.application.dto.request.SnsLoginCommand;
@@ -32,12 +33,18 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class LoginServiceTest {
-    @Mock private JwtFactory jwtFactory;
-    @Mock private JwtDecoder jwtDecoder;
-    @Mock private UserRepository userRepository;
-    @Mock private RedisTemplate<String, String> redisTemplate;
-    @Mock private ValueOperations<String, String> valueOperations;
-    @InjectMocks private LoginService loginService;
+    @Mock
+    private JwtFactory jwtFactory;
+    @Mock
+    private JwtDecoder jwtDecoder;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private RedisTemplate<String, String> redisTemplate;
+    @Mock
+    private ValueOperations<String, String> valueOperations;
+    @InjectMocks
+    private LoginService loginService;
     private User user;
 
     @BeforeEach
@@ -47,22 +54,30 @@ class LoginServiceTest {
     }
 
     @Test
-    void 로그인_성공_테스트() throws Exception{
+    void 로그인_성공_테스트() throws Exception {
         //given
+        LoginToken loginToken = createLoginToken();
         given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.of(user));
-        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 
         //when
         LoginTokenResponse response = loginService.login(new SnsLoginCommand("id", "fcmToken"));
 
         //then
         assertThat(response).isInstanceOf(LoginTokenResponse.class);
-        assertThat(response.getAccessToken()).isNotBlank();
-        assertThat(response.getRefreshToken()).isNotBlank();
+        assertThat(response.accessToken()).isNotBlank();
+        assertThat(response.refreshToken()).isNotBlank();
+    }
+
+    private LoginToken createLoginToken() {
+        return LoginToken.builder()
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .build();
     }
 
     @Test
-    void 로그인_처음인_회원_테스트() throws Exception{
+    void 로그인_처음인_회원_테스트() throws Exception {
         //given
         given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.empty());
 
@@ -73,7 +88,7 @@ class LoginServiceTest {
     }
 
     @Test
-    void 닉네임을_설정하지_않았던_회원_테스트() throws Exception{
+    void 닉네임을_설정하지_않았던_회원_테스트() throws Exception {
         //given
         User user = User.builder()
                 .emailAddress("mail")
@@ -91,9 +106,11 @@ class LoginServiceTest {
         assertThrows(BusinessException.class, () -> loginService.login(new SnsLoginCommand("id", "fcm token")));
     }
 
-    @Test @DisplayName("토큰 재발급 테스트")
-    void reissueToken() throws Exception{
+    @Test
+    @DisplayName("토큰 재발급 테스트")
+    void reissueToken() throws Exception {
         //given
+        LoginToken loginToken = createLoginToken();
         TokenReissueCommand requestDto = TokenReissueCommand.builder()
                 .accessToken("accessToken")
                 .refreshToken("refreshToken")
@@ -103,17 +120,18 @@ class LoginServiceTest {
         given(valueOperations.get(any())).willReturn("Bearer refreshToken");
         given(jwtDecoder.getProviderId(anyString())).willReturn("1");
         given(userRepository.findByProviderId(any())).willReturn(Optional.ofNullable(user));
+        given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 
         //when
         LoginTokenResponse loginTokenResponse = loginService.reissueToken(requestDto);
 
         //then
-        assertThat(loginTokenResponse.getAccessToken()).isNotNull();
-        assertThat(loginTokenResponse.getRefreshToken()).isNotNull();
+        assertThat(loginTokenResponse.accessToken()).isNotNull();
+        assertThat(loginTokenResponse.refreshToken()).isNotNull();
     }
 
     @Test
-    void 로그아웃_테스트() throws Exception{
+    void 로그아웃_테스트() throws Exception {
         //given
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 

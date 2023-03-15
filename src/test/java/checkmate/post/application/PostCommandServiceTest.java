@@ -102,6 +102,7 @@ class PostCommandServiceTest {
         assertThat(post.getLikes().size()).isEqualTo(0);
     }
 
+
     private Post createPost(Mate mate) {
         Post post = TestEntityFactory.post(mate);
         ReflectionTestUtils.setField(post, "id", 1L);
