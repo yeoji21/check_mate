@@ -10,7 +10,6 @@ import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
-import checkmate.user.domain.UserRole;
 import checkmate.user.presentation.dto.response.LoginTokenResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -95,7 +94,6 @@ class LoginServiceTest {
                 .providerId("id")
                 .username("name")
                 .fcmToken("fcm token")
-                .role(UserRole.USER.getRole())
                 .build();
 
         given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.of(user));

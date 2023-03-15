@@ -9,7 +9,6 @@ import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import checkmate.user.domain.UserRole;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
@@ -34,7 +33,6 @@ public class TestEntityFactory {
                 .nickname(name)
                 .providerId(name)
                 .emailAddress(name + "@mail.com")
-                .role(UserRole.USER.getRole())
                 .fcmToken("fcmToken")
                 .build();
         ReflectionTestUtils.setField(user, "id", id);
