@@ -25,6 +25,7 @@ public enum ErrorCode {
     EXCEED_IMAGE_LIMIT(PostCode.IMAGE_LIMIT.getCode(), BAD_REQUEST, "업로드 가능한 최대 이미지 수를 초과한 경우"),
     REFRESH_TOKEN_EXPIRED(TokenCode.REFRESH_TOKEN_EXPIRED.getCode(), BAD_REQUEST, "Refresh Token이 만료된 경우"),
     IMAGE_PROCESSING_IO(PostCode.IMAGE_IO.getCode(), BAD_REQUEST, "이미지 처리 중 문제가 발생한 경우"),
+    DATA_INTEGRITY_VIOLATE(CommonCode.DATA_INTEGTITY.getCode(), BAD_REQUEST, "데이터 무결성을 위반한 경우"),
 
     UNAUTHORIZED_OPERATION(CommonCode.UNAUTHORIZED_OPERATION.getCode(), BAD_REQUEST, "허가되지 않은 작업을 시도한 경우"),
 

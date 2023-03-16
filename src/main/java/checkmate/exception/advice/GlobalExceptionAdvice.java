@@ -6,6 +6,7 @@ import com.amazonaws.services.ecr.model.ImageNotFoundException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,7 +32,7 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler
     protected ResponseEntity<ErrorResponse> methodArgumentValidation(MethodArgumentNotValidException e) {
         log.warn("[exception - {}] -> {}", ErrorCode.INVALID_REQUEST_PARAMETER, e.getFieldErrors().stream()
-                .map(err-> err.getDefaultMessage()).collect(Collectors.joining(" and ")));
+                .map(err -> err.getDefaultMessage()).collect(Collectors.joining(" and ")));
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_REQUEST_PARAMETER);
     }
 
@@ -93,5 +94,11 @@ public class GlobalExceptionAdvice {
     protected ResponseEntity<ErrorResponse> authorityException(UnauthorizedException e) {
         log.warn("[handleAuthorityException] : {}", e.getErrorCode().getDetail());
         return ErrorResponse.toResponseEntity(e.getErrorCode());
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> dataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.warn("[handleAuthorityException] : {}", e.getMessage());
+        return ErrorResponse.toResponseEntity(ErrorCode.DATA_INTEGRITY_VIOLATE);
     }
 }
