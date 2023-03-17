@@ -7,20 +7,20 @@ import java.util.UUID;
 
 @UtilityClass
 public class ImageFileUtil {
-    public static ObjectMetadata getObjectMetadata(String filename) {
+    public static ObjectMetadata createObjectMetadata(String filename) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setHeader("x-amz-acl", "public-read");
-        objectMetadata.setContentType("image/"+ getFileExt(filename));
+        objectMetadata.setContentType("image/" + getFileExt(filename));
         return objectMetadata;
     }
 
-    public static String getFileExt(String imageName) {
+    private static String getFileExt(String imageName) {
         String[] split = imageName.split("\\.");
         return split[split.length - 1];
     }
 
 
-    public static String getObjectNameByUUID(String originalFileName) {
+    public static String createObjectNameByUUID(String originalFileName) {
         return UUID.randomUUID() + originalFileName;
     }
 }

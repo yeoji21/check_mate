@@ -1,43 +1,49 @@
 package checkmate.post.domain;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ImageFileUtilTest {
-
     @Test
-    void MultipartFile로부터_확장자_추출_테스트() throws Exception{
+    @DisplayName("ObjectMetadata 생성")
+    void createObjectMetadata() throws Exception {
         //given
-        MockMultipartFile multipartFile = new MockMultipartFile("multipartFileName", "originalFileName.jpg", "image/jpg", InputStream.nullInputStream());
+        MockMultipartFile jpgFile = createMultipartFile("originalFileName.jpg", "image/jpg");
+        MockMultipartFile pngFile = createMultipartFile("originalFileName.png", "image/png");
+        MockMultipartFile jpegFile = createMultipartFile("originalFileName.jpeg", "image/jpeg");
+
         //when
-        String ext = ImageFileUtil.getFileExt(multipartFile.getOriginalFilename());
+        ObjectMetadata jpgObject = ImageFileUtil.createObjectMetadata(jpgFile.getOriginalFilename());
+        ObjectMetadata pngObject = ImageFileUtil.createObjectMetadata(pngFile.getOriginalFilename());
+        ObjectMetadata jpegObject = ImageFileUtil.createObjectMetadata(jpegFile.getOriginalFilename());
+
         //then
-        assertThat(ext).isEqualTo("jpg");
+        assertThat(jpgObject.getContentType()).isEqualTo("image/jpg");
+        assertThat(pngObject.getContentType()).isEqualTo("image/png");
+        assertThat(jpegObject.getContentType()).isEqualTo("image/jpeg");
     }
 
     @Test
-    void 확장자를_통해_ObjectMetadata_생성_테스트() throws Exception{
+    @DisplayName("UUID 랜덤 이름 생성")
+    void createObjectNameByUUID() throws Exception {
         //given
-        String ext = "jpg";
+        MockMultipartFile multipartFile = createMultipartFile("originalFileName.jpg", "image/jpg");
+
         //when
-        ObjectMetadata objectMetadata = ImageFileUtil.getObjectMetadata(ext);
+        String storedName = ImageFileUtil.createObjectNameByUUID(multipartFile.getOriginalFilename());
+
         //then
-        assertThat(objectMetadata.getContentType()).isEqualTo("image/" + ext);
+        assertThat(storedName).contains(multipartFile.getOriginalFilename());
     }
 
-    @Test
-    void UUID_랜덤_저장_이름_생성_테스트() throws Exception{
-        //given
-        MockMultipartFile multipartFile = new MockMultipartFile("multipartFileName", "originalFileName.jpg", "image/jpg", InputStream.nullInputStream());
-        //when
-        String storedName = ImageFileUtil.getObjectNameByUUID(multipartFile.getOriginalFilename());
-        //then
-        System.out.println(storedName);
-        assertThat(storedName).contains("originalFileName.jpg");
+    private MockMultipartFile createMultipartFile(String originalFilename, String contentType) throws IOException {
+        return new MockMultipartFile("multipartFileName", originalFilename, contentType, InputStream.nullInputStream());
     }
 }

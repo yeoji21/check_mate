@@ -91,6 +91,37 @@ class PostTest {
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
 
+    @Test
+    @DisplayName("게시글 인증 완료")
+    void check() throws Exception {
+        //given
+        Post post = createPost();
+        int before = post.getMate().getWorkingDays();
+
+        //when
+        post.check();
+
+        //then
+        assertThat(post.isChecked()).isTrue();
+        assertThat(post.getMate().getWorkingDays()).isGreaterThan(before);
+    }
+
+    @Test
+    @DisplayName("게시글 인증 취소")
+    void uncheck() throws Exception {
+        //given
+        Post post = createPost();
+        post.check();
+        int before = post.getMate().getWorkingDays();
+
+        //when
+        post.uncheck();
+
+        //then
+        assertThat(post.isChecked()).isFalse();
+        assertThat(post.getMate().getWorkingDays()).isLessThan(before);
+    }
+
     private Post createPost() {
         Goal goal = TestEntityFactory.goal(1L, "test");
         Mate mate = goal.join(TestEntityFactory.user(1L, "user"));

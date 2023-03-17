@@ -1,7 +1,7 @@
 package checkmate.post.infrastructure;
 
-import checkmate.exception.code.ErrorCode;
 import checkmate.exception.RuntimeIOException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.post.domain.FileStore;
 import checkmate.post.domain.ImageFileUtil;
 import com.amazonaws.services.s3.AmazonS3;
@@ -21,9 +21,9 @@ public class S3FileStore implements FileStore {
     private String BUCKET_NAME;
 
     @Override
-    public void upload(String storedFilename, String originalFilename, InputStream inputStream) {
+    public void upload(String storedName, String originalFilename, InputStream inputStream) {
         try (inputStream) {
-            s3.putObject(BUCKET_NAME, storedFilename, inputStream, ImageFileUtil.getObjectMetadata(originalFilename));
+            s3.putObject(BUCKET_NAME, storedName, inputStream, ImageFileUtil.createObjectMetadata(originalFilename));
         } catch (IOException e) {
             throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
         }

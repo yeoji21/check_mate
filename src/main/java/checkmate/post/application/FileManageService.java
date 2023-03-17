@@ -13,7 +13,7 @@ public class FileManageService {
     private final FileStore fileStore;
 
     public void upload(Post post, String imageName, InputStream inputStream) {
-        String storedFilename = ImageFileUtil.getObjectNameByUUID(imageName);
+        String storedFilename = ImageFileUtil.createObjectNameByUUID(imageName);
         fileStore.upload(storedFilename, imageName, inputStream);
         saveImage(post, imageName, storedFilename);
     }
