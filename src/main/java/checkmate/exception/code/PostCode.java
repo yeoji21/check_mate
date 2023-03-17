@@ -10,6 +10,7 @@ public enum PostCode {
     IMAGE_LIMIT("POST-002"),
     IMAGE_NOT_FOUND("POST-003"),
     IMAGE_IO("POST-004"),
+    LIKES_CONDITION("POST-005"),
     ;
 
     private final String code;

@@ -1,8 +1,11 @@
 package checkmate.post.domain;
 
 import checkmate.TestEntityFactory;
+import checkmate.exception.BusinessException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.mate.domain.Mate;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -14,47 +17,41 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PostTest {
     @Test
-    void 좋아요_매핑_테스트() throws Exception {
+    @DisplayName("게시글 좋아요 추가")
+    void addLikes() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
+        Post post = createPost();
 
+        //when
         post.addLikes(new Likes(2L));
         post.addLikes(new Likes(3L));
-        //when
-        List<Likes> likes = post.getLikes();
+
         //then
+        List<Likes> likes = post.getLikes();
         assertThat(likes).hasSize(2);
-        assertThat(likes.get(0).getPost()).isEqualTo(post);
+        assertThat(likes).allMatch(like -> like.getPost() == post);
     }
 
     @Test
-    void 좋아요_가능_여부() throws Exception {
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
-
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
-        assertThat(post.isLikeable()).isFalse();
-
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(2));
-        assertThat(post.isLikeable()).isFalse();
-
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now());
-        assertThat(post.isLikeable()).isTrue();
-
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(1));
-        assertThat(post.isLikeable()).isTrue();
-    }
-
-    @Test
-    void 좋아요_제거_테스트() throws Exception {
+    @DisplayName("게시글 좋아요 추가 - 수정 기간 초과")
+    void addLikes_period() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
+        Post post = createPost();
+        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
 
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> post.addLikes(new Likes(2L)));
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 제거")
+    void removeLikes() throws Exception {
+        //given
+        Post post = createPost();
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));
         post.addLikes(new Likes(3L));
@@ -63,23 +60,41 @@ class PostTest {
         post.removeLikes(1L);
 
         //then
-        assertThat(post.getLikes().size()).isEqualTo(2);
-        post.getLikes().forEach(like -> assertThat(like.getUserId()).isNotEqualTo(1L));
+        List<Likes> likes = post.getLikes();
+        assertThat(likes.size()).isEqualTo(2);
+        assertThat(likes).allMatch(like -> like.getUserId() != 1L);
     }
 
     @Test
-    void 좋아요_제거_실패_테스트() throws Exception {
+    @DisplayName("게시글 좋아요 제거 - 좋아요 누르지 않은 유저")
+    void removeLikes_not_liked_user() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
-        Post post = TestEntityFactory.post(mate);
-
+        Post post = createPost();
         post.addLikes(new Likes(1L));
         post.addLikes(new Likes(2L));
-        post.addLikes(new Likes(3L));
 
         //when //then
-        assertThrows(IllegalArgumentException.class, () -> post.removeLikes(5L));
+        assertThrows(IllegalArgumentException.class, () -> post.removeLikes(3L));
+    }
+
+    @Test
+    @DisplayName("게시글 좋아요 제거 - 좋아요 누르지 않은 유저")
+    void removeLikes_period_exception() throws Exception {
+        //given
+        Post post = createPost();
+        post.addLikes(new Likes(1L));
+        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> post.removeLikes(1L));
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
+    }
+
+    private Post createPost() {
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        return TestEntityFactory.post(mate);
     }
 }
 

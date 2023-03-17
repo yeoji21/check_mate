@@ -1,6 +1,8 @@
 package checkmate.post.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
+import checkmate.exception.BusinessException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import com.mysema.commons.lang.Assert;
 import lombok.*;
@@ -44,23 +46,25 @@ public class Post extends BaseTimeEntity {
         images = new Images();
     }
 
-    public boolean isLikeable() {
-        return !uploadedDate.plusDays(1).isBefore(LocalDate.now());
-    }
-
     void addImage(Image image) {
         images.putImage(image);
     }
 
     public void addLikes(Likes like) {
-        if (!isLikeable()) throw new IllegalArgumentException();
+        checkLikesUpdatable();
         likes.add(like);
         like.setPost(this);
     }
 
     public void removeLikes(long userId) {
-        Assert.isTrue(likes.removeIf(like -> like.getUserId() == userId),
-                "userId " + userId + "'s like is not removed");
+        checkLikesUpdatable();
+        boolean removed = likes.removeIf(like -> like.getUserId() == userId);
+        Assert.isTrue(removed, "userId " + userId + "'s like is not removed");
+    }
+
+    void checkLikesUpdatable() {
+        if (uploadedDate.plusDays(1).isBefore(LocalDate.now()))
+            throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 
     public void check() {

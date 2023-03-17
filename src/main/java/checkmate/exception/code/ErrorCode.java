@@ -26,7 +26,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRED(TokenCode.REFRESH_TOKEN_EXPIRED.getCode(), BAD_REQUEST, "Refresh Token이 만료된 경우"),
     IMAGE_PROCESSING_IO(PostCode.IMAGE_IO.getCode(), BAD_REQUEST, "이미지 처리 중 문제가 발생한 경우"),
     DATA_INTEGRITY_VIOLATE(CommonCode.DATA_INTEGTITY.getCode(), BAD_REQUEST, "데이터 무결성을 위반한 경우"),
-
+    POST_LIKES_UPDATE(PostCode.LIKES_CONDITION.getCode(), BAD_REQUEST, "게시글 좋아요를 수정할 수 없는 경우"),
     UNAUTHORIZED_OPERATION(CommonCode.UNAUTHORIZED_OPERATION.getCode(), BAD_REQUEST, "허가되지 않은 작업을 시도한 경우"),
 
     // 404 NOT_FOUND : Resource를 찾을 수 없음
