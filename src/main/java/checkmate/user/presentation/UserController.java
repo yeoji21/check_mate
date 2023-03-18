@@ -52,6 +52,11 @@ public class UserController {
         userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
     }
 
+    @DeleteMapping("/users/{nickname}")
+    public void delete(@PathVariable String nickname) {
+        userCommandService.delete(nickname);
+    }
+
     @GetMapping("/users/exists")
     public void nicknameDuplicateCheck(@RequestParam String nickname) {
         userQueryService.existsNicknameCheck(nickname);

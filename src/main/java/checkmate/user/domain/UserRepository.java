@@ -14,4 +14,6 @@ public interface UserRepository {
     int countOngoingGoals(long userId);
 
     User save(User user);
+
+    void delete(User user);
 }

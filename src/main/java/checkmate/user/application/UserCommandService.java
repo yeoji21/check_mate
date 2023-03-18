@@ -31,4 +31,11 @@ public class UserCommandService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, command.userId()));
         user.changeNickname(command.nickname());
     }
+
+    @Transactional
+    public void delete(String nickname) {
+        User user = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        userRepository.delete(user);
+    }
 }

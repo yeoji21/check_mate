@@ -77,4 +77,9 @@ public class UserJpaRepository implements UserRepository {
         entityManager.persist(user);
         return user;
     }
+
+    @Override
+    public void delete(User user) {
+        entityManager.remove(user);
+    }
 }
