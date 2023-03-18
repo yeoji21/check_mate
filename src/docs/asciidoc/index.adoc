@@ -442,7 +442,7 @@ include::{snippets}/user-nickname-check/http-response.adoc[]
 
 // =============================================================
 
-== 회원 가입
+== 기존 회원 가입
 
 === Request Fields
 
@@ -455,6 +455,22 @@ include::{snippets}/user-sign-in/http-request.adoc[]
 === HTTP Response
 
 include::{snippets}/user-sign-in/http-response.adoc[]
+
+// =============================================================
+
+== 통합 회원 가입
+
+=== Request Fields
+
+include::{snippets}/user-sign-up/request-fields.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/user-sign-up/http-request.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/user-sign-up/http-response.adoc[]
 
 // =============================================================
 

@@ -4,10 +4,7 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.UserCommandService;
 import checkmate.user.application.UserQueryService;
 import checkmate.user.presentation.dto.UserDtoMapper;
-import checkmate.user.presentation.dto.request.GoogleSignUpDto;
-import checkmate.user.presentation.dto.request.KakaoSignUpDto;
-import checkmate.user.presentation.dto.request.NaverSignUpDto;
-import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
+import checkmate.user.presentation.dto.request.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,6 +20,16 @@ public class UserController {
     private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
     private final UserDtoMapper userDtoMapper;
+
+    // TODO: 2023/03/18 providerId를 대체할 수 있는 방법 고려
+    // 1. emailAddress를 이용 (emailAddress는 unique)
+    // 2. Ramdom UUID를 이용
+    // 사용자의 emailAddress가 토큰 등에서 노출될 수 있으니 UUID 사용을 고려
+    // 하위 호환성을 위해 완전히 전환되기 전까지 기존 API 유지
+    @PostMapping("/users")
+    public void signUp(@RequestBody @Valid UserSignUpDto userSignUpDto) {
+        userCommandService.signUp(userDtoMapper.toCommand(userSignUpDto));
+    }
 
     @PostMapping("/users/kakao")
     public void kakaoSignUp(@RequestBody @Valid KakaoSignUpDto kakaoSignUpDto) {

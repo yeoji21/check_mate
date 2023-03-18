@@ -3,10 +3,7 @@ package checkmate.user.presentation.dto;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.domain.ProviderIdGenerator;
-import checkmate.user.presentation.dto.request.GoogleSignUpDto;
-import checkmate.user.presentation.dto.request.KakaoSignUpDto;
-import checkmate.user.presentation.dto.request.NaverSignUpDto;
-import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
+import checkmate.user.presentation.dto.request.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -42,4 +39,7 @@ public interface UserDtoMapper {
 
     @Mapping(source = "dto.nickname", target = "nickname")
     UserNicknameModifyCommand toCommand(long userId, UserNicknameModifyDto dto);
+
+    @Mapping(source = "userIdentifier", target = "providerId")
+    UserSignUpCommand toCommand(UserSignUpDto userSignUpDto);
 }

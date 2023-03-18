@@ -4,10 +4,7 @@ import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
-import checkmate.user.presentation.dto.request.GoogleSignUpDto;
-import checkmate.user.presentation.dto.request.KakaoSignUpDto;
-import checkmate.user.presentation.dto.request.NaverSignUpDto;
-import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
+import checkmate.user.presentation.dto.request.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -58,6 +55,42 @@ class UserControllerTest extends ControllerTest {
                         nicknameCheckRequestParametersSnippet()
                 ));
         verify(userQueryService).existsNicknameCheck(any(String.class));
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("회원 가입 API")
+    void signUp() throws Exception {
+        UserSignUpDto dto = UserSignUpDto.builder()
+                .userIdentifier("userIdentifier")
+                .username("여지원")
+                .nickname("yeoz1")
+                .emailAddress("test@naverLogin.com")
+                .build();
+
+        UserSignUpCommand command = UserSignUpCommand.builder()
+                .providerId(dto.getUserIdentifier())
+                .nickname(dto.getNickname())
+                .emailAddress(dto.getEmailAddress())
+                .username(dto.getUsername())
+                .build();
+
+        given(userDtoMapper.toCommand(any(UserSignUpDto.class))).willReturn(command);
+
+        mockMvc.perform(post("/users")
+                        .with(csrf())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andDo(document("user-sign-up",
+                        requestFields(
+                                fieldWithPath("userIdentifier").type(JsonFieldType.STRING).description("유저 식별자"),
+                                fieldWithPath("username").type(JsonFieldType.STRING).description("유저의 이름"),
+                                fieldWithPath("emailAddress").type(JsonFieldType.STRING).description("유저의 이메일"),
+                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저의 닉네임"))
+                ));
+
+        verify(userCommandService).signUp(any(UserSignUpCommand.class));
     }
 
     @WithMockAuthUser
