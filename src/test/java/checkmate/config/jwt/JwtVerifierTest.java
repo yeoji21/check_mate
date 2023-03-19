@@ -5,16 +5,30 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
 class JwtVerifierTest {
+    @InjectMocks
     private JwtVerifier jwtVerifier;
+    @Mock
     private RedisTemplate<String, String> redisTemplate;
+    @Mock
+    private ValueOperations<String, String> valueOperations;
 
     @BeforeEach
     void beforeEach() {
@@ -23,6 +37,20 @@ class JwtVerifierTest {
     }
 
     @Test
+    @DisplayName("access token 검증")
+    void vefify() throws Exception {
+        //given
+        String token = createAccessToken("secret");
+
+        //when
+        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+
+        //then
+        assertThat(decodedJWT).isNotNull();
+    }
+
+    @Test
+    @DisplayName("secret이 일치하지 않는 access token")
     void verify_fail() throws Exception {
         //given
         String token = createAccessToken("invalid secret");
@@ -36,20 +64,61 @@ class JwtVerifierTest {
     }
 
     @Test
-    void vefify() throws Exception {
+    @DisplayName("refresh token 검증")
+    void verifyRefeshToken() throws Exception {
         //given
-        String token = createAccessToken("secret");
+        String refreshToken = createRefreshToken("secret");
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(valueOperations.get(any())).willReturn("Bearer " + refreshToken);
 
         //when
-        DecodedJWT decodedJWT = jwtVerifier.verify(token);
+        jwtVerifier.verifyRefeshToken("providerId", refreshToken);
 
         //then
-        assertThat(decodedJWT).isNotNull();
+        verify(valueOperations).get("providerId");
+    }
+
+    @Test
+    @DisplayName("refresh token 검증 실패 - 토큰 불일치")
+    void verifyRefeshToken_not_match() throws Exception {
+        //given
+        String refreshToken = createRefreshToken("secret");
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(valueOperations.get(any())).willReturn("Bearer invalid refresh token");
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> jwtVerifier.verifyRefeshToken("providerId", refreshToken));
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("refresh token 검증 실패 - 토큰 만료")
+    void verifyRefeshToken_expired() throws Exception {
+        //given
+        String refreshToken = createRefreshToken("secret");
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(valueOperations.get(any())).willReturn(null);
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> jwtVerifier.verifyRefeshToken("providerId", refreshToken));
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
     }
 
     private String createAccessToken(String secret) {
         JwtFactory jwtFactory = new JwtFactory(redisTemplate);
         ReflectionTestUtils.setField(jwtFactory, "SECRET", secret);
         return jwtFactory.accessToken(TestEntityFactory.user(1L, "tester"));
+    }
+
+    private String createRefreshToken(String secret) {
+        JwtFactory jwtFactory = new JwtFactory(redisTemplate);
+        ReflectionTestUtils.setField(jwtFactory, "SECRET", secret);
+        return jwtFactory.refreshToken();
     }
 }

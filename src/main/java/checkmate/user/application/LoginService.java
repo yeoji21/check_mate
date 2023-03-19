@@ -38,7 +38,8 @@ public class LoginService {
 
     @Transactional
     public LoginResponse reissueToken(TokenReissueCommand command) {
-        String providerId = jwtVerifier.verifyRefeshToken(command.accessToken(), command.refreshToken());
+        String providerId = jwtVerifier.parseProviderId(command.accessToken());
+        jwtVerifier.verifyRefeshToken(providerId, command.refreshToken());
         User user = userRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return toLoginTokenResponse(jwtFactory.createLoginToken(user));

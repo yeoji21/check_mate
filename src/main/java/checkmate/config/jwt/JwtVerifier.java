@@ -30,10 +30,8 @@ public class JwtVerifier {
             throw new BusinessException(ErrorCode.TOKEN_VERIFY_FAIL);
         }
     }
-
-    // TODO: 2023/03/20 TEST
-    public String verifyRefeshToken(String accessToken, String refreshToken) {
-        String providerId = getProviderId(accessToken);
+    
+    public void verifyRefeshToken(String providerId, String refreshToken) {
         Optional<String> findRefreshToken = Optional.ofNullable(redisTemplate.opsForValue().get(providerId));
         findRefreshToken.ifPresentOrElse(
                 findToken -> {
@@ -43,10 +41,9 @@ public class JwtVerifier {
                 () -> {
                     throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
                 });
-        return providerId;
     }
 
-    private String getProviderId(String accessToken) {
+    public String parseProviderId(String accessToken) {
         return JWT.decode(accessToken).getClaim("providerId").asString();
     }
 }

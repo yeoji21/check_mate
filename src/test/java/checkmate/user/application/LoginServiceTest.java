@@ -25,6 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -93,8 +94,9 @@ class LoginServiceTest {
                 .accessToken("accessToken")
                 .refreshToken("refreshToken")
                 .build();
+        String providerId = "providerId";
 
-        given(jwtVerifier.verifyRefeshToken(command.accessToken(), command.refreshToken())).willReturn("providerId");
+        given(jwtVerifier.parseProviderId(anyString())).willReturn(providerId);
         given(userRepository.findByProviderId(any())).willReturn(Optional.ofNullable(user));
         given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 
@@ -102,6 +104,7 @@ class LoginServiceTest {
         LoginResponse loginResponse = loginService.reissueToken(command);
 
         //then
+        verify(jwtVerifier).verifyRefeshToken(providerId, command.refreshToken());
         assertThat(loginResponse.accessToken()).isNotNull();
         assertThat(loginResponse.refreshToken()).isNotNull();
     }
