@@ -28,6 +28,7 @@ public enum ErrorCode {
     DATA_INTEGRITY_VIOLATE(CommonCode.DATA_INTEGTITY.getCode(), BAD_REQUEST, "데이터 무결성을 위반한 경우"),
     POST_LIKES_UPDATE(PostCode.LIKES_CONDITION.getCode(), BAD_REQUEST, "게시글 좋아요를 수정할 수 없는 경우"),
     UNAUTHORIZED_OPERATION(CommonCode.UNAUTHORIZED_OPERATION.getCode(), BAD_REQUEST, "허가되지 않은 작업을 시도한 경우"),
+    TOKEN_VERIFY_FAIL(CommonCode.TOKEN_VERIFY.getCode(), BAD_REQUEST, "토큰 검증에 실패한 경우"),
 
     // 404 NOT_FOUND : Resource를 찾을 수 없음
     USER_NOT_FOUND(UserCode.NOT_FOUND.getCode(), NOT_FOUND, "존재하지 않는 유저"),
@@ -47,6 +48,7 @@ public enum ErrorCode {
     // 503 SERVICE_UNAVAILABLE
     SERVICE_UNAVAILABLE(CommonCode.SERVICE_UNAVAILABLE.getCode(), HttpStatus.SERVICE_UNAVAILABLE, "서비스에 문제가 발생한 경우"),
     ;
+
 
     private final String code;
     private final HttpStatus status;

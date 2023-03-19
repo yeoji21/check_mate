@@ -1,8 +1,8 @@
 package checkmate.user.application;
 
 import checkmate.TestEntityFactory;
-import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
+import checkmate.config.jwt.JwtVerifier;
 import checkmate.config.jwt.LoginToken;
 import checkmate.exception.NotFoundException;
 import checkmate.user.application.dto.request.SnsLoginCommand;
@@ -33,7 +33,7 @@ class LoginServiceTest {
     @Mock
     private JwtFactory jwtFactory;
     @Mock
-    private JwtDecoder jwtDecoder;
+    private JwtVerifier jwtVerifier;
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -94,7 +94,7 @@ class LoginServiceTest {
                 .refreshToken("refreshToken")
                 .build();
 
-        given(jwtDecoder.validateRefeshToken(command.accessToken(), command.refreshToken())).willReturn("providerId");
+        given(jwtVerifier.verifyRefeshToken(command.accessToken(), command.refreshToken())).willReturn("providerId");
         given(userRepository.findByProviderId(any())).willReturn(Optional.ofNullable(user));
         given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 

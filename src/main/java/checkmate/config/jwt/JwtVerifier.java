@@ -1,6 +1,7 @@
 package checkmate.config.jwt;
 
 import checkmate.config.auth.AuthConstants;
+import checkmate.exception.BusinessException;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import com.auth0.jwt.JWT;
@@ -15,19 +16,23 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
-public class JwtDecoder {
+public class JwtVerifier {
     private final RedisTemplate<String, String> redisTemplate;
     @Value("${jwt.secret-key}")
     private String SECRET;
 
     public DecodedJWT verify(String token) {
-        return JWT.require(Algorithm.HMAC512(SECRET))
-                .build()
-                .verify(token);
+        try {
+            return JWT.require(Algorithm.HMAC512(SECRET))
+                    .build()
+                    .verify(token);
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.TOKEN_VERIFY_FAIL);
+        }
     }
 
     // TODO: 2023/03/20 TEST
-    public String validateRefeshToken(String accessToken, String refreshToken) {
+    public String verifyRefeshToken(String accessToken, String refreshToken) {
         String providerId = getProviderId(accessToken);
         Optional<String> findRefreshToken = Optional.ofNullable(redisTemplate.opsForValue().get(providerId));
         findRefreshToken.ifPresentOrElse(

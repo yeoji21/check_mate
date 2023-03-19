@@ -1,7 +1,7 @@
 package checkmate.user.application;
 
-import checkmate.config.jwt.JwtDecoder;
 import checkmate.config.jwt.JwtFactory;
+import checkmate.config.jwt.JwtVerifier;
 import checkmate.config.jwt.LoginToken;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
@@ -25,7 +25,7 @@ import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 public class LoginService {
     private final UserRepository userRepository;
     private final JwtFactory jwtFactory;
-    private final JwtDecoder jwtDecoder;
+    private final JwtVerifier jwtVerifier;
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
@@ -38,7 +38,7 @@ public class LoginService {
 
     @Transactional
     public LoginResponse reissueToken(TokenReissueCommand command) {
-        String providerId = jwtDecoder.validateRefeshToken(command.accessToken(), command.refreshToken());
+        String providerId = jwtVerifier.verifyRefeshToken(command.accessToken(), command.refreshToken());
         User user = userRepository.findByProviderId(providerId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return toLoginTokenResponse(jwtFactory.createLoginToken(user));

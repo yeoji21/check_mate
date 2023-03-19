@@ -27,7 +27,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
-    private final JwtDecoder jwtDecoder;
+    private final JwtVerifier jwtVerifier;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -44,7 +44,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String token = authorizationHeader.replace(AuthConstants.TOKEN_PREFIX.getValue(), "");
         try {
             SecurityContext context = SecurityContextHolder.createEmptyContext();
-            DecodedJWT decodedJWT = jwtDecoder.verify(token);
+            DecodedJWT decodedJWT = jwtVerifier.verify(token);
             JwtUserDetails jwtUserDetails = new JwtUserDetails(decodedJWT);
             Authentication authentication =
                     new UsernamePasswordAuthenticationToken(jwtUserDetails, null, jwtUserDetails.getAuthorities());

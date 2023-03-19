@@ -12,7 +12,8 @@ public enum CommonCode {
     FILE_SIZE("C-004"),
     SERVICE_UNAVAILABLE("C-005"),
     UNAUTHORIZED_OPERATION("C-006"),
-    DATA_INTEGTITY("C-007");
+    DATA_INTEGTITY("C-007"),
+    TOKEN_VERIFY("C-008");
 
     private final String code;
 }
