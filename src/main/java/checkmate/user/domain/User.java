@@ -28,6 +28,7 @@ public class User extends BaseTimeEntity {
     private String emailAddress;
     @Column(name = "password")
     private String password;
+    // TODO: 2023/03/19 회원가입 로직 전환되면 userIdentifier로 변경 예정
     @Column(unique = true, name = "provider_id")
     private String providerId;
     @Column(unique = true, name = "nickname")

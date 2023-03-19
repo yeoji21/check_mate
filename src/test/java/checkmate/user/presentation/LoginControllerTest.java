@@ -6,7 +6,7 @@ import checkmate.user.presentation.dto.request.GoogleLoginDto;
 import checkmate.user.presentation.dto.request.KakaoLoginDto;
 import checkmate.user.presentation.dto.request.NaverLoginDto;
 import checkmate.user.presentation.dto.request.TokenReissueDto;
-import checkmate.user.presentation.dto.response.LoginTokenResponse;
+import checkmate.user.presentation.dto.response.LoginResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -33,7 +33,7 @@ class LoginControllerTest extends ControllerTest {
     @DisplayName("로그인 토큰 재발급 API")
     void tokenReissue() throws Exception {
         TokenReissueDto dto = getTokenReissueDto();
-        LoginTokenResponse response = getLoginTokenResponse();
+        LoginResponse response = getLoginTokenResponse();
         given(loginService.reissueToken(any())).willReturn(response);
 
         mockMvc.perform(post("/login/reissue")
@@ -65,7 +65,7 @@ class LoginControllerTest extends ControllerTest {
     @DisplayName("구글 로그인 API")
     void loginGoogle() throws Exception {
         GoogleLoginDto loginDto = new GoogleLoginDto("providerId", "test FcmToken");
-        LoginTokenResponse response = createLoginTokenResponse();
+        LoginResponse response = createLoginTokenResponse();
 
         given(loginService.login(any())).willReturn(response);
 
@@ -85,7 +85,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     void 네이버_로그인_성공_테스트() throws Exception {
         NaverLoginDto loginDto = new NaverLoginDto("providerId", "test FcmToken");
-        LoginTokenResponse response = createLoginTokenResponse();
+        LoginResponse response = createLoginTokenResponse();
 
         when(loginService.login(any())).thenReturn(response);
 
@@ -105,7 +105,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     void 카카오_로그인_성공_테스트() throws Exception {
         KakaoLoginDto loginDto = new KakaoLoginDto("providerId", "testFcmToken");
-        LoginTokenResponse response = createLoginTokenResponse();
+        LoginResponse response = createLoginTokenResponse();
 
         given(loginService.login(any())).willReturn(response);
 
@@ -141,8 +141,8 @@ class LoginControllerTest extends ControllerTest {
         );
     }
 
-    private LoginTokenResponse createLoginTokenResponse() {
-        return LoginTokenResponse.builder()
+    private LoginResponse createLoginTokenResponse() {
+        return LoginResponse.builder()
                 .accessToken("testAccessToken")
                 .refreshToken("testRefreshToken")
                 .build();
@@ -154,8 +154,8 @@ class LoginControllerTest extends ControllerTest {
                 fieldWithPath("accessToken").type(JsonFieldType.STRING).description("기존 access token"));
     }
 
-    private LoginTokenResponse getLoginTokenResponse() {
-        return LoginTokenResponse.builder()
+    private LoginResponse getLoginTokenResponse() {
+        return LoginResponse.builder()
                 .refreshToken("after refresh token")
                 .accessToken("after access token")
                 .build();
