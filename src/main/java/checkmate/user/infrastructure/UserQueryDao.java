@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.mate.domain.QMate.mate;
+import static checkmate.user.domain.QUser.user;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
 @RequiredArgsConstructor
@@ -24,5 +25,12 @@ public class UserQueryDao {
                         goal.status.eq(GoalStatus.ONGOING))
                 .fetchOne()
                 .intValue();
+    }
+
+    public boolean isExistsNickname(String nickname) {
+        return queryFactory.select(user.id)
+                .from(user)
+                .where(user.nickname.eq(nickname))
+                .fetchOne() != null;
     }
 }
