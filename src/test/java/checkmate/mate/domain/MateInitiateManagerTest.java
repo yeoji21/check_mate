@@ -6,6 +6,7 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
+import checkmate.user.infrastructure.UserQueryDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,6 +24,8 @@ import static org.mockito.BDDMockito.given;
 class MateInitiateManagerTest {
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserQueryDao userQueryDao;
     @InjectMocks
     private MateInitiateManager mateInitiateManager;
 
@@ -32,7 +35,7 @@ class MateInitiateManagerTest {
         //given
         Mate mate = createMate();
         mate.toWaitingStatus();
-        given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
+        given(userQueryDao.countOngoingGoals(any(Long.class))).willReturn(1);
 
         //when
         MateStatus before = mate.getStatus();
@@ -49,7 +52,7 @@ class MateInitiateManagerTest {
     void initiate_ongoing_count_fail() throws Exception {
         //given
         Mate mate = createMate();
-        given(userRepository.countOngoingGoals(any(Long.class))).willReturn(10);
+        given(userQueryDao.countOngoingGoals(any(Long.class))).willReturn(10);
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
@@ -63,7 +66,7 @@ class MateInitiateManagerTest {
         //given
         Mate mate = createMate();
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
-        given(userRepository.countOngoingGoals(any(Long.class))).willReturn(1);
+        given(userQueryDao.countOngoingGoals(any(Long.class))).willReturn(1);
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,

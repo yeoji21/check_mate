@@ -52,6 +52,11 @@ public class UserController {
         userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
     }
 
+    /**
+     * 백오피스 전용 회원 삭제 API
+     *
+     * @param nickname - 삭제할 회원의 닉네임
+     */
     @DeleteMapping("/users/{nickname}")
     public void delete(@PathVariable String nickname) {
         userCommandService.delete(nickname);

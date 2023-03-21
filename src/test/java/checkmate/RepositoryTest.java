@@ -17,6 +17,7 @@ import checkmate.post.infrastructure.ImageJpaRepository;
 import checkmate.post.infrastructure.PostJpaRepository;
 import checkmate.post.infrastructure.PostQueryDao;
 import checkmate.user.infrastructure.UserJpaRepository;
+import checkmate.user.infrastructure.UserQueryDao;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,8 @@ import javax.persistence.EntityManager;
         GoalJpaRepository.class,
         PostQueryDao.class,
         NotificationQueryDao.class,
-        UserJpaRepository.class
+        UserJpaRepository.class,
+        UserQueryDao.class
 })
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
@@ -68,4 +70,6 @@ public abstract class RepositoryTest {
     protected NotificationQueryDao notificationQueryDao;
     @Autowired
     protected UserJpaRepository userRepository;
+    @Autowired
+    protected UserQueryDao userQueryDao;
 }
