@@ -5,19 +5,18 @@ import checkmate.config.jwt.JwtFactory;
 import checkmate.config.jwt.JwtVerifier;
 import checkmate.config.jwt.LoginToken;
 import checkmate.exception.NotFoundException;
+import checkmate.exception.code.ErrorCode;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.presentation.dto.response.LoginResponse;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Optional;
 
@@ -36,79 +35,67 @@ class LoginServiceTest {
     private JwtVerifier jwtVerifier;
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private RedisTemplate<String, String> redisTemplate;
     @InjectMocks
     private LoginService loginService;
-    private User user;
-
-    @BeforeEach
-    void setUp() {
-        user = TestEntityFactory.user(1L, "tester");
-        user.updateFcmToken("fcm token");
-    }
 
     @Test
-    void 로그인_성공_테스트() throws Exception {
+    @DisplayName("로그인 성공")
+    void login() throws Exception {
         //given
+        User user = createUser();
         LoginToken loginToken = createLoginToken();
+        SnsLoginCommand command = createLoginCommand(user);
         given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.of(user));
         given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 
         //when
-        LoginResponse response = loginService.login(new SnsLoginCommand("id", "fcmToken"));
+        LoginResponse response = loginService.login(command);
 
         //then
-        assertThat(response).isInstanceOf(LoginResponse.class);
-        assertThat(response.accessToken()).isNotBlank();
-        assertThat(response.refreshToken()).isNotBlank();
-    }
-
-    private LoginToken createLoginToken() {
-        return LoginToken.builder()
-                .accessToken("accessToken")
-                .refreshToken("refreshToken")
-                .build();
+        assertThat(response.accessToken()).startsWith("Bearer ");
+        assertThat(response.refreshToken()).startsWith("Bearer ");
     }
 
     @Test
-    void 로그인_처음인_회원_테스트() throws Exception {
+    @DisplayName("로그인 실패 - 회원이 아닌 경우")
+    void login_not_exist() throws Exception {
         //given
+        User user = createUser();
+        SnsLoginCommand command = createLoginCommand(user);
         given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.empty());
 
         //when
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> loginService.login(command));
 
         //then
-        assertThrows(NotFoundException.class, () -> loginService.login(new SnsLoginCommand("id", "fcmToken")));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
     }
 
     @Test
     @DisplayName("토큰 재발급 테스트")
     void reissueToken() throws Exception {
         //given
-        LoginToken loginToken = createLoginToken();
-        TokenReissueCommand command = TokenReissueCommand.builder()
-                .accessToken("accessToken")
-                .refreshToken("refreshToken")
-                .build();
-        String providerId = "providerId";
+        User user = createUser();
+        TokenReissueCommand command = createTokenReissueCommand();
 
-        given(jwtVerifier.parseProviderId(anyString())).willReturn(providerId);
+        given(jwtVerifier.parseProviderId(anyString())).willReturn(user.getProviderId());
         given(userRepository.findByProviderId(any())).willReturn(Optional.ofNullable(user));
-        given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
+        given(jwtFactory.createLoginToken(any(User.class))).willReturn(createLoginToken());
 
         //when
-        LoginResponse loginResponse = loginService.reissueToken(command);
+        LoginResponse response = loginService.reissueToken(command);
 
         //then
-        verify(jwtVerifier).verifyRefeshToken(providerId, command.refreshToken());
-        assertThat(loginResponse.accessToken()).isNotNull();
-        assertThat(loginResponse.refreshToken()).isNotNull();
+        verify(jwtVerifier).verifyRefeshToken(user.getProviderId(), command.refreshToken());
+        assertThat(response.accessToken()).isNotNull();
+        assertThat(response.refreshToken()).isNotNull();
     }
 
     @Test
-    void 로그아웃_테스트() throws Exception {
+    @DisplayName("로그아웃")
+    void logout() throws Exception {
         //given
+        User user = createUser();
         given(userRepository.findById(any(Long.class))).willReturn(Optional.ofNullable(user));
 
         //when
@@ -116,5 +103,27 @@ class LoginServiceTest {
 
         //then
         verify(jwtVerifier).expireRefreshToken(user.getProviderId());
+    }
+
+    private TokenReissueCommand createTokenReissueCommand() {
+        return TokenReissueCommand.builder()
+                .accessToken("Bearer accessToken")
+                .refreshToken("Bearer refreshToken")
+                .build();
+    }
+
+    private User createUser() {
+        return TestEntityFactory.user(1L, "tester");
+    }
+
+    private SnsLoginCommand createLoginCommand(User user) {
+        return new SnsLoginCommand(user.getProviderId(), user.getFcmToken());
+    }
+
+    private LoginToken createLoginToken() {
+        return LoginToken.builder()
+                .accessToken("Bearer accessToken")
+                .refreshToken("Bearer refreshToken")
+                .build();
     }
 }

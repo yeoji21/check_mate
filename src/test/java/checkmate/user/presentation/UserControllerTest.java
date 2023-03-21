@@ -61,20 +61,8 @@ class UserControllerTest extends ControllerTest {
     @Test
     @DisplayName("회원 가입 API")
     void signUp() throws Exception {
-        UserSignUpDto dto = UserSignUpDto.builder()
-                .userIdentifier("userIdentifier")
-                .username("여지원")
-                .nickname("yeoz1")
-                .emailAddress("test@naverLogin.com")
-                .build();
-
-        UserSignUpCommand command = UserSignUpCommand.builder()
-                .providerId(dto.getUserIdentifier())
-                .nickname(dto.getNickname())
-                .emailAddress(dto.getEmailAddress())
-                .username(dto.getUsername())
-                .build();
-
+        UserSignUpDto dto = createUserSignUpDto();
+        UserSignUpCommand command = createUserSignUpCommand(dto);
         given(userDtoMapper.toCommand(any(UserSignUpDto.class))).willReturn(command);
 
         mockMvc.perform(post("/users")
@@ -162,6 +150,24 @@ class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userCommandService).signUp(any(UserSignUpCommand.class));
+    }
+
+    private UserSignUpCommand createUserSignUpCommand(UserSignUpDto dto) {
+        return UserSignUpCommand.builder()
+                .providerId(dto.getUserIdentifier())
+                .nickname(dto.getNickname())
+                .emailAddress(dto.getEmailAddress())
+                .username(dto.getUsername())
+                .build();
+    }
+
+    private UserSignUpDto createUserSignUpDto() {
+        return UserSignUpDto.builder()
+                .userIdentifier("userIdentifier")
+                .username("여지원")
+                .nickname("yeoz1")
+                .emailAddress("test@naverLogin.com")
+                .build();
     }
 
     private RequestFieldsSnippet signUpRequestFieldsSnippet() {

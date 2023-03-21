@@ -32,8 +32,8 @@ class LoginControllerTest extends ControllerTest {
     @Test
     @DisplayName("로그인 토큰 재발급 API")
     void tokenReissue() throws Exception {
-        TokenReissueDto dto = getTokenReissueDto();
-        LoginResponse response = getLoginTokenResponse();
+        TokenReissueDto dto = createTokenReissueDto();
+        LoginResponse response = createLoginResponse();
         given(loginService.reissueToken(any())).willReturn(response);
 
         mockMvc.perform(post("/login/reissue")
@@ -50,13 +50,14 @@ class LoginControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
-    @DisplayName("로그아웃 API")
+    @DisplayName("로그아웃")
     void logout() throws Exception {
         mockMvc.perform(delete("/login/logout")
                         .contentType(APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(document("logout"));
+
         verify(loginService).logout(any(Long.class));
     }
 
@@ -65,7 +66,7 @@ class LoginControllerTest extends ControllerTest {
     @DisplayName("구글 로그인 API")
     void loginGoogle() throws Exception {
         GoogleLoginDto loginDto = new GoogleLoginDto("providerId", "test FcmToken");
-        LoginResponse response = createLoginTokenResponse();
+        LoginResponse response = createLoginResponse();
 
         given(loginService.login(any())).willReturn(response);
 
@@ -85,7 +86,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     void 네이버_로그인_성공_테스트() throws Exception {
         NaverLoginDto loginDto = new NaverLoginDto("providerId", "test FcmToken");
-        LoginResponse response = createLoginTokenResponse();
+        LoginResponse response = createLoginResponse();
 
         when(loginService.login(any())).thenReturn(response);
 
@@ -105,7 +106,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     void 카카오_로그인_성공_테스트() throws Exception {
         KakaoLoginDto loginDto = new KakaoLoginDto("providerId", "testFcmToken");
-        LoginResponse response = createLoginTokenResponse();
+        LoginResponse response = createLoginResponse();
 
         given(loginService.login(any())).willReturn(response);
 
@@ -141,10 +142,10 @@ class LoginControllerTest extends ControllerTest {
         );
     }
 
-    private LoginResponse createLoginTokenResponse() {
+    private LoginResponse createLoginResponse() {
         return LoginResponse.builder()
-                .accessToken("testAccessToken")
-                .refreshToken("testRefreshToken")
+                .accessToken("Bearer accessToken")
+                .refreshToken("Bearer refreshToken")
                 .build();
     }
 
@@ -154,17 +155,10 @@ class LoginControllerTest extends ControllerTest {
                 fieldWithPath("accessToken").type(JsonFieldType.STRING).description("기존 access token"));
     }
 
-    private LoginResponse getLoginTokenResponse() {
-        return LoginResponse.builder()
-                .refreshToken("after refresh token")
-                .accessToken("after access token")
-                .build();
-    }
-
-    private TokenReissueDto getTokenReissueDto() {
+    private TokenReissueDto createTokenReissueDto() {
         return TokenReissueDto.builder()
-                .refreshToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJleHAiOjE2NTI2MTE2MTF9.Hj9kuCtbxEQSdXgtGhKf0PnaXBNw4vtzeZ49fm24dREbRF7mOOw634ykk6aO0VjeuinikNVMI0xP5zURZj93OA")
-                .accessToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLsl6zsp4Dsm5AiLCJhdXRoIjoiUk9MRV9VU0VSIiwicHJvdmlkZXJJZCI6IktBS0FPXzIwODcxNjM5NzUiLCJuaWNrbmFtZSI6IuynhOuLrOuemCIsImlkIjoxMiwiZXhwIjoxNjUxMjE4MjMzfQ.3_oRpdYdy4dHr9myPS8a032BNS0Acjt9SAqJ3E0yvWU19NFUN9nOQSZWge4cxX5kWucoZ-AAPKDnzcEzyfDEQA")
+                .refreshToken("Bearer accessToken")
+                .accessToken("Bearer refreshToken")
                 .build();
     }
 }
