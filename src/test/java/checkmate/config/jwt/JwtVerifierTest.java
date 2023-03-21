@@ -3,6 +3,7 @@ package checkmate.config.jwt;
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.user.domain.User;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -108,6 +109,19 @@ class JwtVerifierTest {
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+    }
+
+    @Test
+    @DisplayName("refresh token 만료")
+    void expireRefreshToken() throws Exception {
+        //given
+        User user = TestEntityFactory.user(1L, "user");
+
+        //when
+        jwtVerifier.expireRefreshToken(user.getProviderId());
+
+        //then
+        verify(redisTemplate).delete(user.getProviderId());
     }
 
     private String createAccessToken(String secret) {

@@ -83,11 +83,7 @@ class UserControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andDo(document("user-sign-up",
-                        requestFields(
-                                fieldWithPath("userIdentifier").type(JsonFieldType.STRING).description("유저 식별자"),
-                                fieldWithPath("username").type(JsonFieldType.STRING).description("유저의 이름"),
-                                fieldWithPath("emailAddress").type(JsonFieldType.STRING).description("유저의 이메일"),
-                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저의 닉네임"))
+                        signUpRequestFieldsSnippet()
                 ));
 
         verify(userCommandService).signUp(any(UserSignUpCommand.class));
@@ -166,6 +162,14 @@ class UserControllerTest extends ControllerTest {
                 ));
 
         verify(userCommandService).signUp(any(UserSignUpCommand.class));
+    }
+
+    private RequestFieldsSnippet signUpRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("userIdentifier").type(JsonFieldType.STRING).description("유저 식별자"),
+                fieldWithPath("username").type(JsonFieldType.STRING).description("유저의 이름"),
+                fieldWithPath("emailAddress").type(JsonFieldType.STRING).description("유저의 이메일"),
+                fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저의 닉네임"));
     }
 
     private RequestParametersSnippet nicknameCheckRequestParametersSnippet() {

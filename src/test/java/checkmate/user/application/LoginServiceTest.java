@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.Optional;
 
@@ -39,8 +38,6 @@ class LoginServiceTest {
     private UserRepository userRepository;
     @Mock
     private RedisTemplate<String, String> redisTemplate;
-    @Mock
-    private ValueOperations<String, String> valueOperations;
     @InjectMocks
     private LoginService loginService;
     private User user;
@@ -118,6 +115,6 @@ class LoginServiceTest {
         loginService.logout(user.getId());
 
         //then
-        verify(redisTemplate).delete(user.getProviderId());
+        verify(jwtVerifier).expireRefreshToken(user.getProviderId());
     }
 }

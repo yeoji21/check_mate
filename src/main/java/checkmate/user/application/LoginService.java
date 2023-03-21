@@ -12,7 +12,6 @@ import checkmate.user.domain.UserRepository;
 import checkmate.user.presentation.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +25,6 @@ public class LoginService {
     private final UserRepository userRepository;
     private final JwtFactory jwtFactory;
     private final JwtVerifier jwtVerifier;
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public LoginResponse login(SnsLoginCommand snsLoginCommand) {
@@ -45,11 +43,12 @@ public class LoginService {
         return toLoginTokenResponse(jwtFactory.createLoginToken(user));
     }
 
+    // TODO: 2023/03/21 logout 요청 시 token 검증 필요한지 고려
     @Transactional
     public void logout(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
-        redisTemplate.delete(user.getProviderId());
+        jwtVerifier.expireRefreshToken(user.getProviderId());
     }
 
     private LoginResponse toLoginTokenResponse(LoginToken loginToken) {

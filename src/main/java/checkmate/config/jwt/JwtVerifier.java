@@ -33,14 +33,17 @@ public class JwtVerifier {
     
     public void verifyRefeshToken(String providerId, String refreshToken) {
         Optional<String> findRefreshToken = Optional.ofNullable(redisTemplate.opsForValue().get(providerId));
-        findRefreshToken.ifPresentOrElse(
-                findToken -> {
+        findRefreshToken.ifPresentOrElse(findToken -> {
                     if (!findToken.equals(AuthConstants.TOKEN_PREFIX.getValue() + refreshToken))
                         throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
                 },
                 () -> {
                     throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
                 });
+    }
+
+    public void expireRefreshToken(String providerId) {
+        redisTemplate.delete(providerId);
     }
 
     public String parseProviderId(String accessToken) {
