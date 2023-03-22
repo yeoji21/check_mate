@@ -5,11 +5,13 @@ import checkmate.goal.domain.GoalCategory;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 
+import java.io.Serializable;
+
 public record OngoingGoalInfo(
         long id,
         GoalCategory category,
         String title,
-        String weekDays) {
+        String weekDays) implements Serializable {
     @Builder
     @QueryProjection
     public OngoingGoalInfo {

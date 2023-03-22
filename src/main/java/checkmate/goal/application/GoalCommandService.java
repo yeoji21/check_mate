@@ -90,6 +90,7 @@ public class GoalCommandService {
         cacheHandler.deleteMateCaches(mates);
     }
 
+    // TODO: 2023/03/22 mapper로 이동
     private List<CompleteGoalNotificationDto> toDtos(List<Mate> mates) {
         return mates.stream().map(
                 tm -> CompleteGoalNotificationDto.builder()

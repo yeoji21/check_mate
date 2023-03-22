@@ -6,11 +6,12 @@ import checkmate.goal.domain.GoalCheckDays;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 
 @Getter
-public class TodayGoalInfo {
+public class TodayGoalInfo implements Serializable {
     private long id;
     private GoalCategory category;
     private String title;

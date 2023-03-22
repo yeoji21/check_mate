@@ -7,10 +7,11 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
-public class GoalScheduleInfo {
+public class GoalScheduleInfo implements Serializable {
     private LocalDate startDate;
     private LocalDate endDate;
     private String schedule;
@@ -25,6 +26,7 @@ public class GoalScheduleInfo {
         this.schedule = createGoal(startDate, endDate, weekDays).getSchedule();
     }
 
+    // TODO: 2023/03/22 개선 고려
     private Goal createGoal(LocalDate startDate, LocalDate endDate, int weekDays) {
         return Goal.builder()
                 .checkDays(new GoalCheckDays(weekDays))
