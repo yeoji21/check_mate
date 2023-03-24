@@ -16,15 +16,9 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.ContentCachingRequestWrapper;
-import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolationException;
-import java.io.UnsupportedEncodingException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -108,31 +102,5 @@ public class GlobalExceptionAdvice {
     protected ResponseEntity<ErrorResponse> dataIntegrityViolationException(DataIntegrityViolationException e, HttpServletRequest request) {
         log.warn(request.getMethod() + " - " + request.getRequestURI() + " [handleAuthorityException] : {}", e.getMessage());
         return ErrorResponse.toResponseEntity(ErrorCode.DATA_INTEGRITY_VIOLATE);
-    }
-
-    private Map<String, Object> getHeaders(HttpServletRequest request) {
-        Map<String, Object> headerMap = new HashMap<>();
-
-        Enumeration<String> headerArray = request.getHeaderNames();
-        while (headerArray.hasMoreElements()) {
-            String headerName = headerArray.nextElement();
-            headerMap.put(headerName, request.getHeader(headerName));
-        }
-        return headerMap;
-    }
-
-    private String getRequestBody(ContentCachingRequestWrapper request) {
-        ContentCachingRequestWrapper wrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
-        if (wrapper != null) {
-            byte[] buf = wrapper.getContentAsByteArray();
-            if (buf.length > 0) {
-                try {
-                    return new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
-                } catch (UnsupportedEncodingException e) {
-                    return " - ";
-                }
-            }
-        }
-        return " - ";
     }
 }
