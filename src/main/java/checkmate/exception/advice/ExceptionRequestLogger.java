@@ -1,7 +1,10 @@
 package checkmate.exception.advice;
 
+import checkmate.exception.ErrorResponse;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.WebUtils;
 
@@ -10,14 +13,31 @@ import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @UtilityClass
 public class ExceptionRequestLogger {
-    public static void logging(Exception e, HttpServletRequest request) {
-        log.warn(request.getMethod() + " - " + request.getRequestURI() + " [exception - {}] -> {}", e.getClass().getSimpleName(), e.getMessage());
-        log.warn("header " + getHeaders(request));
-        log.warn("body " + getRequestBody((ContentCachingRequestWrapper) request));
+    public static void logging(ResponseEntity<ErrorResponse> response, Exception e, HttpServletRequest request) {
+        StringBuilder logBuilder = new StringBuilder();
+        logBuilder.append(request.getMethod()).append("-").append(request.getRequestURI()).append("\n");
+        logBuilder.append("[" + e.getClass().getSimpleName() + "] -> ").append(getExceptionMessage(e)).append("\n");
+        logBuilder.append(response.getBody()).append("\n");
+        logBuilder.append(getHeaders(request)).append("\n");
+        logBuilder.append(getRequestBody((ContentCachingRequestWrapper) request));
+        log.warn(logBuilder.toString());
+    }
+
+    private static String getExceptionMessage(Exception e) {
+        String message = e.getMessage();
+        if (e.getClass().equals(MethodArgumentNotValidException.class)) {
+            message = ((MethodArgumentNotValidException) e).getBindingResult().getFieldErrors().stream()
+                    .map(err -> err.getDefaultMessage()).collect(Collectors.joining(" and "));
+        }
+        if (message == null) {
+            message = "EMPTY MESSAGE";
+        }
+        return message;
     }
 
     private static Map<String, Object> getHeaders(HttpServletRequest request) {

@@ -26,4 +26,15 @@ public class ErrorResponse {
                         .message(errorCode.getDetail())
                         .build());
     }
+
+    @Override
+    public String toString() {
+        return "ErrorResponse = {" +
+                "timestamp=" + timestamp +
+                ", status=" + status +
+                ", error='" + error + '\'' +
+                ", code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }

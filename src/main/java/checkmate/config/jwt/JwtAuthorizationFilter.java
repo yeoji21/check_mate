@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+// TODO: 2023/03/24 LOGGING
 @Slf4j
 @Profile("!test")
 @Component
@@ -35,7 +36,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                                     FilterChain chain) throws IOException, ServletException {
         String authorizationHeader = request.getHeader(AuthConstants.HEADER_STRING.getValue());
         log.info("Header Authorization : {}", authorizationHeader);
-
         if (authorizationHeader == null || !authorizationHeader.startsWith(AuthConstants.TOKEN_PREFIX.getValue())) {
             chain.doFilter(request, response);
             return;
