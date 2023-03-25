@@ -46,6 +46,15 @@ public class UserJpaRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByIdentifier(String identifier) {
+        return Optional.ofNullable(
+                queryFactory.selectFrom(user)
+                        .where(user.identifier.eq(identifier))
+                        .fetchOne()
+        );
+    }
+
+    @Override
     public Optional<String> findNicknameById(long userId) {
         return Optional.ofNullable(
                 queryFactory.select(user.nickname)

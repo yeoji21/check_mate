@@ -5,6 +5,7 @@ import checkmate.config.jwt.JwtVerifier;
 import checkmate.config.jwt.LoginToken;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.user.application.dto.request.LoginCommand;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.User;
@@ -27,7 +28,15 @@ public class LoginService {
     private final JwtVerifier jwtVerifier;
 
     @Transactional
-    public LoginResponse login(SnsLoginCommand snsLoginCommand) {
+    public LoginResponse login(LoginCommand loginCommand) {
+        User user = userRepository.findByIdentifier(loginCommand.identifier())
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
+        user.updateFcmToken(loginCommand.fcmToken());
+        return toLoginTokenResponse(jwtFactory.createLoginToken(user));
+    }
+
+    @Transactional
+    public LoginResponse login_v1(SnsLoginCommand snsLoginCommand) {
         User user = userRepository.findByProviderId(snsLoginCommand.providerId())
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         user.updateFcmToken(snsLoginCommand.fcmToken());

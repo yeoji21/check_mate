@@ -2,10 +2,7 @@ package checkmate.user.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
-import checkmate.user.presentation.dto.request.GoogleLoginDto;
-import checkmate.user.presentation.dto.request.KakaoLoginDto;
-import checkmate.user.presentation.dto.request.NaverLoginDto;
-import checkmate.user.presentation.dto.request.TokenReissueDto;
+import checkmate.user.presentation.dto.request.*;
 import checkmate.user.presentation.dto.response.LoginResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +27,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class LoginControllerTest extends ControllerTest {
     @WithMockAuthUser
     @Test
+    @DisplayName("로그인 API")
+    void login() throws Exception {
+        LoginRequestDto loginDto = new LoginRequestDto("identifier", "test fcmToken");
+        LoginResponse response = createLoginResponse();
+
+        given(loginService.login(any())).willReturn(response);
+
+        mockMvc.perform(post("/users/login")
+                        .contentType(APPLICATION_JSON)
+                        .with(csrf())
+                        .content(objectMapper.writeValueAsString(loginDto)))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(response)))
+                .andDo(document("login",
+                        loginRequestFieldsSnippet(),
+                        loginResponseFieldsSnippet()
+                ));
+    }
+
+    @WithMockAuthUser
+    @Test
     @DisplayName("로그인 토큰 재발급 API")
     void tokenReissue() throws Exception {
         TokenReissueDto dto = createTokenReissueDto();
@@ -52,7 +70,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     @DisplayName("로그아웃")
     void logout() throws Exception {
-        mockMvc.perform(delete("/login/logout")
+        mockMvc.perform(delete("/user/logout")
                         .contentType(APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())
@@ -68,7 +86,7 @@ class LoginControllerTest extends ControllerTest {
         GoogleLoginDto loginDto = new GoogleLoginDto("providerId", "test FcmToken");
         LoginResponse response = createLoginResponse();
 
-        given(loginService.login(any())).willReturn(response);
+        given(loginService.login_v1(any())).willReturn(response);
 
         mockMvc.perform(post("/login/google")
                         .contentType(APPLICATION_JSON)
@@ -77,7 +95,10 @@ class LoginControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(document("login-google",
-                        loginRequestFieldsSnippet(),
+                        requestFields(
+                                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
+                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
+                        ),
                         loginResponseFieldsSnippet()
                 ));
     }
@@ -88,7 +109,7 @@ class LoginControllerTest extends ControllerTest {
         NaverLoginDto loginDto = new NaverLoginDto("providerId", "test FcmToken");
         LoginResponse response = createLoginResponse();
 
-        when(loginService.login(any())).thenReturn(response);
+        when(loginService.login_v1(any())).thenReturn(response);
 
         mockMvc.perform(post("/login/naver")
                         .contentType(APPLICATION_JSON)
@@ -97,7 +118,10 @@ class LoginControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(document("login-naver",
-                        loginRequestFieldsSnippet(),
+                        requestFields(
+                                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
+                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
+                        ),
                         loginResponseFieldsSnippet()
                 ));
     }
@@ -108,7 +132,7 @@ class LoginControllerTest extends ControllerTest {
         KakaoLoginDto loginDto = new KakaoLoginDto("providerId", "testFcmToken");
         LoginResponse response = createLoginResponse();
 
-        given(loginService.login(any())).willReturn(response);
+        given(loginService.login_v1(any())).willReturn(response);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/login/kakao").contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginDto))
@@ -116,7 +140,10 @@ class LoginControllerTest extends ControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
                 .andDo(document("login-kakao",
-                        loginRequestFieldsSnippet(),
+                        requestFields(
+                                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
+                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
+                        ),
                         loginResponseFieldsSnippet()
                 ));
     }
@@ -125,13 +152,6 @@ class LoginControllerTest extends ControllerTest {
         return responseFields(
                 fieldWithPath("accessToken").type(JsonFieldType.STRING).description("로그인 성공 후 발급하는 accessToken"),
                 fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("로그인 성공 후 발급하는 refreshToken")
-        );
-    }
-
-    private RequestFieldsSnippet loginRequestFieldsSnippet() {
-        return requestFields(
-                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
-                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
         );
     }
 
@@ -160,5 +180,12 @@ class LoginControllerTest extends ControllerTest {
                 .refreshToken("Bearer accessToken")
                 .accessToken("Bearer refreshToken")
                 .build();
+    }
+
+    private RequestFieldsSnippet loginRequestFieldsSnippet() {
+        return requestFields(
+                fieldWithPath("identifier").type(JsonFieldType.STRING).description("로그인 시도하는 유저 식별자"),
+                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
+        );
     }
 }

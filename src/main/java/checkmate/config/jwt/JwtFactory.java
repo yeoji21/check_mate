@@ -27,7 +27,9 @@ public class JwtFactory {
 
     public LoginToken createLoginToken(User user) {
         String refreshToken = refreshToken();
-        redisTemplate.opsForValue().set(user.getProviderId(), refreshToken, 30, TimeUnit.DAYS);
+        // TODO: 2023/03/25 로그인 로직 통합 후 제거
+        String key = user.getIdentifier() == null ? user.getProviderId() : user.getIdentifier();
+        redisTemplate.opsForValue().set(key, refreshToken, 30, TimeUnit.DAYS);
         return LoginToken.builder()
                 .accessToken(AuthConstants.TOKEN_PREFIX.getValue() + accessToken(user))
                 .refreshToken(AuthConstants.TOKEN_PREFIX.getValue() + refreshToken)

@@ -64,7 +64,7 @@ class UserControllerTest extends ControllerTest {
     void signUp() throws Exception {
         UserSignUpDto dto = createUserSignUpDto();
         UserSignUpCommand command = UserSignUpCommand.builder()
-                .userIdentifier("userIdentifier")
+                .identifier("identifier")
                 .username("username")
                 .emailAddress("email@test.com")
                 .nickname("nickname")
@@ -160,7 +160,7 @@ class UserControllerTest extends ControllerTest {
 
     private SignUpCommand createUserSignUpCommand(UserSignUpDto dto) {
         return SignUpCommand.builder()
-                .providerId(dto.getUserIdentifier())
+                .providerId(dto.getIdentifier())
                 .nickname(dto.getNickname())
                 .emailAddress(dto.getEmailAddress())
                 .username(dto.getUsername())
@@ -169,8 +169,8 @@ class UserControllerTest extends ControllerTest {
 
     private UserSignUpDto createUserSignUpDto() {
         return UserSignUpDto.builder()
-                .userIdentifier("userIdentifier")
-                .username("여지원")
+                .identifier("identifier")
+                .username("username")
                 .nickname("yeoz1")
                 .emailAddress("test@naverLogin.com")
                 .build();
@@ -178,7 +178,7 @@ class UserControllerTest extends ControllerTest {
 
     private RequestFieldsSnippet signUpRequestFieldsSnippet() {
         return requestFields(
-                fieldWithPath("userIdentifier").type(JsonFieldType.STRING).description("유저 식별자"),
+                fieldWithPath("identifier").type(JsonFieldType.STRING).description("유저 식별자"),
                 fieldWithPath("username").type(JsonFieldType.STRING).description("유저의 이름"),
                 fieldWithPath("emailAddress").type(JsonFieldType.STRING).description("유저의 이메일"),
                 fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저의 닉네임"));

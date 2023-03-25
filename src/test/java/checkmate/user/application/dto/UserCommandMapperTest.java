@@ -35,7 +35,7 @@ class UserCommandMapperTest extends MapperTest {
     void toEntity() throws Exception {
         //given
         UserSignUpCommand command = UserSignUpCommand.builder()
-                .userIdentifier("userIdentifier")
+                .identifier("identifier")
                 .username("username")
                 .emailAddress("email@test.com")
                 .nickname("nickname")
@@ -48,6 +48,6 @@ class UserCommandMapperTest extends MapperTest {
         isEqualTo(user.getUsername(), command.username());
         isEqualTo(user.getEmailAddress(), command.emailAddress());
         isEqualTo(user.getNickname(), command.nickname());
-        isEqualTo(user.getUserIdentifier(), command.userIdentifier());
+        isEqualTo(user.getIdentifier(), command.identifier());
     }
 }

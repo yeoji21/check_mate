@@ -11,8 +11,8 @@ import javax.validation.constraints.Size;
 @Getter
 @NoArgsConstructor
 public class UserSignUpDto {
-    @NotBlank(message = "userIdentifier is blank")
-    private String userIdentifier;
+    @NotBlank(message = "identifier is blank")
+    private String identifier;
     @NotBlank(message = "username is blank")
     private String username;
     @Email(message = "invalid emailAddress form")
@@ -22,11 +22,11 @@ public class UserSignUpDto {
     private String nickname;
 
     @Builder
-    public UserSignUpDto(String userIdentifier,
+    public UserSignUpDto(String identifier,
                          String username,
                          String emailAddress,
                          String nickname) {
-        this.userIdentifier = userIdentifier;
+        this.identifier = identifier;
         this.username = username;
         this.emailAddress = emailAddress;
         this.nickname = nickname;

@@ -15,7 +15,7 @@ class UserDtoMapperTest extends MapperTest {
     void userSignUpDto() throws Exception {
         //given
         UserSignUpDto dto = UserSignUpDto.builder()
-                .userIdentifier("userIdentifier")
+                .identifier("identifier")
                 .username("username")
                 .emailAddress("email@test.com")
                 .nickname("nickname")
@@ -28,7 +28,7 @@ class UserDtoMapperTest extends MapperTest {
         isEqualTo(command.username(), dto.getUsername());
         isEqualTo(command.emailAddress(), dto.getEmailAddress());
         isEqualTo(command.nickname(), dto.getNickname());
-        isEqualTo(command.userIdentifier(), dto.getUserIdentifier());
+        isEqualTo(command.identifier(), dto.getIdentifier());
     }
 
     @Test

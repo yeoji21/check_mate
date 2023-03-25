@@ -49,7 +49,7 @@ class LoginServiceTest {
         given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 
         //when
-        LoginResponse response = loginService.login(command);
+        LoginResponse response = loginService.login_v1(command);
 
         //then
         assertThat(response.accessToken()).startsWith("Bearer ");
@@ -65,7 +65,7 @@ class LoginServiceTest {
         given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.empty());
 
         //when
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> loginService.login(command));
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> loginService.login_v1(command));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);

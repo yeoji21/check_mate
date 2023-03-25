@@ -1,20 +1,34 @@
 package checkmate.user.presentation.dto;
 
 import checkmate.MapperTest;
+import checkmate.user.application.dto.request.LoginCommand;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.ProviderIdGenerator;
-import checkmate.user.presentation.dto.request.GoogleLoginDto;
-import checkmate.user.presentation.dto.request.KakaoLoginDto;
-import checkmate.user.presentation.dto.request.NaverLoginDto;
-import checkmate.user.presentation.dto.request.TokenReissueDto;
+import checkmate.user.presentation.dto.request.*;
 import org.junit.jupiter.api.Test;
 
 class LoginDtoMapperTest extends MapperTest {
     private static final LoginDtoMapper mapper = LoginDtoMapper.INSTANCE;
 
     @Test
-    void kakaoLoginDto() throws Exception{
+    void loginRequestDto() throws Exception {
+        //given
+        LoginRequestDto dto = LoginRequestDto.builder()
+                .fcmToken("fcmToken")
+                .identifier("identifier")
+                .build();
+
+        //when
+        LoginCommand command = mapper.toCommand(dto);
+
+        //then
+        isEqualTo(command.fcmToken(), dto.getFcmToken());
+        isEqualTo(command.identifier(), dto.getIdentifier());
+    }
+
+    @Test
+    void kakaoLoginDto() throws Exception {
         //given
         KakaoLoginDto dto = KakaoLoginDto.builder()
                 .fcmToken("fcmToken")
@@ -30,7 +44,7 @@ class LoginDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void naverLoginDto() throws Exception{
+    void naverLoginDto() throws Exception {
         //given
         NaverLoginDto dto = NaverLoginDto.builder()
                 .fcmToken("fcmToken")
@@ -46,7 +60,7 @@ class LoginDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void googleLoginDto() throws Exception{
+    void googleLoginDto() throws Exception {
         //given
         GoogleLoginDto dto = GoogleLoginDto.builder()
                 .fcmToken("fcmToken")
@@ -62,7 +76,7 @@ class LoginDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void tokenReissueCommand() throws Exception{
+    void tokenReissueCommand() throws Exception {
         //given
         TokenReissueDto dto = TokenReissueDto.builder()
                 .accessToken("accessToken")

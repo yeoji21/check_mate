@@ -4,7 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record UserSignUpCommand(
-        String userIdentifier,
+        String identifier,
         String username,
         String emailAddress,
         String nickname) {

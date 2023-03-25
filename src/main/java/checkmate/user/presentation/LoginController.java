@@ -3,10 +3,7 @@ package checkmate.user.presentation;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.LoginService;
 import checkmate.user.presentation.dto.LoginDtoMapper;
-import checkmate.user.presentation.dto.request.GoogleLoginDto;
-import checkmate.user.presentation.dto.request.KakaoLoginDto;
-import checkmate.user.presentation.dto.request.NaverLoginDto;
-import checkmate.user.presentation.dto.request.TokenReissueDto;
+import checkmate.user.presentation.dto.request.*;
 import checkmate.user.presentation.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +23,24 @@ public class LoginController {
     private final LoginService loginService;
     private final LoginDtoMapper loginDtoMapper;
 
+    @PostMapping("/users/login")
+    public LoginResponse login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
+        return loginService.login(loginDtoMapper.toCommand(loginRequestDto));
+    }
+
     @PostMapping("/login/kakao")
     public LoginResponse kakaoLogin(@RequestBody @Valid KakaoLoginDto kakaoLoginDto) {
-        return loginService.login(loginDtoMapper.toCommand(kakaoLoginDto));
+        return loginService.login_v1(loginDtoMapper.toCommand(kakaoLoginDto));
     }
 
     @PostMapping("/login/google")
     public LoginResponse googleLogin(@RequestBody @Valid GoogleLoginDto googleLoginDto) {
-        return loginService.login(loginDtoMapper.toCommand(googleLoginDto));
+        return loginService.login_v1(loginDtoMapper.toCommand(googleLoginDto));
     }
 
     @PostMapping("/login/naver")
     public LoginResponse naverLogin(@RequestBody @Valid NaverLoginDto naverLoginDto) {
-        return loginService.login(loginDtoMapper.toCommand(naverLoginDto));
+        return loginService.login_v1(loginDtoMapper.toCommand(naverLoginDto));
     }
 
     @PostMapping("/login/reissue")
@@ -46,7 +48,7 @@ public class LoginController {
         return loginService.reissueToken(loginDtoMapper.toCommand(tokenReissueDto));
     }
 
-    @DeleteMapping("/login/logout")
+    @DeleteMapping("/user/logout")
     public void logout(@AuthenticationPrincipal JwtUserDetails userDetails) {
         loginService.logout(userDetails.getUserId());
     }

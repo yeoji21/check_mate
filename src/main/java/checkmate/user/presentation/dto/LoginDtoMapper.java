@@ -1,12 +1,10 @@
 package checkmate.user.presentation.dto;
 
+import checkmate.user.application.dto.request.LoginCommand;
 import checkmate.user.application.dto.request.SnsLoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.ProviderIdGenerator;
-import checkmate.user.presentation.dto.request.GoogleLoginDto;
-import checkmate.user.presentation.dto.request.KakaoLoginDto;
-import checkmate.user.presentation.dto.request.NaverLoginDto;
-import checkmate.user.presentation.dto.request.TokenReissueDto;
+import checkmate.user.presentation.dto.request.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -15,6 +13,8 @@ import org.mapstruct.factory.Mappers;
 @Mapper(componentModel = "spring")
 public interface LoginDtoMapper {
     LoginDtoMapper INSTANCE = Mappers.getMapper(LoginDtoMapper.class);
+
+    LoginCommand toCommand(LoginRequestDto loginRequestDto);
 
     @Mapping(target = "providerId", source = "providerId", qualifiedByName = "kakaoId")
     SnsLoginCommand toCommand(KakaoLoginDto kakaoLoginDto);
