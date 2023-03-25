@@ -21,11 +21,6 @@ public class UserController {
     private final UserCommandService userCommandService;
     private final UserDtoMapper userDtoMapper;
 
-    // TODO: 2023/03/18 providerId를 대체할 수 있는 방법 고려
-    // 1. emailAddress를 이용 (emailAddress는 unique)
-    // 2. Ramdom UUID를 이용
-    // 사용자의 emailAddress가 토큰 등에서 노출될 수 있으니 UUID 사용을 고려
-    // 하위 호환성을 위해 완전히 전환되기 전까지 기존 API 유지
     @PostMapping("/users")
     public void signUp(@RequestBody @Valid UserSignUpDto userSignUpDto) {
         userCommandService.signUp(userDtoMapper.toCommand(userSignUpDto));
@@ -33,17 +28,17 @@ public class UserController {
 
     @PostMapping("/users/kakao")
     public void kakaoSignUp(@RequestBody @Valid KakaoSignUpDto kakaoSignUpDto) {
-        userCommandService.signUp(userDtoMapper.toCommand(kakaoSignUpDto));
+        userCommandService.signUp_v1(userDtoMapper.toCommand(kakaoSignUpDto));
     }
 
     @PostMapping("/users/google")
     public void googleSignUp(@RequestBody @Valid GoogleSignUpDto googleSignUpDto) {
-        userCommandService.signUp(userDtoMapper.toCommand(googleSignUpDto));
+        userCommandService.signUp_v1(userDtoMapper.toCommand(googleSignUpDto));
     }
 
     @PostMapping("/users/naver")
     public void naverSignUp(@RequestBody @Valid NaverSignUpDto naverSignUpDto) {
-        userCommandService.signUp(userDtoMapper.toCommand(naverSignUpDto));
+        userCommandService.signUp_v1(userDtoMapper.toCommand(naverSignUpDto));
     }
 
     @PatchMapping("/users/nickname")

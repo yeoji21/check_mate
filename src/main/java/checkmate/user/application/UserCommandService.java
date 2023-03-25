@@ -3,6 +3,7 @@ package checkmate.user.application;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.user.application.dto.UserCommandMapper;
+import checkmate.user.application.dto.request.SignUpCommand;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.domain.User;
@@ -21,6 +22,12 @@ public class UserCommandService {
 
     @Transactional
     public void signUp(UserSignUpCommand command) {
+        User user = userCommandMapper.toEntity(command);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void signUp_v1(SignUpCommand command) {
         User user = userCommandMapper.toEntity(command);
         userRepository.save(user);
     }

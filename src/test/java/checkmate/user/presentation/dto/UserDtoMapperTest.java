@@ -1,20 +1,38 @@
 package checkmate.user.presentation.dto;
 
 import checkmate.MapperTest;
+import checkmate.user.application.dto.request.SignUpCommand;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.domain.ProviderIdGenerator;
-import checkmate.user.presentation.dto.request.GoogleSignUpDto;
-import checkmate.user.presentation.dto.request.KakaoSignUpDto;
-import checkmate.user.presentation.dto.request.NaverSignUpDto;
-import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
+import checkmate.user.presentation.dto.request.*;
 import org.junit.jupiter.api.Test;
 
 class UserDtoMapperTest extends MapperTest {
     private static final UserDtoMapper mapper = UserDtoMapper.INSTANCE;
 
     @Test
-    void kakaoSignUpDto() throws Exception{
+    void userSignUpDto() throws Exception {
+        //given
+        UserSignUpDto dto = UserSignUpDto.builder()
+                .userIdentifier("userIdentifier")
+                .username("username")
+                .emailAddress("email@test.com")
+                .nickname("nickname")
+                .build();
+
+        //when
+        UserSignUpCommand command = mapper.toCommand(dto);
+
+        //then
+        isEqualTo(command.username(), dto.getUsername());
+        isEqualTo(command.emailAddress(), dto.getEmailAddress());
+        isEqualTo(command.nickname(), dto.getNickname());
+        isEqualTo(command.userIdentifier(), dto.getUserIdentifier());
+    }
+
+    @Test
+    void kakaoSignUpDto() throws Exception {
         //given
         KakaoSignUpDto dto = KakaoSignUpDto.builder()
                 .providerId("providerId")
@@ -25,7 +43,7 @@ class UserDtoMapperTest extends MapperTest {
                 .build();
 
         //when
-        UserSignUpCommand command = mapper.toCommand(dto);
+        SignUpCommand command = mapper.toCommand(dto);
 
         //then
         isEqualTo(command.providerId(), ProviderIdGenerator.kakao(dto.getProviderId()));
@@ -36,7 +54,7 @@ class UserDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void naverSignUpDto() throws Exception{
+    void naverSignUpDto() throws Exception {
         //given
         NaverSignUpDto dto = NaverSignUpDto.builder()
                 .providerId("providerId")
@@ -47,7 +65,7 @@ class UserDtoMapperTest extends MapperTest {
                 .build();
 
         //when
-        UserSignUpCommand command = mapper.toCommand(dto);
+        SignUpCommand command = mapper.toCommand(dto);
 
         //then
         isEqualTo(command.providerId(), ProviderIdGenerator.naver(dto.getProviderId()));
@@ -58,7 +76,7 @@ class UserDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void googleSignUpDto() throws Exception{
+    void googleSignUpDto() throws Exception {
         //given
         GoogleSignUpDto dto = GoogleSignUpDto.builder()
                 .providerId("providerId")
@@ -69,7 +87,7 @@ class UserDtoMapperTest extends MapperTest {
                 .build();
 
         //when
-        UserSignUpCommand command = mapper.toCommand(dto);
+        SignUpCommand command = mapper.toCommand(dto);
 
         //then
         isEqualTo(command.providerId(), ProviderIdGenerator.google(dto.getProviderId()));
@@ -80,7 +98,7 @@ class UserDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void userNicknameModifyCommand() throws Exception{
+    void userNicknameModifyCommand() throws Exception {
         //given
         UserNicknameModifyDto dto = new UserNicknameModifyDto("newNickname");
         long userId = 1L;

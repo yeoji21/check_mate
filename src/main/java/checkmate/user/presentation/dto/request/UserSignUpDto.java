@@ -13,13 +13,10 @@ import javax.validation.constraints.Size;
 public class UserSignUpDto {
     @NotBlank(message = "userIdentifier is blank")
     private String userIdentifier;
-
     @NotBlank(message = "username is blank")
     private String username;
-
     @Email(message = "invalid emailAddress form")
     private String emailAddress;
-
     @NotBlank
     @Size(max = 8)
     private String nickname;

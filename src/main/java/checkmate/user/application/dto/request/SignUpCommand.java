@@ -3,9 +3,10 @@ package checkmate.user.application.dto.request;
 import lombok.Builder;
 
 @Builder
-public record UserSignUpCommand(
-        String userIdentifier,
+public record SignUpCommand(
+        String providerId,
         String username,
         String emailAddress,
-        String nickname) {
+        String nickname,
+        String fcmToken) {
 }

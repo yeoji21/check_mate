@@ -2,6 +2,7 @@ package checkmate.user.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
+import checkmate.user.application.dto.request.SignUpCommand;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.presentation.dto.request.*;
@@ -62,7 +63,12 @@ class UserControllerTest extends ControllerTest {
     @DisplayName("회원 가입 API")
     void signUp() throws Exception {
         UserSignUpDto dto = createUserSignUpDto();
-        UserSignUpCommand command = createUserSignUpCommand(dto);
+        UserSignUpCommand command = UserSignUpCommand.builder()
+                .userIdentifier("userIdentifier")
+                .username("username")
+                .emailAddress("email@test.com")
+                .nickname("nickname")
+                .build();
         given(userDtoMapper.toCommand(any(UserSignUpDto.class))).willReturn(command);
 
         mockMvc.perform(post("/users")
@@ -88,7 +94,7 @@ class UserControllerTest extends ControllerTest {
                 .fcmToken("fcmToken")
                 .build();
 
-        given(userDtoMapper.toCommand(any(KakaoSignUpDto.class))).willReturn(UserSignUpCommand.builder().build());
+        given(userDtoMapper.toCommand(any(KakaoSignUpDto.class))).willReturn(SignUpCommand.builder().build());
 
         mockMvc.perform(post("/users/kakao")
                         .with(csrf())
@@ -99,7 +105,7 @@ class UserControllerTest extends ControllerTest {
                         setUserRegisterRequestFields()
                 ));
 
-        verify(userCommandService).signUp(any(UserSignUpCommand.class));
+        verify(userCommandService).signUp_v1(any(SignUpCommand.class));
     }
 
     @WithMockAuthUser
@@ -113,7 +119,7 @@ class UserControllerTest extends ControllerTest {
                 .fcmToken("fcmToken")
                 .build();
 
-        given(userDtoMapper.toCommand(any(GoogleSignUpDto.class))).willReturn(UserSignUpCommand.builder().build());
+        given(userDtoMapper.toCommand(any(GoogleSignUpDto.class))).willReturn(SignUpCommand.builder().build());
 
         mockMvc.perform(post("/users/google")
                         .with(csrf())
@@ -124,7 +130,7 @@ class UserControllerTest extends ControllerTest {
                         setUserRegisterRequestFields()
                 ));
 
-        verify(userCommandService).signUp(any(UserSignUpCommand.class));
+        verify(userCommandService).signUp_v1(any(SignUpCommand.class));
     }
 
     @WithMockAuthUser
@@ -138,7 +144,7 @@ class UserControllerTest extends ControllerTest {
                 .fcmToken("fcmToken")
                 .build();
 
-        given(userDtoMapper.toCommand(any(NaverSignUpDto.class))).willReturn(UserSignUpCommand.builder().build());
+        given(userDtoMapper.toCommand(any(NaverSignUpDto.class))).willReturn(SignUpCommand.builder().build());
 
         mockMvc.perform(post("/users/naver")
                         .with(csrf())
@@ -149,11 +155,11 @@ class UserControllerTest extends ControllerTest {
                         setUserRegisterRequestFields()
                 ));
 
-        verify(userCommandService).signUp(any(UserSignUpCommand.class));
+        verify(userCommandService).signUp_v1(any(SignUpCommand.class));
     }
 
-    private UserSignUpCommand createUserSignUpCommand(UserSignUpDto dto) {
-        return UserSignUpCommand.builder()
+    private SignUpCommand createUserSignUpCommand(UserSignUpDto dto) {
+        return SignUpCommand.builder()
                 .providerId(dto.getUserIdentifier())
                 .nickname(dto.getNickname())
                 .emailAddress(dto.getEmailAddress())

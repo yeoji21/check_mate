@@ -2,8 +2,8 @@ package checkmate.user.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.user.application.dto.UserCommandMapper;
+import checkmate.user.application.dto.request.SignUpCommand;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
-import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -34,9 +34,9 @@ class UserCommandServiceTest {
     @DisplayName("회원 가입")
     void signUp() throws Exception {
         //given
-        UserSignUpCommand command = createUserSignUpCommand();
+        SignUpCommand command = createUserSignUpCommand();
         User user = createUser(command);
-        given(userCommandMapper.toEntity(any(UserSignUpCommand.class))).willReturn(user);
+        given(userCommandMapper.toEntity(any(SignUpCommand.class))).willReturn(user);
         doAnswer((invocation) -> {
             User argument = (User) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "id", 1L);
@@ -44,7 +44,7 @@ class UserCommandServiceTest {
         }).when(userRepository).save(any(User.class));
 
         //when
-        userRegisterService.signUp(command);
+        userRegisterService.signUp_v1(command);
 
         //then
         assertThat(user.getId()).isEqualTo(1L);
@@ -69,7 +69,7 @@ class UserCommandServiceTest {
         return TestEntityFactory.user(1L, "user");
     }
 
-    private User createUser(UserSignUpCommand command) {
+    private User createUser(SignUpCommand command) {
         return User.builder()
                 .providerId(command.providerId())
                 .username(command.username())
@@ -78,8 +78,8 @@ class UserCommandServiceTest {
                 .build();
     }
 
-    private UserSignUpCommand createUserSignUpCommand() {
-        return UserSignUpCommand.builder()
+    private SignUpCommand createUserSignUpCommand() {
+        return SignUpCommand.builder()
                 .providerId("providerId")
                 .username("여지원")
                 .nickname("yeoz1")

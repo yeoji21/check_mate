@@ -28,9 +28,13 @@ public class User extends BaseTimeEntity {
     private String emailAddress;
     @Column(name = "password")
     private String password;
-    // TODO: 2023/03/19 회원가입 로직 전환되면 userIdentifier로 변경 예정
+    @Column(unique = true, name = "user_identifier")
+    private String userIdentifier;
+
+    // TODO: 2023/03/19 회원가입 로직 전환되면 제거 예정
     @Column(unique = true, name = "provider_id")
     private String providerId;
+
     @Column(unique = true, name = "nickname")
     private String nickname;
     @NotNull
@@ -47,6 +51,7 @@ public class User extends BaseTimeEntity {
                    String nickname,
                    String password,
                    String providerId,
+                   String userIdentifier,
                    String fcmToken) {
         this.username = username;
         this.emailAddress = emailAddress;
@@ -54,6 +59,7 @@ public class User extends BaseTimeEntity {
         this.password = password;
         this.providerId = providerId;
         this.role = UserRole.USER.getRole();
+        this.userIdentifier = userIdentifier;
         this.fcmToken = fcmToken;
     }
 

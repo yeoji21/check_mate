@@ -1,5 +1,6 @@
 package checkmate.user.presentation.dto;
 
+import checkmate.user.application.dto.request.SignUpCommand;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
 import checkmate.user.domain.ProviderIdGenerator;
@@ -14,7 +15,7 @@ public interface UserDtoMapper {
     UserDtoMapper INSTANCE = Mappers.getMapper(UserDtoMapper.class);
 
     @Mapping(target = "providerId", source = "providerId", qualifiedByName = "kakaoId")
-    UserSignUpCommand toCommand(KakaoSignUpDto kakaoSignUpDto);
+    SignUpCommand toCommand(KakaoSignUpDto kakaoSignUpDto);
 
     @Named("kakaoId")
     default String kakaoId(String providerId) {
@@ -22,7 +23,7 @@ public interface UserDtoMapper {
     }
 
     @Mapping(target = "providerId", source = "providerId", qualifiedByName = "googleId")
-    UserSignUpCommand toCommand(GoogleSignUpDto googleSignUpDto);
+    SignUpCommand toCommand(GoogleSignUpDto googleSignUpDto);
 
     @Named("googleId")
     default String googleId(String providerId) {
@@ -30,7 +31,7 @@ public interface UserDtoMapper {
     }
 
     @Mapping(target = "providerId", source = "providerId", qualifiedByName = "naverId")
-    UserSignUpCommand toCommand(NaverSignUpDto naverSignUpDto);
+    SignUpCommand toCommand(NaverSignUpDto naverSignUpDto);
 
     @Named("naverId")
     default String naverId(String providerId) {
@@ -40,6 +41,5 @@ public interface UserDtoMapper {
     @Mapping(source = "dto.nickname", target = "nickname")
     UserNicknameModifyCommand toCommand(long userId, UserNicknameModifyDto dto);
 
-    @Mapping(source = "userIdentifier", target = "providerId")
     UserSignUpCommand toCommand(UserSignUpDto userSignUpDto);
 }
