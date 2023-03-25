@@ -70,7 +70,7 @@ class LoginControllerTest extends ControllerTest {
     @Test
     @DisplayName("로그아웃")
     void logout() throws Exception {
-        mockMvc.perform(delete("/user/logout")
+        mockMvc.perform(delete("/users/logout")
                         .contentType(APPLICATION_JSON)
                         .with(csrf()))
                 .andExpect(status().isOk())

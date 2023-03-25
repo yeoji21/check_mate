@@ -48,7 +48,7 @@ public class LoginController {
         return loginService.reissueToken(loginDtoMapper.toCommand(tokenReissueDto));
     }
 
-    @DeleteMapping("/user/logout")
+    @DeleteMapping("/users/logout")
     public void logout(@AuthenticationPrincipal JwtUserDetails userDetails) {
         loginService.logout(userDetails.getUserId());
     }
