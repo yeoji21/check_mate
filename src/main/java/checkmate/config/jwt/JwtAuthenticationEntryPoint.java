@@ -7,13 +7,14 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+// TODO: 2023/03/26 ExceptionRequestLogger 적용 고려
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException authException){
+                         AuthenticationException authException) {
         JwtException exception = getJwtException(request);
-        if (exception != JwtException.EMPTY_TOKEN) exception.setResponse(response);
+        exception.setResponse(response);
     }
 
     private JwtException getJwtException(HttpServletRequest request) {

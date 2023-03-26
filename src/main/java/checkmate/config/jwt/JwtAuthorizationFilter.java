@@ -2,6 +2,7 @@ package checkmate.config.jwt;
 
 import checkmate.config.auth.AuthConstants;
 import checkmate.config.auth.JwtUserDetails;
+import checkmate.exception.BusinessException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -52,7 +53,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             SecurityContextHolder.setContext(context);
         } catch (SecurityException | MalformedJwtException e) {
             request.setAttribute("exception", JwtException.WRONG_TYPE_TOKEN.name());
-        } catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException | BusinessException e) {
             request.setAttribute("exception", JwtException.EXPIRED_TOKEN.name());
         } catch (UnsupportedJwtException e) {
             request.setAttribute("exception", JwtException.UNSUPPORTED_TOKEN.name());
