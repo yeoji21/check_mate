@@ -20,15 +20,15 @@ import java.util.stream.Collectors;
 public class ExceptionRequestLogger {
     public static void logging(ResponseEntity<ErrorResponse> response, Exception e, HttpServletRequest request) {
         StringBuilder logBuilder = new StringBuilder();
-        logBuilder.append(request.getMethod()).append("-").append(request.getRequestURI()).append("\n");
-        logBuilder.append("[" + e.getClass().getSimpleName() + "] -> ").append(getExceptionMessage(e)).append("\n");
+        logBuilder.append(getRequestURI(request)).append("\n");
+        logBuilder.append(getExceptionName(e)).append(" -> ").append(parsingMessage(e)).append("\n");
         logBuilder.append(response.getBody()).append("\n");
-        logBuilder.append(getHeaders(request)).append("\n");
-        logBuilder.append(getRequestBody((ContentCachingRequestWrapper) request));
+        logBuilder.append(parsingHeaders(request)).append("\n");
+        logBuilder.append(parsingBody((ContentCachingRequestWrapper) request));
         log.warn(logBuilder.toString());
     }
 
-    private static String getExceptionMessage(Exception e) {
+    private static String parsingMessage(Exception e) {
         String message = e.getMessage();
         if (e.getClass().equals(MethodArgumentNotValidException.class)) {
             message = ((MethodArgumentNotValidException) e).getBindingResult().getFieldErrors().stream()
@@ -40,29 +40,37 @@ public class ExceptionRequestLogger {
         return message;
     }
 
-    private static Map<String, Object> getHeaders(HttpServletRequest request) {
+    private static Map<String, Object> parsingHeaders(HttpServletRequest request) {
         Map<String, Object> headerMap = new HashMap<>();
 
-        Enumeration<String> headerArray = request.getHeaderNames();
-        while (headerArray.hasMoreElements()) {
-            String headerName = headerArray.nextElement();
+        Enumeration<String> headers = request.getHeaderNames();
+        while (headers.hasMoreElements()) {
+            String headerName = headers.nextElement();
             headerMap.put(headerName, request.getHeader(headerName));
         }
         return headerMap;
     }
 
-    private static String getRequestBody(ContentCachingRequestWrapper request) {
-        ContentCachingRequestWrapper wrapper = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
-        if (wrapper != null) {
-            byte[] buf = wrapper.getContentAsByteArray();
+    private static String parsingBody(ContentCachingRequestWrapper request) {
+        ContentCachingRequestWrapper cachedRequest = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
+        if (cachedRequest != null) {
+            byte[] buf = cachedRequest.getContentAsByteArray();
             if (buf.length > 0) {
                 try {
-                    return new String(buf, 0, buf.length, wrapper.getCharacterEncoding());
+                    return new String(buf, 0, buf.length, cachedRequest.getCharacterEncoding());
                 } catch (UnsupportedEncodingException e) {
-                    return " - ";
+                    return " Unsupported Encoding ";
                 }
             }
         }
-        return " - ";
+        return " EMPTY BODY ";
+    }
+
+    private static String getExceptionName(Exception e) {
+        return "[" + e.getClass().getSimpleName() + "]";
+    }
+
+    private static String getRequestURI(HttpServletRequest request) {
+        return request.getMethod() + " - " + request.getRequestURI();
     }
 }
