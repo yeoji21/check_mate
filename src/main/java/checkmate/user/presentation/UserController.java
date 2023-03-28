@@ -4,7 +4,8 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.UserCommandService;
 import checkmate.user.application.UserQueryService;
 import checkmate.user.presentation.dto.UserDtoMapper;
-import checkmate.user.presentation.dto.request.*;
+import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
+import checkmate.user.presentation.dto.request.UserSignUpDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,21 +25,6 @@ public class UserController {
     @PostMapping("/users")
     public void signUp(@RequestBody @Valid UserSignUpDto userSignUpDto) {
         userCommandService.signUp(userDtoMapper.toCommand(userSignUpDto));
-    }
-
-    @PostMapping("/users/kakao")
-    public void kakaoSignUp(@RequestBody @Valid KakaoSignUpDto kakaoSignUpDto) {
-        userCommandService.signUp_v1(userDtoMapper.toCommand(kakaoSignUpDto));
-    }
-
-    @PostMapping("/users/google")
-    public void googleSignUp(@RequestBody @Valid GoogleSignUpDto googleSignUpDto) {
-        userCommandService.signUp_v1(userDtoMapper.toCommand(googleSignUpDto));
-    }
-
-    @PostMapping("/users/naver")
-    public void naverSignUp(@RequestBody @Valid NaverSignUpDto naverSignUpDto) {
-        userCommandService.signUp_v1(userDtoMapper.toCommand(naverSignUpDto));
     }
 
     @PatchMapping("/users/nickname")

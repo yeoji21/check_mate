@@ -36,6 +36,7 @@ public class JwtFactory {
                 .build();
     }
 
+    // TODO: 2023/03/28 providerId -> identifier
     protected String accessToken(User user) {
         return JWT.create()
                 .withSubject(user.getUsername())

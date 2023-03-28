@@ -44,6 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(encodingFilter, CsrfFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
+                // TODO: 2023/03/26 JwtAuthenticationEntryPoint()는 Component
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
