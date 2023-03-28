@@ -3,7 +3,8 @@ package checkmate.user.presentation;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.LoginService;
 import checkmate.user.presentation.dto.LoginDtoMapper;
-import checkmate.user.presentation.dto.request.*;
+import checkmate.user.presentation.dto.request.LoginRequestDto;
+import checkmate.user.presentation.dto.request.TokenReissueDto;
 import checkmate.user.presentation.dto.response.LoginResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +27,6 @@ public class LoginController {
     @PostMapping("/users/login")
     public LoginResponse login(@RequestBody @Valid LoginRequestDto loginRequestDto) {
         return loginService.login(loginDtoMapper.toCommand(loginRequestDto));
-    }
-
-    @PostMapping("/login/kakao")
-    public LoginResponse kakaoLogin(@RequestBody @Valid KakaoLoginDto kakaoLoginDto) {
-        return loginService.login_v1(loginDtoMapper.toCommand(kakaoLoginDto));
-    }
-
-    @PostMapping("/login/google")
-    public LoginResponse googleLogin(@RequestBody @Valid GoogleLoginDto googleLoginDto) {
-        return loginService.login_v1(loginDtoMapper.toCommand(googleLoginDto));
-    }
-
-    @PostMapping("/login/naver")
-    public LoginResponse naverLogin(@RequestBody @Valid NaverLoginDto naverLoginDto) {
-        return loginService.login_v1(loginDtoMapper.toCommand(naverLoginDto));
     }
 
     @PostMapping("/login/reissue")

@@ -6,7 +6,7 @@ import checkmate.config.jwt.JwtVerifier;
 import checkmate.config.jwt.LoginToken;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.user.application.dto.request.SnsLoginCommand;
+import checkmate.user.application.dto.request.LoginCommand;
 import checkmate.user.application.dto.request.TokenReissueCommand;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
@@ -44,12 +44,12 @@ class LoginServiceTest {
         //given
         User user = createUser();
         LoginToken loginToken = createLoginToken();
-        SnsLoginCommand command = createLoginCommand(user);
-        given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.of(user));
+        LoginCommand command = createLoginCommand(user);
+        given(userRepository.findByIdentifier(any(String.class))).willReturn(Optional.of(user));
         given(jwtFactory.createLoginToken(any(User.class))).willReturn(loginToken);
 
         //when
-        LoginResponse response = loginService.login_v1(command);
+        LoginResponse response = loginService.login(command);
 
         //then
         assertThat(response.accessToken()).startsWith("Bearer ");
@@ -61,11 +61,11 @@ class LoginServiceTest {
     void login_not_exist() throws Exception {
         //given
         User user = createUser();
-        SnsLoginCommand command = createLoginCommand(user);
-        given(userRepository.findByProviderId(any(String.class))).willReturn(Optional.empty());
+        LoginCommand command = createLoginCommand(user);
+        given(userRepository.findByIdentifier(any(String.class))).willReturn(Optional.empty());
 
         //when
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> loginService.login_v1(command));
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> loginService.login(command));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.USER_NOT_FOUND);
@@ -116,8 +116,8 @@ class LoginServiceTest {
         return TestEntityFactory.user(1L, "tester");
     }
 
-    private SnsLoginCommand createLoginCommand(User user) {
-        return new SnsLoginCommand(user.getProviderId(), user.getFcmToken());
+    private LoginCommand createLoginCommand(User user) {
+        return new LoginCommand(user.getProviderId(), user.getFcmToken());
     }
 
     private LoginToken createLoginToken() {

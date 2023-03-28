@@ -2,19 +2,18 @@ package checkmate.user.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
-import checkmate.user.presentation.dto.request.*;
+import checkmate.user.presentation.dto.request.LoginRequestDto;
+import checkmate.user.presentation.dto.request.TokenReissueDto;
 import checkmate.user.presentation.dto.response.LoginResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
@@ -77,75 +76,6 @@ class LoginControllerTest extends ControllerTest {
                 .andDo(document("logout"));
 
         verify(loginService).logout(any(Long.class));
-    }
-
-    @WithMockAuthUser
-    @Test
-    @DisplayName("구글 로그인 API")
-    void loginGoogle() throws Exception {
-        GoogleLoginDto loginDto = new GoogleLoginDto("providerId", "test FcmToken");
-        LoginResponse response = createLoginResponse();
-
-        given(loginService.login_v1(any())).willReturn(response);
-
-        mockMvc.perform(post("/login/google")
-                        .contentType(APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(loginDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(response)))
-                .andDo(document("login-google",
-                        requestFields(
-                                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
-                        ),
-                        loginResponseFieldsSnippet()
-                ));
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 네이버_로그인_성공_테스트() throws Exception {
-        NaverLoginDto loginDto = new NaverLoginDto("providerId", "test FcmToken");
-        LoginResponse response = createLoginResponse();
-
-        when(loginService.login_v1(any())).thenReturn(response);
-
-        mockMvc.perform(post("/login/naver")
-                        .contentType(APPLICATION_JSON)
-                        .with(csrf())
-                        .content(objectMapper.writeValueAsString(loginDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(response)))
-                .andDo(document("login-naver",
-                        requestFields(
-                                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
-                        ),
-                        loginResponseFieldsSnippet()
-                ));
-    }
-
-    @WithMockAuthUser
-    @Test
-    void 카카오_로그인_성공_테스트() throws Exception {
-        KakaoLoginDto loginDto = new KakaoLoginDto("providerId", "testFcmToken");
-        LoginResponse response = createLoginResponse();
-
-        given(loginService.login_v1(any())).willReturn(response);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/login/kakao").contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDto))
-                        .with(csrf()))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(response)))
-                .andDo(document("login-kakao",
-                        requestFields(
-                                fieldWithPath("providerId").type(JsonFieldType.STRING).description("로그인 시도하는 소셜 고유 아이디"),
-                                fieldWithPath("fcmToken").type(JsonFieldType.STRING).description("로그인한 기기의 fcmToken")
-                        ),
-                        loginResponseFieldsSnippet()
-                ));
     }
 
     private ResponseFieldsSnippet loginResponseFieldsSnippet() {
