@@ -70,13 +70,13 @@ class JwtVerifierTest {
         //given
         String refreshToken = createRefreshToken("secret");
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
-        given(valueOperations.get(any())).willReturn("Bearer " + refreshToken);
+        given(valueOperations.get(any())).willReturn(refreshToken);
 
         //when
-        jwtVerifier.verifyRefeshToken("providerId", refreshToken);
+        jwtVerifier.verifyRefeshToken("identifier", refreshToken);
 
         //then
-        verify(valueOperations).get("providerId");
+        verify(valueOperations).get("identifier");
     }
 
     @Test
@@ -118,10 +118,10 @@ class JwtVerifierTest {
         User user = TestEntityFactory.user(1L, "user");
 
         //when
-        jwtVerifier.expireRefreshToken(user.getProviderId());
+        jwtVerifier.expireRefreshToken(user.getIdentifier());
 
         //then
-        verify(redisTemplate).delete(user.getProviderId());
+        verify(redisTemplate).delete(user.getIdentifier());
     }
 
     private String createAccessToken(String secret) {

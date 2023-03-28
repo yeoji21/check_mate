@@ -42,22 +42,6 @@ class UserRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("providerId로 조회")
-    void findByProviderId() throws Exception {
-        //given
-        User user = createUser();
-        em.flush();
-        em.clear();
-
-        //when
-        User foundUser = userRepository.findByProviderId(user.getProviderId())
-                .orElseThrow(IllegalArgumentException::new);
-
-        //then
-        assertThat(foundUser).isEqualTo(user);
-    }
-
-    @Test
     @DisplayName("id로 유저의 닉네임 조회")
     void findNicknameById() throws Exception {
         //given

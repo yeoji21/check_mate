@@ -31,7 +31,7 @@ public class TestEntityFactory {
         User user = User.builder()
                 .username(name)
                 .nickname(name)
-                .providerId(name)
+                .identifier(name)
                 .emailAddress(name + "@mail.com")
                 .fcmToken("fcmToken")
                 .build();

@@ -36,9 +36,9 @@ public class LoginService {
 
     @Transactional
     public LoginResponse reissueToken(TokenReissueCommand command) {
-        String providerId = jwtVerifier.parseProviderId(command.accessToken());
-        jwtVerifier.verifyRefeshToken(providerId, command.refreshToken());
-        User user = userRepository.findByProviderId(providerId)
+        String identifier = jwtVerifier.parseIdentifier(command.accessToken());
+        jwtVerifier.verifyRefeshToken(identifier, command.refreshToken());
+        User user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND));
         return toLoginTokenResponse(jwtFactory.createLoginToken(user));
     }
@@ -48,7 +48,7 @@ public class LoginService {
     public void logout(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
-        jwtVerifier.expireRefreshToken(user.getProviderId());
+        jwtVerifier.expireRefreshToken(user.getIdentifier());
     }
 
     private LoginResponse toLoginTokenResponse(LoginToken loginToken) {

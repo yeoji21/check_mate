@@ -7,8 +7,6 @@ public interface UserRepository {
 
     Optional<User> findByNickname(String nickname);
 
-    Optional<User> findByProviderId(String providerId);
-
     Optional<String> findNicknameById(long userId);
 
     User save(User user);

@@ -35,16 +35,6 @@ public class UserJpaRepository implements UserRepository {
         );
     }
 
-
-    @Override
-    public Optional<User> findByProviderId(String providerId) {
-        return Optional.ofNullable(
-                queryFactory.selectFrom(user)
-                        .where(user.providerId.eq(providerId))
-                        .fetchOne()
-        );
-    }
-
     @Override
     public Optional<User> findByIdentifier(String identifier) {
         return Optional.ofNullable(

@@ -27,9 +27,7 @@ public class JwtFactory {
 
     public LoginToken createLoginToken(User user) {
         String refreshToken = refreshToken();
-        // TODO: 2023/03/25 로그인 로직 통합 후 제거
-        String key = user.getIdentifier() == null ? user.getProviderId() : user.getIdentifier();
-        redisTemplate.opsForValue().set(key, refreshToken, 30, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(user.getIdentifier(), refreshToken, 30, TimeUnit.DAYS);
         return LoginToken.builder()
                 .accessToken(AuthConstants.TOKEN_PREFIX.getValue() + accessToken(user))
                 .refreshToken(AuthConstants.TOKEN_PREFIX.getValue() + refreshToken)
@@ -37,12 +35,13 @@ public class JwtFactory {
     }
 
     // TODO: 2023/03/28 providerId -> identifier
+    // TODO: 2023/03/28 claim에 id와 nickname 필요한지 검토
     protected String accessToken(User user) {
         return JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION_TIME))
                 .withClaim("id", user.getId())
-                .withClaim("providerId", user.getProviderId())
+                .withClaim("identifier", user.getIdentifier())
                 .withClaim("nickname", user.getNickname())
                 .withClaim("auth", user.getRole())
                 .sign(Algorithm.HMAC512(SECRET));

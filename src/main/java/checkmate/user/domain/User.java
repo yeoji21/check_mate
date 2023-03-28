@@ -30,11 +30,6 @@ public class User extends BaseTimeEntity {
     private String password;
     @Column(unique = true, name = "identifier")
     private String identifier;
-
-    // TODO: 2023/03/19 회원가입 로직 전환되면 제거 예정
-    @Column(unique = true, name = "provider_id")
-    private String providerId;
-
     @Column(unique = true, name = "nickname")
     private String nickname;
     @NotNull
@@ -50,14 +45,12 @@ public class User extends BaseTimeEntity {
                    String emailAddress,
                    String nickname,
                    String password,
-                   String providerId,
                    String identifier,
                    String fcmToken) {
         this.username = username;
         this.emailAddress = emailAddress;
         this.nickname = nickname;
         this.password = password;
-        this.providerId = providerId;
         this.role = UserRole.USER.getRole();
         this.identifier = identifier;
         this.fcmToken = fcmToken;

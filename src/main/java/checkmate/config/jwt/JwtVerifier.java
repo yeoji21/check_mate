@@ -1,6 +1,5 @@
 package checkmate.config.jwt;
 
-import checkmate.config.auth.AuthConstants;
 import checkmate.exception.BusinessException;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
@@ -30,23 +29,24 @@ public class JwtVerifier {
             throw new BusinessException(ErrorCode.TOKEN_VERIFY_FAIL);
         }
     }
-    
-    public void verifyRefeshToken(String providerId, String refreshToken) {
-        Optional<String> findRefreshToken = Optional.ofNullable(redisTemplate.opsForValue().get(providerId));
+
+    public void verifyRefeshToken(String identifier, String refreshToken) {
+        Optional<String> findRefreshToken = Optional.ofNullable(redisTemplate.opsForValue().get(identifier));
         findRefreshToken.ifPresentOrElse(findToken -> {
-                    if (!findToken.equals(AuthConstants.TOKEN_PREFIX.getValue() + refreshToken))
+                    if (!findToken.equals(refreshToken)) {
                         throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+                    }
                 },
                 () -> {
                     throw new NotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
                 });
     }
 
-    public void expireRefreshToken(String providerId) {
-        redisTemplate.delete(providerId);
+    public void expireRefreshToken(String identifier) {
+        redisTemplate.delete(identifier);
     }
 
-    public String parseProviderId(String accessToken) {
-        return JWT.decode(accessToken).getClaim("providerId").asString();
+    public String parseIdentifier(String accessToken) {
+        return JWT.decode(accessToken).getClaim("identifier").asString();
     }
 }

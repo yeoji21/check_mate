@@ -78,15 +78,15 @@ class LoginServiceTest {
         User user = createUser();
         TokenReissueCommand command = createTokenReissueCommand();
 
-        given(jwtVerifier.parseProviderId(anyString())).willReturn(user.getProviderId());
-        given(userRepository.findByProviderId(any())).willReturn(Optional.ofNullable(user));
+        given(jwtVerifier.parseIdentifier(anyString())).willReturn(user.getIdentifier());
+        given(userRepository.findByIdentifier(any())).willReturn(Optional.ofNullable(user));
         given(jwtFactory.createLoginToken(any(User.class))).willReturn(createLoginToken());
 
         //when
         LoginResponse response = loginService.reissueToken(command);
 
         //then
-        verify(jwtVerifier).verifyRefeshToken(user.getProviderId(), command.refreshToken());
+        verify(jwtVerifier).verifyRefeshToken(user.getIdentifier(), command.refreshToken());
         assertThat(response.accessToken()).isNotNull();
         assertThat(response.refreshToken()).isNotNull();
     }
@@ -102,7 +102,7 @@ class LoginServiceTest {
         loginService.logout(user.getId());
 
         //then
-        verify(jwtVerifier).expireRefreshToken(user.getProviderId());
+        verify(jwtVerifier).expireRefreshToken(user.getIdentifier());
     }
 
     private TokenReissueCommand createTokenReissueCommand() {
@@ -117,7 +117,7 @@ class LoginServiceTest {
     }
 
     private LoginCommand createLoginCommand(User user) {
-        return new LoginCommand(user.getProviderId(), user.getFcmToken());
+        return new LoginCommand(user.getIdentifier(), user.getFcmToken());
     }
 
     private LoginToken createLoginToken() {
