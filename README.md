@@ -41,6 +41,7 @@
 -  [Custom Exception 명확한 기준을 두고 사용하기](https://yeoji21.github.io/posts/custom-exception/)
 -  [JWT 비밀키를 외부로 분리하기 위한 문제 해결 과정](https://yeoji21.github.io/posts/jwt-refactoring/)
 -  [AWS CloudWatch를 통한 로그 수집](https://yeoji21.github.io/posts/cloudwatch-log/) 
+-  [예외 상황에 대한 힌트를 주는 Request 로깅하기](https://yeoji21.github.io/posts/request-logging/)
 -  [컨트롤러에서 습관성 ResponseEntity 남발](https://yeoji21.github.io/posts/controller-return/)
 
 ### 테스트 코드
