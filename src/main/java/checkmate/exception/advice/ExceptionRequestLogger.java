@@ -1,5 +1,6 @@
 package checkmate.exception.advice;
 
+import checkmate.config.jwt.JwtException;
 import checkmate.exception.ErrorResponse;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,14 @@ public class ExceptionRequestLogger {
         logBuilder.append(response.getBody()).append("\n");
         logBuilder.append(parsingHeaders(request)).append("\n");
         logBuilder.append(parsingBody((ContentCachingRequestWrapper) request));
+        log.warn(logBuilder.toString());
+    }
+
+    public static void logging(HttpServletRequest request, JwtException exception) {
+        StringBuilder logBuilder = new StringBuilder();
+        logBuilder.append(getRequestURI(request)).append("\n");
+        logBuilder.append(parsingHeaders(request)).append("\n");
+        logBuilder.append(exception.createResponseBody()).append("\n");
         log.warn(logBuilder.toString());
     }
 

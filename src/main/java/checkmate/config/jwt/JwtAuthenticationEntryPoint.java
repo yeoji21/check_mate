@@ -1,5 +1,6 @@
 package checkmate.config.jwt;
 
+import checkmate.exception.advice.ExceptionRequestLogger;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -7,7 +8,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-// TODO: 2023/03/26 ExceptionRequestLogger 적용 고려
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
@@ -15,6 +15,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) {
         JwtException exception = getJwtException(request);
         exception.setResponse(response);
+        ExceptionRequestLogger.logging(request, exception);
     }
 
     private JwtException getJwtException(HttpServletRequest request) {

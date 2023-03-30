@@ -25,20 +25,23 @@ public enum JwtException {
     private final HttpStatus httpStatus;
     private final String detail;
 
-    public void setResponse(HttpServletResponse response){
+    public void setResponse(HttpServletResponse response) {
         response.setContentType("application/json;charset=UTF-8");
-        log.error("jwt token error - {}", this.name());
+        JSONObject responseJson = createResponseBody();
+        try {
+            response.setStatus(401);
+            response.getWriter().print(responseJson);
+        } catch (IOException e) {
+            log.error("JWT IOException on {}", e.getMessage());
+        }
+    }
 
+    public JSONObject createResponseBody() {
         JSONObject responseJson = new JSONObject();
         responseJson.put("status", this.getHttpStatus().value());
         responseJson.put("error", this.getHttpStatus().name());
         responseJson.put("code", this.name());
         responseJson.put("message", this.getDetail());
-        try {
-            response.setStatus(401);
-            response.getWriter().print(responseJson);
-        } catch (IOException e) {
-            log.error("JWT setResponse error on {}", e.getMessage());
-        }
+        return responseJson;
     }
 }

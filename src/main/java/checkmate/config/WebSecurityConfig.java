@@ -22,6 +22,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final CorsConfig corsConfig;
     private final JwtAuthorizationFilter jwtAuthorizationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -44,8 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilterBefore(encodingFilter, CsrfFilter.class)
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
-                // TODO: 2023/03/26 JwtAuthenticationEntryPoint()는 Component
-                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .and()
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")

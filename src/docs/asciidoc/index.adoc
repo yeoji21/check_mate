@@ -442,23 +442,7 @@ include::{snippets}/user-nickname-check/http-response.adoc[]
 
 // =============================================================
 
-== 기존 회원 가입
-
-=== Request Fields
-
-include::{snippets}/user-sign-in/request-fields.adoc[]
-
-=== HTTP Request
-
-include::{snippets}/user-sign-in/http-request.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/user-sign-in/http-response.adoc[]
-
-// =============================================================
-
-== 통합 회원 가입
+== 회원 가입
 
 === Request Fields
 
@@ -474,7 +458,7 @@ include::{snippets}/user-sign-up/http-response.adoc[]
 
 // =============================================================
 
-== 통합 로그인
+== 로그인
 
 === Request Fields
 
@@ -492,23 +476,4 @@ include::{snippets}/login/response-fields.adoc[]
 
 include::{snippets}/login/http-response.adoc[]
 
-
 // =============================================================
-
-== 기존 로그인
-
-=== Request Fields
-
-include::{snippets}/login-google/request-fields.adoc[]
-
-=== HTTP Request
-
-include::{snippets}/login-google/http-request.adoc[]
-
-=== Response Fields
-
-include::{snippets}/login-google/response-fields.adoc[]
-
-=== HTTP Response
-
-include::{snippets}/login-google/http-response.adoc[]
