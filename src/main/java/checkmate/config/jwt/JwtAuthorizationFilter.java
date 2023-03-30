@@ -51,19 +51,19 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(jwtUserDetails, null, jwtUserDetails.getAuthorities());
             context.setAuthentication(authentication);
             SecurityContextHolder.setContext(context);
-        } catch (SecurityException | MalformedJwtException e) {
-            request.setAttribute("exception", JwtException.WRONG_TYPE_TOKEN.name());
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            setJwtException(request, JwtException.WRONG_TOKEN);
         } catch (ExpiredJwtException | BusinessException e) {
-            request.setAttribute("exception", JwtException.EXPIRED_TOKEN.name());
-        } catch (UnsupportedJwtException e) {
-            request.setAttribute("exception", JwtException.UNSUPPORTED_TOKEN.name());
-        } catch (IllegalArgumentException e) {
-            request.setAttribute("exception", JwtException.WRONG_TOKEN.name());
+            setJwtException(request, JwtException.EXPIRED_TOKEN);
         } catch (Exception e) {
             log.error("JwtFilter - doFilterInternal() : {}", e.getMessage());
-            request.setAttribute("exception", JwtException.UNKNOWN_ERROR.name());
+            setJwtException(request, JwtException.UNKNOWN_ERROR);
         }
         chain.doFilter(request, response);
+    }
+
+    private void setJwtException(HttpServletRequest request, JwtException exception) {
+        request.setAttribute("exception", exception.name());
     }
 
 }

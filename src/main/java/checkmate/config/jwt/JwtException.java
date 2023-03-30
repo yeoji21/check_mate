@@ -15,12 +15,10 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @Getter
 @AllArgsConstructor
 public enum JwtException {
-    WRONG_TYPE_TOKEN(UNAUTHORIZED, "잘못된 형식"),
-    EXPIRED_TOKEN(UNAUTHORIZED, "기간 만료"),
-    UNSUPPORTED_TOKEN(UNAUTHORIZED, "지원되지 않는 토큰"),
-    WRONG_TOKEN(UNAUTHORIZED, "잘못된 토큰"),
-    EMPTY_TOKEN(UNAUTHORIZED, "빈 토큰"),
-    UNKNOWN_ERROR(UNAUTHORIZED, "토큰 에러");
+    EXPIRED_TOKEN(UNAUTHORIZED, "만료됨"),
+    WRONG_TOKEN(UNAUTHORIZED, "잘못된 형식"),
+    EMPTY_TOKEN(UNAUTHORIZED, "토큰이 없음"),
+    UNKNOWN_ERROR(UNAUTHORIZED, "알 수 없는 문제");
 
     private final HttpStatus httpStatus;
     private final String detail;
