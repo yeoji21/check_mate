@@ -60,11 +60,10 @@ public class GoalCommandServiceTest {
     @DisplayName("성공한 목표 처리 스케쥴러")
     void updateYesterdayOveredGoals() throws Exception {
         //given
-        Goal goal1 = TestEntityFactory.goal(1L, "testGoal1");
-        Goal goal2 = TestEntityFactory.goal(3L, "testGoal3");
-
+        Goal goal1 = createGoal(1L);
+        Goal goal2 = createGoal(2L);
         given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
-        given(mateRepository.findMateInGoals(anyList())).willReturn(getTeamMates(goal1, goal2));
+        given(mateRepository.findMatesInGoals(anyList())).willReturn(createMates(goal1, goal2));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
@@ -78,8 +77,8 @@ public class GoalCommandServiceTest {
     @DisplayName("목표 수정")
     void modifyGoal() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "testGoal");
-        GoalModifyCommand command = getGoalModifyCommand(goal);
+        Goal goal = createGoal(1L);
+        GoalModifyCommand command = createGoalModifyCommand(goal);
         given(goalRepository.findByIdForUpdate(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
@@ -98,7 +97,7 @@ public class GoalCommandServiceTest {
     @DisplayName("새 목표 생성")
     void create() {
         //given
-        GoalCreateCommand command = getGoalCreateCommand();
+        GoalCreateCommand command = createGoalCreateCommand();
         doAnswer((invocation) -> {
             Goal argument = (Goal) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "id", 1L);
@@ -116,32 +115,36 @@ public class GoalCommandServiceTest {
         verify(mateInitiateManager).initiate(any(Mate.class));
     }
 
-    private List<Mate> getTeamMates(Goal goal1, Goal goal2) {
-        return List.of(getTeamMate(goal1, 1L), getTeamMate(goal1, 2L), getTeamMate(goal2, 3L));
+    private List<Mate> createMates(Goal goal1, Goal goal2) {
+        return List.of(createMate(goal1, 1L), createMate(goal1, 2L), createMate(goal2, 3L));
     }
 
-    private GoalCreateCommand getGoalCreateCommand() {
+    private GoalCreateCommand createGoalCreateCommand() {
         return GoalCreateCommand.builder()
                 .userId(1L)
                 .category(GoalCategory.LEARNING)
-                .title("testGoal")
+                .title("goal")
                 .startDate(LocalDate.now().minusDays(10L))
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays("월수금")
                 .build();
     }
 
-    private Mate getTeamMate(Goal goal, long userId) {
-        User user = TestEntityFactory.user(userId, "user1");
-        Mate mate1 = goal.join(user);
-        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
-        return mate1;
+    private Mate createMate(Goal goal, long userId) {
+        User user = TestEntityFactory.user(userId, "user");
+        Mate mate = goal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        return mate;
     }
 
-    private GoalModifyCommand getGoalModifyCommand(Goal goal) {
+    private GoalModifyCommand createGoalModifyCommand(Goal goal) {
         return GoalModifyCommand.builder()
                 .endDate(goal.getEndDate().plusDays(10L))
                 .appointmentTime(LocalTime.now())
                 .build();
+    }
+
+    private Goal createGoal(long id) {
+        return TestEntityFactory.goal(id, "goal");
     }
 }

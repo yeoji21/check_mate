@@ -103,10 +103,11 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Mate> findMateInGoals(List<Long> goalIds) {
+    public List<Mate> findMatesInGoals(List<Long> goalIds) {
         return queryFactory.select(mate)
                 .from(mate)
-                .where(mate.goal.id.in(goalIds))
+                .where(mate.goal.id.in(goalIds),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
 

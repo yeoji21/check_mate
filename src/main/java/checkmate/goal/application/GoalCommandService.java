@@ -14,7 +14,6 @@ import checkmate.goal.domain.LikeCountCondition;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.MateStatus;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
@@ -81,24 +80,9 @@ public class GoalCommandService {
     @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
-        List<Mate> mates = mateRepository.findMateInGoals(overedGoalIds)
-                .stream()
-                .filter(tm -> tm.getStatus() == MateStatus.ONGOING)
-                .toList();
-
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toDtos(mates)));
+        List<Mate> mates = mateRepository.findMatesInGoals(overedGoalIds);
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toNotificationDtos(mates)));
         cacheHandler.deleteMateCaches(mates);
-    }
-
-    // TODO: 2023/03/22 mapper로 이동
-    private List<CompleteGoalNotificationDto> toDtos(List<Mate> mates) {
-        return mates.stream().map(
-                tm -> CompleteGoalNotificationDto.builder()
-                        .goalId(tm.getGoal().getId())
-                        .goalTitle(tm.getGoal().getTitle())
-                        .userId(tm.getUserId())
-                        .build()
-        ).toList();
     }
 
     private Mate joinToGoal(Goal goal, long userId) {
@@ -112,5 +96,15 @@ public class GoalCommandService {
     private Goal findGoalForUpdate(long goalId) {
         return goalRepository.findByIdForUpdate(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+    }
+
+    private List<CompleteGoalNotificationDto> toNotificationDtos(List<Mate> mates) {
+        return mates.stream().map(
+                tm -> CompleteGoalNotificationDto.builder()
+                        .goalId(tm.getGoal().getId())
+                        .goalTitle(tm.getGoal().getTitle())
+                        .userId(tm.getUserId())
+                        .build()
+        ).toList();
     }
 }

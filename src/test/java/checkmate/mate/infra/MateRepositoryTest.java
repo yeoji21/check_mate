@@ -128,6 +128,24 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
+    void findMatesInGoals() throws Exception {
+        //given
+        Goal goal1 = createGoal();
+        Goal goal2 = createGoal();
+        createMate(goal1);
+        createOngoingMate(goal1);
+        createOngoingMate(goal2);
+        createOngoingMate(goal2);
+
+        //when
+        List<Mate> mates = mateRepository.findMatesInGoals(List.of(goal1.getId(), goal2.getId()));
+
+        //then
+        assertThat(mates.size()).isEqualTo(3);
+        assertThat(mates).allMatch(mate -> mate.getStatus() == MateStatus.ONGOING);
+    }
+
+    @Test
     @DisplayName("팀원 제거 스케쥴러")
     void eliminateOveredMates() throws Exception {
         //given

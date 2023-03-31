@@ -34,7 +34,6 @@ public class JwtFactory {
                 .build();
     }
 
-    // TODO: 2023/03/28 providerId -> identifier
     // TODO: 2023/03/28 claim에 id와 nickname 필요한지 검토
     protected String accessToken(User user) {
         return JWT.create()
