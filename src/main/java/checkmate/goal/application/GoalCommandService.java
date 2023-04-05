@@ -89,6 +89,7 @@ public class GoalCommandService {
         User creator = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
         Mate mate = goal.join(creator);
+        mate.toWaitingStatus();
         mateInitiateManager.initiate(mate);
         return mate;
     }
