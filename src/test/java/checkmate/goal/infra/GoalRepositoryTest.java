@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,18 +17,15 @@ public class GoalRepositoryTest extends RepositoryTest {
     @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
     void findConditions() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
+        Goal goal = createGoal();
         goal.addCondition(new LikeCountCondition(5));
-        em.flush();
-        em.clear();
 
         //when
         Goal findGoal = goalRepository.findWithConditions(goal.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
-        List conditions = (List) ReflectionTestUtils.getField(findGoal, "conditions");
+        List<VerificationCondition> conditions = getGoalConditions(findGoal);
         assertThat(conditions.size()).isEqualTo(1);
     }
 
@@ -37,35 +33,34 @@ public class GoalRepositoryTest extends RepositoryTest {
     @DisplayName("목표와 조건 함께 조회 - 조건이 없는 경우")
     void findConditionsWithNoConditions() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
-        em.flush();
-        em.clear();
+        Goal goal = createGoal();
 
         //when
         Goal findGoal = goalRepository.findWithConditions(goal.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
-        List conditions = (List) ReflectionTestUtils.getField(findGoal, "conditions");
+        List<VerificationCondition> conditions = getGoalConditions(findGoal);
         assertThat(conditions.size()).isEqualTo(0);
     }
 
     @Test
-    void saveVerificationCondition() throws Exception {
+    @DisplayName("목표 인증 조건 추가")
+    void addCondition() throws Exception {
         //given
-        Goal testGoal = TestEntityFactory.goal(null, "test");
-        em.persist(testGoal);
+        Goal goal = createGoal();
         LikeCountCondition condition = new LikeCountCondition(5);
 
         //when
-        testGoal.addCondition(condition);
-        em.flush();
-        em.clear();
+        goal.addCondition(condition);
 
         //then
+        Goal findGoal = goalRepository.findWithConditions(goal.getId())
+                .orElseThrow(IllegalArgumentException::new);
         LikeCountCondition findCondition = em.find(LikeCountCondition.class, condition.getId());
-        assertThat(findCondition.getId()).isNotNull();
+
+        List<VerificationCondition> conditions = getGoalConditions(findGoal);
+        assertThat(conditions).contains(findCondition);
         assertThat(findCondition.getMinimumLike()).isEqualTo(5);
     }
 
@@ -73,34 +68,19 @@ public class GoalRepositoryTest extends RepositoryTest {
     @DisplayName("오늘 시작일인 목표의 status 업데이트")
     void updateTodayStartGoal() throws Exception {
         //given
-        Goal todayStart1 = Goal.builder()
-                .title("todayStart1")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .category(GoalCategory.ETC)
-                .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(10)))
-                .build();
+        Goal todayStart1 = createGoal(LocalDate.now(), LocalDate.now().plusDays(10));
         ReflectionTestUtils.setField(todayStart1, "status", GoalStatus.WAITING);
-        em.persist(todayStart1);
 
-        Goal todayStart2 = Goal.builder()
-                .title("todayStart2")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .category(GoalCategory.ETC)
-                .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(10)))
-                .build();
+        Goal todayStart2 = createGoal(LocalDate.now(), LocalDate.now().plusDays(10));
         ReflectionTestUtils.setField(todayStart2, "status", GoalStatus.WAITING);
-        em.persist(todayStart2);
 
-        Goal notToday = Goal.builder()
-                .title("todayStart2")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .category(GoalCategory.ETC)
-                .period(new GoalPeriod(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10)))
-                .build();
-        em.persist(notToday);
+        Goal notToday = createGoal(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10));
 
         //when
         goalRepository.updateTodayStartGoal();
+
+        em.flush();
+        em.clear();
 
         //then
         assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(GoalStatus.ONGOING);
@@ -109,40 +89,43 @@ public class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
+    @DisplayName("종료된 목표 status 업데이트")
     void updateYesterdayOveredGoals() throws Exception {
         //given
-        Goal testGoal = Goal.builder()
-                .title("testGoal")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .category(GoalCategory.ETC)
-                .period(new GoalPeriod(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1)))
-                .build();
-        em.persist(testGoal);
-
-        Goal testGoal2 = Goal.builder()
-                .title("testGoal2")
-                .period(new GoalPeriod(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1)))
-                .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().minusDays(2))))
-                .category(GoalCategory.ETC)
-                .build();
-        em.persist(testGoal2);
-
-        Goal oneDayGoal = Goal.builder()
-                .title("하루짜리 목표")
-                .period(new GoalPeriod(LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
-                .checkDays(new GoalCheckDays(Collections.singletonList(LocalDate.now().minusDays(1))))
-                .category(GoalCategory.ETC)
-                .build();
-        em.persist(oneDayGoal);
-
-        em.flush();
-        em.clear();
+        createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
 
         //when
         List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
+
         List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
                 .setParameter("ids", overedGoalIds)
                 .getResultList();
+
+        System.out.println(goals.size());
         goals.forEach(goal -> assertThat(goal.getStatus()).isEqualTo(GoalStatus.OVER));
+    }
+
+    private Goal createGoal(LocalDate startDate, LocalDate endDate) {
+        Goal goal = Goal.builder()
+                .title("title")
+                .checkDays(new GoalCheckDays("월화수목금토일"))
+                .category(GoalCategory.ETC)
+                .period(new GoalPeriod(startDate, endDate))
+                .build();
+        em.persist(goal);
+        return goal;
+    }
+
+    private List<VerificationCondition> getGoalConditions(Goal findGoal) {
+        return (List<VerificationCondition>)
+                ReflectionTestUtils.getField(findGoal, "conditions");
+    }
+
+    private Goal createGoal() {
+        Goal goal = TestEntityFactory.goal(null, "testGoal");
+        em.persist(goal);
+        return goal;
     }
 }

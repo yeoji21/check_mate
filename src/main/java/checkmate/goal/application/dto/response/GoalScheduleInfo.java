@@ -23,14 +23,14 @@ public class GoalScheduleInfo implements Serializable {
                             int weekDays) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.schedule = createGoal(startDate, endDate, weekDays).getSchedule();
+        this.schedule = getSchedule(startDate, endDate, weekDays);
     }
 
-    // TODO: 2023/03/22 개선 고려
-    private Goal createGoal(LocalDate startDate, LocalDate endDate, int weekDays) {
+    private String getSchedule(LocalDate startDate, LocalDate endDate, int weekDays) {
         return Goal.builder()
                 .checkDays(new GoalCheckDays(weekDays))
                 .period(new GoalPeriod(startDate, endDate))
-                .build();
+                .build()
+                .getSchedule();
     }
 }
