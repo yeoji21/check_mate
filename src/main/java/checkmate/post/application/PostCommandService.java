@@ -8,6 +8,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
@@ -40,6 +41,7 @@ public class PostCommandService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final MateRepository mateRepository;
+    private final MateQueryDao mateQueryDao;
     private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(
@@ -94,13 +96,13 @@ public class PostCommandService {
                 .uploaderNickname(user.getNickname())
                 .goalId(uploader.getGoal().getId())
                 .goalTitle(uploader.getGoal().getTitle())
-                .mateUserIds(getTeamMateUserIds(uploader))
+                .mateUserIds(getMateUserIds(uploader))
                 .build();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, dto));
     }
 
-    private List<Long> getTeamMateUserIds(Mate uploader) {
-        return mateRepository.findMateUserIds(uploader.getGoal().getId())
+    private List<Long> getMateUserIds(Mate uploader) {
+        return mateQueryDao.findMateUserIds(uploader.getGoal().getId())
                 .stream()
                 .filter(userId -> !userId.equals(uploader.getUserId()))
                 .collect(Collectors.toList());

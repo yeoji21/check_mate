@@ -10,15 +10,13 @@ public interface MateRepository {
 
     Optional<Mate> findMateWithGoal(long goalId, long userId);
 
+    // TODO: 2023/04/08 리턴 타입을 void로 바꾸고 따로 조회 메소드 생성 고려
+    // 수정 후 영속성 컨텍스트 주의
     List<Mate> updateYesterdaySkippedMates();
 
-    void eliminateOveredMates(List<Mate> hookyTMs);
-
-    List<Long> findMateUserIds(Long goalId);
+    void updateLimitOveredMates(List<Mate> limitOveredMates);
 
     List<Mate> findMatesInGoals(List<Long> goalIds);
-
-    boolean existOngoingMate(long goalId, long userId);
 
     Mate save(Mate mate);
 }

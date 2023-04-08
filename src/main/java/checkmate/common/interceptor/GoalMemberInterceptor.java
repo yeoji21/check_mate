@@ -4,7 +4,7 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.exception.BusinessException;
 import checkmate.exception.JsonConvertingException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.mate.domain.MateRepository;
+import checkmate.mate.infra.MateQueryDao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,7 +27,7 @@ import java.util.Map;
 @Component
 public class GoalMemberInterceptor implements HandlerInterceptor {
     private final ObjectMapper objectMapper;
-    private final MateRepository mateRepository;
+    private final MateQueryDao mateQueryDao;
 
     @Override
     public boolean preHandle(HttpServletRequest request,
@@ -38,7 +38,7 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
 
         long goalId = getGoalIdInRequest(handlerMethod, request);
         long userId = getRequestUserId();
-        boolean exist = mateRepository.existOngoingMate(goalId, userId);
+        boolean exist = mateQueryDao.existOngoingMate(goalId, userId);
         if (!exist) throw new IllegalArgumentException("존재하지 않는 팀원");
         return true;
     }

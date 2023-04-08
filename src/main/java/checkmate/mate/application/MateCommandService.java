@@ -88,17 +88,17 @@ public class MateCommandService {
     @Transactional
     public void updateUploadSkippedMates() {
         List<Mate> skippedMates = mateRepository.updateYesterdaySkippedMates();
-        List<Mate> eliminatedMates = filterEliminateMates(skippedMates);
-        mateRepository.eliminateOveredMates(eliminatedMates);
+        List<Mate> limitOveredMates = filterLimitOveredMates(skippedMates);
+        mateRepository.updateLimitOveredMates(limitOveredMates);
 
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
-                eliminatedMates.stream().map(mapper::toNotificationDto).toList()));
-        cacheHandler.deleteMateCaches(eliminatedMates);
+                limitOveredMates.stream().map(mapper::toNotificationDto).toList()));
+        cacheHandler.deleteMateCaches(limitOveredMates);
     }
 
-    private List<Mate> filterEliminateMates(List<Mate> hookyMates) {
+    private List<Mate> filterLimitOveredMates(List<Mate> hookyMates) {
         return hookyMates.stream()
-                .filter(tm -> tm.getHookyDays() >= tm.getGoal().getSkippedDayLimit())
+                .filter(tm -> tm.getSkippedDays() >= tm.getGoal().getSkippedDayLimit())
                 .toList();
     }
 

@@ -37,6 +37,25 @@ public class MateQueryDao {
                 .fetch();
     }
 
+    public boolean existOngoingMate(long goalId, long userId) {
+        Long mateId = queryFactory.select(mate.id)
+                .from(mate)
+                .where(mate.goal.id.eq(goalId),
+                        mate.userId.eq(userId),
+                        mate.status.eq(MateStatus.ONGOING))
+                .fetchOne();
+        return mateId != null;
+    }
+
+    public List<Long> findMateUserIds(long goalId) {
+        return queryFactory
+                .select(mate.userId)
+                .from(mate)
+                .where(mate.goal.id.eq(goalId),
+                        mate.status.eq(MateStatus.ONGOING))
+                .fetch();
+    }
+
     public Map<Long, List<String>> findMateNicknames(List<Long> goalIds) {
         return queryFactory
                 .from(goal)

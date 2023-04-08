@@ -5,6 +5,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.post.application.dto.request.PostUploadCommand;
 import checkmate.post.domain.Likes;
@@ -45,6 +46,8 @@ class PostCommandServiceTest {
     @Mock
     private MateRepository mateRepository;
     @Mock
+    private MateQueryDao mateQueryDao;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @Test
@@ -56,7 +59,8 @@ class PostCommandServiceTest {
         given(userRepository.findById(any(Long.class)))
                 .willReturn(Optional.ofNullable(TestEntityFactory.user(mate.getUserId(), "tester")));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
-
+        given(mateQueryDao.findMateUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
+        
         //when
         postCommandService.upload(createPostUploadCommand(mate));
 

@@ -4,7 +4,7 @@ import checkmate.common.interceptor.GoalIdRoute;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.common.interceptor.GoalMemberInterceptor;
 import checkmate.config.auth.JwtUserDetails;
-import checkmate.mate.domain.MateRepository;
+import checkmate.mate.infra.MateQueryDao;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,7 @@ class GoalMemberInterceptorTest {
     @Spy
     private ObjectMapper objectMapper = new ObjectMapper();
     @Mock
-    private MateRepository mateRepository;
+    private MateQueryDao mateQueryDao;
     private GoalMember mockAnnotation;
 
     @InjectMocks
@@ -58,8 +58,7 @@ class GoalMemberInterceptorTest {
 
         given(handlerMethod.hasMethodAnnotation(GoalMember.class)).willReturn(true);
         given(handlerMethod.getMethodAnnotation(GoalMember.class)).willReturn(mockAnnotation);
-//        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
-        given(mateRepository.existOngoingMate(anyLong(), anyLong())).willReturn(true);
+        given(mateQueryDao.existOngoingMate(anyLong(), anyLong())).willReturn(true);
     }
 
 

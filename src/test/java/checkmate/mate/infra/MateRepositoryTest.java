@@ -37,48 +37,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("존재하는 팀원인지 여부 조회 - 존재")
-    void isExistMate() throws Exception {
-        //given
-        Goal goal = createGoal();
-        Mate mate = createOngoingMate(goal);
-        em.flush();
-        em.clear();
-        //when
-        boolean existTeamMate = mateRepository.existOngoingMate(goal.getId(), mate.getUserId());
-        //then
-        assertThat(existTeamMate).isTrue();
-    }
-
-    @Test
-    @DisplayName("존재하는 팀원인지 여부 조회 - 존재 x (진행 중이 아님)")
-    void isExistMate_not_ongoing() throws Exception {
-        //given
-        Goal goal = createGoal();
-        Mate mate = createMate(goal);
-
-        em.flush();
-        em.clear();
-        //when
-        boolean existTeamMate = mateRepository.existOngoingMate(goal.getId(), mate.getUserId());
-        //then
-        assertThat(existTeamMate).isFalse();
-    }
-
-    @Test
-    @DisplayName("존재하는 팀원인지 여부 조회 - 존재 x")
-    void isExistMate_not_exist() throws Exception {
-        //given
-        Goal goal = createGoal();
-        em.flush();
-        em.clear();
-        //when
-        boolean existTeamMate = mateRepository.existOngoingMate(goal.getId(), 22L);
-        //then
-        assertThat(existTeamMate).isFalse();
-    }
-
-    @Test
     @DisplayName("팀원 조회 (목표 fetch join)")
     void findMateWithGoal() throws Exception {
         //given
@@ -162,7 +120,7 @@ class MateRepositoryTest extends RepositoryTest {
 
         //when
         List<Mate> mates = queryFactory.selectFrom(mate).fetch();
-        mateRepository.eliminateOveredMates(mates);
+        mateRepository.updateLimitOveredMates(mates);
 
         //then
         assertThat(mates.size()).isEqualTo(2);

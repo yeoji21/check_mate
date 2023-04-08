@@ -169,7 +169,7 @@ public class MateCommandServiceTest {
         mateCommandService.updateUploadSkippedMates();
 
         //then
-        verify(mateRepository).eliminateOveredMates(any(List.class));
+        verify(mateRepository).updateLimitOveredMates(any(List.class));
         verify(cacheHandler).deleteMateCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }

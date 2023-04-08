@@ -85,21 +85,11 @@ public class MateJpaRepository implements MateRepository {
 
     // TODO: 2022/08/25 TM의 skippedCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
     @Override
-    public void eliminateOveredMates(List<Mate> eliminators) {
+    public void updateLimitOveredMates(List<Mate> limitOveredMates) {
         queryFactory.update(mate)
-                .where(mate.in(eliminators))
+                .where(mate.in(limitOveredMates))
                 .set(mate.status, MateStatus.OUT)
                 .execute();
-    }
-
-    @Override
-    public List<Long> findMateUserIds(Long goalId) {
-        return queryFactory
-                .select(mate.userId)
-                .from(mate)
-                .where(mate.goal.id.eq(goalId),
-                        mate.status.eq(MateStatus.ONGOING))
-                .fetch();
     }
 
     @Override
@@ -109,17 +99,6 @@ public class MateJpaRepository implements MateRepository {
                 .where(mate.goal.id.in(goalIds),
                         mate.status.eq(MateStatus.ONGOING))
                 .fetch();
-    }
-
-    @Override
-    public boolean existOngoingMate(long goalId, long userId) {
-        Long teamMateId = queryFactory.select(mate.id)
-                .from(mate)
-                .where(mate.goal.id.eq(goalId),
-                        mate.userId.eq(userId),
-                        mate.status.eq(MateStatus.ONGOING))
-                .fetchOne();
-        return teamMateId != null;
     }
 
     @Override

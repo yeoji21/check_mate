@@ -23,6 +23,48 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MateQueryDaoTest extends RepositoryTest {
     @Test
+    @DisplayName("존재하는 팀원인지 여부 조회 - 존재")
+    void isExistMate() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate = createOngoingMate(goal);
+
+        //when
+        boolean existTeamMate = mateQueryDao.existOngoingMate(goal.getId(), mate.getUserId());
+        //then
+        assertThat(existTeamMate).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하는 팀원인지 여부 조회 - 존재 x (진행 중이 아님)")
+    void isExistMate_not_ongoing() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate = createMate(goal, "user");
+        ReflectionTestUtils.setField(mate, "status", MateStatus.WAITING);
+
+        //when
+        boolean existTeamMate = mateQueryDao.existOngoingMate(goal.getId(), mate.getUserId());
+
+        //then
+        assertThat(existTeamMate).isFalse();
+    }
+
+    @Test
+    @DisplayName("존재하는 팀원인지 여부 조회 - 존재 x")
+    void isExistMate_not_exist() throws Exception {
+        //given
+        Goal goal = createGoal();
+
+        //when
+        boolean existTeamMate = mateQueryDao.existOngoingMate(goal.getId(), 22L);
+
+        //then
+        assertThat(existTeamMate).isFalse();
+    }
+
+
+    @Test
     @DisplayName("팀원의 목표 캘린더 조회")
     void findMateCalendar() throws Exception {
         //given
@@ -40,6 +82,22 @@ class MateQueryDaoTest extends RepositoryTest {
         assertThat(info.getStartDate()).isEqualTo(goal.getStartDate());
         assertThat(info.getGoalSchedule()).isEqualTo(goal.getSchedule());
         assertThat(info.getMateSchedule().length()).isEqualTo(info.getGoalSchedule().length());
+    }
+
+    @Test
+    @DisplayName("목표에 속한 팀원들의 userId 조회")
+    void findMateUserIds() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate1 = createMate(goal, "user1");
+        Mate mate2 = createMate(goal, "user2");
+        Mate mate3 = createMate(goal, "user3");
+
+        //when
+        List<Long> userIds = mateQueryDao.findMateUserIds(goal.getId());
+
+        //then
+        assertThat(userIds).contains(mate1.getUserId(), mate2.getUserId(), mate3.getUserId());
     }
 
     @Test
@@ -120,6 +178,15 @@ class MateQueryDaoTest extends RepositoryTest {
             assertThat(nicknames.size()).isEqualTo(10);
             assertThat(nicknames).allMatch(nickname -> nickname != null);
         });
+    }
+
+    private Mate createOngoingMate(Goal goal) {
+        User user = TestEntityFactory.user(null, "user" + Math.random() % 100);
+        em.persist(user);
+        Mate mate = goal.join(user);
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
+        return mate;
     }
 
     private User createSuccessedMates() {

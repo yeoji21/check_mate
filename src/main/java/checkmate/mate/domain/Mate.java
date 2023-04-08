@@ -100,7 +100,7 @@ public class Mate extends BaseTimeEntity {
         return progress.getCheckDayCount();
     }
 
-    public int getHookyDays() {
+    public int getSkippedDays() {
         return progress.getSkippedDayCount();
     }
 }
