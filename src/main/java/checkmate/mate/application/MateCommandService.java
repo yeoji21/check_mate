@@ -106,7 +106,7 @@ public class MateCommandService {
         User invitee = userRepository.findByNickname(inviteeNickname)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        return mateRepository.findMateWithGoal(goalId, invitee.getId())
+        return mateRepository.findWithGoal(goalId, invitee.getId())
                 .orElseGet(() -> {
                     Goal goal = goalRepository.findById(goalId)
                             .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));

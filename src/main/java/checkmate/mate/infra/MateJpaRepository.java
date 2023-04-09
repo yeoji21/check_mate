@@ -33,7 +33,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public Optional<Mate> findMateWithGoal(long mateId) {
+    public Optional<Mate> findWithGoal(long mateId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(mate)
@@ -43,7 +43,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public Optional<Mate> findMateWithGoal(long goalId, long userId) {
+    public Optional<Mate> findWithGoal(long goalId, long userId) {
         return Optional.ofNullable(
                 queryFactory
                         .selectFrom(mate)
@@ -52,6 +52,25 @@ public class MateJpaRepository implements MateRepository {
                                 mate.userId.eq(userId))
                         .fetchOne()
         );
+    }
+
+    @Override
+    public List<Mate> findByGoalIds(List<Long> goalIds) {
+        return queryFactory.select(mate)
+                .from(mate)
+                .where(mate.goal.id.in(goalIds),
+                        mate.status.eq(MateStatus.ONGOING))
+                .fetch();
+    }
+
+    @Override
+    public List<Mate> findSuccessMates(long userId) {
+        return queryFactory.select(mate)
+                .from(mate)
+                .join(mate.goal, goal).fetchJoin()
+                .where(mate.userId.eq(userId),
+                        mate.status.eq(MateStatus.SUCCESS))
+                .fetch();
     }
 
     @Override
@@ -90,15 +109,6 @@ public class MateJpaRepository implements MateRepository {
                 .where(mate.in(limitOveredMates))
                 .set(mate.status, MateStatus.OUT)
                 .execute();
-    }
-
-    @Override
-    public List<Mate> findMatesInGoals(List<Long> goalIds) {
-        return queryFactory.select(mate)
-                .from(mate)
-                .where(mate.goal.id.in(goalIds),
-                        mate.status.eq(MateStatus.ONGOING))
-                .fetch();
     }
 
     @Override

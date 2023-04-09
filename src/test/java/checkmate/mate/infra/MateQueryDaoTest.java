@@ -3,7 +3,6 @@ package checkmate.mate.infra;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.domain.Mate;
@@ -66,16 +65,17 @@ class MateQueryDaoTest extends RepositoryTest {
 
     @Test
     @DisplayName("팀원의 목표 캘린더 조회")
-    void findMateCalendar() throws Exception {
+    void findScheduleInfo() throws Exception {
         //given
         Goal goal = createGoal();
         Mate mate = createMate(goal, "user");
-        savePost(mate);
+        createPost(mate);
+
         em.flush();
         em.clear();
 
         //when
-        MateScheduleInfo info = mateQueryDao.findMateCalendar(mate.getId())
+        MateScheduleInfo info = mateQueryDao.findScheduleInfo(mate.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
@@ -94,7 +94,7 @@ class MateQueryDaoTest extends RepositoryTest {
         Mate mate3 = createMate(goal, "user3");
 
         //when
-        List<Long> userIds = mateQueryDao.findMateUserIds(goal.getId());
+        List<Long> userIds = mateQueryDao.findOngoingUserIds(goal.getId());
 
         //then
         assertThat(userIds).contains(mate1.getUserId(), mate2.getUserId(), mate3.getUserId());
@@ -106,8 +106,10 @@ class MateQueryDaoTest extends RepositoryTest {
         //given
         Goal goal = createGoal();
         Mate mate = createMate(goal, "user");
-        createYesterdayUploadedPost(mate);
-        savePost(mate);
+        createPost(mate);
+        Post yesterDayPost = createPost(mate);
+        ReflectionTestUtils.setField(yesterDayPost, "uploadedDate", LocalDate.now().minusDays(1));
+        
         em.flush();
         em.clear();
 
@@ -139,33 +141,10 @@ class MateQueryDaoTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("목표 수행 성공한 팀원 목록 조회")
-    void findSuccessTeamMates() throws Exception {
-        //given
-        User user = createSuccessedMates();
-        em.flush();
-        em.clear();
-
-        //when
-        List<Mate> successMates = mateQueryDao.findSuccessMates(user.getId());
-
-        //then
-        assertThat(successMates.size()).isEqualTo(2);
-        assertThat(successMates).allMatch(mate ->
-                mate.getStatus() == MateStatus.SUCCESS &&
-                        mate.getGoal().getStatus() == GoalStatus.OVER);
-    }
-
-    @Test
     @DisplayName("팀원들의 닉네임 조회")
     void findTeamMateNicknames() throws Exception {
         //given
-        List<Long> goalIds = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            Goal goal = createGoal();
-            goalIds.add(goal.getId());
-            for (int j = 0; j < 10; j++) createMate(goal, i + "user" + j);
-        }
+        List<Long> goalIds = createGoals();
         em.flush();
         em.clear();
 
@@ -189,40 +168,22 @@ class MateQueryDaoTest extends RepositoryTest {
         return mate;
     }
 
-    private User createSuccessedMates() {
-        User user = TestEntityFactory.user(null, "tester1");
-        em.persist(user);
-
-        Goal goal1 = TestEntityFactory.goal(null, "testGoal");
-        ReflectionTestUtils.setField(goal1, "status", GoalStatus.OVER);
-        em.persist(goal1);
-        Goal goal2 = TestEntityFactory.goal(null, "testGoal");
-        ReflectionTestUtils.setField(goal2, "status", GoalStatus.OVER);
-        em.persist(goal2);
-
-        Mate mate1 = goal1.join(user);
-        ReflectionTestUtils.setField(mate1, "status", MateStatus.SUCCESS);
-        em.persist(mate1);
-
-        Mate mate2 = goal2.join(user);
-        ReflectionTestUtils.setField(mate2, "status", MateStatus.SUCCESS);
-        em.persist(mate2);
-
-        em.flush();
-        em.clear();
-
-        return user;
-    }
-
-    private void savePost(Mate mate) {
+    private Post createPost(Mate mate) {
         Post post = TestEntityFactory.post(mate);
         em.persist(post);
+        return post;
     }
 
-    private void createYesterdayUploadedPost(Mate mate) {
-        Post yesterDayPost = TestEntityFactory.post(mate);
-        ReflectionTestUtils.setField(yesterDayPost, "uploadedDate", LocalDate.now().minusDays(1));
-        em.persist(yesterDayPost);
+    private List<Long> createGoals() {
+        List<Long> goalIds = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            Goal goal = createGoal();
+            goalIds.add(goal.getId());
+            for (int j = 0; j < 10; j++) {
+                createMate(goal, i + "user" + j);
+            }
+        }
+        return goalIds;
     }
 
     private Mate createMate(Goal goal, String nickname) {

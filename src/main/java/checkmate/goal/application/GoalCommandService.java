@@ -80,7 +80,7 @@ public class GoalCommandService {
     @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
-        List<Mate> mates = mateRepository.findMatesInGoals(overedGoalIds);
+        List<Mate> mates = mateRepository.findByGoalIds(overedGoalIds);
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toNotificationDtos(mates)));
         cacheHandler.deleteMateCaches(mates);
     }

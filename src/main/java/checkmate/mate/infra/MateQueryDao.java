@@ -4,7 +4,6 @@ import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateScheduleInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
-import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +26,6 @@ import static com.querydsl.core.group.GroupBy.list;
 public class MateQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    // TODO: 2023/03/09 status에 따른 조회 조건을 파라미터로 변경 고려
-    public List<Mate> findSuccessMates(long userId) {
-        return queryFactory.select(mate)
-                .from(mate)
-                .join(mate.goal, goal).fetchJoin()
-                .where(mate.userId.eq(userId),
-                        mate.status.eq(MateStatus.SUCCESS))
-                .fetch();
-    }
-
     // TODO: 2023/04/08 인덱스 (goalId, userId, status) 고려
     public boolean existOngoingMate(long goalId, long userId) {
         Long mateId = queryFactory.select(mate.id)
@@ -49,7 +38,7 @@ public class MateQueryDao {
     }
 
     // TODO: 2023/04/08 인덱스 (goalId, userId, status) 고려
-    public List<Long> findMateUserIds(long goalId) {
+    public List<Long> findOngoingUserIds(long goalId) {
         return queryFactory
                 .select(mate.userId)
                 .from(mate)
@@ -58,6 +47,12 @@ public class MateQueryDao {
                 .fetch();
     }
 
+    /**
+     * goalId에 해당하는 mate들의 닉네임을 조회
+     *
+     * @param goalIds
+     * @return key: goalId, value: 닉네임 리스트
+     */
     public Map<Long, List<String>> findMateNicknames(List<Long> goalIds) {
         return queryFactory
                 .from(goal)
@@ -67,7 +62,7 @@ public class MateQueryDao {
                 .transform(groupBy(goal.id).as(list(user.nickname)));
     }
 
-    public Optional<MateScheduleInfo> findMateCalendar(long mateId) {
+    public Optional<MateScheduleInfo> findScheduleInfo(long mateId) {
         Map<Long, MateScheduleInfo> scheduleInfoMap = queryFactory
                 .from(mate)
                 .innerJoin(mate.goal, goal)

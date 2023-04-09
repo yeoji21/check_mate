@@ -72,7 +72,7 @@ public class MateCommandServiceTest {
 
         given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate.getGoal()));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
-        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.empty());
+        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.empty());
         given(mateRepository.save(any(Mate.class))).willReturn(inviteeMate);
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.of("inviter"));
 
@@ -93,7 +93,7 @@ public class MateCommandServiceTest {
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
 
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
-        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.of("inviter"));
 
         //when

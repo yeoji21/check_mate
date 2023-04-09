@@ -83,7 +83,7 @@ public class PostCommandService {
     }
 
     private long validateUserInGoal(long userId, Post post) {
-        return mateRepository.findMateWithGoal(post.getMate().getGoal().getId(), userId)
+        return mateRepository.findWithGoal(post.getMate().getGoal().getId(), userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, post.getMate().getId()))
                 .getGoal()
                 .getId();
@@ -102,7 +102,7 @@ public class PostCommandService {
     }
 
     private List<Long> getMateUserIds(Mate uploader) {
-        return mateQueryDao.findMateUserIds(uploader.getGoal().getId())
+        return mateQueryDao.findOngoingUserIds(uploader.getGoal().getId())
                 .stream()
                 .filter(userId -> !userId.equals(uploader.getUserId()))
                 .collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class PostCommandService {
     }
 
     private Mate findMate(long mateId) {
-        return mateRepository.findMateWithGoal(mateId)
+        return mateRepository.findWithGoal(mateId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
     }
 }

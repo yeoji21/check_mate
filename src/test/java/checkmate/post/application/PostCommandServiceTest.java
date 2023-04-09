@@ -55,12 +55,12 @@ class PostCommandServiceTest {
     void upload() throws Exception {
         //given
         Mate mate = createMate();
-        given(mateRepository.findMateWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
+        given(mateRepository.findWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
         given(userRepository.findById(any(Long.class)))
                 .willReturn(Optional.ofNullable(TestEntityFactory.user(mate.getUserId(), "tester")));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
-        given(mateQueryDao.findMateUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
-        
+        given(mateQueryDao.findOngoingUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
+
         //when
         postCommandService.upload(createPostUploadCommand(mate));
 
@@ -77,7 +77,7 @@ class PostCommandServiceTest {
         Post post = createPost(mate);
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
+        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when
@@ -96,7 +96,7 @@ class PostCommandServiceTest {
         post.addLikes(new Likes(mate.getUserId()));
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
-        given(mateRepository.findMateWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
+        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when

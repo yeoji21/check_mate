@@ -27,13 +27,13 @@ public class MateQueryService {
 
     @Transactional(readOnly = true)
     public MateScheduleInfo findCalenderInfo(long teamMateId) {
-        return mateQueryDao.findMateCalendar(teamMateId)
+        return mateQueryDao.findScheduleInfo(teamMateId)
                 .orElseThrow(IllegalArgumentException::new);
     }
 
     @Transactional(readOnly = true)
     public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(long goalId, long userId) {
-        Mate mate = mateRepository.findMateWithGoal(goalId, userId)
+        Mate mate = mateRepository.findWithGoal(goalId, userId)
                 .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND));
         return new SpecifiedGoalDetailInfo(mate,
                 mateQueryDao.findUploadedDates(mate.getId()),
@@ -43,7 +43,7 @@ public class MateQueryService {
     @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
     public GoalHistoryInfoResult findGoalHistoryResult(long userId) {
-        List<Mate> successMates = mateQueryDao.findSuccessMates(userId);
+        List<Mate> successMates = mateRepository.findSuccessMates(userId);
         return new GoalHistoryInfoResult(mapToGoalHistoryInfo(successMates));
     }
 
