@@ -37,7 +37,7 @@ public class MateQueryService {
                 .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND));
         return new SpecifiedGoalDetailInfo(mate,
                 mateQueryDao.findUploadedDates(mate.getId()),
-                mateQueryDao.findMateInfo(goalId));
+                mateQueryDao.findUploadInfo(goalId));
     }
 
     @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")

@@ -131,7 +131,7 @@ class MateQueryDaoTest extends RepositoryTest {
         em.clear();
 
         //when
-        List<MateUploadInfo> uploadInfo = mateQueryDao.findMateInfo(goal.getId());
+        List<MateUploadInfo> uploadInfo = mateQueryDao.findUploadInfo(goal.getId());
 
         //then
         assertThat(uploadInfo.size()).isEqualTo(10);

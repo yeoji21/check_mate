@@ -28,6 +28,7 @@ public class GoalQueryDao {
     private final EntityManager entityManager;
 
     // 오늘 진행할 목표 정보 조회
+    // TODO: 2023/04/08 인덱스 고려
     public List<TodayGoalInfo> findTodayGoalInfo(Long userId) {
         List<Object[]> resultList = entityManager.createNativeQuery(
                         "select g.id, g.category, g.title, g.check_days, m.last_upload_date" +

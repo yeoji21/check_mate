@@ -22,6 +22,7 @@ import static com.querydsl.core.group.GroupBy.list;
 public class PostQueryDao {
     private final JPAQueryFactory queryFactory;
 
+    // TODO: 2023/04/09 인덱스 고려
     public List<PostInfo> findTimelinePosts(long goalId, LocalDate date) {
         return queryFactory
                 .from(mate)

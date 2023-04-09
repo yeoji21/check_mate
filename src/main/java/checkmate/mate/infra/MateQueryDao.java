@@ -37,6 +37,7 @@ public class MateQueryDao {
                 .fetch();
     }
 
+    // TODO: 2023/04/08 인덱스 (goalId, userId, status) 고려
     public boolean existOngoingMate(long goalId, long userId) {
         Long mateId = queryFactory.select(mate.id)
                 .from(mate)
@@ -47,6 +48,7 @@ public class MateQueryDao {
         return mateId != null;
     }
 
+    // TODO: 2023/04/08 인덱스 (goalId, userId, status) 고려
     public List<Long> findMateUserIds(long goalId) {
         return queryFactory
                 .select(mate.userId)
@@ -89,7 +91,7 @@ public class MateQueryDao {
                 .fetch();
     }
 
-    public List<MateUploadInfo> findMateInfo(long goalId) {
+    public List<MateUploadInfo> findUploadInfo(long goalId) {
         return queryFactory
                 .select(new QMateUploadInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
                 .from(mate)
