@@ -54,7 +54,7 @@ class NotificationQueryServiceTest {
         Notification notification = createNotification(receiver, NotificationType.POST_UPLOAD);
         notification.addAttribute("goalId", 1L);
 
-        given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
+        given(notificationRepository.findReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
 
         //when
         NotificationAttributeInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
@@ -74,7 +74,7 @@ class NotificationQueryServiceTest {
         NotificationReceiver receiver = new NotificationReceiver(1L);
         Notification notification = createNotification(receiver, NotificationType.INVITE_GOAL);
 
-        given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
+        given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
 
         //when
@@ -91,7 +91,7 @@ class NotificationQueryServiceTest {
     void findGoalCompleteNotifications() throws Exception {
         //given
         List<NotificationReceiver> receivers = createNotificationReceivers();
-        given(notificationRepository.findGoalCompleteNotificationReceivers(anyLong())).willReturn(receivers);
+        given(notificationRepository.findUnCheckedReceivers(anyLong(), any())).willReturn(receivers);
 
         //when
         NotificationAttributeInfoResult result = notificationQueryService.findGoalCompleteNotifications(1L);

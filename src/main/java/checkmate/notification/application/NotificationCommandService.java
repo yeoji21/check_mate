@@ -5,6 +5,7 @@ import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.NotificationGenerator;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
+import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.notification.infrastructure.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import java.util.List;
 @Service
 public class NotificationCommandService {
     private final NotificationRepository notificationRepository;
+    private final NotificationQueryDao notificationQueryDao;
     private final NotificationGenerator notificationGenerator;
     private final NotificationSender notificationSender;
 
@@ -25,7 +27,7 @@ public class NotificationCommandService {
     public void savePushNotification(NotificationType type, NotificationCreateDto dto) {
         Notification notification = notificationGenerator.generate(type, dto);
         notificationRepository.save(notification);
-        List<String> tokens = notificationRepository.findReceiversFcmToken(notification.getId());
+        List<String> tokens = notificationQueryDao.findReceiversFcmToken(notification.getId());
         notificationSender.send(notification, tokens);
     }
 

@@ -8,9 +8,7 @@ public interface NotificationRepository {
 
     void save(Notification notification);
 
-    Optional<NotificationReceiver> findNotificationReceiver(long notificationId, long receiverUserId);
+    Optional<NotificationReceiver> findReceiver(long notificationId, long receiverUserId);
 
-    List<String> findReceiversFcmToken(Long notificationId);
-
-    List<NotificationReceiver> findGoalCompleteNotificationReceivers(long userId);
+    List<NotificationReceiver> findUnCheckedReceivers(long receiverUserId, NotificationType notificationType);
 }

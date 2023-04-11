@@ -13,6 +13,7 @@ import java.util.List;
 
 import static checkmate.notification.domain.QNotification.notification;
 import static checkmate.notification.domain.QNotificationReceiver.notificationReceiver;
+import static checkmate.user.domain.QUser.user;
 
 @RequiredArgsConstructor
 @Repository
@@ -31,6 +32,14 @@ public class NotificationQueryDao {
                 .fetch();
         boolean hasNext = hasNext(pageable.getPageSize(), notifications);
         return new NotificationDetailResult(notifications, hasNext);
+    }
+
+    public List<String> findReceiversFcmToken(long notificationId) {
+        return queryFactory.select(user.fcmToken)
+                .from(notificationReceiver)
+                .innerJoin(user).on(notificationReceiver.userId.eq(user.id))
+                .where(notificationReceiver.notification.id.eq(notificationId))
+                .fetch();
     }
 
     private boolean hasNext(int size, List<NotificationDetailInfo> notificationDetails) {

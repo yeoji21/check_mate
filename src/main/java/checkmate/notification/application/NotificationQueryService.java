@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -28,7 +27,7 @@ public class NotificationQueryService {
 
     @Transactional
     public NotificationAttributeInfo findNotificationInfo(long notificationId, long userId) {
-        NotificationReceiver receiver = notificationRepository.findNotificationReceiver(notificationId, userId)
+        NotificationReceiver receiver = notificationRepository.findReceiver(notificationId, userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
         read(receiver);
         return mapper.toInfo(receiver.getNotification());
@@ -36,13 +35,13 @@ public class NotificationQueryService {
 
     @Transactional
     public NotificationAttributeInfoResult findGoalCompleteNotifications(long userId) {
-        List<NotificationAttributeInfo> notifications = notificationRepository.findGoalCompleteNotificationReceivers(userId)
+        List<NotificationAttributeInfo> notifications = notificationRepository.findUnCheckedReceivers(userId, NotificationType.COMPLETE_GOAL)
                 .stream()
                 .map(receiver -> {
                     receiver.read();
                     return mapper.toInfo(receiver.getNotification());
                 })
-                .collect(Collectors.toList());
+                .toList();
         return new NotificationAttributeInfoResult(notifications);
     }
 

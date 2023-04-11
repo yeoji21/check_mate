@@ -115,7 +115,7 @@ public class MateCommandService {
     }
 
     private Notification findAndReadNotification(long notificationId, long inviteeUserId) {
-        NotificationReceiver receiver = notificationRepository.findNotificationReceiver(notificationId, inviteeUserId)
+        NotificationReceiver receiver = notificationRepository.findReceiver(notificationId, inviteeUserId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
         receiver.read();
         return receiver.getNotification();

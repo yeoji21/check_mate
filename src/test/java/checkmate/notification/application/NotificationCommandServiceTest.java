@@ -9,6 +9,7 @@ import checkmate.notification.domain.factory.NotificationGenerator;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
+import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.notification.infrastructure.NotificationSender;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +34,8 @@ class NotificationCommandServiceTest {
     @Mock
     private NotificationRepository notificationRepository;
     @Mock
+    private NotificationQueryDao notificationQueryDao;
+    @Mock
     private NotificationGenerator notificationGenerator;
     @Mock
     private NotificationSender notificationSender;
@@ -52,7 +55,7 @@ class NotificationCommandServiceTest {
             ReflectionTestUtils.setField(argument, "id", 1L);
             return argument;
         })).when(notificationRepository).save(notification);
-        given(notificationRepository.findReceiversFcmToken(any(Long.class))).willReturn(List.of("token1", "token2", "token3"));
+        given(notificationQueryDao.findReceiversFcmToken(any(Long.class))).willReturn(List.of("token1", "token2", "token3"));
 
         //when
         notificationCommandService.savePushNotification(POST_UPLOAD, dto);

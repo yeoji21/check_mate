@@ -12,11 +12,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
 
-import static checkmate.notification.domain.NotificationType.*;
+import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
+import static checkmate.notification.domain.NotificationType.INVITE_GOAL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NotificationRepositoryTest extends RepositoryTest {
-    @Test @DisplayName("알림 수신자 조회")
+    @Test
+    @DisplayName("알림 수신자 조회")
     void findNotificationReceiver() throws Exception {
         //given
         User sender = createUser("sender");
@@ -26,30 +28,13 @@ class NotificationRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        NotificationReceiver notificationReceiver = notificationRepository.findNotificationReceiver(notification.getId(), receiver.getId())
+        NotificationReceiver notificationReceiver = notificationRepository.findReceiver(notification.getId(), receiver.getId())
                 .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(notificationReceiver.getNotification()).isEqualTo(notification);
         assertThat(notification.getReceivers()).contains(notificationReceiver);
         assertThat(notificationReceiver.getUserId()).isEqualTo(receiver.getId());
-    }
-
-    @Test
-    @DisplayName("알림 수신자 FCM 토큰 목록 조회")
-    void findReceiversFcmToken() throws Exception {
-        //given
-        User sender = createUser("sender");
-        Notification notification = createNotification(sender, POST_UPLOAD, createNotificationReceivers());
-        em.flush();
-        em.clear();
-
-        //when
-        List<String> fcmTokens = notificationRepository.findReceiversFcmToken(notification.getId());
-
-        //then
-        assertThat(fcmTokens.size()).isEqualTo(notification.getReceivers().size());
-        assertThat(fcmTokens).allMatch(token -> token != null);
     }
 
     @Test
@@ -68,7 +53,7 @@ class NotificationRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        List<NotificationReceiver> receivers = notificationRepository.findGoalCompleteNotificationReceivers(receiver.getId());
+        List<NotificationReceiver> receivers = notificationRepository.findUnCheckedReceivers(receiver.getId(), COMPLETE_GOAL);
 
         //then
         assertThat(receivers.size()).isEqualTo(1);
@@ -89,12 +74,6 @@ class NotificationRepositoryTest extends RepositoryTest {
                 .build();
         em.persist(notification);
         return notification;
-    }
-
-    private List<NotificationReceiver> createNotificationReceivers() {
-        User receiver1 = createUser("receiver1");
-        User receiver2 = createUser("receiver2");
-        return List.of(new NotificationReceiver(receiver1.getId()), new NotificationReceiver(receiver2.getId()));
     }
 
     private User createUser(String nickname) {

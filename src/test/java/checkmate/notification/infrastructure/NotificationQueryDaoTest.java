@@ -45,6 +45,25 @@ class NotificationQueryDaoTest extends RepositoryTest {
         assertThat(result.isHasNext()).isFalse();
     }
 
+    @Test
+    @DisplayName("알림 수신자 FCM 토큰 목록 조회")
+    void findReceiversFcmToken() throws Exception {
+        //given
+        User sender = createUser("sender");
+        User receiver1 = createUser("receiver1");
+        User receiver2 = createUser("receiver2");
+        Notification notification = createNotification(sender, createNotificationReceivers(receiver1, receiver2));
+        em.flush();
+        em.clear();
+
+        //when
+        List<String> fcmTokens = notificationQueryDao.findReceiversFcmToken(notification.getId());
+
+        //then
+        assertThat(fcmTokens.size()).isEqualTo(notification.getReceivers().size());
+        assertThat(fcmTokens).allMatch(token -> token != null);
+    }
+
     private List<NotificationReceiver> createNotificationReceivers(User user1, User user2) {
         return List.of(new NotificationReceiver(user1.getId()), new NotificationReceiver(user2.getId()));
     }

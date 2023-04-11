@@ -113,7 +113,7 @@ public class MateCommandServiceTest {
 
         MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId());
 
-        given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
+        given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(notification.getReceivers().get(0)));
         given(mateRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
@@ -143,7 +143,7 @@ public class MateCommandServiceTest {
         Notification notification = createInviteNotification(inviteeMate);
         NotificationReceiver receiver = notification.getReceivers().get(0);
 
-        given(notificationRepository.findNotificationReceiver(any(Long.class), any(Long.class)))
+        given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
                 .willReturn(Optional.of(receiver));
         given(mateRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));

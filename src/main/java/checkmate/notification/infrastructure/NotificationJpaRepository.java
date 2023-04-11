@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import static checkmate.notification.domain.QNotification.notification;
 import static checkmate.notification.domain.QNotificationReceiver.notificationReceiver;
-import static checkmate.user.domain.QUser.user;
 
 
 @RequiredArgsConstructor
@@ -34,7 +33,7 @@ public class NotificationJpaRepository implements NotificationRepository {
     }
 
     @Override
-    public Optional<NotificationReceiver> findNotificationReceiver(long notificationId, long receiverUserId) {
+    public Optional<NotificationReceiver> findReceiver(long notificationId, long receiverUserId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(notificationReceiver)
                         .join(notificationReceiver.notification, notification).fetchJoin()
@@ -45,22 +44,13 @@ public class NotificationJpaRepository implements NotificationRepository {
     }
 
     @Override
-    public List<String> findReceiversFcmToken(Long notificationId) {
-        return queryFactory.select(user.fcmToken)
-                .from(notificationReceiver)
-                .innerJoin(user).on(notificationReceiver.userId.eq(user.id))
-                .where(notificationReceiver.notification.id.eq(notificationId))
-                .fetch();
-    }
-
-    @Override
-    public List<NotificationReceiver> findGoalCompleteNotificationReceivers(long userId) {
+    public List<NotificationReceiver> findUnCheckedReceivers(long receiverUserId, NotificationType notificationType) {
         return queryFactory
                 .select(notificationReceiver)
                 .from(notificationReceiver)
-                .where(notificationReceiver.userId.eq(userId),
+                .where(notificationReceiver.userId.eq(receiverUserId),
                         notificationReceiver.checked.isFalse(),
-                        notification.type.eq(NotificationType.COMPLETE_GOAL))
+                        notification.type.eq(notificationType))
                 .fetch();
     }
 }
