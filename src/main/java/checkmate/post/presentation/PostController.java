@@ -35,15 +35,16 @@ public class PostController {
         return postQueryService.findPostByGoalIdAndDate(goalId, date);
     }
 
+    // TODO: 2023/04/11 GoalMember 인터셉터 적용
     @PostMapping("/posts/{postId}/like")
     public void like(@PathVariable long postId,
-                     @AuthenticationPrincipal JwtUserDetails principal) {
-        postCommandService.like(principal.getUserId(), postId);
+                     @AuthenticationPrincipal JwtUserDetails details) {
+        postCommandService.like(details.getUserId(), postId);
     }
 
     @DeleteMapping("/posts/{postId}/unlike")
     public void unlike(@PathVariable long postId,
-                       @AuthenticationPrincipal JwtUserDetails principal) {
-        postCommandService.unlike(principal.getUserId(), postId);
+                       @AuthenticationPrincipal JwtUserDetails details) {
+        postCommandService.unlike(details.getUserId(), postId);
     }
 }

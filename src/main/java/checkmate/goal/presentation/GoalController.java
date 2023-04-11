@@ -1,6 +1,6 @@
 package checkmate.goal.presentation;
 
-import checkmate.common.interceptor.GoalIdRoute;
+import checkmate.common.interceptor.GoalId;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.goal.application.GoalCommandService;
@@ -33,7 +33,7 @@ public class GoalController {
         return new GoalCreateResponse(goalId);
     }
 
-    @GoalMember(GoalIdRoute.REQUEST_BODY)
+    @GoalMember(GoalId.REQUEST_BODY)
     @PostMapping("/goals/like-condition")
     public void addLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
                                  @AuthenticationPrincipal JwtUserDetails details) {
@@ -41,7 +41,7 @@ public class GoalController {
         goalCommandService.addLikeCountCondition(command);
     }
 
-    @GoalMember(GoalIdRoute.PATH_VARIABLE)
+    @GoalMember(GoalId.PATH_VARIABLE)
     @PatchMapping("/goals/{goalId}")
     public void modify(@PathVariable long goalId,
                        @RequestBody GoalModifyDto dto,

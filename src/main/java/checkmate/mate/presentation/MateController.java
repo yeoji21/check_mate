@@ -1,6 +1,6 @@
 package checkmate.mate.presentation;
 
-import checkmate.common.interceptor.GoalIdRoute;
+import checkmate.common.interceptor.GoalId;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.mate.application.MateCommandService;
@@ -27,7 +27,7 @@ public class MateController {
     private final MateQueryService mateQueryService;
     private final MateDtoMapper mapper;
 
-    @GoalMember(GoalIdRoute.PATH_VARIABLE)
+    @GoalMember(GoalId.PATH_VARIABLE)
     @GetMapping("/goals/{goalId}/detail")
     public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(@PathVariable long goalId,
                                                                @AuthenticationPrincipal JwtUserDetails details) {
@@ -39,7 +39,7 @@ public class MateController {
         return mateQueryService.findGoalHistoryResult(details.getUserId());
     }
 
-    @GoalMember(GoalIdRoute.REQUEST_BODY)
+    @GoalMember(GoalId.REQUEST_BODY)
     @PostMapping("/mates")
     public void inviteToGoal(@RequestBody @Valid MateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.Optional;
 
-import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QPost.post;
 
@@ -23,7 +22,6 @@ public class PostJpaRepository implements PostRepository {
     public Optional<Post> findById(long postId) {
         return Optional.ofNullable(queryFactory.selectFrom(post)
                 .join(post.mate, mate).fetchJoin()
-                .join(mate.goal, goal).fetchJoin()
                 .where(post.id.eq(postId))
                 .fetchOne());
     }

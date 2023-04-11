@@ -57,11 +57,13 @@ public class PostCommandService {
         return new PostUploadResult(post.getId());
     }
 
+    // TODO: 2023/04/11 메소드 내 중복되는 쿼리 제거
     @Transactional
     public void like(long userId, long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
+        // TODO: 2023/04/11 new Likes(userId)
         post.addLikes(new Likes(userId));
         verifyGoalConditions(goalId, post);
     }
@@ -84,7 +86,7 @@ public class PostCommandService {
 
     private long validateUserInGoal(long userId, Post post) {
         return mateRepository.findWithGoal(post.getMate().getGoal().getId(), userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, post.getMate().getId()))
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND))
                 .getGoal()
                 .getId();
     }

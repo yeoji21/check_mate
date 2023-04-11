@@ -50,7 +50,7 @@ public class GoalMemberInterceptor implements HandlerInterceptor {
 
     private long getGoalIdInRequest(HandlerMethod handlerMethod,
                                     HttpServletRequest request) throws IOException {
-        GoalIdRoute route = handlerMethod.getMethodAnnotation(GoalMember.class).value();
+        GoalId route = handlerMethod.getMethodAnnotation(GoalMember.class).value();
         Long goalId = switch (route) {
             case REQUEST_PARAM -> Long.parseLong(request.getParameter("goalId"));
             case REQUEST_BODY -> getFromMessageBody(request);

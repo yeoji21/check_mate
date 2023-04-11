@@ -1,6 +1,6 @@
 package checkmate.common;
 
-import checkmate.common.interceptor.GoalIdRoute;
+import checkmate.common.interceptor.GoalId;
 import checkmate.common.interceptor.GoalMember;
 import checkmate.common.interceptor.GoalMemberInterceptor;
 import checkmate.config.auth.JwtUserDetails;
@@ -70,7 +70,7 @@ class GoalMemberInterceptorTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         request.setParameter("goalId", "123");
-        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_PARAM);
+        given(mockAnnotation.value()).willReturn(GoalId.REQUEST_PARAM);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -87,7 +87,7 @@ class GoalMemberInterceptorTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         request.setContent("{\"goalId\": 123}".getBytes(StandardCharsets.UTF_8));
-        given(mockAnnotation.value()).willReturn(GoalIdRoute.REQUEST_BODY);
+        given(mockAnnotation.value()).willReturn(GoalId.REQUEST_BODY);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
@@ -105,7 +105,7 @@ class GoalMemberInterceptorTest {
 
         request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
                 Collections.singletonMap("goalId", "1"));
-        given(mockAnnotation.value()).willReturn(GoalIdRoute.PATH_VARIABLE);
+        given(mockAnnotation.value()).willReturn(GoalId.PATH_VARIABLE);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);
