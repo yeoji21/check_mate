@@ -75,7 +75,7 @@ class PostCommandServiceTest {
         Mate mate = createMate();
         Post post = createPost(mate);
 
-        given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
+        given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
         given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
@@ -94,7 +94,7 @@ class PostCommandServiceTest {
         Post post = createPost(mate);
         post.addLikes(mate.getUserId());
 
-        given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
+        given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
         given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 

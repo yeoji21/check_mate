@@ -38,6 +38,7 @@ import javax.persistence.EntityManager;
         ImageJpaRepository.class,
         PostJpaRepository.class,
         GoalJpaRepository.class,
+        PostJpaRepository.class,
         PostQueryDao.class,
         NotificationQueryDao.class,
         UserJpaRepository.class,

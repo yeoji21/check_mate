@@ -59,7 +59,7 @@ public class PostCommandService {
     // TODO: 2023/04/11 메소드 내 중복되는 쿼리 제거
     @Transactional
     public void like(long userId, long postId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
         post.addLikes(userId);
@@ -68,7 +68,7 @@ public class PostCommandService {
 
     @Transactional
     public void unlike(long userId, long postId) {
-        Post post = postRepository.findById(postId)
+        Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
         post.removeLikes(userId);
