@@ -31,7 +31,7 @@ public class PostJpaRepository implements PostRepository {
     public Optional<Post> findWithLikes(long postId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(post)
-                        .join(post.likes, likes).fetchJoin()
+                        .leftJoin(post.likes, likes).fetchJoin()
                         .join(post.mate, mate).fetchJoin()
                         .where(post.id.eq(postId))
                         .fetchOne()

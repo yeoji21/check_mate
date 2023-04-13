@@ -36,7 +36,6 @@ public class PostController {
     }
 
     // TODO: 2023/04/11 GoalMember 인터셉터 적용
-    // TODO: 2023/04/13 중복되는 유저가 좋아요/좋아요 취소한 경우에 대한 로직 필요
     @PostMapping("/posts/{postId}/like")
     public void like(@PathVariable long postId,
                      @AuthenticationPrincipal JwtUserDetails details) {

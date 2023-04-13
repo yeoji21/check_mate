@@ -48,6 +48,21 @@ class PostTest {
     }
 
     @Test
+    @DisplayName("게시글 좋아요 추가 - 이미 좋아요 누른 유저")
+    void addLikes_duplicate() throws Exception {
+        //given
+        Post post = createPost();
+        post.addLikes(1L);
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> post.addLikes(1L));
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
+    }
+
+    @Test
     @DisplayName("게시글 좋아요 제거")
     void removeLikes() throws Exception {
         //given
@@ -74,7 +89,9 @@ class PostTest {
         post.addLikes(2L);
 
         //when //then
-        assertThrows(IllegalArgumentException.class, () -> post.removeLikes(3L));
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> post.removeLikes(3L));
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
 
     @Test

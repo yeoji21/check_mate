@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PostRepositoryTest extends RepositoryTest {
-
     @Test
     @DisplayName("게시글과 좋아요 목록 조회 - postId")
     void findWithLikes() throws Exception {

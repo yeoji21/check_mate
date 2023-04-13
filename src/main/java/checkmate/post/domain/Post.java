@@ -4,7 +4,6 @@ import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
-import com.mysema.commons.lang.Assert;
 import lombok.*;
 
 import javax.persistence.*;
@@ -52,6 +51,9 @@ public class Post extends BaseTimeEntity {
 
     public void addLikes(long userId) {
         checkLikesUpdatable();
+        boolean exist = likes.stream().anyMatch(like -> like.getUserId() == userId);
+        if (exist) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+
         Likes likes = new Likes(userId);
         this.likes.add(likes);
         likes.setPost(this);
@@ -60,7 +62,7 @@ public class Post extends BaseTimeEntity {
     public void removeLikes(long userId) {
         checkLikesUpdatable();
         boolean removed = likes.removeIf(like -> like.getUserId() == userId);
-        Assert.isTrue(removed, "userId " + userId + "'s like is not removed");
+        if (!removed) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 
     void checkLikesUpdatable() {
