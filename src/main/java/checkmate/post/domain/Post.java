@@ -50,10 +50,11 @@ public class Post extends BaseTimeEntity {
         images.putImage(image);
     }
 
-    public void addLikes(Likes like) {
+    public void addLikes(long userId) {
         checkLikesUpdatable();
-        likes.add(like);
-        like.setPost(this);
+        Likes likes = new Likes(userId);
+        this.likes.add(likes);
+        likes.setPost(this);
     }
 
     public void removeLikes(long userId) {

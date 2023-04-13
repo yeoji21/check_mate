@@ -6,7 +6,6 @@ import checkmate.goal.domain.Goal;
 import checkmate.mate.domain.Mate;
 import checkmate.post.application.dto.response.PostInfo;
 import checkmate.post.domain.Image;
-import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,8 @@ class PostQueryDaoTest extends RepositoryTest {
         Post post2 = getPost(mate);
         Post post3 = getPost(mate);
 
-        post3.addLikes(new Likes(1L));
-        post3.addLikes(new Likes(2L));
+        post3.addLikes(1L);
+        post3.addLikes(2L);
         em.persist(getImage(post2));
 
         em.flush();

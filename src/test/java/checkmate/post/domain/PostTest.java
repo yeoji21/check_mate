@@ -23,8 +23,8 @@ class PostTest {
         Post post = createPost();
 
         //when
-        post.addLikes(new Likes(2L));
-        post.addLikes(new Likes(3L));
+        post.addLikes(2L);
+        post.addLikes(3L);
 
         //then
         List<Likes> likes = post.getLikes();
@@ -41,7 +41,7 @@ class PostTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> post.addLikes(new Likes(2L)));
+                () -> post.addLikes(1L));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
@@ -52,9 +52,9 @@ class PostTest {
     void removeLikes() throws Exception {
         //given
         Post post = createPost();
-        post.addLikes(new Likes(1L));
-        post.addLikes(new Likes(2L));
-        post.addLikes(new Likes(3L));
+        post.addLikes(1L);
+        post.addLikes(2L);
+        post.addLikes(3L);
 
         //when
         post.removeLikes(1L);
@@ -70,8 +70,8 @@ class PostTest {
     void removeLikes_not_liked_user() throws Exception {
         //given
         Post post = createPost();
-        post.addLikes(new Likes(1L));
-        post.addLikes(new Likes(2L));
+        post.addLikes(1L);
+        post.addLikes(2L);
 
         //when //then
         assertThrows(IllegalArgumentException.class, () -> post.removeLikes(3L));
@@ -82,7 +82,7 @@ class PostTest {
     void removeLikes_period_exception() throws Exception {
         //given
         Post post = createPost();
-        post.addLikes(new Likes(1L));
+        post.addLikes(1L);
         ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
         //when
         BusinessException exception = assertThrows(BusinessException.class,

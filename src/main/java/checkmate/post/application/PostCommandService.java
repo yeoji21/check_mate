@@ -13,7 +13,6 @@ import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
 import checkmate.post.application.dto.response.PostUploadResult;
-import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.domain.event.FileUploadedEvent;
@@ -63,8 +62,7 @@ public class PostCommandService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         long goalId = validateUserInGoal(userId, post);
-        // TODO: 2023/04/11 new Likes(userId)
-        post.addLikes(new Likes(userId));
+        post.addLikes(userId);
         verifyGoalConditions(goalId, post);
     }
 

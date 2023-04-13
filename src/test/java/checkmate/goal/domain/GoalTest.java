@@ -5,7 +5,6 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
-import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -183,7 +182,7 @@ class GoalTest {
         goal.addCondition(new LikeCountCondition(5));
         Post post = TestEntityFactory.post(goal.join(TestEntityFactory.user(1L, "user")));
         for (int i = 0; i < 5; i++) {
-            post.addLikes(new Likes(1L));
+            post.addLikes(i);
         }
         //when
         goal.checkConditions(post);

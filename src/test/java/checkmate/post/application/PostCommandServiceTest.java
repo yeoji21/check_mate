@@ -8,7 +8,6 @@ import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.post.application.dto.request.PostUploadCommand;
-import checkmate.post.domain.Likes;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.user.domain.UserRepository;
@@ -93,7 +92,7 @@ class PostCommandServiceTest {
         //given
         Mate mate = createMate();
         Post post = createPost(mate);
-        post.addLikes(new Likes(mate.getUserId()));
+        post.addLikes(mate.getUserId());
 
         given(postRepository.findById(any(Long.class))).willReturn(Optional.of(post));
         given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(mate));
