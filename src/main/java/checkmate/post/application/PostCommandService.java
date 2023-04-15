@@ -8,6 +8,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.Uploadable;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
@@ -50,7 +51,7 @@ public class PostCommandService {
     @Transactional
     public PostUploadResult upload(PostUploadCommand command) {
         Mate uploader = findMate(command.mateId());
-        Post post = save(command, uploader);
+        Post post = create(command, uploader);
         verifyGoalConditions(uploader.getGoal().getId(), post);
         publishNotificationEvent(uploader);
         return new PostUploadResult(post.getId());
@@ -108,8 +109,9 @@ public class PostCommandService {
                 .collect(Collectors.toList());
     }
 
-    private Post save(PostUploadCommand command, Mate uploader) {
-        Assert.isTrue(uploader.getUploadable().isUploadable(), "uploadable");
+    private Post create(PostUploadCommand command, Mate uploader) {
+        Uploadable uploadable = uploader.getUploadable();
+        Assert.isTrue(uploadable.isUploadable(), uploadable.toString());
 
         Post post = Post.builder()
                 .mate(uploader)

@@ -17,4 +17,13 @@ public class Uploadable {
         this.timeOver = timeOver;
         this.uploadable = !uploaded && workingDay && !timeOver;
     }
+
+    @Override
+    public String toString() {
+        return "{ uploadable = " + uploadable +
+                ", uploaded = " + uploaded +
+                ", workingDay = " + workingDay +
+                ", timeOver = " + timeOver +
+                " }";
+    }
 }
