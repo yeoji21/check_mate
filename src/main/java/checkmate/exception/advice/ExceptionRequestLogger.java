@@ -25,7 +25,7 @@ public class ExceptionRequestLogger {
         logBuilder.append(getExceptionName(e)).append(" -> ").append(parsingMessage(e)).append("\n");
         logBuilder.append(response.getBody()).append("\n");
         logBuilder.append(parsingHeaders(request)).append("\n");
-        logBuilder.append(parsingBody((ContentCachingRequestWrapper) request));
+        logBuilder.append(parsingBody(request));
         log.warn(logBuilder.toString());
     }
 
@@ -60,7 +60,7 @@ public class ExceptionRequestLogger {
         return headerMap;
     }
 
-    private static String parsingBody(ContentCachingRequestWrapper request) {
+    private static String parsingBody(HttpServletRequest request) {
         ContentCachingRequestWrapper cachedRequest = WebUtils.getNativeRequest(request, ContentCachingRequestWrapper.class);
         if (cachedRequest != null) {
             byte[] buf = cachedRequest.getContentAsByteArray();
