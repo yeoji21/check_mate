@@ -57,10 +57,10 @@ class GoalQueryDaoTest extends RepositoryTest {
         assertThat(ongoingGoals.size()).isEqualTo(3);
         for (int i = 0; i < ongoingGoals.size(); i++) {
             OngoingGoalInfo info = ongoingGoals.get(i);
-            assertThat(info.id()).isGreaterThan(0L);
-            assertThat(info.title()).isEqualTo("goal" + (i + 1));
-            assertThat(info.category()).isNotNull();
-            assertThat(info.weekDays()).isEqualTo("월화수목금토일");
+            assertThat(info.getId()).isGreaterThan(0L);
+            assertThat(info.getTitle()).isEqualTo("goal" + (i + 1));
+            assertThat(info.getCategory()).isNotNull();
+            assertThat(info.getWeekDays()).isEqualTo("월화수목금토일");
         }
     }
 

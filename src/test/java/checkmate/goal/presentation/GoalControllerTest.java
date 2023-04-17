@@ -288,7 +288,7 @@ public class GoalControllerTest extends ControllerTest {
                 .id(goal.getId())
                 .category(goal.getCategory())
                 .title(goal.getTitle())
-                .weekDays(goal.getCheckDays().toString())
+                .weekDays(goal.getCheckDays().intValue())
                 .build();
     }
 
