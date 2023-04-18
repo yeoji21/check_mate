@@ -84,7 +84,7 @@ class PostControllerTest extends ControllerTest {
     @Test
     @DisplayName("인증글 좋아요 API")
     void like() throws Exception {
-        mockMvc.perform(post("/posts/{postId}/like", 1L)
+        mockMvc.perform(post("/goals/{goalId}/posts/{postId}/like", 1L, 1L)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -99,13 +99,15 @@ class PostControllerTest extends ControllerTest {
     @Test
     @DisplayName("인증글 좋아요 취소 API")
     void unlike() throws Exception {
-        mockMvc.perform(delete("/posts/{postId}/unlike", 1L)
+        mockMvc.perform(delete("/goals/{goalId}/posts/{postId}/unlike", 1L, 1L)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("post-unlike",
                         postIdPathParametersSnippet()
                 ));
+
+        Mockito.verify(postCommandService).unlike(any(Long.class), any(Long.class));
     }
 
     private PathParametersSnippet findPostPathParametersSnippet() {
@@ -116,7 +118,8 @@ class PostControllerTest extends ControllerTest {
     }
 
     private PathParametersSnippet postIdPathParametersSnippet() {
-        return pathParameters(parameterWithName("postId").description("포스트 ID"));
+        return pathParameters(parameterWithName("goalId").description("목표 ID"),
+                parameterWithName("postId").description("포스트 ID"));
     }
 
     private ResponseFieldsSnippet findPostResponseFieldsSnippet() {

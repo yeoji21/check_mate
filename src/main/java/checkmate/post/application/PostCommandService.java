@@ -52,7 +52,7 @@ public class PostCommandService {
     public PostUploadResult upload(PostUploadCommand command) {
         Mate uploader = findMate(command.mateId());
         Post post = create(command, uploader);
-        verifyGoalConditions(uploader.getGoal().getId(), post);
+        verifyGoalConditions(post);
         publishNotificationEvent(uploader);
         return new PostUploadResult(post.getId());
     }
@@ -62,22 +62,21 @@ public class PostCommandService {
     public void like(long userId, long postId) {
         Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
-        long goalId = validateUserInGoal(userId, post);
         post.addLikes(userId);
-        verifyGoalConditions(goalId, post);
+        verifyGoalConditions(post);
     }
 
     @Transactional
     public void unlike(long userId, long postId) {
         Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
-        long goalId = validateUserInGoal(userId, post);
         post.removeLikes(userId);
-        verifyGoalConditions(goalId, post);
+        verifyGoalConditions(post);
     }
 
     // TODO: 2023/02/23 공통 관심사
-    private void verifyGoalConditions(Long goalId, Post post) {
+    private void verifyGoalConditions(Post post) {
+        long goalId = post.getMate().getGoal().getId();
         Goal goal = goalRepository.findWithConditions(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
         goal.checkConditions(post);

@@ -1,5 +1,7 @@
 package checkmate.post.presentation;
 
+import checkmate.common.interceptor.GoalId;
+import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.post.application.PostCommandService;
 import checkmate.post.application.PostQueryService;
@@ -35,15 +37,18 @@ public class PostController {
         return postQueryService.findPostByGoalIdAndDate(goalId, date);
     }
 
-    // TODO: 2023/04/11 GoalMember 인터셉터 적용
-    @PostMapping("/posts/{postId}/like")
-    public void like(@PathVariable long postId,
+    @GoalMember(value = GoalId.PATH_VARIABLE)
+    @PostMapping("/goals/{goalId}/posts/{postId}/like")
+    public void like(@PathVariable long goalId,
+                     @PathVariable long postId,
                      @AuthenticationPrincipal JwtUserDetails details) {
         postCommandService.like(details.getUserId(), postId);
     }
 
-    @DeleteMapping("/posts/{postId}/unlike")
-    public void unlike(@PathVariable long postId,
+    @GoalMember(value = GoalId.PATH_VARIABLE)
+    @DeleteMapping("/goals/{goalId}/posts/{postId}/unlike")
+    public void unlike(@PathVariable long goalId,
+                       @PathVariable long postId,
                        @AuthenticationPrincipal JwtUserDetails details) {
         postCommandService.unlike(details.getUserId(), postId);
     }
