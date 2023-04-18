@@ -176,6 +176,10 @@ include::{snippets}/goal-history/http-response.adoc[]
 
 == 팀원 초대 요청
 
+=== Path Variables
+
+include::{snippets}/mate-invite/path-parameters.adoc[]
+
 === Request Fields
 
 include::{snippets}/mate-invite/request-fields.adoc[]

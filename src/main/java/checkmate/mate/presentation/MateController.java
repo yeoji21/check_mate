@@ -39,11 +39,12 @@ public class MateController {
         return mateQueryService.findGoalHistoryResult(details.getUserId());
     }
 
-    @GoalMember(GoalId.REQUEST_BODY)
-    @PostMapping("/mates")
-    public void inviteToGoal(@RequestBody @Valid MateInviteDto inviteDto,
+    @GoalMember(GoalId.PATH_VARIABLE)
+    @PostMapping("/goals/{goalId}/mates")
+    public void inviteToGoal(@PathVariable long goalId,
+                             @RequestBody @Valid MateInviteDto inviteDto,
                              @AuthenticationPrincipal JwtUserDetails principal) {
-        mateCommandService.inviteMate(mapper.toCommand(inviteDto, principal.getUserId()));
+        mateCommandService.inviteMate(mapper.toCommand(goalId, inviteDto, principal.getUserId()));
     }
 
     @PatchMapping("/mates/accept")

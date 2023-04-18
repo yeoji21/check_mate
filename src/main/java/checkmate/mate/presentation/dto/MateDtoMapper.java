@@ -10,7 +10,7 @@ import org.mapstruct.factory.Mappers;
 public interface MateDtoMapper {
     MateDtoMapper INSTANCE = Mappers.getMapper(MateDtoMapper.class);
 
-    MateInviteCommand toCommand(MateInviteDto inviteDto, long inviterUserId);
+    MateInviteCommand toCommand(long goalId, MateInviteDto inviteDto, long inviterUserId);
 
     @Mapping(target = "notificationId", source = "dto.notificationId")
     MateInviteReplyCommand toCommand(MateInviteReplyDto dto, long userId);

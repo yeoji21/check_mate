@@ -11,14 +11,15 @@ class MateDtoMapperTest extends MapperTest {
     @Test
     void teamMateInviteCommand() throws Exception {
         //given
-        MateInviteDto dto = new MateInviteDto(1L, "nickname");
+        MateInviteDto dto = new MateInviteDto("nickname");
+        long goalId = 1L;
         long inviterUserId = 2L;
 
         //when
-        MateInviteCommand command = mapper.toCommand(dto, inviterUserId);
+        MateInviteCommand command = mapper.toCommand(goalId, dto, inviterUserId);
 
         //then
-        isEqualTo(command.goalId(), dto.getGoalId());
+        isEqualTo(command.goalId(), goalId);
         isEqualTo(command.inviteeNickname(), dto.getInviteeNickname());
         isEqualTo(command.inviterUserId(), inviterUserId);
     }

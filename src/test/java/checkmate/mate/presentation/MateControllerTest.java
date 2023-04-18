@@ -74,14 +74,15 @@ class MateControllerTest extends ControllerTest {
     @Test
     @DisplayName("팀원 초대 API")
     void inviteToGoal() throws Exception {
-        MateInviteDto request = new MateInviteDto(1L, "yeoz1");
+        MateInviteDto request = new MateInviteDto("yeoz1");
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/mates")
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/goals/{goalId}/mates", 1L)
                         .with(csrf())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andDo(document("mate-invite",
+                        pathParameters(parameterWithName("goalId").description("목표 ID")),
                         inviteRequestFieldsSnippet()
                 ));
         verify(mateCommandService).inviteMate(any());
@@ -177,7 +178,6 @@ class MateControllerTest extends ControllerTest {
 
     private RequestFieldsSnippet inviteRequestFieldsSnippet() {
         return requestFields(
-                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
                 fieldWithPath("inviteeNickname").type(JsonFieldType.STRING).description("초대할 유저의 닉네임")
         );
     }
