@@ -22,8 +22,7 @@ public interface GoalDtoMapper {
     GoalModifyCommand toCommand(GoalModifyDto dto, long goalId, long userId);
 
     @Mappings({
-            @Mapping(source = "dto.goalId", target = "goalId"),
             @Mapping(source = "dto.likeCount", target = "likeCount")
     })
-    LikeCountCreateCommand toCommand(LikeCountCreateDto dto, long userId);
+    LikeCountCreateCommand toCommand(long goalId, LikeCountCreateDto dto, long userId);
 }

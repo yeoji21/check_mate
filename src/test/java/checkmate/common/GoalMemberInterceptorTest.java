@@ -24,7 +24,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,23 +70,6 @@ class GoalMemberInterceptorTest {
 
         request.setParameter("goalId", "123");
         given(mockAnnotation.value()).willReturn(GoalId.REQUEST_PARAM);
-
-        //when
-        boolean result = interceptor.preHandle(request, response, handlerMethod);
-
-        //then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("request body에 goalId가 존재하는 경우")
-    void goalId_in_body() throws Exception {
-        //given
-        MockHttpServletRequest request = new MockHttpServletRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
-
-        request.setContent("{\"goalId\": 123}".getBytes(StandardCharsets.UTF_8));
-        given(mockAnnotation.value()).willReturn(GoalId.REQUEST_BODY);
 
         //when
         boolean result = interceptor.preHandle(request, response, handlerMethod);

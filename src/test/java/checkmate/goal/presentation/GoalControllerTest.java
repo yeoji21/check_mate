@@ -64,15 +64,18 @@ public class GoalControllerTest extends ControllerTest {
     @Test
     @DisplayName("좋아요 확인 조건 추가 API")
     void addLikeCondition() throws Exception {
-        LikeCountCreateDto dto = new LikeCountCreateDto(1L, 5);
+        long goalId = 1L;
+        LikeCountCreateDto dto = new LikeCountCreateDto(5);
+
 
         mockMvc.perform(RestDocumentationRequestBuilders
-                        .post("/goals/like-condition")
+                        .post("/goals/{goalId}/like-condition", goalId)
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto))
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andDo(document("goal-like-condition",
+                        goalIdPathParametersSnippet(),
                         likeConditionRequestFieldsSnippet()
                 ));
 
@@ -263,7 +266,6 @@ public class GoalControllerTest extends ControllerTest {
 
     private RequestFieldsSnippet likeConditionRequestFieldsSnippet() {
         return requestFields(
-                fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
                 fieldWithPath("likeCount").type(JsonFieldType.NUMBER).description("최소 좋아요 수")
         );
     }

@@ -33,11 +33,12 @@ public class GoalController {
         return new GoalCreateResponse(goalId);
     }
 
-    @GoalMember(GoalId.REQUEST_BODY)
-    @PostMapping("/goals/like-condition")
-    public void addLikeCondition(@RequestBody @Valid LikeCountCreateDto dto,
+    @GoalMember(GoalId.PATH_VARIABLE)
+    @PostMapping("/goals/{goalId}/like-condition")
+    public void addLikeCondition(@PathVariable long goalId,
+                                 @RequestBody @Valid LikeCountCreateDto dto,
                                  @AuthenticationPrincipal JwtUserDetails details) {
-        LikeCountCreateCommand command = mapper.toCommand(dto, details.getUserId());
+        LikeCountCreateCommand command = mapper.toCommand(goalId, dto, details.getUserId());
         goalCommandService.addLikeCountCondition(command);
     }
 

@@ -63,17 +63,15 @@ class GoalDtoMapperTest extends MapperTest {
     @Test
     void likeCountCreateCommand() throws Exception {
         //given
-        LikeCountCreateDto dto = LikeCountCreateDto.builder()
-                .goalId(1L)
-                .likeCount(10)
-                .build();
+        long goalId = 1L;
         long userId = 2L;
+        LikeCountCreateDto dto = new LikeCountCreateDto(10);
 
         //when
-        LikeCountCreateCommand command = mapper.toCommand(dto, userId);
+        LikeCountCreateCommand command = mapper.toCommand(goalId, dto, userId);
 
         //then
-        isEqualTo(command.goalId(), dto.getGoalId());
+        isEqualTo(command.goalId(), goalId);
         isEqualTo(command.likeCount(), dto.getLikeCount());
         isEqualTo(command.userId(), userId);
     }
