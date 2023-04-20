@@ -57,7 +57,6 @@ public class PostCommandService {
         return new PostUploadResult(post.getId());
     }
 
-    // TODO: 2023/04/11 메소드 내 중복되는 쿼리 제거
     @Transactional
     public void like(long userId, long postId) {
         Post post = postRepository.findWithLikes(postId)
@@ -80,13 +79,6 @@ public class PostCommandService {
         Goal goal = goalRepository.findWithConditions(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
         goal.checkConditions(post);
-    }
-
-    private long validateUserInGoal(long userId, Post post) {
-        return mateRepository.findWithGoal(post.getMate().getGoal().getId(), userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND))
-                .getGoal()
-                .getId();
     }
 
     private void publishNotificationEvent(Mate uploader) {

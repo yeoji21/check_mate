@@ -3,6 +3,7 @@ package checkmate.goal.application.dto.response;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,6 +19,7 @@ public class TodayGoalInfo implements Serializable {
     private String checkDays;
     private boolean checked;
 
+    @QueryProjection
     @Builder
     public TodayGoalInfo(long id,
                          GoalCategory category,

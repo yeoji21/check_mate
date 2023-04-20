@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.StopWatch;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -92,19 +91,12 @@ class GoalQueryDaoTest extends RepositoryTest {
         setTodayStartGoal(tester);
 
         //when
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
         List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(tester.getId());
-        stopWatch.stop();
-        System.out.println("time : " + stopWatch.getTotalTimeMillis());
-        System.out.println(todayGoals.get(0).getCheckDays());
 
         //then
         assertThat(todayGoals.size()).isEqualTo(1);
-        todayGoals.forEach(
-                goal -> assertThat(CheckDaysConverter.isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()))
-                        .isTrue()
-        );
+        assertThat(todayGoals).allMatch(goal -> CheckDaysConverter
+                .isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()));
     }
 
     @Test
