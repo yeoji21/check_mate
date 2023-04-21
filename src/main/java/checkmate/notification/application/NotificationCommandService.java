@@ -2,11 +2,11 @@ package checkmate.notification.application;
 
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationRepository;
+import checkmate.notification.domain.NotificationSender;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.NotificationGenerator;
 import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import checkmate.notification.infrastructure.NotificationQueryDao;
-import checkmate.notification.infrastructure.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,6 @@ public class NotificationCommandService {
         notificationRepository.save(notification);
         List<String> tokens = notificationQueryDao.findReceiversFcmToken(notification.getId());
         notificationSender.send(notification, tokens);
-
-        System.out.println("here");
     }
 
     @Transactional

@@ -19,11 +19,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class NotificationSenderTest {
+class FirebaseNotificationSenderTest {
     @Mock
     private FirebaseMessaging firebaseMessaging;
     @InjectMocks
-    private NotificationSender notificationSender;
+    private FirebaseNotificationSender firebaseNotificationSender;
 
     @Test
     @DisplayName("단일 푸쉬 알림 전송")
@@ -33,7 +33,7 @@ class NotificationSenderTest {
         List<String> tokens = List.of("FCM Token");
 
         //when
-        notificationSender.send(notification, tokens);
+        firebaseNotificationSender.send(notification, tokens);
 
         //then
         verify(firebaseMessaging).sendAsync(any(Message.class));
@@ -47,7 +47,7 @@ class NotificationSenderTest {
         List<String> tokens = List.of("FCM Token1", "FCM Token2", "FCM Token3");
 
         //when
-        notificationSender.send(notification, tokens);
+        firebaseNotificationSender.send(notification, tokens);
 
         //then
         verify(firebaseMessaging).sendMulticastAsync(any(MulticastMessage.class));

@@ -1,18 +1,19 @@
 package checkmate.notification.infrastructure;
 
+import checkmate.notification.domain.NotificationSender;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.MulticastMessage;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Slf4j
+@Profile("production")
 @AllArgsConstructor
 @Component
-public class NotificationSender {
+public class FirebaseNotificationSender implements NotificationSender {
     private final FirebaseMessaging firebaseMessaging;
 
     public void send(checkmate.notification.domain.Notification notification, List<String> tokens) {
