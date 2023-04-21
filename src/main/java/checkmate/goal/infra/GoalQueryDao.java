@@ -24,7 +24,6 @@ public class GoalQueryDao {
     private final JPAQueryFactory queryFactory;
 
     // 오늘 진행할 목표 정보 조회
-    // TODO: 2023/04/08 인덱스 고려
     public List<TodayGoalInfo> findTodayGoalInfo(long userId) {
         return queryFactory.select(new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays, mate.lastUploadDate))
                 .from(mate)
