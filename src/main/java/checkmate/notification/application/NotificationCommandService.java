@@ -29,6 +29,8 @@ public class NotificationCommandService {
         notificationRepository.save(notification);
         List<String> tokens = notificationQueryDao.findReceiversFcmToken(notification.getId());
         notificationSender.send(notification, tokens);
+
+        System.out.println("here");
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package checkmate.notification.domain.factory;
 
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
@@ -27,6 +28,6 @@ public class MateInviteNotificationFactory extends NotificationFactory<MateInvit
 
     @Override
     void setAttributes(Notification notification, MateInviteNotificationDto dto) {
-        notification.addAttribute("mateId", dto.inviteeMateId());
+        notification.addAttribute(NotificationAttributeKey.MATE_ID, dto.inviteeMateId());
     }
 }

@@ -7,6 +7,7 @@ import checkmate.notification.application.dto.response.NotificationAttributeInfo
 import checkmate.notification.application.dto.response.NotificationDetailInfo;
 import checkmate.notification.application.dto.response.NotificationDetailResult;
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationAttributes;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
@@ -159,7 +160,8 @@ class NotificationControllerTest extends ControllerTest {
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .type(notification.getType().toString())
-                .attributes(new NotificationAttributes(Map.of("key1", "value1", "key2", "value2")).toString())
+                .attributes(new NotificationAttributes(Map.of(NotificationAttributeKey.GOAL_ID.getKey(), "value1",
+                        NotificationAttributeKey.MATE_ID.getKey(), "value2")).toString())
                 .build();
     }
 }

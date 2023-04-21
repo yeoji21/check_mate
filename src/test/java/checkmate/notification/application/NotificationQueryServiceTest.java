@@ -2,10 +2,7 @@ package checkmate.notification.application;
 
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationAttributeInfo;
-import checkmate.notification.domain.Notification;
-import checkmate.notification.domain.NotificationReceiver;
-import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.NotificationType;
+import checkmate.notification.domain.*;
 import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +49,7 @@ class NotificationQueryServiceTest {
         //given
         NotificationReceiver receiver = new NotificationReceiver(1L);
         Notification notification = createNotification(receiver, NotificationType.POST_UPLOAD);
-        notification.addAttribute("goalId", 1L);
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, 1L);
 
         given(notificationRepository.findReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
 
@@ -62,7 +59,7 @@ class NotificationQueryServiceTest {
 
         //then
         assertThat(receiver.isChecked()).isTrue();
-        assertThat(attributes.containsKey("goalId")).isTrue();
+        assertThat(attributes.containsKey(NotificationAttributeKey.GOAL_ID.getKey())).isTrue();
         assertThat(info.getTitle()).isEqualTo(notification.getTitle());
         assertThat(info.getContent()).isEqualTo(notification.getContent());
     }

@@ -41,9 +41,9 @@ class NotificationAttributeConverterTest {
         NotificationAttributes attributes = converter.convertToEntityAttribute(json);
 
         //then
-        assertThat(attributes.getStringValue("abc")).isEqualTo("abcde");
-        assertThat(attributes.getStringValue("123")).isEqualTo("a23b2");
-        assertThat(attributes.getStringValue("가나다라")).isEqualTo("마바사아");
+        assertThat(attributes.getStringValue(NotificationAttributeKey.GOAL_ID)).isEqualTo("a23b2");
+        assertThat(attributes.getStringValue(NotificationAttributeKey.MATE_ID)).isEqualTo("abcde");
+        assertThat(attributes.getStringValue(NotificationAttributeKey.USER_ID)).isEqualTo("마바사아");
     }
 
     @Test
@@ -93,14 +93,14 @@ class NotificationAttributeConverterTest {
 
     private NotificationAttributes createNotificationAttributes() {
         NotificationAttributes attributes = new NotificationAttributes(new HashMap<>());
-        attributes.addAttribute("abc", "abcde");
-        attributes.addAttribute("123", "a23b2");
-        attributes.addAttribute("가나다라", "마바사아");
+        attributes.addAttribute(NotificationAttributeKey.MATE_ID, "abcde");
+        attributes.addAttribute(NotificationAttributeKey.GOAL_ID, "a23b2");
+        attributes.addAttribute(NotificationAttributeKey.USER_ID, "마바사아");
         return attributes;
     }
 
     private String getConvertedJsonString() {
-        return "{\"123\":\"a23b2\",\"abc\":\"abcde\",\"가나다라\":\"마바사아\"}";
+        return "{\"goalId\":\"a23b2\",\"mateId\":\"abcde\",\"userId\":\"마바사아\"}";
     }
 
 }

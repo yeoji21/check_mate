@@ -1,6 +1,7 @@
 package checkmate.notification.domain.factory;
 
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
@@ -27,6 +28,6 @@ public class ExpulsionGoalNotificationFactory extends NotificationFactory<Expuls
 
     @Override
     void setAttributes(Notification notification, ExpulsionGoalNotificationDto dto) {
-        notification.addAttribute("mateId", dto.mateId());
+        notification.addAttribute(NotificationAttributeKey.MATE_ID, dto.mateId());
     }
 }

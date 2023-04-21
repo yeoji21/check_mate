@@ -4,6 +4,7 @@ import checkmate.MapperTest;
 import checkmate.TestEntityFactory;
 import checkmate.notification.application.dto.response.NotificationAttributeInfo;
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +24,9 @@ class NotificationQueryMapperTest extends MapperTest {
     void notificationInfo() throws Exception {
         //given
         Notification notification = TestEntityFactory.notification(1L, 2L, NotificationType.POST_UPLOAD);
-        notification.addAttribute("key1", "value1");
-        notification.addAttribute("key2", "value2");
-        notification.addAttribute("key3", "value3");
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, "value1");
+        notification.addAttribute(NotificationAttributeKey.MATE_ID, "value2");
+        notification.addAttribute(NotificationAttributeKey.USER_ID, "value3");
 
         //when
         NotificationAttributeInfo info = mapper.toInfo(notification);

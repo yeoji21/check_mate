@@ -2,6 +2,7 @@ package checkmate.notification.domain.factory;
 
 
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
@@ -32,6 +33,6 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
 
     @Override
     void setAttributes(Notification notification, PostUploadNotificationDto dto) {
-        notification.addAttribute("goalId", dto.goalId());
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, dto.goalId());
     }
 }

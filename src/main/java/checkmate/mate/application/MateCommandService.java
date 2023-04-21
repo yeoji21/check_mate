@@ -14,6 +14,7 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
@@ -67,7 +68,7 @@ public class MateCommandService {
     @Transactional
     public MateAcceptResult inviteAccept(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        Mate mate = find(notification.getLongAttribute("mateId"));
+        Mate mate = find(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
         mateInitiateManager.initiate(mate);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
@@ -78,7 +79,7 @@ public class MateCommandService {
     @Transactional
     public void inviteReject(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(), command.userId());
-        Mate mate = find(notification.getLongAttribute("mateId"));
+        Mate mate = find(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
         mate.toRejectStatus();
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,

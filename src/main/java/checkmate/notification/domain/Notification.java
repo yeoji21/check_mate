@@ -50,16 +50,16 @@ public class Notification extends BaseTimeEntity {
         setUpReceivers(receivers);
     }
 
-    public <T> void addAttribute(String key, T value) {
+    public <T> void addAttribute(NotificationAttributeKey key, T value) {
         attributes.addAttribute(key, value.toString());
     }
 
     // TODO: 2023/03/08 상수 key 통일
-    public Long getLongAttribute(String key) {
+    public Long getLongAttribute(NotificationAttributeKey key) {
         return attributes.getLongValue(key);
     }
 
-    public String getStringAttribute(String key) {
+    public String getStringAttribute(NotificationAttributeKey key) {
         return attributes.getStringValue(key);
     }
 

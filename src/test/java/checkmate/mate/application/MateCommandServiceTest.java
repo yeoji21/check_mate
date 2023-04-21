@@ -12,10 +12,7 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStatus;
-import checkmate.notification.domain.Notification;
-import checkmate.notification.domain.NotificationReceiver;
-import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.NotificationType;
+import checkmate.notification.domain.*;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.user.domain.User;
@@ -184,7 +181,7 @@ public class MateCommandServiceTest {
                 .content("content")
                 .receivers(List.of(receiver))
                 .build();
-        notification.addAttribute("mateId", mate.getId());
+        notification.addAttribute(NotificationAttributeKey.MATE_ID, mate.getId());
         ReflectionTestUtils.setField(notification, "id", 1L);
         return notification;
     }

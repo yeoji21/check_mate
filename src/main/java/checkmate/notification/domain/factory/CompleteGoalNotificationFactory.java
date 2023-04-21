@@ -1,6 +1,7 @@
 package checkmate.notification.domain.factory;
 
 import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
@@ -29,7 +30,7 @@ public class CompleteGoalNotificationFactory extends NotificationFactory<Complet
 
     @Override
     void setAttributes(Notification notification, CompleteGoalNotificationDto dto) {
-        notification.addAttribute("userId", dto.userId());
-        notification.addAttribute("goalId", dto.goalId());
+        notification.addAttribute(NotificationAttributeKey.USER_ID, dto.userId());
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, dto.goalId());
     }
 }

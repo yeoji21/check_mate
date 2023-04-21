@@ -17,12 +17,12 @@ class NotificationTest {
         Notification notification = createNotification();
 
         //when
-        notification.addAttribute("key1", 123);
-        notification.addAttribute("key2", "value");
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, 123);
+        notification.addAttribute(NotificationAttributeKey.MATE_ID, "value");
 
         //then
-        assertThat(notification.getLongAttribute("key1")).isEqualTo(123);
-        assertThat(notification.getStringAttribute("key2")).isEqualTo("value");
+        assertThat(notification.getLongAttribute(NotificationAttributeKey.GOAL_ID)).isEqualTo(123);
+        assertThat(notification.getStringAttribute(NotificationAttributeKey.MATE_ID)).isEqualTo("value");
     }
 
     @Test

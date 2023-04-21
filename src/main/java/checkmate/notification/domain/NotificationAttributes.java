@@ -14,15 +14,15 @@ public class NotificationAttributes {
         this.attributes = attributes;
     }
 
-    public void addAttribute(String key, String value) {
-        attributes.put(key, value);
+    public void addAttribute(NotificationAttributeKey key, String value) {
+        attributes.put(key.getKey(), value);
     }
 
-    Long getLongValue(String key) {
-        return Long.parseLong(String.valueOf(attributes.get(key)));
+    Long getLongValue(NotificationAttributeKey key) {
+        return Long.parseLong(String.valueOf(attributes.get(key.getKey())));
     }
 
-    String getStringValue(String key) {
-        return attributes.get(key);
+    String getStringValue(NotificationAttributeKey key) {
+        return attributes.get(key.getKey());
     }
 }
