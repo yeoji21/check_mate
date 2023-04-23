@@ -17,6 +17,10 @@ import java.util.List;
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "post", indexes = {
+        @Index(name = "mateId_idx", columnList = "mate_id"),
+        @Index(name = "uploadedDate_idx", columnList = "uploaded_date")
+})
 @Entity
 public class Post extends BaseTimeEntity {
     @Id

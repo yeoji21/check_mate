@@ -10,9 +10,13 @@ import javax.validation.constraints.NotNull;
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "image", indexes = {
+        @Index(name = "postId_storedName_idx", columnList = "post_id, stored_name")
+})
 @Entity
 public class Image extends BaseTimeEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private long id;
     @NotNull

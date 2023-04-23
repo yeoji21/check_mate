@@ -17,9 +17,11 @@ import java.time.LocalDate;
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "mate",
-        indexes = @Index(name = "goalId_userId_status_idx", columnList = "goal_id, user_id, status")
-)
+@Table(name = "mate", indexes = {
+        @Index(name = "goalId_userId_status_idx", columnList = "goal_id, user_id, status"),
+        @Index(name = "userId_idx", columnList = "user_id"),
+        @Index(name = "goalId_idx", columnList = "goal_id")
+})
 @Entity
 public class Mate extends BaseTimeEntity {
     @Id

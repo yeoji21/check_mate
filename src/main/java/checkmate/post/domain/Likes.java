@@ -9,19 +9,22 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Getter
-@Table(uniqueConstraints = {
-        @UniqueConstraint(name = "user_post", columnNames = {"user_id", "post_id"})
-})
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "likes", uniqueConstraints = @UniqueConstraint(name = "user_post", columnNames = {"user_id", "post_id"}),
+        indexes = {
+                @Index(name = "postId_userId_idx", columnList = "post_id, user_id")
+        })
 @Entity
 public class Likes {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "like_id")
     private long id;
     @Column(name = "user_id")
     private long userId;
-    @NotNull @ManyToOne
+    @NotNull
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
 
