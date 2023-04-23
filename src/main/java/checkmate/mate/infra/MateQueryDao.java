@@ -26,18 +26,16 @@ import static com.querydsl.core.group.GroupBy.list;
 public class MateQueryDao {
     private final JPAQueryFactory queryFactory;
 
-    // TODO: 2023/04/08 인덱스 (goalId, userId, status) 고려
     public boolean existOngoingMate(long goalId, long userId) {
         Long mateId = queryFactory.select(mate.id)
                 .from(mate)
-                .where(mate.goal.id.eq(goalId),
-                        mate.userId.eq(userId),
+                .where(mate.userId.eq(userId),
+                        mate.goal.id.eq(goalId),
                         mate.status.eq(MateStatus.ONGOING))
                 .fetchOne();
         return mateId != null;
     }
 
-    // TODO: 2023/04/08 인덱스 (goalId, userId, status) 고려
     public List<Long> findOngoingUserIds(long goalId) {
         return queryFactory
                 .select(mate.userId)

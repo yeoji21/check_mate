@@ -25,6 +25,7 @@ public class JwtFactory {
     @Value("${jwt.refresh-time}")
     private long REFRESH_EXPIRATION_TIME;
 
+    // TODO: 2023/04/23 레디스에 저장하는 방식 검토
     public LoginToken createLoginToken(User user) {
         String refreshToken = refreshToken();
         redisTemplate.opsForValue().set(user.getIdentifier(), refreshToken, 30, TimeUnit.DAYS);

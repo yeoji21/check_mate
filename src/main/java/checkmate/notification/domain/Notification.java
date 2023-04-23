@@ -54,7 +54,6 @@ public class Notification extends BaseTimeEntity {
         attributes.addAttribute(key, value.toString());
     }
 
-    // TODO: 2023/03/08 상수 key 통일
     public Long getLongAttribute(NotificationAttributeKey key) {
         return attributes.getLongValue(key);
     }
