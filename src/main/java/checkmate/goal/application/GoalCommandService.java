@@ -81,7 +81,8 @@ public class GoalCommandService {
 
     @Transactional
     public void updateYesterdayOveredGoals() {
-        List<Long> overedGoalIds = goalRepository.updateStatusToOver();
+        List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
+        goalRepository.updateStatusToOver(overedGoalIds);
         List<Mate> mates = mateRepository.findByGoalIds(overedGoalIds);
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toNotificationDtos(mates)));
         cacheHandler.deleteMateCaches(mates);

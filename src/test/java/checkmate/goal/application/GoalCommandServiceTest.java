@@ -8,6 +8,7 @@ import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
@@ -42,6 +43,8 @@ public class GoalCommandServiceTest {
     @Mock
     private GoalRepository goalRepository;
     @Mock
+    private GoalQueryDao goalQueryDao;
+    @Mock
     private UserRepository userRepository;
     @Mock
     private MateRepository mateRepository;
@@ -62,13 +65,15 @@ public class GoalCommandServiceTest {
         //given
         Goal goal1 = createGoal(1L);
         Goal goal2 = createGoal(2L);
-        given(goalRepository.updateStatusToOver()).willReturn(List.of(goal1.getId(), goal2.getId()));
+
+        given(goalQueryDao.findYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
         given(mateRepository.findByGoalIds(anyList())).willReturn(createMates(goal1, goal2));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
 
         //then
+        verify(goalRepository).updateStatusToOver(anyList());
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
         verify(cacheHandler).deleteMateCaches(any(List.class));
     }

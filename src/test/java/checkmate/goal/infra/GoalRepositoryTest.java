@@ -108,18 +108,18 @@ public class GoalRepositoryTest extends RepositoryTest {
     @DisplayName("종료된 목표 status 업데이트")
     void updateYesterdayOveredGoals() throws Exception {
         //given
-        createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
-        createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
-        createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        Goal goal1 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        Goal goal2 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        Goal goal3 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        List<Long> goalIds = List.of(goal1.getId(), goal2.getId(), goal3.getId());
 
         //when
-        List<Long> overedGoalIds = goalRepository.updateStatusToOver();
+        goalRepository.updateStatusToOver(goalIds);
 
         List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
-                .setParameter("ids", overedGoalIds)
+                .setParameter("ids", goalIds)
                 .getResultList();
-
-        goals.forEach(goal -> assertThat(goal.getStatus()).isEqualTo(GoalStatus.OVER));
+        assertThat(goals).allMatch(goal -> goal.getStatus() == GoalStatus.OVER);
     }
 
     private Goal createGoal(LocalDate startDate, LocalDate endDate) {

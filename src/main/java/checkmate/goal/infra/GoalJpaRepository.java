@@ -5,6 +5,7 @@ import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.GoalStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -22,6 +23,7 @@ import static checkmate.goal.domain.QVerificationCondition.verificationCondition
 public class GoalJpaRepository implements GoalRepository {
     private final EntityManager entityManager;
     private final JPAQueryFactory queryFactory;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Goal save(Goal goal) {
@@ -53,24 +55,17 @@ public class GoalJpaRepository implements GoalRepository {
                 .execute();
     }
 
-    // TODO: 2023/04/24 bulk update 고려
-    public List<Long> updateStatusToOver() {
-        List<Goal> yesterdayOveredGoal = queryFactory
-                .selectFrom(goal)
-                .where(goal.period.endDate.eq(LocalDate.now().minusDays(1)),
-                        goal.status.eq(GoalStatus.ONGOING))
-                .fetch();
+    public void updateStatusToOver(List<Long> goalIds) {
+        jdbcTemplate.batchUpdate("UPDATE goal SET status = ? WHERE id = ?",
+                goalIds,
+                goalIds.size(),
+                (ps, id) -> {
+                    ps.setString(1, GoalStatus.OVER.name());
+                    ps.setLong(2, id);
+                });
 
-        queryFactory.update(goal)
-                .where(goal.in(yesterdayOveredGoal))
-                .set(goal.status, GoalStatus.OVER)
-                .execute();
-
-        List<Long> goalIds = yesterdayOveredGoal.stream().map(Goal::getId).toList();
         entityManager.flush();
         entityManager.clear();
-
-        return goalIds;
     }
 
     @Override
