@@ -7,7 +7,6 @@ import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.*;
-import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
 import checkmate.user.domain.User;
@@ -25,50 +24,47 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
 class GoalQueryDaoTest extends RepositoryTest {
     @Test
+    @DisplayName("어제가 종료일인 목표 목록 조회")
+    void findYesterdayOveredGoals() throws Exception {
+        //given
+        Goal goal1 = createYesterDayOveredGoal();
+        Goal goal2 = createYesterDayOveredGoal();
+        Goal goal3 = createYesterDayOveredGoal();
+
+        //when
+        List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
+
+        //then
+        assertThat(overedGoalIds).hasSize(3);
+        assertThat(overedGoalIds).contains(goal1.getId(), goal2.getId(), goal3.getId());
+    }
+
+    @Test
     @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
     void findOngoingSimpleInfo() throws Exception {
         //given
-        User user = TestEntityFactory.user(null, "user");
-        em.persist(user);
-
-        Goal goal1 = TestEntityFactory.goal(null, "goal1");
-        Goal goal2 = TestEntityFactory.goal(null, "goal2");
-        Goal goal3 = TestEntityFactory.goal(null, "goal3");
-
-        em.persist(goal1);
-        em.persist(goal2);
-        em.persist(goal3);
-
-        Mate mate1 = goal1.join(user);
-        Mate mate2 = goal2.join(user);
-        Mate mate3 = goal3.join(user);
-        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
-        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
-        ReflectionTestUtils.setField(mate3, "status", MateStatus.ONGOING);
-        em.persist(mate1);
-        em.persist(mate2);
-        em.persist(mate3);
+        User user = createUser("user");
+        createMate(user, createGoal());
+        createMate(user, createGoal());
+        createMate(user, createGoal());
 
         //when
         List<OngoingGoalInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
 
         //then
-        assertThat(ongoingGoals.size()).isEqualTo(3);
-        for (int i = 0; i < ongoingGoals.size(); i++) {
-            OngoingGoalInfo info = ongoingGoals.get(i);
-            assertThat(info.getId()).isGreaterThan(0L);
-            assertThat(info.getTitle()).isEqualTo("goal" + (i + 1));
-            assertThat(info.getCategory()).isNotNull();
-            assertThat(info.getWeekDays()).isEqualTo("월화수목금토일");
-        }
+        assertThat(ongoingGoals).hasSize(3);
+        assertThat(ongoingGoals)
+                .allMatch(info -> info.getId() > 0L)
+                .allMatch(info -> info.getTitle() != null)
+                .allMatch(info -> info.getCategory() != null)
+                .allMatch(info -> info.getWeekDays() != null);
     }
 
     @Test
     @DisplayName("목표 진행 스케쥴 조회")
     void findGoalScheduleInfo() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(null, "testGoal");
-        em.persist(goal);
+        Goal goal = createGoal();
 
         //when
         GoalScheduleInfo goalScheduleInfo = goalQueryDao.findGoalScheduleInfo(goal.getId())
@@ -84,17 +80,15 @@ class GoalQueryDaoTest extends RepositoryTest {
     @DisplayName("오늘 진행할 목표 정보")
     void findTodayGoalInfo() throws Exception {
         //given
-        User tester = TestEntityFactory.user(null, "todayGoalFindTester");
-        em.persist(tester);
-
-        setFutureStartGoal(tester);
-        setTodayStartGoal(tester);
+        User user = createUser("user");
+        createFutureStartGoal(user);
+        createTodayStartGoal(user);
 
         //when
-        List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(tester.getId());
+        List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(user.getId());
 
         //then
-        assertThat(todayGoals.size()).isEqualTo(1);
+        assertThat(todayGoals).hasSize(1);
         assertThat(todayGoals).allMatch(goal -> CheckDaysConverter
                 .isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()));
     }
@@ -103,28 +97,10 @@ class GoalQueryDaoTest extends RepositoryTest {
     @DisplayName("목표 상세 정보 조회")
     void findDetailInfo() throws Exception {
         //given
-        User user1 = TestEntityFactory.user(null, "tester1");
-        User user2 = TestEntityFactory.user(null, "tester2");
-        User user3 = TestEntityFactory.user(null, "tester3");
-        em.persist(user1);
-        em.persist(user2);
-        em.persist(user3);
-
-        Goal goal = TestEntityFactory.goal(null, "goal");
-        em.persist(goal);
-
-        Mate mate1 = goal.join(user1);
-        Mate mate2 = goal.join(user2);
-        Mate mate3 = goal.join(user3);
-        ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
-        ReflectionTestUtils.setField(mate2, "status", MateStatus.ONGOING);
-        ReflectionTestUtils.setField(mate3, "status", MateStatus.ONGOING);
-        em.persist(mate1);
-        em.persist(mate2);
-        em.persist(mate3);
-
-        em.flush();
-        em.clear();
+        Goal goal = createGoal();
+        createMate(createUser("user1"), goal);
+        createMate(createUser("user2"), goal);
+        createMate(createUser("user3"), goal);
 
         //when
         GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId())
@@ -132,42 +108,53 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(info.getTitle()).isEqualTo(goal.getTitle());
-        for (int i = 0; i < info.getMates().size(); i++) {
-            MateUploadInfo tm = info.getMates().get(i);
-            assertThat(tm.getNickname()).isEqualTo("tester" + (i + 1));
-            assertThat(tm.isUploaded()).isFalse();
-            assertThat(tm.getMateId()).isNotNull();
-            assertThat(tm.getUserId()).isNotNull();
-        }
-        assertThat(info.getMates().size()).isEqualTo(3);
+        assertThat(info.getMates()).hasSize(3);
+        assertThat(info.getMates())
+                .allMatch(mate -> mate.getNickname() != null)
+                .allMatch(mate -> !mate.isUploaded())
+                .allMatch(mate -> mate.getMateId() > 0)
+                .allMatch(mate -> mate.getUserId() > 0);
         assertThat(info.isInviteable()).isTrue();
     }
 
-    private void setTodayStartGoal(User user) {
-        Goal todayStartGoal = Goal.builder()
-                .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(20)))
-                .category(GoalCategory.ETC)
-                .title("todayGoal")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .build();
-        em.persist(todayStartGoal);
-
-        Mate mate = todayStartGoal.join(user);
-        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
-        em.persist(mate);
+    private void createTodayStartGoal(User user) {
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now());
+        createMate(user, goal);
     }
 
-    private void setFutureStartGoal(User user) {
-        Goal futureGoal = Goal.builder()
+    private void createFutureStartGoal(User user) {
+        Goal goal = Goal.builder()
                 .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
                 .category(GoalCategory.ETC)
                 .title("futureGoal")
                 .checkDays(new GoalCheckDays("월화수목금토일"))
                 .build();
-        em.persist(futureGoal);
+        em.persist(goal);
+        createMate(user, goal);
+    }
 
-        Mate mate = futureGoal.join(user);
+    private User createUser(String name) {
+        User user = TestEntityFactory.user(null, name);
+        em.persist(user);
+        return user;
+    }
+
+    private void createMate(User user, Goal goal) {
+        Mate mate = goal.join(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
+    }
+
+    private Goal createGoal() {
+        Goal goal = TestEntityFactory.goal(null, "goal");
+        em.persist(goal);
+        return goal;
+    }
+
+    private Goal createYesterDayOveredGoal() {
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal.getPeriod(), "endDate", LocalDate.now().minusDays(1L));
+        return goal;
     }
 }

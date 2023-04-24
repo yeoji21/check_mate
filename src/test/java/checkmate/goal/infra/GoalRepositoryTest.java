@@ -113,13 +113,12 @@ public class GoalRepositoryTest extends RepositoryTest {
         createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
 
         //when
-        List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
+        List<Long> overedGoalIds = goalRepository.updateStatusToOver();
 
         List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
                 .setParameter("ids", overedGoalIds)
                 .getResultList();
 
-        System.out.println(goals.size());
         goals.forEach(goal -> assertThat(goal.getStatus()).isEqualTo(GoalStatus.OVER));
     }
 

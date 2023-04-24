@@ -62,7 +62,7 @@ public class GoalCommandServiceTest {
         //given
         Goal goal1 = createGoal(1L);
         Goal goal2 = createGoal(2L);
-        given(goalRepository.updateYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
+        given(goalRepository.updateStatusToOver()).willReturn(List.of(goal1.getId(), goal2.getId()));
         given(mateRepository.findByGoalIds(anyList())).willReturn(createMates(goal1, goal2));
 
         //when

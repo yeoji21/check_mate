@@ -78,4 +78,13 @@ public class GoalQueryDao {
                         mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
+
+    public List<Long> findYesterdayOveredGoals() {
+        return queryFactory
+                .select(goal.id)
+                .from(goal)
+                .where(goal.period.endDate.eq(LocalDate.now().minusDays(1)),
+                        goal.status.eq(GoalStatus.ONGOING))
+                .fetch();
+    }
 }

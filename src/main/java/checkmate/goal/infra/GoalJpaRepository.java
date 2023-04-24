@@ -53,9 +53,8 @@ public class GoalJpaRepository implements GoalRepository {
                 .execute();
     }
 
-    // TODO: 2023/04/24 Command와 Query 분리 고려
     // TODO: 2023/04/24 bulk update 고려
-    public List<Long> updateYesterdayOveredGoals() {
+    public List<Long> updateStatusToOver() {
         List<Goal> yesterdayOveredGoal = queryFactory
                 .selectFrom(goal)
                 .where(goal.period.endDate.eq(LocalDate.now().minusDays(1)),

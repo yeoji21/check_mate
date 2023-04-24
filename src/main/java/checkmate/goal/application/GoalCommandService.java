@@ -11,6 +11,7 @@ import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.LikeCountCondition;
+import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
@@ -36,6 +37,7 @@ import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 @Service
 public class GoalCommandService {
     private final GoalRepository goalRepository;
+    private final GoalQueryDao goalQueryDao;
     private final UserRepository userRepository;
     private final MateRepository mateRepository;
     private final MateInitiateManager mateInitiateManager;
@@ -79,7 +81,7 @@ public class GoalCommandService {
 
     @Transactional
     public void updateYesterdayOveredGoals() {
-        List<Long> overedGoalIds = goalRepository.updateYesterdayOveredGoals();
+        List<Long> overedGoalIds = goalRepository.updateStatusToOver();
         List<Mate> mates = mateRepository.findByGoalIds(overedGoalIds);
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toNotificationDtos(mates)));
         cacheHandler.deleteMateCaches(mates);
