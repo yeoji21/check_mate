@@ -3,7 +3,6 @@ package checkmate.goal.infra;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.GoalStatus;
-import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,7 +15,6 @@ import java.util.Optional;
 
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QVerificationCondition.verificationCondition;
-import static checkmate.mate.domain.QMate.mate;
 
 
 @RequiredArgsConstructor
@@ -32,23 +30,16 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public Optional<Goal> findByIdForUpdate(long goalId) {
-        return Optional.ofNullable(
-                queryFactory.select(goal)
-                        .from(mate)
-                        .join(mate.goal, goal)
-                        .where(goal.id.eq(goalId),
-                                mate.status.eq(MateStatus.ONGOING)
-                                        .or(mate.status.eq(MateStatus.SUCCESS)))
-                        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
-                        .fetchOne());
+    public Optional<Goal> findById(long goalId) {
+        return Optional.ofNullable(entityManager.find(Goal.class, goalId));
     }
 
     @Override
-    public Optional<Goal> findById(long goalId) {
+    public Optional<Goal> findByIdForUpdate(long goalId) {
         return Optional.ofNullable(
                 queryFactory.selectFrom(goal)
                         .where(goal.id.eq(goalId))
+                        .setLockMode(LockModeType.PESSIMISTIC_WRITE)
                         .fetchOne()
         );
     }
@@ -60,9 +51,10 @@ public class GoalJpaRepository implements GoalRepository {
                         goal.period.startDate.eq(LocalDate.now()))
                 .set(goal.status, GoalStatus.ONGOING)
                 .execute();
-
     }
 
+    // TODO: 2023/04/24 Command와 Query 분리 고려
+    // TODO: 2023/04/24 bulk update 고려
     public List<Long> updateYesterdayOveredGoals() {
         List<Goal> yesterdayOveredGoal = queryFactory
                 .selectFrom(goal)
@@ -83,7 +75,7 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public Optional<Goal> findWithConditions(Long goalId) {
+    public Optional<Goal> findWithConditions(long goalId) {
         return Optional.ofNullable(
                 queryFactory.select(goal).distinct()
                         .from(goal)

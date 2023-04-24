@@ -30,6 +30,22 @@ public class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
+    @DisplayName("목표 조회 - for update")
+    void findByIdForUpdate() throws Exception {
+        //given
+        Goal goal = createGoal();
+        em.flush();
+        em.clear();
+
+        //when
+        Goal findGoal = goalRepository.findByIdForUpdate(goal.getId())
+                .orElseThrow(IllegalArgumentException::new);
+
+        //then
+        assertThat(findGoal).isEqualTo(goal);
+    }
+
+    @Test
     @DisplayName("목표와 조건 함께 조회 - 조건이 없는 경우")
     void findConditionsWithNoConditions() throws Exception {
         //given

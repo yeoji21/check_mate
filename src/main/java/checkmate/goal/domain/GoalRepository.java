@@ -12,7 +12,7 @@ public interface GoalRepository {
 
     List<Long> updateYesterdayOveredGoals();
 
-    Optional<Goal> findWithConditions(Long goalId);
+    Optional<Goal> findWithConditions(long goalId);
 
     void updateTodayStartGoal();
 }
