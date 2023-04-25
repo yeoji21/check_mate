@@ -83,14 +83,15 @@ public class GoalCommandService {
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
         goalRepository.updateStatusToOver(overedGoalIds);
-        publishComplateNotifications(overedGoalIds);
 
-        cacheHandler.deleteMateCaches(mateRepository.findByGoalIds(overedGoalIds));
+        List<Long> userIds = publishComplateNotifications(overedGoalIds);
+        cacheHandler.deleteUserCaches(userIds);
     }
 
-    private void publishComplateNotifications(List<Long> overedGoalIds) {
+    private List<Long> publishComplateNotifications(List<Long> overedGoalIds) {
         List<CompleteGoalNotificationDto> notificationDto = goalQueryDao.findCompleteNotificationDto(overedGoalIds);
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDto));
+        return notificationDto.stream().map(dto -> dto.getUserId()).toList();
     }
 
     private Mate joinToGoal(Goal goal, long userId) {

@@ -167,7 +167,7 @@ public class MateCommandServiceTest {
 
         //then
         verify(mateRepository).updateLimitOveredMates(any(List.class));
-        verify(cacheHandler).deleteMateCaches(any(List.class));
+        verify(cacheHandler).deleteUserCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
 

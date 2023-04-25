@@ -65,9 +65,7 @@ public class GoalCommandServiceTest {
         //given
         Goal goal1 = createGoal(1L);
         Goal goal2 = createGoal(2L);
-
         given(goalQueryDao.findYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
-        given(mateRepository.findByGoalIds(anyList())).willReturn(createMates(goal1, goal2));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
@@ -75,7 +73,7 @@ public class GoalCommandServiceTest {
         //then
         verify(goalRepository).updateStatusToOver(anyList());
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(cacheHandler).deleteMateCaches(any(List.class));
+        verify(cacheHandler).deleteUserCaches(any(List.class));
     }
 
     @Test

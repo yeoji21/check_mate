@@ -94,7 +94,7 @@ public class MateCommandService {
 
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
                 limitOveredMates.stream().map(mapper::toNotificationDto).toList()));
-        cacheHandler.deleteMateCaches(limitOveredMates);
+        cacheHandler.deleteUserCaches(limitOveredMates.stream().map(Mate::getUserId).toList());
     }
 
     private List<Mate> filterLimitOveredMates(List<Mate> hookyMates) {
