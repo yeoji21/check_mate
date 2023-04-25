@@ -73,6 +73,7 @@ public class MateJpaRepository implements MateRepository {
                 .fetch();
     }
 
+    // TODO: 2023/04/25 command와 query 분리 고려
     @Override
     public List<Mate> updateYesterdaySkippedMates() {
         List<Mate> yesterdayMates = entityManager.createNativeQuery(

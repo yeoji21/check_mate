@@ -6,6 +6,8 @@ import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
 import checkmate.mate.domain.MateStatus;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
+import checkmate.notification.domain.factory.dto.QCompleteGoalNotificationDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -85,6 +87,15 @@ public class GoalQueryDao {
                 .from(goal)
                 .where(goal.period.endDate.eq(LocalDate.now().minusDays(1)),
                         goal.status.eq(GoalStatus.ONGOING))
+                .fetch();
+    }
+
+    public List<CompleteGoalNotificationDto> findCompleteNotificationDto(List<Long> goalIds) {
+        return queryFactory.select(new QCompleteGoalNotificationDto(mate.userId, goal.id, goal.title))
+                .from(mate)
+                .join(mate.goal, goal)
+                .where(mate.goal.id.in(goalIds),
+                        mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
 }

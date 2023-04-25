@@ -9,6 +9,7 @@ import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.*;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -37,6 +38,28 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(overedGoalIds).hasSize(3);
         assertThat(overedGoalIds).contains(goal1.getId(), goal2.getId(), goal3.getId());
+    }
+
+    @Test
+    void findCompleteNotificationDto() throws Exception {
+        //given
+        Goal goal1 = createGoal();
+        Goal goal2 = createGoal();
+        createMate(createUser("user1"), goal1);
+        createMate(createUser("user2"), goal1);
+        createMate(createUser("user3"), goal2);
+        createMate(createUser("user4"), goal2);
+
+        //when
+        List<CompleteGoalNotificationDto> notificationDto =
+                goalQueryDao.findCompleteNotificationDto(List.of(goal1.getId(), goal2.getId()));
+
+        //then
+        assertThat(notificationDto).hasSize(4);
+        assertThat(notificationDto)
+                .allMatch(dto -> dto.getGoalId() > 0L)
+                .allMatch(dto -> dto.getUserId() > 0L)
+                .allMatch(dto -> dto.getGoalTitle() != null);
     }
 
     @Test

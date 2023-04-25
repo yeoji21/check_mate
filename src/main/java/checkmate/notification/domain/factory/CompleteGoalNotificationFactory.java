@@ -20,17 +20,17 @@ public class CompleteGoalNotificationFactory extends NotificationFactory<Complet
 
     @Override
     String getContent(CompleteGoalNotificationDto dto) {
-        return dto.goalTitle() + " 목표 수행을 끝까지 완수하였습니다";
+        return dto.getGoalTitle() + " 목표 수행을 끝까지 완수하였습니다";
     }
 
     @Override
     List<NotificationReceiver> getReceivers(CompleteGoalNotificationDto dto) {
-        return List.of(new NotificationReceiver(dto.userId()));
+        return List.of(new NotificationReceiver(dto.getUserId()));
     }
 
     @Override
     void setAttributes(Notification notification, CompleteGoalNotificationDto dto) {
-        notification.addAttribute(NotificationAttributeKey.USER_ID, dto.userId());
-        notification.addAttribute(NotificationAttributeKey.GOAL_ID, dto.goalId());
+        notification.addAttribute(NotificationAttributeKey.USER_ID, dto.getUserId());
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, dto.getGoalId());
     }
 }

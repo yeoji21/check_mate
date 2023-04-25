@@ -83,9 +83,14 @@ public class GoalCommandService {
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
         goalRepository.updateStatusToOver(overedGoalIds);
-        List<Mate> mates = mateRepository.findByGoalIds(overedGoalIds);
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, toNotificationDtos(mates)));
-        cacheHandler.deleteMateCaches(mates);
+        publishComplateNotifications(overedGoalIds);
+
+        cacheHandler.deleteMateCaches(mateRepository.findByGoalIds(overedGoalIds));
+    }
+
+    private void publishComplateNotifications(List<Long> overedGoalIds) {
+        List<CompleteGoalNotificationDto> notificationDto = goalQueryDao.findCompleteNotificationDto(overedGoalIds);
+        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDto));
     }
 
     private Mate joinToGoal(Goal goal, long userId) {
@@ -100,15 +105,5 @@ public class GoalCommandService {
     private Goal findGoalForUpdate(long goalId) {
         return goalRepository.findByIdForUpdate(goalId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-    }
-
-    private List<CompleteGoalNotificationDto> toNotificationDtos(List<Mate> mates) {
-        return mates.stream().map(
-                tm -> CompleteGoalNotificationDto.builder()
-                        .goalId(tm.getGoal().getId())
-                        .goalTitle(tm.getGoal().getTitle())
-                        .userId(tm.getUserId())
-                        .build()
-        ).toList();
     }
 }
