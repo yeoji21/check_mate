@@ -4,7 +4,9 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
@@ -14,7 +16,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static checkmate.mate.domain.QMate.mate;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,35 +77,52 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("인증하지 않은 팀원들 검사 스케쥴러")
-    void updateYesterdayHookyMates() throws Exception {
+    @DisplayName("어제가 인증하지 않은 팀원 목록 조회")
+    void findYesterdaySkippedMates() throws Exception {
         //given
-        Goal goal = createGoal();
-        Mate mate1 = createOngoingMate(goal);
-        Mate mate2 = createOngoingMate(goal);
-        Mate notUploadedMate = createOngoingMate(goal);
-        Mate notCheckedMate = createOngoingMate(goal);
+        Goal yesterDayGoal = createGoal();
+        Goal notYesterDayGoal = createGoal();
+        ReflectionTestUtils.setField(notYesterDayGoal, "checkDays", new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
 
-        Post post1 = TestEntityFactory.post(mate1);
-        post1.check();
-        em.persist(post1);
-
-        Post post2 = TestEntityFactory.post(mate2);
-        post2.check();
-        em.persist(post2);
-
-        Post post3 = TestEntityFactory.post(notCheckedMate);
-        em.persist(post3);
+        createOngoingMate(yesterDayGoal);
+        createOngoingMate(yesterDayGoal);
+        createOngoingMate(notYesterDayGoal);
+        Mate mate = createOngoingMate(yesterDayGoal);
+        createYesterDayUploadedPost(mate);
 
         em.flush();
         em.clear();
 
         //when
-        List<Mate> hookyMates = mateRepository.updateYesterdaySkippedMates();
+        List<Mate> mates = mateRepository.findYesterdaySkippedMates();
 
         //then
-        assertThat(hookyMates.size()).isEqualTo(2);
-        assertThat(hookyMates).contains(notUploadedMate, notCheckedMate);
+        assertThat(mates).hasSize(2);
+        assertThat(mates)
+                .allMatch(m -> CheckDaysConverter.isWorkingDay(m.getGoal().getCheckDays().intValue(), LocalDate.now().minusDays(1)))
+                .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
+                .allMatch(m -> m.getStatus() == MateStatus.ONGOING)
+                .allMatch(m -> m.getGoal().getStatus() == GoalStatus.ONGOING);
+    }
+
+    @Test
+    @DisplayName("인증하지 않은 팀원들 검사 스케쥴러")
+    void increaseSkippedDayCount() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate1 = createOngoingMate(goal);
+        Mate mate2 = createOngoingMate(goal);
+        Mate mate3 = createOngoingMate(goal);
+        Mate mate4 = createOngoingMate(goal);
+
+        //when
+        mateRepository.increaseSkippedDayCount(List.of(mate1, mate2, mate3, mate4));
+
+        //then
+        List<Mate> findMates = em.createQuery("select m from Mate m where m.id in :mateIds", Mate.class)
+                .setParameter("mateIds", List.of(mate1.getId(), mate2.getId(), mate3.getId(), mate4.getId()))
+                .getResultList();
+        assertThat(findMates).allMatch(m -> m.getSkippedDays() == 1);
     }
 
     @Test
@@ -206,11 +228,18 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     private Mate createOngoingMate(Goal goal) {
-        User user = TestEntityFactory.user(null, "user" + Math.random() % 100);
+        User user = TestEntityFactory.user(null, UUID.randomUUID().toString());
         em.persist(user);
         Mate mate = goal.join(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;
+    }
+
+    private void createYesterDayUploadedPost(Mate mate) {
+        Post post = TestEntityFactory.post(mate);
+        post.check();
+        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(1));
+        em.persist(post);
     }
 }

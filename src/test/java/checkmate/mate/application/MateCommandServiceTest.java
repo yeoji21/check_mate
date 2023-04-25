@@ -160,12 +160,12 @@ public class MateCommandServiceTest {
     void updateUploadSkippedMate() throws Exception {
         //given
         List<Mate> uploadSkippedMates = createUploadSkippedMates();
-        given(mateRepository.updateYesterdaySkippedMates()).willReturn(uploadSkippedMates);
 
         //when
         mateCommandService.updateUploadSkippedMates();
 
         //then
+        verify(mateRepository).increaseSkippedDayCount(any(List.class));
         verify(mateRepository).updateLimitOveredMates(any(List.class));
         verify(cacheHandler).deleteUserCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));

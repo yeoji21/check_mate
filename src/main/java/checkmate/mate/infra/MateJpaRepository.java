@@ -1,11 +1,13 @@
 package checkmate.mate.infra;
 
 import checkmate.goal.domain.CheckDaysConverter;
+import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -21,6 +23,7 @@ import static checkmate.post.domain.QPost.post;
 @Repository
 public class MateJpaRepository implements MateRepository {
     private final JPAQueryFactory queryFactory;
+    private final JdbcTemplate jdbcTemplate;
     private final EntityManager entityManager;
 
     @Override
@@ -73,34 +76,43 @@ public class MateJpaRepository implements MateRepository {
                 .fetch();
     }
 
-    // TODO: 2023/04/25 command와 query 분리 고려
     @Override
-    public List<Mate> updateYesterdaySkippedMates() {
-        List<Mate> yesterdayMates = entityManager.createNativeQuery(
-                        "select m.* from mate as m" +
-                                " join goal as g on g.id = m.goal_id " +
-                                " where g.check_days in :values" +
-                                " and g.status = 'ONGOING' and m.status = 'ONGOING'"
-                        , Mate.class)
-                .setParameter("values", CheckDaysConverter.matchingDateValues(LocalDate.now().minusDays(1)))
-                .getResultList();
+    public List<Mate> findYesterdaySkippedMates() {
+        LocalDate yesterDay = LocalDate.now().minusDays(1);
+        List<Integer> checkDays = CheckDaysConverter.matchingDateValues(yesterDay);
+        List<Mate> mates = queryFactory.select(mate)
+                .from(mate)
+                .join(mate.goal, goal).fetchJoin()
+                .where(goal.checkDays.checkDays.in(checkDays),
+                        goal.status.eq(GoalStatus.ONGOING),
+                        mate.status.eq(MateStatus.ONGOING)
+                )
+                .fetch();
 
         List<Long> uploadedMateIds = queryFactory
                 .select(post.mate.id)
                 .from(post)
                 .where(
-                        post.mate.in(yesterdayMates),
-                        post.uploadedDate.eq(LocalDate.now()),
+                        post.mate.in(mates),
+                        post.uploadedDate.eq(yesterDay),
                         post.checked.isTrue())
                 .fetch();
-        yesterdayMates.removeIf(tm -> uploadedMateIds.contains(tm.getId()));
 
-        queryFactory.update(mate)
-                .where(mate.in(yesterdayMates))
-                .set(mate.progress.skippedDayCount, mate.progress.skippedDayCount.add(1))
-                .execute();
+        mates.removeIf(tm -> uploadedMateIds.contains(tm.getId()));
+        return mates;
+    }
 
-        return yesterdayMates;
+    @Override
+    public void increaseSkippedDayCount(List<Mate> mates) {
+        jdbcTemplate.batchUpdate(
+                "update mate set skipped_day_count = skipped_day_count + 1 where id = ?",
+                mates,
+                mates.size(),
+                (ps, mate) -> ps.setLong(1, mate.getId())
+        );
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     // TODO: 2022/08/25 TM의 skippedCount를 초기에 max로 해놓고 점점 줄이는 방식 고려

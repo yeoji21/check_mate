@@ -88,13 +88,21 @@ public class MateCommandService {
 
     @Transactional
     public void updateUploadSkippedMates() {
-        List<Mate> skippedMates = mateRepository.updateYesterdaySkippedMates();
+        List<Mate> skippedMates = mateRepository.findYesterdaySkippedMates();
+        mateRepository.increaseSkippedDayCount(skippedMates);
+
+        // TODO: 2023/04/25 update 후 영속성 컨텍스트가 초기화되어 버림 
+        skippedMates = mateRepository.findYesterdaySkippedMates();
         List<Mate> limitOveredMates = filterLimitOveredMates(skippedMates);
         mateRepository.updateLimitOveredMates(limitOveredMates);
 
+        publishExpulsionNotifications(limitOveredMates);
+        cacheHandler.deleteUserCaches(limitOveredMates.stream().map(Mate::getUserId).toList());
+    }
+
+    private void publishExpulsionNotifications(List<Mate> limitOveredMates) {
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
                 limitOveredMates.stream().map(mapper::toNotificationDto).toList()));
-        cacheHandler.deleteUserCaches(limitOveredMates.stream().map(Mate::getUserId).toList());
     }
 
     private List<Mate> filterLimitOveredMates(List<Mate> hookyMates) {
