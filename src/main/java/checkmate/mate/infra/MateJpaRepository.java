@@ -82,7 +82,6 @@ public class MateJpaRepository implements MateRepository {
         List<Integer> checkDays = CheckDaysConverter.matchingDateValues(yesterDay);
         List<Mate> mates = queryFactory.select(mate)
                 .from(mate)
-                .join(mate.goal, goal).fetchJoin()
                 .where(goal.checkDays.checkDays.in(checkDays),
                         goal.status.eq(GoalStatus.ONGOING),
                         mate.status.eq(MateStatus.ONGOING)
@@ -100,6 +99,14 @@ public class MateJpaRepository implements MateRepository {
 
         mates.removeIf(tm -> uploadedMateIds.contains(tm.getId()));
         return mates;
+    }
+
+    @Override
+    public List<Mate> findAllWithGoal(List<Long> mateIds) {
+        return queryFactory.selectFrom(mate)
+                .join(mate.goal, goal).fetchJoin()
+                .where(mate.id.in(mateIds))
+                .fetch();
     }
 
     @Override

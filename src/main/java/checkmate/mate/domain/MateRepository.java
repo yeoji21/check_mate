@@ -21,4 +21,6 @@ public interface MateRepository {
     Mate save(Mate mate);
 
     List<Mate> findYesterdaySkippedMates();
+
+    List<Mate> findAllWithGoal(List<Long> mateIds);
 }

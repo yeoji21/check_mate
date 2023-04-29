@@ -76,7 +76,7 @@ public class GoalCommandService {
 
     @Transactional
     public void updateTodayStartGoal() {
-        goalRepository.updateTodayStartGoal();
+        goalRepository.updateTodayStartStatus();
     }
 
     @Transactional

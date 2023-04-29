@@ -84,19 +84,14 @@ public class GoalRepositoryTest extends RepositoryTest {
     @DisplayName("오늘 시작일인 목표의 status 업데이트")
     void updateTodayStartGoal() throws Exception {
         //given
-        Goal todayStart1 = createGoal(LocalDate.now(), LocalDate.now().plusDays(10));
-        ReflectionTestUtils.setField(todayStart1, "status", GoalStatus.WAITING);
-
-        Goal todayStart2 = createGoal(LocalDate.now(), LocalDate.now().plusDays(10));
-        ReflectionTestUtils.setField(todayStart2, "status", GoalStatus.WAITING);
-
+        Goal todayStart1 = createTodayStartGoal();
+        Goal todayStart2 = createTodayStartGoal();
         Goal notToday = createGoal(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10));
-
-        //when
-        goalRepository.updateTodayStartGoal();
-
         em.flush();
         em.clear();
+
+        //when
+        goalRepository.updateTodayStartStatus();
 
         //then
         assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(GoalStatus.ONGOING);
@@ -142,5 +137,11 @@ public class GoalRepositoryTest extends RepositoryTest {
         Goal goal = TestEntityFactory.goal(null, "testGoal");
         em.persist(goal);
         return goal;
+    }
+
+    private Goal createTodayStartGoal() {
+        Goal todayStart1 = createGoal(LocalDate.now(), LocalDate.now().plusDays(10));
+        ReflectionTestUtils.setField(todayStart1, "status", GoalStatus.WAITING);
+        return todayStart1;
     }
 }

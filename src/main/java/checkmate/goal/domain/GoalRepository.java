@@ -10,9 +10,9 @@ public interface GoalRepository {
 
     Optional<Goal> findByIdForUpdate(long goalId);
 
-    void updateStatusToOver(List<Long> goalIds);
-
     Optional<Goal> findWithConditions(long goalId);
 
-    void updateTodayStartGoal();
+    void updateStatusToOver(List<Long> goalIds);
+
+    void updateTodayStartStatus();
 }

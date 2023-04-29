@@ -88,16 +88,20 @@ public class MateCommandService {
 
     @Transactional
     public void updateUploadSkippedMates() {
-        List<Mate> skippedMates = mateRepository.findYesterdaySkippedMates();
-        mateRepository.increaseSkippedDayCount(skippedMates);
-
-        // TODO: 2023/04/25 update 후 영속성 컨텍스트가 초기화되어 버림 
-        skippedMates = mateRepository.findYesterdaySkippedMates();
+        List<Mate> skippedMates = updateYesterdaySkippedMates();
         List<Mate> limitOveredMates = filterLimitOveredMates(skippedMates);
         mateRepository.updateLimitOveredMates(limitOveredMates);
 
         publishExpulsionNotifications(limitOveredMates);
         cacheHandler.deleteUserCaches(limitOveredMates.stream().map(Mate::getUserId).toList());
+    }
+
+    private List<Mate> updateYesterdaySkippedMates() {
+        List<Mate> skippedMates = mateRepository.findYesterdaySkippedMates();
+        mateRepository.increaseSkippedDayCount(skippedMates);
+        List<Long> mateIds = skippedMates.stream().map(Mate::getId).toList();
+        skippedMates = mateRepository.findAllWithGoal(mateIds);
+        return skippedMates;
     }
 
     private void publishExpulsionNotifications(List<Mate> limitOveredMates) {

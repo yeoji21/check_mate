@@ -47,12 +47,15 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public void updateTodayStartGoal() {
+    public void updateTodayStartStatus() {
         queryFactory.update(goal)
-                .where(goal.status.eq(GoalStatus.WAITING),
-                        goal.period.startDate.eq(LocalDate.now()))
+                .where(goal.period.startDate.eq(LocalDate.now()),
+                        goal.status.eq(GoalStatus.WAITING))
                 .set(goal.status, GoalStatus.ONGOING)
                 .execute();
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     public void updateStatusToOver(List<Long> goalIds) {
