@@ -98,4 +98,12 @@ public class GoalQueryDao {
                         mate.status.eq(MateStatus.ONGOING))
                 .fetch();
     }
+
+    public List<GoalHistoryInfo> findGoalHistoryInfo(long userId) {
+        return queryFactory.select(new QGoalHistoryInfo(mate))
+                .from(mate)
+                .join(mate.goal, goal).fetchJoin()
+                .where(mate.userId.eq(userId))
+                .fetch();
+    }
 }

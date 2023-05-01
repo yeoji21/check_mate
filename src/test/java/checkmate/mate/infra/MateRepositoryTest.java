@@ -126,23 +126,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("목표 수행 성공한 팀원 목록 조회")
-    void findSuccessTeamMates() throws Exception {
-        //given
-        User user = createSuccessedMates();
-        em.flush();
-        em.clear();
-
-        //when
-        List<Mate> successMates = mateRepository.findSuccessMates(user.getId());
-
-        //then
-        assertThat(successMates.size()).isEqualTo(2);
-        assertThat(successMates).allMatch(mate ->
-                mate.getStatus() == MateStatus.SUCCESS && mate.getGoal().getStatus() == GoalStatus.OVER);
-    }
-
-    @Test
     @DisplayName("팀원 제거 스케쥴러")
     void eliminateOveredMates() throws Exception {
         //given

@@ -3,9 +3,11 @@ package checkmate.mate.presentation;
 import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
-import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.domain.Goal;
-import checkmate.mate.application.dto.response.*;
+import checkmate.mate.application.dto.response.MateAcceptResult;
+import checkmate.mate.application.dto.response.MateScheduleInfo;
+import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.application.dto.response.SpecifiedGoalDetailInfo;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.presentation.dto.MateInviteDto;
 import checkmate.mate.presentation.dto.MateInviteReplyDto;
@@ -25,7 +27,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -52,22 +53,6 @@ class MateControllerTest extends ControllerTest {
                         goalIdPathParametersSnippet(),
                         specifiedGoalDetailResponseFieldsSnippet()
                 ));
-    }
-
-    @WithMockAuthUser
-    @Test
-    @DisplayName("성공한 목표 목록 조회 API")
-    void findGoalHistoryResult() throws Exception {
-        GoalHistoryInfoResult result = new GoalHistoryInfoResult(getGoalHistoryInfoList());
-        given(mateQueryService.findGoalHistoryResult(any(Long.class))).willReturn(result);
-
-        mockMvc.perform(get("/goals/history")
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("goal-history",
-                        historyResultResponseFieldsSnippet())
-                );
     }
 
     @WithMockAuthUser
@@ -182,20 +167,6 @@ class MateControllerTest extends ControllerTest {
         );
     }
 
-    private ResponseFieldsSnippet historyResultResponseFieldsSnippet() {
-        return responseFields(
-                fieldWithPath("goals[].goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
-                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
-                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
-                fieldWithPath("goals[].startDate").type(JsonFieldType.STRING).description("목표 시작일"),
-                fieldWithPath("goals[].endDate").type(JsonFieldType.STRING).description("목표 종료일"),
-                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
-                fieldWithPath("goals[].appointmentTime").type(JsonFieldType.STRING).description("목표 인증 시간").optional(),
-                fieldWithPath("goals[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
-                fieldWithPath("goals[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
-        );
-    }
-
     private ResponseFieldsSnippet specifiedGoalDetailResponseFieldsSnippet() {
         return responseFields(
                 fieldWithPath("goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
@@ -234,16 +205,6 @@ class MateControllerTest extends ControllerTest {
                 List.of(new MateUploadInfo(1L, 2L, LocalDate.now(), "nickname1"),
                         new MateUploadInfo(3L, 4L, LocalDate.now().minusDays(1), "nickname2"))
         );
-    }
-
-    private List<GoalHistoryInfo> getGoalHistoryInfoList() {
-        Mate mate1 = TestEntityFactory.goal(1L, "goal1")
-                .join(TestEntityFactory.user(1L, "user1"));
-        Mate mate2 = TestEntityFactory.goal(2L, "goal2")
-                .join(TestEntityFactory.user(2L, "user2"));
-
-        return List.of(new GoalHistoryInfo(mate1, List.of("nickname1", "nickname2", "nickname3")),
-                new GoalHistoryInfo(mate2, List.of("nickname4", "nickname5")));
     }
 
 }

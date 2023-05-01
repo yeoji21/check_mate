@@ -3,22 +3,25 @@ package checkmate.goal.application;
 import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.application.dto.response.GoalDetailInfo;
-import checkmate.goal.application.dto.response.GoalScheduleInfo;
-import checkmate.goal.application.dto.response.OngoingGoalInfoResult;
-import checkmate.goal.application.dto.response.TodayGoalInfoResult;
+import checkmate.goal.application.dto.response.*;
 import checkmate.goal.infra.GoalQueryDao;
+import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
+import checkmate.mate.infra.MateQueryDao;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class GoalQueryService {
     private final GoalQueryDao goalQueryDao;
+    private final MateQueryDao mateQueryDao;
 
     @Transactional(readOnly = true)
     public GoalDetailInfo findGoalDetail(long goalId) {
@@ -49,5 +52,22 @@ public class GoalQueryService {
     @Transactional(readOnly = true)
     public TodayGoalInfoResult findTodayGoalInfo(long userId) {
         return new TodayGoalInfoResult(goalQueryDao.findTodayGoalInfo(userId));
+    }
+
+    @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
+    @Transactional(readOnly = true)
+    public GoalHistoryInfoResult findGoalHistoryResult(long userId) {
+        List<GoalHistoryInfo> historyInfo = goalQueryDao.findGoalHistoryInfo(userId);
+        setMateNicknames(historyInfo);
+        return new GoalHistoryInfoResult(historyInfo);
+    }
+
+    private void setMateNicknames(List<GoalHistoryInfo> historyInfo) {
+        Map<Long, List<String>> mateNicknames = mateQueryDao.findMateNicknames(getGoalIds(historyInfo));
+        historyInfo.forEach(info -> info.setMateNicknames(mateNicknames.get(info.getGoalId())));
+    }
+
+    private List<Long> getGoalIds(List<GoalHistoryInfo> historyInfo) {
+        return historyInfo.stream().map(info -> info.getGoalId()).toList();
     }
 }

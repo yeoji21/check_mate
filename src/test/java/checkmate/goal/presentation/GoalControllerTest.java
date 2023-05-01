@@ -10,7 +10,9 @@ import checkmate.goal.presentation.dto.GoalCreateDto;
 import checkmate.goal.presentation.dto.GoalCreateResponse;
 import checkmate.goal.presentation.dto.GoalModifyDto;
 import checkmate.goal.presentation.dto.LikeCountCreateDto;
+import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
 import checkmate.mate.application.dto.response.MateUploadInfo;
+import checkmate.mate.domain.Mate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -170,6 +172,49 @@ public class GoalControllerTest extends ControllerTest {
                 .andDo(document("goal-today-info",
                         todayInfoResponseFieldsSnippet()
                 ));
+    }
+
+    @WithMockAuthUser
+    @Test
+    @DisplayName("성공한 목표 목록 조회 API")
+    void findGoalHistoryResult() throws Exception {
+        GoalHistoryInfoResult result = new GoalHistoryInfoResult(createGoalHistoryInfoList());
+        given(goalQueryService.findGoalHistoryResult(any(Long.class))).willReturn(result);
+
+        mockMvc.perform(get("/goals/history")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(result)))
+                .andDo(document("goal-history",
+                        historyResultResponseFieldsSnippet())
+                );
+    }
+
+    private List<GoalHistoryInfo> createGoalHistoryInfoList() {
+        Mate mate1 = TestEntityFactory.goal(1L, "goal1")
+                .join(TestEntityFactory.user(1L, "user1"));
+        Mate mate2 = TestEntityFactory.goal(2L, "goal2")
+                .join(TestEntityFactory.user(2L, "user2"));
+
+        GoalHistoryInfo info1 = new GoalHistoryInfo(mate1);
+        info1.setMateNicknames(List.of("nickname1", "nickname2", "nickname3"));
+        GoalHistoryInfo info2 = new GoalHistoryInfo(mate2);
+        info2.setMateNicknames(List.of("nickname4", "nickname5"));
+        return List.of(info1, info2);
+    }
+
+    private ResponseFieldsSnippet historyResultResponseFieldsSnippet() {
+        return responseFields(
+                fieldWithPath("goals[].goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
+                fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
+                fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
+                fieldWithPath("goals[].startDate").type(JsonFieldType.STRING).description("목표 시작일"),
+                fieldWithPath("goals[].endDate").type(JsonFieldType.STRING).description("목표 종료일"),
+                fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
+                fieldWithPath("goals[].appointmentTime").type(JsonFieldType.STRING).description("목표 인증 시간").optional(),
+                fieldWithPath("goals[].achievementRate").type(JsonFieldType.NUMBER).description("유저의 최종 성취율"),
+                fieldWithPath("goals[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
+        );
     }
 
     private ResponseFieldsSnippet todayInfoResponseFieldsSnippet() {

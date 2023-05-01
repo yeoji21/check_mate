@@ -4,6 +4,7 @@ import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.mate.domain.Mate;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -23,7 +24,8 @@ public class GoalHistoryInfo implements Serializable {
     private double achievementRate;
     private List<String> mateNicknames;
 
-    public GoalHistoryInfo(Mate finder, List<String> mateNicknames) {
+    @QueryProjection
+    public GoalHistoryInfo(Mate finder) {
         Goal goal = finder.getGoal();
         this.goalId = goal.getId();
         this.category = goal.getCategory();
@@ -33,6 +35,9 @@ public class GoalHistoryInfo implements Serializable {
         this.appointmentTime = goal.getAppointmentTime();
         this.checkDays = CheckDaysConverter.toDays(goal.getCheckDays().intValue());
         this.achievementRate = finder.calcProgressPercent();
+    }
+
+    public void setMateNicknames(List<String> mateNicknames) {
         this.mateNicknames = mateNicknames;
     }
 }

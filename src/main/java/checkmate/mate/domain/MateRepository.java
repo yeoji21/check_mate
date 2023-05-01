@@ -10,8 +10,6 @@ public interface MateRepository {
 
     Optional<Mate> findWithGoal(long goalId, long userId);
 
-    List<Mate> findSuccessMates(long userId);
-
     void increaseSkippedDayCount(List<Mate> mates);
 
     void updateLimitOveredMates(List<Mate> limitOveredMates);

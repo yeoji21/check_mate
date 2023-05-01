@@ -55,16 +55,6 @@ public class MateJpaRepository implements MateRepository {
     }
 
     @Override
-    public List<Mate> findSuccessMates(long userId) {
-        return queryFactory.select(mate)
-                .from(mate)
-                .join(mate.goal, goal).fetchJoin()
-                .where(mate.userId.eq(userId),
-                        mate.status.eq(MateStatus.SUCCESS))
-                .fetch();
-    }
-
-    @Override
     public List<Mate> findYesterdaySkippedMates() {
         LocalDate yesterDay = LocalDate.now().minusDays(1);
         List<Integer> checkDays = CheckDaysConverter.matchingDateValues(yesterDay);

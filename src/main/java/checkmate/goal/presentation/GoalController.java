@@ -11,6 +11,7 @@ import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfoResult;
 import checkmate.goal.application.dto.response.TodayGoalInfoResult;
 import checkmate.goal.presentation.dto.*;
+import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -68,5 +69,10 @@ public class GoalController {
     @GetMapping("/goals/today")
     public TodayGoalInfoResult findTodayGoalInfo(@AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findTodayGoalInfo(details.getUserId());
+    }
+
+    @GetMapping("/goals/history")
+    public GoalHistoryInfoResult findGoalHistoryResult(@AuthenticationPrincipal JwtUserDetails details) {
+        return goalQueryService.findGoalHistoryResult(details.getUserId());
     }
 }
