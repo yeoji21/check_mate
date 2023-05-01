@@ -43,6 +43,7 @@ public class MateQueryService {
     @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
     public GoalHistoryInfoResult findGoalHistoryResult(long userId) {
+        // TODO: 2023/05/01 조회용 쿼리로 개선
         List<Mate> successMates = mateRepository.findSuccessMates(userId);
         return new GoalHistoryInfoResult(mapToGoalHistoryInfo(successMates));
     }
@@ -54,8 +55,8 @@ public class MateQueryService {
                 .toList();
     }
 
-    private List<Long> getGoalIds(List<Mate> successMates) {
-        return successMates.stream()
+    private List<Long> getGoalIds(List<Mate> mates) {
+        return mates.stream()
                 .map(mate -> mate.getGoal().getId())
                 .toList();
     }

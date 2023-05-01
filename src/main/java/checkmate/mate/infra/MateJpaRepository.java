@@ -28,11 +28,7 @@ public class MateJpaRepository implements MateRepository {
 
     @Override
     public Optional<Mate> findById(long mateId) {
-        return Optional.ofNullable(
-                queryFactory.selectFrom(mate)
-                        .where(mate.id.eq(mateId))
-                        .fetchOne()
-        );
+        return Optional.ofNullable(entityManager.find(Mate.class, mateId));
     }
 
     @Override
@@ -42,7 +38,8 @@ public class MateJpaRepository implements MateRepository {
                         .selectFrom(mate)
                         .join(mate.goal, goal).fetchJoin()
                         .where(mate.id.eq(mateId))
-                        .fetchOne());
+                        .fetchOne()
+        );
     }
 
     @Override
@@ -55,15 +52,6 @@ public class MateJpaRepository implements MateRepository {
                                 mate.userId.eq(userId))
                         .fetchOne()
         );
-    }
-
-    @Override
-    public List<Mate> findByGoalIds(List<Long> goalIds) {
-        return queryFactory.select(mate)
-                .from(mate)
-                .where(mate.goal.id.in(goalIds),
-                        mate.status.eq(MateStatus.ONGOING))
-                .fetch();
     }
 
     @Override
@@ -125,10 +113,12 @@ public class MateJpaRepository implements MateRepository {
     // TODO: 2022/08/25 TM의 skippedCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
     @Override
     public void updateLimitOveredMates(List<Mate> limitOveredMates) {
-        queryFactory.update(mate)
-                .where(mate.in(limitOveredMates))
-                .set(mate.status, MateStatus.OUT)
-                .execute();
+        jdbcTemplate.batchUpdate(
+                "update mate set status = 'OUT' where id = ?",
+                limitOveredMates,
+                limitOveredMates.size(),
+                (ps, mate) -> ps.setLong(1, mate.getId())
+        );
     }
 
     @Override

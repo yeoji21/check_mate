@@ -119,6 +119,7 @@ public class MateCommandService {
         User invitee = userRepository.findByNickname(inviteeNickname)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
+        // TODO: 2023/05/01 로직
         return mateRepository.findWithGoal(goalId, invitee.getId())
                 .orElseGet(() -> {
                     Goal goal = goalRepository.findById(goalId)

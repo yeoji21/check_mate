@@ -126,25 +126,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("팀원 목록 조회 - goalIds로 조회")
-    void findByGoalIds() throws Exception {
-        //given
-        Goal goal1 = createGoal();
-        Goal goal2 = createGoal();
-        createMate(goal1);
-        createOngoingMate(goal1);
-        createOngoingMate(goal2);
-        createOngoingMate(goal2);
-
-        //when
-        List<Mate> mates = mateRepository.findByGoalIds(List.of(goal1.getId(), goal2.getId()));
-
-        //then
-        assertThat(mates.size()).isEqualTo(3);
-        assertThat(mates).allMatch(mate -> mate.getStatus() == MateStatus.ONGOING);
-    }
-
-    @Test
     @DisplayName("목표 수행 성공한 팀원 목록 조회")
     void findSuccessTeamMates() throws Exception {
         //given
