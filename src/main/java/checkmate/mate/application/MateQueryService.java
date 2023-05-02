@@ -29,6 +29,7 @@ public class MateQueryService {
     public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(long goalId, long userId) {
         Mate mate = mateRepository.findWithGoal(goalId, userId)
                 .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND));
+
         return new SpecifiedGoalDetailInfo(mate,
                 mateQueryDao.findUploadedDates(mate.getId()),
                 mateQueryDao.findUploadInfo(goalId));

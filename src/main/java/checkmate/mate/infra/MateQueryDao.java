@@ -78,8 +78,7 @@ public class MateQueryDao {
     public List<LocalDate> findUploadedDates(long mateId) {
         return queryFactory
                 .select(post.uploadedDate)
-                .from(mate)
-                .leftJoin(post).on(post.mate.id.eq(mateId))
+                .from(post)
                 .where(mate.id.eq(mateId))
                 .fetch();
     }

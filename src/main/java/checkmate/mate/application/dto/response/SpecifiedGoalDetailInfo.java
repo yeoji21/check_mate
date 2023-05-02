@@ -27,12 +27,11 @@ public class SpecifiedGoalDetailInfo {
     private final String goalSchedule;
     private final String mateSchedule;
     private final double progress;
-
     private final List<MateUploadInfo> mates;
 
     public SpecifiedGoalDetailInfo(Mate mate,
                                    List<LocalDate> uploadedDates,
-                                   List<MateUploadInfo> mates) {
+                                   List<MateUploadInfo> mateUploadInfo) {
         Goal goal = mate.getGoal();
 
         this.goalId = goal.getId();
@@ -50,7 +49,7 @@ public class SpecifiedGoalDetailInfo {
         this.uploadable = mate.getUploadable();
         this.progress = mate.calcProgressPercent();
 
-        this.mates = mates;
+        this.mates = mateUploadInfo;
     }
 
 }
