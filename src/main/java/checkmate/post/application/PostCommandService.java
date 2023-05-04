@@ -17,8 +17,6 @@ import checkmate.post.application.dto.response.PostUploadResult;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.domain.event.FileUploadedEvent;
-import checkmate.user.domain.User;
-import checkmate.user.domain.UserRepository;
 import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +37,6 @@ import static checkmate.notification.domain.NotificationType.POST_UPLOAD;
 public class PostCommandService {
     private final PostRepository postRepository;
     private final GoalRepository goalRepository;
-    private final UserRepository userRepository;
     private final MateRepository mateRepository;
     private final MateQueryDao mateQueryDao;
     private final ApplicationEventPublisher eventPublisher;
@@ -53,6 +50,7 @@ public class PostCommandService {
         Mate uploader = findMate(command.mateId());
         Post post = create(command, uploader);
         verifyGoalConditions(post);
+
         publishNotificationEvent(uploader);
         return new PostUploadResult(post.getId());
     }
@@ -82,18 +80,13 @@ public class PostCommandService {
     }
 
     private void publishNotificationEvent(Mate uploader) {
-        User user = findUser(uploader);
-        PostUploadNotificationDto dto = PostUploadNotificationDto.builder()
-                .uploaderUserId(user.getId())
-                .uploaderNickname(user.getNickname())
-                .goalId(uploader.getGoal().getId())
-                .goalTitle(uploader.getGoal().getTitle())
-                .mateUserIds(getMateUserIds(uploader))
-                .build();
+        PostUploadNotificationDto dto = mateQueryDao.findPostUploadNotificationDto(uploader.getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, uploader.getId()));
+        dto.setMateUserIds(findOtherMateUserIds(uploader));
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, dto));
     }
 
-    private List<Long> getMateUserIds(Mate uploader) {
+    private List<Long> findOtherMateUserIds(Mate uploader) {
         return mateQueryDao.findOngoingUserIds(uploader.getGoal().getId())
                 .stream()
                 .filter(userId -> !userId.equals(uploader.getUserId()))
@@ -124,11 +117,6 @@ public class PostCommandService {
                 }
             });
         }
-    }
-
-    private User findUser(Mate uploader) {
-        return userRepository.findById(uploader.getUserId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, uploader.getUserId()));
     }
 
     private Mate findMate(long mateId) {

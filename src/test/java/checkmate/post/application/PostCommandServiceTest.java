@@ -7,10 +7,10 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
+import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostUploadCommand;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
-import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,8 +39,6 @@ class PostCommandServiceTest {
     @Mock
     private PostRepository postRepository;
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private GoalRepository goalRepository;
     @Mock
     private MateRepository mateRepository;
@@ -55,8 +53,7 @@ class PostCommandServiceTest {
         //given
         Mate mate = createMate();
         given(mateRepository.findWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
-        given(userRepository.findById(any(Long.class)))
-                .willReturn(Optional.ofNullable(TestEntityFactory.user(mate.getUserId(), "tester")));
+        given(mateQueryDao.findPostUploadNotificationDto(any(Long.class))).willReturn(createNotificationDto(mate));
         given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
         given(mateQueryDao.findOngoingUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
 
@@ -66,6 +63,17 @@ class PostCommandServiceTest {
         //then
         verify(postRepository).save(any());
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
+    }
+
+    private Optional<PostUploadNotificationDto> createNotificationDto(Mate mate) {
+        PostUploadNotificationDto dto = PostUploadNotificationDto.builder()
+                .uploaderUserId(mate.getUserId())
+                .uploaderNickname("nickname")
+                .goalId(mate.getGoal().getId())
+                .goalTitle(mate.getGoal().getTitle())
+                .build();
+        dto.setMateUserIds(List.of(1L, 2L));
+        return Optional.of(dto);
     }
 
     @Test

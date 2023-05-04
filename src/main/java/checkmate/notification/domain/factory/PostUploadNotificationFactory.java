@@ -20,12 +20,12 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
 
     @Override
     String getContent(PostUploadNotificationDto dto) {
-        return dto.goalTitle() + " 목표의 " + dto.uploaderNickname() + "님이 목표 수행을 인증했어요!";
+        return dto.getGoalTitle() + " 목표의 " + dto.getUploaderNickname() + "님이 목표 수행을 인증했어요!";
     }
 
     @Override
     List<NotificationReceiver> getReceivers(PostUploadNotificationDto dto) {
-        return dto.mateUserIds()
+        return dto.getMateUserIds()
                 .stream()
                 .map(NotificationReceiver::new)
                 .collect(Collectors.toList());
@@ -33,6 +33,6 @@ public class PostUploadNotificationFactory extends NotificationFactory<PostUploa
 
     @Override
     void setAttributes(Notification notification, PostUploadNotificationDto dto) {
-        notification.addAttribute(NotificationAttributeKey.GOAL_ID, dto.goalId());
+        notification.addAttribute(NotificationAttributeKey.GOAL_ID, dto.getGoalId());
     }
 }

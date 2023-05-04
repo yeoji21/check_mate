@@ -5,6 +5,8 @@ import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateScheduleInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
 import checkmate.mate.domain.MateStatus;
+import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
+import checkmate.notification.domain.factory.dto.QPostUploadNotificationDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -91,5 +93,16 @@ public class MateQueryDao {
                 .where(mate.goal.id.eq(goalId),
                         mate.status.eq(MateStatus.ONGOING))
                 .fetch();
+    }
+
+    public Optional<PostUploadNotificationDto> findPostUploadNotificationDto(long mateId) {
+        return Optional.ofNullable(
+                queryFactory
+                        .select(new QPostUploadNotificationDto(mate.userId, user.nickname, mate.goal.id, mate.goal.title))
+                        .from(mate)
+                        .join(user).on(mate.userId.eq(user.id))
+                        .where(mate.id.eq(mateId))
+                        .fetchOne()
+        );
     }
 }

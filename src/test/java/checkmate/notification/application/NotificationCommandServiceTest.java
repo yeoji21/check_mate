@@ -90,12 +90,13 @@ class NotificationCommandServiceTest {
         User user = TestEntityFactory.user(1L, "user");
         Goal goal = TestEntityFactory.goal(1L, "goal");
 
-        return PostUploadNotificationDto.builder()
+        PostUploadNotificationDto dto = PostUploadNotificationDto.builder()
                 .uploaderUserId(user.getId())
                 .uploaderNickname(user.getNickname())
                 .goalId(goal.getId())
                 .goalTitle(goal.getTitle())
-                .mateUserIds(List.of(1L, 2L))
                 .build();
+        dto.setMateUserIds(List.of(1L, 2L));
+        return dto;
     }
 }
