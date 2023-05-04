@@ -16,7 +16,7 @@ public class DailyScheduler {
 
     @Scheduled(cron = "0 0 0 1/1 * ?")
     public void updateInitiateGoal() {
-        goalCommandService.updateTodayStartGoal();
+        goalCommandService.updateTodayStartGoals();
     }
 
     @Scheduled(cron = "0 5 0 1/1 * ?")

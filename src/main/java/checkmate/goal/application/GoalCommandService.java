@@ -69,13 +69,12 @@ public class GoalCommandService {
 
     @Transactional
     public void addLikeCountCondition(LikeCountCreateCommand command) {
-        Goal goal = goalRepository.findById(command.goalId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, command.goalId()));
-        goal.addCondition(new LikeCountCondition(command.likeCount()));
+        Goal goal = findGoal(command.goalId());
+        goal.addCondition(createLikeCountCondition(command.likeCount()));
     }
 
     @Transactional
-    public void updateTodayStartGoal() {
+    public void updateTodayStartGoals() {
         goalRepository.updateTodayStartStatus();
     }
 
@@ -83,19 +82,13 @@ public class GoalCommandService {
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
         goalRepository.updateStatusToOver(overedGoalIds);
-
-        List<Long> userIds = publishComplateNotifications(overedGoalIds);
-        cacheHandler.deleteUserCaches(userIds);
+        cacheHandler.deleteUserCaches(publishComplateNotifications(overedGoalIds));
     }
 
     private List<Long> publishComplateNotifications(List<Long> overedGoalIds) {
         List<CompleteGoalNotificationDto> notificationDto = goalQueryDao.findCompleteNotificationDto(overedGoalIds);
         eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDto));
         return notificationDto.stream().map(dto -> dto.getUserId()).toList();
-    }
-
-    private Goal saveNewGoal(GoalCreateCommand command) {
-        return goalRepository.save(mapper.toEntity(command));
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {
@@ -109,6 +102,19 @@ public class GoalCommandService {
         Mate mate = goal.join(user);
         mate.toWaitingStatus();
         return mate;
+    }
+
+    private LikeCountCondition createLikeCountCondition(int count) {
+        return new LikeCountCondition(count);
+    }
+
+    private Goal findGoal(long goalId) {
+        return goalRepository.findById(goalId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+    }
+
+    private Goal saveNewGoal(GoalCreateCommand command) {
+        return goalRepository.save(mapper.toEntity(command));
     }
 
     private User findUser(long userId) {
