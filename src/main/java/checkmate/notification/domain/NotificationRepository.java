@@ -10,5 +10,5 @@ public interface NotificationRepository {
 
     Optional<NotificationReceiver> findReceiver(long notificationId, long receiverUserId);
 
-    List<NotificationReceiver> findUnCheckedReceivers(long receiverUserId, NotificationType notificationType);
+    List<NotificationReceiver> findUncheckedReceivers(long receiverUserId, NotificationType notificationType);
 }

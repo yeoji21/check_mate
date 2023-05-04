@@ -19,11 +19,7 @@ public class UserJpaRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(long userId) {
-        return Optional.ofNullable(
-                queryFactory.selectFrom(user)
-                        .where(user.id.eq(userId))
-                        .fetchOne()
-        );
+        return Optional.ofNullable(entityManager.find(User.class, userId));
     }
 
     @Override

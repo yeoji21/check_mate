@@ -88,7 +88,7 @@ class NotificationQueryServiceTest {
     void findGoalCompleteNotifications() throws Exception {
         //given
         List<NotificationReceiver> receivers = createNotificationReceivers();
-        given(notificationRepository.findUnCheckedReceivers(anyLong(), any())).willReturn(receivers);
+        given(notificationRepository.findUncheckedReceivers(anyLong(), any())).willReturn(receivers);
 
         //when
         NotificationAttributeInfoResult result = notificationQueryService.findGoalCompleteNotifications(1L);

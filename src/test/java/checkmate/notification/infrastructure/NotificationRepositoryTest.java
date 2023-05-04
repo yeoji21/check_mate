@@ -53,7 +53,7 @@ class NotificationRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        List<NotificationReceiver> receivers = notificationRepository.findUnCheckedReceivers(receiver.getId(), COMPLETE_GOAL);
+        List<NotificationReceiver> receivers = notificationRepository.findUncheckedReceivers(receiver.getId(), COMPLETE_GOAL);
 
         //then
         assertThat(receivers.size()).isEqualTo(1);

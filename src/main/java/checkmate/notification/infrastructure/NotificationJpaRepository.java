@@ -44,11 +44,11 @@ public class NotificationJpaRepository implements NotificationRepository {
     }
 
     @Override
-    public List<NotificationReceiver> findUnCheckedReceivers(long receiverUserId, NotificationType notificationType) {
+    public List<NotificationReceiver> findUncheckedReceivers(long userId, NotificationType notificationType) {
         return queryFactory
                 .select(notificationReceiver)
                 .from(notificationReceiver)
-                .where(notificationReceiver.userId.eq(receiverUserId),
+                .where(notificationReceiver.userId.eq(userId),
                         notificationReceiver.checked.isFalse(),
                         notification.type.eq(notificationType))
                 .fetch();

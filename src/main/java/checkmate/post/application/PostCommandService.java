@@ -55,6 +55,7 @@ public class PostCommandService {
         return new PostUploadResult(post.getId());
     }
 
+    // TODO: 2023/05/04 컨트롤러 단에서 goalID 받도록 변경 후 mate fetch join 제거
     @Transactional
     public void like(long userId, long postId) {
         Post post = postRepository.findWithLikes(postId)

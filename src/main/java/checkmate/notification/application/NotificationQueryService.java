@@ -35,7 +35,7 @@ public class NotificationQueryService {
 
     @Transactional
     public NotificationAttributeInfoResult findGoalCompleteNotifications(long userId) {
-        List<NotificationAttributeInfo> notifications = notificationRepository.findUnCheckedReceivers(userId, NotificationType.COMPLETE_GOAL)
+        List<NotificationAttributeInfo> notifications = notificationRepository.findUncheckedReceivers(userId, NotificationType.COMPLETE_GOAL)
                 .stream()
                 .map(receiver -> {
                     receiver.read();

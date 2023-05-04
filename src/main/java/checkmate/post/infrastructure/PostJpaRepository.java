@@ -21,10 +21,7 @@ public class PostJpaRepository implements PostRepository {
 
     @Override
     public Optional<Post> findById(long postId) {
-        return Optional.ofNullable(queryFactory.selectFrom(post)
-                .join(post.mate, mate).fetchJoin()
-                .where(post.id.eq(postId))
-                .fetchOne());
+        return Optional.ofNullable(entityManager.find(Post.class, postId));
     }
 
     @Override
