@@ -55,8 +55,8 @@ public class GoalCommandService {
     })
     @Transactional
     public long create(GoalCreateCommand command) {
-        Goal goal = goalRepository.save(mapper.toEntity(command));
-        mateRepository.save(joinToGoal(goal, command.userId()));
+        Goal goal = saveNewGoal(command);
+        creatorJoinToGoal(goal, command.userId());
         return goal.getId();
     }
 
@@ -94,13 +94,26 @@ public class GoalCommandService {
         return notificationDto.stream().map(dto -> dto.getUserId()).toList();
     }
 
-    private Mate joinToGoal(Goal goal, long userId) {
-        User creator = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
-        Mate mate = goal.join(creator);
-        mate.toWaitingStatus();
+    private Goal saveNewGoal(GoalCreateCommand command) {
+        return goalRepository.save(mapper.toEntity(command));
+    }
+
+    private void creatorJoinToGoal(Goal goal, long userId) {
+        Mate mate = createMate(goal, userId);
         mateInitiateManager.initiate(mate);
+        mateRepository.save(mate);
+    }
+
+    private Mate createMate(Goal goal, long userId) {
+        User user = findUser(userId);
+        Mate mate = goal.join(user);
+        mate.toWaitingStatus();
         return mate;
+    }
+
+    private User findUser(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
     }
 
     private Goal findGoalForUpdate(long goalId) {
