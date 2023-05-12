@@ -70,10 +70,8 @@ public class Goal extends BaseTimeEntity {
         condition.setGoal(this);
     }
 
-    public void checkConditions(Post post) {
-        boolean verified = conditions.stream().allMatch(condition -> condition.satisfy(post));
-        if (post.isChecked() && !verified) post.uncheck();
-        else if (!post.isChecked() && verified) post.check();
+    public boolean checkConditions(Post post) {
+        return conditions.stream().allMatch(condition -> condition.satisfy(post));
     }
 
     public int getSkippedDayLimit() {
@@ -90,7 +88,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public Mate join(User user) {
-        inviteableCheck();
+        joinableCheck();
         return new Mate(this, user);
     }
 
@@ -98,7 +96,7 @@ public class Goal extends BaseTimeEntity {
         return GoalJoiningPolicy.progressedPercent(period.calcProgressedPercent());
     }
 
-    public void inviteableCheck() {
+    public void joinableCheck() {
         if (!isInviteable())
             throw UnInviteableGoalException.EXCEED_GOAL_INVITEABLE_DATE;
     }

@@ -133,7 +133,7 @@ class GoalTest {
         boolean inviteable = goal.isInviteable();
         //then
         assertThat(inviteable).isTrue();
-        assertDoesNotThrow(goal::inviteableCheck);
+        assertDoesNotThrow(goal::joinableCheck);
     }
 
     @Test
@@ -146,7 +146,7 @@ class GoalTest {
         boolean inviteable = goal.isInviteable();
         //then
         assertThat(inviteable).isFalse();
-        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class, goal::inviteableCheck);
+        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class, goal::joinableCheck);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
     }
 
@@ -168,10 +168,12 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         Post post = TestEntityFactory.post(goal.join(TestEntityFactory.user(1L, "user")));
+
         //when
-        goal.checkConditions(post);
+        boolean check = goal.checkConditions(post);
+
         //then
-        assertThat(post.isChecked()).isTrue();
+        assertThat(check).isTrue();
     }
 
     @Test
@@ -185,9 +187,11 @@ class GoalTest {
             post.addLikes(i);
         }
         //when
-        goal.checkConditions(post);
+
+        boolean check = goal.checkConditions(post);
+
         //then
-        assertThat(post.isChecked()).isTrue();
+        assertThat(check).isTrue();
     }
 
     @Test
@@ -212,9 +216,9 @@ class GoalTest {
         Post post = getCheckedPost(goal.join(TestEntityFactory.user(1L, "user")));
         ReflectionTestUtils.setField(post, "checked", true);
         //when
-        goal.checkConditions(post);
+        boolean check = goal.checkConditions(post);
         //then
-        assertThat(post.isChecked()).isFalse();
+        assertThat(check).isFalse();
     }
 
     private GoalModifyRequest getEndDateModifyRequest(Goal goal) {

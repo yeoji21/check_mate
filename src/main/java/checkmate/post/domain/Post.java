@@ -74,17 +74,19 @@ public class Post extends BaseTimeEntity {
             throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 
-    public void check() {
+    public void updateCheck() {
+        boolean verified = mate.getGoal().checkConditions(this);
+        if (checked && !verified) uncheck();
+        else if (!checked && verified) check();
+    }
+
+    private void check() {
         checked = true;
         mate.plusWorkingDay();
     }
 
-    public void uncheck() {
+    private void uncheck() {
         checked = false;
         mate.minusWorkingDay();
-    }
-
-    public List<Image> getImages() {
-        return images.getImages();
     }
 }

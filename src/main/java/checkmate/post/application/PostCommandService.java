@@ -4,7 +4,6 @@ import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
@@ -49,7 +48,7 @@ public class PostCommandService {
     public PostUploadResult upload(PostUploadCommand command) {
         Mate uploader = findMate(command.mateId());
         Post post = create(command, uploader);
-        verifyGoalConditions(post);
+        post.updateCheck();
 
         publishNotificationEvent(uploader);
         return new PostUploadResult(post.getId());
@@ -61,7 +60,7 @@ public class PostCommandService {
         Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         post.addLikes(userId);
-        verifyGoalConditions(post);
+        post.updateCheck();
     }
 
     @Transactional
@@ -69,15 +68,7 @@ public class PostCommandService {
         Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         post.removeLikes(userId);
-        verifyGoalConditions(post);
-    }
-
-    // TODO: 2023/02/23 공통 관심사
-    private void verifyGoalConditions(Post post) {
-        long goalId = post.getMate().getGoal().getId();
-        Goal goal = goalRepository.findWithConditions(goalId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-        goal.checkConditions(post);
+        post.updateCheck();
     }
 
     private void publishNotificationEvent(Mate uploader) {

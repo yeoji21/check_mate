@@ -54,7 +54,6 @@ class PostCommandServiceTest {
         Mate mate = createMate();
         given(mateRepository.findWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
         given(mateQueryDao.findPostUploadNotificationDto(any(Long.class))).willReturn(createNotificationDto(mate));
-        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
         given(mateQueryDao.findOngoingUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
 
         //when
@@ -84,7 +83,6 @@ class PostCommandServiceTest {
         Post post = createPost(mate);
 
         given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
-        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when
         postCommandService.like(mate.getUserId(), post.getId());
@@ -102,7 +100,6 @@ class PostCommandServiceTest {
         post.addLikes(mate.getUserId());
 
         given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
-        given(goalRepository.findWithConditions(any(Long.class))).willReturn(Optional.of(mate.getGoal()));
 
         //when
         postCommandService.unlike(mate.getUserId(), post.getId());

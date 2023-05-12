@@ -202,7 +202,7 @@ class MateRepositoryTest extends RepositoryTest {
 
     private void createYesterDayUploadedPost(Mate mate) {
         Post post = TestEntityFactory.post(mate);
-        post.check();
+        ReflectionTestUtils.setField(post, "checked", true);
         ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(1));
         em.persist(post);
     }

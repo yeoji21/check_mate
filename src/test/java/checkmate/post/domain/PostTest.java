@@ -4,6 +4,7 @@ import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.LikeCountCondition;
 import checkmate.mate.domain.Mate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -116,7 +117,7 @@ class PostTest {
         int before = post.getMate().getWorkingDays();
 
         //when
-        post.check();
+        post.updateCheck();
 
         //then
         assertThat(post.isChecked()).isTrue();
@@ -128,15 +129,21 @@ class PostTest {
     void uncheck() throws Exception {
         //given
         Post post = createPost();
-        post.check();
+        ReflectionTestUtils.setField(post, "checked", true);
+        addConditionToGoal(post);
         int before = post.getMate().getWorkingDays();
 
         //when
-        post.uncheck();
+        post.updateCheck();
 
         //then
         assertThat(post.isChecked()).isFalse();
         assertThat(post.getMate().getWorkingDays()).isLessThan(before);
+    }
+
+    private void addConditionToGoal(Post post) {
+        Goal goal = post.getMate().getGoal();
+        goal.addCondition(new LikeCountCondition(5));
     }
 
     private Post createPost() {
