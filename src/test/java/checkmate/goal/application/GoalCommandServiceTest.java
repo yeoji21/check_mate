@@ -12,9 +12,7 @@ import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.MateStatus;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
-import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -118,10 +116,6 @@ public class GoalCommandServiceTest {
         verify(mateInitiateManager).initiate(any(Mate.class));
     }
 
-    private List<Mate> createMates(Goal goal1, Goal goal2) {
-        return List.of(createMate(goal1, 1L), createMate(goal1, 2L), createMate(goal2, 3L));
-    }
-
     private GoalCreateCommand createGoalCreateCommand() {
         return GoalCreateCommand.builder()
                 .userId(1L)
@@ -131,13 +125,6 @@ public class GoalCommandServiceTest {
                 .endDate(LocalDate.now().plusDays(30L))
                 .checkDays("월수금")
                 .build();
-    }
-
-    private Mate createMate(Goal goal, long userId) {
-        User user = TestEntityFactory.user(userId, "user");
-        Mate mate = goal.join(user);
-        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
-        return mate;
     }
 
     private GoalModifyCommand createGoalModifyCommand(Goal goal) {

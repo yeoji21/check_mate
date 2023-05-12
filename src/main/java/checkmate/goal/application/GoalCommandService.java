@@ -92,15 +92,13 @@ public class GoalCommandService {
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {
-        Mate mate = createMate(goal, userId);
-        mateInitiateManager.initiate(mate);
-        mateRepository.save(mate);
+        mateInitiateManager.initiate(saveNewMate(goal, userId));
     }
 
-    private Mate createMate(Goal goal, long userId) {
-        User user = findUser(userId);
-        Mate mate = goal.join(user);
+    private Mate saveNewMate(Goal goal, long userId) {
+        Mate mate = goal.join(findUser(userId));
         mate.toWaitingStatus();
+        mateRepository.save(mate);
         return mate;
     }
 
