@@ -47,6 +47,7 @@ public class Post extends BaseTimeEntity {
         this.mate = mate;
         this.content = content;
         images = new Images();
+        mate.updateUploadedDate();
     }
 
     void addImage(Image image) {
@@ -55,9 +56,7 @@ public class Post extends BaseTimeEntity {
 
     public void addLikes(long userId) {
         checkLikesUpdatable();
-        boolean exist = likes.stream().anyMatch(like -> like.getUserId() == userId);
-        if (exist) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
-
+        checkAlreadyLiked(userId);
         Likes likes = new Likes(userId);
         this.likes.add(likes);
         likes.setPost(this);
@@ -78,6 +77,11 @@ public class Post extends BaseTimeEntity {
         boolean verified = verifyGoalConditions();
         if (!checked && verified) check();
         else if (checked && !verified) uncheck();
+    }
+
+    private void checkAlreadyLiked(long userId) {
+        boolean exist = likes.stream().anyMatch(like -> like.getUserId() == userId);
+        if (exist) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 
     private boolean verifyGoalConditions() {

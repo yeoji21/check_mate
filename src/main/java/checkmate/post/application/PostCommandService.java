@@ -22,6 +22,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -44,10 +45,9 @@ public class PostCommandService {
     )
     @Transactional
     public PostUploadResult upload(PostUploadCommand command) {
-        Mate uploader = findUploadMate(command.mateId());
-        Post post = createNewPost(command, uploader);
+        Post post = createNewPost(command);
         post.updateCheckStatus();
-        publishNotificationEvent(uploader);
+        publishNotificationEvent(command.mateId());
         return new PostUploadResult(post.getId());
     }
 
@@ -68,11 +68,12 @@ public class PostCommandService {
         post.updateCheckStatus();
     }
 
-    private void publishNotificationEvent(Mate uploader) {
+    private PostUploadNotificationDto findPostUploadNotificationDto(long mateId) {
+        Mate uploader = findMate(mateId);
         PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(uploader.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, uploader.getId()));
         notificationDto.setMateUserIds(findOtherMateUserIds(uploader));
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, notificationDto));
+        return notificationDto;
     }
 
     private List<Long> findOtherMateUserIds(Mate uploader) {
@@ -82,33 +83,57 @@ public class PostCommandService {
                 .collect(Collectors.toList());
     }
 
-    private Post createNewPost(PostUploadCommand command, Mate uploader) {
+    private Post createNewPost(PostUploadCommand command) {
+        Mate uploader = findMate(command.mateId());
+        checkPostUploadable(uploader);
+        return createAndSavePost(uploader, command);
+    }
+
+    private void checkPostUploadable(Mate uploader) {
         Uploadable uploadable = uploader.getUploadable();
         Assert.isTrue(uploadable.isUploadable(), uploadable.toString());
+    }
 
-        Post post = Post.builder()
-                .mate(uploader)
-                .content(command.content())
-                .build();
+    private Post createAndSavePost(Mate uploader, PostUploadCommand command) {
+        Post post = createPost(uploader, command.content());
         postRepository.save(post);
-        publishFileUploadedEvent(command, post);
-        uploader.updateUploadedDate();
+        saveImages(post, command.images());
         return post;
     }
 
-    private void publishFileUploadedEvent(PostUploadCommand command, Post post) {
-        if (command.images().size() > 0) {
-            command.images().forEach(multipartFile -> {
-                try {
-                    eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
-                } catch (IOException e) {
-                    throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
-                }
-            });
-        }
+    private Post createPost(Mate uploader, String content) {
+        return Post.builder()
+                .mate(uploader)
+                .content(content)
+                .build();
     }
 
-    private Mate findUploadMate(long mateId) {
+    private void saveImages(Post post, List<MultipartFile> images) {
+        if (images.size() == 0) return;
+
+        images.forEach(multipartFile -> {
+            try {
+                publishImageUploadEvent(post, multipartFile);
+            } catch (IOException e) {
+                throwRuntimeIOException(e);
+            }
+        });
+    }
+
+    private void publishImageUploadEvent(Post post, MultipartFile multipartFile) throws IOException {
+        eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
+    }
+
+    private void throwRuntimeIOException(IOException e) {
+        throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
+    }
+
+    private void publishNotificationEvent(long mateId) {
+        PostUploadNotificationDto notificationDto = findPostUploadNotificationDto(mateId);
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, notificationDto));
+    }
+
+    private Mate findMate(long mateId) {
         return mateRepository.findWithGoal(mateId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
     }
