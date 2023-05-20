@@ -30,7 +30,7 @@ public class PostQueryDao {
                 .leftJoin(image).on(image.post.eq(post))
                 .leftJoin(likes).on(likes.post.eq(post))
                 .where(mate.goal.id.eq(goalId),
-                        post.uploadedDate.eq(date))
+                        post.createdDate.eq(date))
                 .orderBy(post.createdDateTime.desc())
                 .transform(GroupBy.groupBy(post).list(new QPostInfo(post.id, mate.id, user.nickname,
                         post.createdDateTime, list(image.storedName), post.content, list(likes.userId))));

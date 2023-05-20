@@ -1,7 +1,7 @@
 package checkmate.post.presentation.dto;
 
 import checkmate.MapperTest;
-import checkmate.post.application.dto.request.PostUploadCommand;
+import checkmate.post.application.dto.request.PostCreateCommand;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,10 +17,10 @@ class PostDtoMapperTest extends MapperTest {
         List<MultipartFile> files = List.of(new MockMultipartFile("file1", new byte[1]),
                 new MockMultipartFile("file2", new byte[1]));
         long userId = 1L;
-        PostUploadDto dto = new PostUploadDto(2L, files, "content");
+        PostCreateDto dto = new PostCreateDto(2L, files, "content");
 
         //when
-        PostUploadCommand command = mapper.toCommand(dto, userId);
+        PostCreateCommand command = mapper.toCommand(dto, userId);
 
         //then
         isEqualTo(command.mateId(), dto.getMateId());

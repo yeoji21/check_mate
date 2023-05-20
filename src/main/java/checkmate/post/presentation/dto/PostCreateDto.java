@@ -11,12 +11,12 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostUploadDto {
+public class PostCreateDto {
     private Long mateId;
     private String content;
     private List<MultipartFile> images;
 
-    public PostUploadDto(Long mateId, List<MultipartFile> images, String content) {
+    public PostCreateDto(Long mateId, List<MultipartFile> images, String content) {
         this.mateId = mateId;
         this.content = content;
         this.images = images != null ? new ArrayList<>(images) : Collections.emptyList();

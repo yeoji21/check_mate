@@ -71,7 +71,7 @@ public class MateJpaRepository implements MateRepository {
                 .from(post)
                 .where(
                         post.mate.in(mates),
-                        post.uploadedDate.eq(yesterDay),
+                        post.createdDate.eq(yesterDay),
                         post.checked.isTrue())
                 .fetch();
 

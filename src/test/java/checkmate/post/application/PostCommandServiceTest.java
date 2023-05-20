@@ -7,7 +7,7 @@ import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
-import checkmate.post.application.dto.request.PostUploadCommand;
+import checkmate.post.application.dto.request.PostCreateCommand;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -54,7 +54,7 @@ class PostCommandServiceTest {
         given(mateQueryDao.findOngoingUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
 
         //when
-        postCommandService.upload(createPostUploadCommand(mate));
+        postCommandService.create(createPostUploadCommand(mate));
 
         //then
         verify(postRepository).save(any());
@@ -119,8 +119,8 @@ class PostCommandServiceTest {
         return mate;
     }
 
-    private PostUploadCommand createPostUploadCommand(Mate mate) throws IOException {
-        return new PostUploadCommand(mate.getUserId(),
+    private PostCreateCommand createPostUploadCommand(Mate mate) throws IOException {
+        return new PostCreateCommand(mate.getUserId(),
                 mate.getId(),
                 List.of(new MockMultipartFile("filename", InputStream.nullInputStream())),
                 "content");

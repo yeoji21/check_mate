@@ -5,11 +5,11 @@ import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.post.application.PostCommandService;
 import checkmate.post.application.PostQueryService;
+import checkmate.post.application.dto.response.PostCreateResult;
 import checkmate.post.application.dto.response.PostInfoResult;
-import checkmate.post.application.dto.response.PostUploadResult;
+import checkmate.post.presentation.dto.PostCreateDto;
 import checkmate.post.presentation.dto.PostDate;
 import checkmate.post.presentation.dto.PostDtoMapper;
-import checkmate.post.presentation.dto.PostUploadDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,11 +24,10 @@ public class PostController {
     private final PostDtoMapper postDtoMapper;
 
     @PostMapping("/posts")
-    public PostUploadResult upload(@ModelAttribute PostUploadDto dto,
+    public PostCreateResult create(@ModelAttribute PostCreateDto dto,
                                    @AuthenticationPrincipal JwtUserDetails principal) {
-        if (dto.getImages() == null && dto.getContent() == null)
-            throw new IllegalArgumentException("빈 목표인증 요청");
-        return postCommandService.upload(postDtoMapper.toCommand(dto, principal.getUserId()));
+        validateContentAndImageNotEmpty(dto);
+        return postCommandService.create(postDtoMapper.toCommand(dto, principal.getUserId()));
     }
 
     @GetMapping("/goals/{goalId}/posts/{date}")
@@ -51,5 +50,10 @@ public class PostController {
                        @PathVariable long postId,
                        @AuthenticationPrincipal JwtUserDetails details) {
         postCommandService.unlike(details.getUserId(), postId);
+    }
+
+    private void validateContentAndImageNotEmpty(PostCreateDto dto) {
+        if (dto.getImages() == null && dto.getContent() == null)
+            throw new IllegalArgumentException("빈 목표인증 요청");
     }
 }

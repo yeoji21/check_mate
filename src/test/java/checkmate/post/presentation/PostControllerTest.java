@@ -2,10 +2,10 @@ package checkmate.post.presentation;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
-import checkmate.post.application.dto.request.PostUploadCommand;
+import checkmate.post.application.dto.request.PostCreateCommand;
+import checkmate.post.application.dto.response.PostCreateResult;
 import checkmate.post.application.dto.response.PostInfo;
 import checkmate.post.application.dto.response.PostInfoResult;
-import checkmate.post.application.dto.response.PostUploadResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -42,11 +42,11 @@ class PostControllerTest extends ControllerTest {
     void upload() throws Exception {
         MockMultipartFile firstFile = getMockMultipartFile("imageFile1");
         MockMultipartFile secondFile = getMockMultipartFile("imageFile2");
-        PostUploadCommand command = getPostUploadCommand(firstFile, secondFile);
-        PostUploadResult result = new PostUploadResult(1L);
+        PostCreateCommand command = getPostUploadCommand(firstFile, secondFile);
+        PostCreateResult result = new PostCreateResult(1L);
 
         given(postDtoMapper.toCommand(any(), anyLong())).willReturn(command);
-        given(postCommandService.upload(any(PostUploadCommand.class))).willReturn(result);
+        given(postCommandService.create(any(PostCreateCommand.class))).willReturn(result);
 
         mockMvc.perform(multipart("/posts")
                         .file(firstFile).file(secondFile)
@@ -55,7 +55,7 @@ class PostControllerTest extends ControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(result)))
-                .andDo(document("post-upload",
+                .andDo(document("post-create",
                         uploadRequestPartsSnippet(),
                         uploadRequestParametersSnippet(),
                         uploadResponseFieldsSnippet()
@@ -154,8 +154,8 @@ class PostControllerTest extends ControllerTest {
         );
     }
 
-    private PostUploadCommand getPostUploadCommand(MockMultipartFile firstFile, MockMultipartFile secondFile) {
-        return PostUploadCommand.builder()
+    private PostCreateCommand getPostUploadCommand(MockMultipartFile firstFile, MockMultipartFile secondFile) {
+        return PostCreateCommand.builder()
                 .userId(1L)
                 .mateId(2L)
                 .content("~~~")

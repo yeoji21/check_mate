@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "post", indexes = {
         @Index(name = "mateId_idx", columnList = "mate_id"),
-        @Index(name = "uploadedDate_idx", columnList = "uploaded_date")
+        @Index(name = "createdDate_idx", columnList = "created_date")
 })
 @Entity
 public class Post extends BaseTimeEntity {
@@ -30,12 +30,12 @@ public class Post extends BaseTimeEntity {
     @NotNull
     @Column(name = "content")
     private String content;
-    @Column(name = "uploaded_date")
-    private LocalDate uploadedDate = LocalDate.now();
-    @Column(name = "checked")
-    private boolean checked = false;
     @Embedded
     private Images images;
+    @Column(name = "checked")
+    private boolean checked = false;
+    @Column(name = "created_date")
+    private LocalDate createdDate = LocalDate.now();
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mate_id")
     private Mate mate;
@@ -47,7 +47,7 @@ public class Post extends BaseTimeEntity {
         this.mate = mate;
         this.content = content;
         images = new Images();
-        mate.updateUploadedDate();
+        mate.updatePostUploadedDate();
     }
 
     void addImage(Image image) {
@@ -66,7 +66,7 @@ public class Post extends BaseTimeEntity {
     }
 
     void checkLikesUpdatable() {
-        if (uploadedDate.plusDays(1).isBefore(LocalDate.now()))
+        if (createdDate.plusDays(1).isBefore(LocalDate.now()))
             throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 

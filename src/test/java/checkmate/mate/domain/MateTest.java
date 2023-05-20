@@ -51,7 +51,7 @@ class MateTest {
     void getUploadable_uploaded() throws Exception {
         //given
         Mate mate = createMate();
-        mate.updateUploadedDate();
+        mate.updatePostUploadedDate();
 
         //when
         Uploadable uploadable = mate.getUploadable();

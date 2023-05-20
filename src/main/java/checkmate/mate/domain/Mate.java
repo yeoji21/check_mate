@@ -89,7 +89,7 @@ public class Mate extends BaseTimeEntity {
         return lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now());
     }
 
-    public void updateUploadedDate() {
+    public void updatePostUploadedDate() {
         lastUploadDate = LocalDate.now();
     }
 

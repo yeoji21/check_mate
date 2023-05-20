@@ -38,7 +38,7 @@ class PostTest {
     void addLikes_period() throws Exception {
         //given
         Post post = createPost();
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
+        ReflectionTestUtils.setField(post, "createdDate", LocalDate.now().minusDays(5));
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
@@ -101,7 +101,7 @@ class PostTest {
         //given
         Post post = createPost();
         post.addLikes(1L);
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(5));
+        ReflectionTestUtils.setField(post, "createdDate", LocalDate.now().minusDays(5));
         //when
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> post.removeLikes(1L));

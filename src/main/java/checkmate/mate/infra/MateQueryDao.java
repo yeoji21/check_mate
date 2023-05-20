@@ -71,7 +71,7 @@ public class MateQueryDao {
                 .transform(
                         groupBy(mate.id).as(
                                 new QMateScheduleInfo(goal.period.startDate, goal.period.endDate,
-                                        goal.checkDays.checkDays, list(post.uploadedDate))
+                                        goal.checkDays.checkDays, list(post.createdDate))
                         )
                 );
         return Optional.ofNullable(scheduleInfoMap.get(mateId));
@@ -79,7 +79,7 @@ public class MateQueryDao {
 
     public List<LocalDate> findUploadedDates(long mateId) {
         return queryFactory
-                .select(post.uploadedDate)
+                .select(post.createdDate)
                 .from(post)
                 .where(mate.id.eq(mateId))
                 .fetch();

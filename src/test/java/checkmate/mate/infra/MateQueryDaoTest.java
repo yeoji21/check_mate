@@ -108,8 +108,8 @@ class MateQueryDaoTest extends RepositoryTest {
         Mate mate = createMate(goal, "user");
         createPost(mate);
         Post yesterDayPost = createPost(mate);
-        ReflectionTestUtils.setField(yesterDayPost, "uploadedDate", LocalDate.now().minusDays(1));
-        
+        ReflectionTestUtils.setField(yesterDayPost, "createdDate", LocalDate.now().minusDays(1));
+
         em.flush();
         em.clear();
 

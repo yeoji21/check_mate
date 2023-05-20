@@ -149,34 +149,6 @@ class MateRepositoryTest extends RepositoryTest {
         assertThat(mates).contains(mate1, mate2);
     }
 
-    private User createSuccessedMates() {
-        User user = TestEntityFactory.user(null, "tester1");
-        em.persist(user);
-
-        Goal goal1 = createGoal();
-        ReflectionTestUtils.setField(goal1, "status", GoalStatus.OVER);
-
-        Goal goal2 = createGoal();
-        ReflectionTestUtils.setField(goal2, "status", GoalStatus.OVER);
-
-        Mate mate1 = createMate(user, goal1);
-        ReflectionTestUtils.setField(mate1, "status", MateStatus.SUCCESS);
-
-        Mate mate2 = createMate(user, goal2);
-        ReflectionTestUtils.setField(mate2, "status", MateStatus.SUCCESS);
-
-        em.flush();
-        em.clear();
-
-        return user;
-    }
-
-    private Mate createMate(User user, Goal goal) {
-        Mate mate = goal.join(user);
-        em.persist(mate);
-        return mate;
-    }
-
     private Mate createMate(Goal goal) {
         User user = TestEntityFactory.user(null, "user");
         em.persist(user);
@@ -203,7 +175,7 @@ class MateRepositoryTest extends RepositoryTest {
     private void createYesterDayUploadedPost(Mate mate) {
         Post post = TestEntityFactory.post(mate);
         ReflectionTestUtils.setField(post, "checked", true);
-        ReflectionTestUtils.setField(post, "uploadedDate", LocalDate.now().minusDays(1));
+        ReflectionTestUtils.setField(post, "createdDate", LocalDate.now().minusDays(1));
         em.persist(post);
     }
 }

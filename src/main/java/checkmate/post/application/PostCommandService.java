@@ -9,8 +9,8 @@ import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
-import checkmate.post.application.dto.request.PostUploadCommand;
-import checkmate.post.application.dto.response.PostUploadResult;
+import checkmate.post.application.dto.request.PostCreateCommand;
+import checkmate.post.application.dto.response.PostCreateResult;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.domain.event.FileUploadedEvent;
@@ -43,11 +43,11 @@ public class PostCommandService {
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional
-    public PostUploadResult upload(PostUploadCommand command) {
+    public PostCreateResult create(PostCreateCommand command) {
         Post post = createAndSavePost(command);
         post.updateCheckStatus();
         publishPostUploadEvent(command.mateId());
-        return new PostUploadResult(post.getId());
+        return new PostCreateResult(post.getId());
     }
 
     @Transactional
@@ -71,14 +71,14 @@ public class PostCommandService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
     }
 
-    private Post createAndSavePost(PostUploadCommand command) {
+    private Post createAndSavePost(PostCreateCommand command) {
         Post post = createPost(findUploader(command), command.content());
         postRepository.save(post);
         saveImages(post, command.images());
         return post;
     }
 
-    private Mate findUploader(PostUploadCommand command) {
+    private Mate findUploader(PostCreateCommand command) {
         Mate uploader = findMate(command.mateId());
         uploader.validatePostUploadable();
         return uploader;
