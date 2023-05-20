@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static checkmate.notification.domain.NotificationType.POST_UPLOAD;
@@ -54,18 +55,23 @@ public class PostCommandService {
     // TODO: 2023/05/04 컨트롤러 단에서 goalID 받도록 변경 후 mate fetch join 제거
     @Transactional
     public void like(long userId, long postId) {
-        Post post = postRepository.findWithLikes(postId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
-        post.addLikes(userId);
-        post.updateCheckStatus();
+        updateLikes(postId, post -> post.addLikes(userId));
     }
 
     @Transactional
     public void unlike(long userId, long postId) {
-        Post post = postRepository.findWithLikes(postId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
-        post.removeLikes(userId);
+        updateLikes(postId, post -> post.removeLikes(userId));
+    }
+
+    public void updateLikes(long postId, Consumer<Post> action) {
+        Post post = findPostWithLikes(postId);
+        action.accept(post);
         post.updateCheckStatus();
+    }
+
+    private Post findPostWithLikes(long postId) {
+        return postRepository.findWithLikes(postId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
     }
 
     private PostUploadNotificationDto findPostUploadNotificationDto(long mateId) {
