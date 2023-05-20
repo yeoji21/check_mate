@@ -57,20 +57,28 @@ public class Post extends BaseTimeEntity {
     public void addLikes(long userId) {
         checkLikesUpdatable();
         checkAlreadyLiked(userId);
-        Likes likes = new Likes(userId);
-        this.likes.add(likes);
-        likes.setPost(this);
+        createNewLike(userId);
     }
 
     public void removeLikes(long userId) {
         checkLikesUpdatable();
-        boolean removed = likes.removeIf(like -> like.getUserId() == userId);
-        if (!removed) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+        removeLiked(userId);
     }
 
     void checkLikesUpdatable() {
         if (uploadedDate.plusDays(1).isBefore(LocalDate.now()))
             throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+    }
+
+    private void createNewLike(long userId) {
+        Likes likes = new Likes(userId);
+        this.likes.add(likes);
+        likes.setPost(this);
+    }
+
+    private void removeLiked(long userId) {
+        boolean isRemoved = likes.removeIf(like -> like.getUserId() == userId);
+        if (!isRemoved) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 
     public void updateCheckStatus() {

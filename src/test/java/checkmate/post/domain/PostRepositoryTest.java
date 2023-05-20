@@ -16,27 +16,47 @@ class PostRepositoryTest extends RepositoryTest {
     void findWithLikes() throws Exception {
         //given
         Mate mate = createMate();
-        Post post = TestEntityFactory.post(mate);
-        em.persist(post);
-        for (int i = 0; i < 5; i++) {
-            post.addLikes(i);
-        }
+        Post post = createPost(mate);
+        setFiveLikes(post);
 
         //when
-        Post findPost = postRepository.findWithLikes(post.getId()).orElseThrow(IllegalArgumentException::new);
+        Post findPost = postRepository.findWithLikes(post.getId())
+                .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(post).isEqualTo(findPost);
         assertThat(findPost.getLikes()).hasSize(5);
     }
 
+    private void setFiveLikes(Post post) {
+        for (int i = 0; i < 5; i++) {
+            post.addLikes(i);
+        }
+    }
+
+    private Post createPost(Mate mate) {
+        Post post = TestEntityFactory.post(mate);
+        em.persist(post);
+        return post;
+    }
+
     private Mate createMate() {
-        Goal goal = TestEntityFactory.goal(null, "title");
-        em.persist(goal);
-        User user = TestEntityFactory.user(null, "user");
-        em.persist(user);
+        Goal goal = createGoal();
+        User user = createUser();
         Mate mate = goal.join(user);
         em.persist(mate);
         return mate;
+    }
+
+    private User createUser() {
+        User user = TestEntityFactory.user(null, "user");
+        em.persist(user);
+        return user;
+    }
+
+    private Goal createGoal() {
+        Goal goal = TestEntityFactory.goal(null, "title");
+        em.persist(goal);
+        return goal;
     }
 }

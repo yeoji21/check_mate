@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.Optional;
 
-import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QLikes.likes;
 import static checkmate.post.domain.QPost.post;
 
@@ -29,7 +28,6 @@ public class PostJpaRepository implements PostRepository {
         return Optional.ofNullable(
                 queryFactory.selectFrom(post)
                         .leftJoin(post.likes, likes).fetchJoin()
-                        .join(post.mate, mate).fetchJoin()
                         .where(post.id.eq(postId))
                         .fetchOne()
         );
