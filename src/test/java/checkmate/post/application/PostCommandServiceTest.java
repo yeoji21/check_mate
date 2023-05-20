@@ -2,7 +2,6 @@ package checkmate.post.application;
 
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalRepository;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.MateQueryDao;
@@ -39,8 +38,6 @@ class PostCommandServiceTest {
     @Mock
     private PostRepository postRepository;
     @Mock
-    private GoalRepository goalRepository;
-    @Mock
     private MateRepository mateRepository;
     @Mock
     private MateQueryDao mateQueryDao;
@@ -62,17 +59,6 @@ class PostCommandServiceTest {
         //then
         verify(postRepository).save(any());
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
-    }
-
-    private Optional<PostUploadNotificationDto> createNotificationDto(Mate mate) {
-        PostUploadNotificationDto dto = PostUploadNotificationDto.builder()
-                .uploaderUserId(mate.getUserId())
-                .uploaderNickname("nickname")
-                .goalId(mate.getGoal().getId())
-                .goalTitle(mate.getGoal().getTitle())
-                .build();
-        dto.setMateUserIds(List.of(1L, 2L));
-        return Optional.of(dto);
     }
 
     @Test
@@ -108,6 +94,17 @@ class PostCommandServiceTest {
         assertThat(post.getLikes().size()).isEqualTo(0);
     }
 
+
+    private Optional<PostUploadNotificationDto> createNotificationDto(Mate mate) {
+        PostUploadNotificationDto dto = PostUploadNotificationDto.builder()
+                .uploaderUserId(mate.getUserId())
+                .uploaderNickname("nickname")
+                .goalId(mate.getGoal().getId())
+                .goalTitle(mate.getGoal().getTitle())
+                .build();
+        dto.setMateUserIds(List.of(1L, 2L));
+        return Optional.of(dto);
+    }
 
     private Post createPost(Mate mate) {
         Post post = TestEntityFactory.post(mate);

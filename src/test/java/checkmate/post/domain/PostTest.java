@@ -117,7 +117,7 @@ class PostTest {
         int before = post.getMate().getWorkingDays();
 
         //when
-        post.updateCheck();
+        post.updateCheckStatus();
 
         //then
         assertThat(post.isChecked()).isTrue();
@@ -134,7 +134,7 @@ class PostTest {
         int before = post.getMate().getWorkingDays();
 
         //when
-        post.updateCheck();
+        post.updateCheckStatus();
 
         //then
         assertThat(post.isChecked()).isFalse();

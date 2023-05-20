@@ -74,10 +74,14 @@ public class Post extends BaseTimeEntity {
             throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
     }
 
-    public void updateCheck() {
-        boolean verified = mate.getGoal().checkConditions(this);
-        if (checked && !verified) uncheck();
-        else if (!checked && verified) check();
+    public void updateCheckStatus() {
+        boolean verified = verifyGoalConditions();
+        if (!checked && verified) check();
+        else if (checked && !verified) uncheck();
+    }
+
+    private boolean verifyGoalConditions() {
+        return mate.getGoal().checkConditions(this);
     }
 
     private void check() {

@@ -4,7 +4,6 @@ import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.domain.GoalRepository;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.Uploadable;
@@ -35,7 +34,6 @@ import static checkmate.notification.domain.NotificationType.POST_UPLOAD;
 @Service
 public class PostCommandService {
     private final PostRepository postRepository;
-    private final GoalRepository goalRepository;
     private final MateRepository mateRepository;
     private final MateQueryDao mateQueryDao;
     private final ApplicationEventPublisher eventPublisher;
@@ -46,10 +44,9 @@ public class PostCommandService {
     )
     @Transactional
     public PostUploadResult upload(PostUploadCommand command) {
-        Mate uploader = findMate(command.mateId());
-        Post post = create(command, uploader);
-        post.updateCheck();
-
+        Mate uploader = findUploadMate(command.mateId());
+        Post post = createNewPost(command, uploader);
+        post.updateCheckStatus();
         publishNotificationEvent(uploader);
         return new PostUploadResult(post.getId());
     }
@@ -60,7 +57,7 @@ public class PostCommandService {
         Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         post.addLikes(userId);
-        post.updateCheck();
+        post.updateCheckStatus();
     }
 
     @Transactional
@@ -68,14 +65,14 @@ public class PostCommandService {
         Post post = postRepository.findWithLikes(postId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
         post.removeLikes(userId);
-        post.updateCheck();
+        post.updateCheckStatus();
     }
 
     private void publishNotificationEvent(Mate uploader) {
-        PostUploadNotificationDto dto = mateQueryDao.findPostUploadNotificationDto(uploader.getId())
+        PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(uploader.getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, uploader.getId()));
-        dto.setMateUserIds(findOtherMateUserIds(uploader));
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, dto));
+        notificationDto.setMateUserIds(findOtherMateUserIds(uploader));
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, notificationDto));
     }
 
     private List<Long> findOtherMateUserIds(Mate uploader) {
@@ -85,7 +82,7 @@ public class PostCommandService {
                 .collect(Collectors.toList());
     }
 
-    private Post create(PostUploadCommand command, Mate uploader) {
+    private Post createNewPost(PostUploadCommand command, Mate uploader) {
         Uploadable uploadable = uploader.getUploadable();
         Assert.isTrue(uploadable.isUploadable(), uploadable.toString());
 
@@ -111,7 +108,7 @@ public class PostCommandService {
         }
     }
 
-    private Mate findMate(long mateId) {
+    private Mate findUploadMate(long mateId) {
         return mateRepository.findWithGoal(mateId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
     }
