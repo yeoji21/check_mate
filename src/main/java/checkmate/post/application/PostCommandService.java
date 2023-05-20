@@ -6,7 +6,6 @@ import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.Uploadable;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
@@ -15,7 +14,6 @@ import checkmate.post.application.dto.response.PostUploadResult;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.domain.event.FileUploadedEvent;
-import io.jsonwebtoken.lang.Assert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -46,9 +44,9 @@ public class PostCommandService {
     )
     @Transactional
     public PostUploadResult upload(PostUploadCommand command) {
-        Post post = createNewPost(command);
+        Post post = createAndSavePost(command);
         post.updateCheckStatus();
-        publishNotificationEvent(command.mateId());
+        publishPostUploadEvent(command.mateId());
         return new PostUploadResult(post.getId());
     }
 
@@ -73,37 +71,17 @@ public class PostCommandService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
     }
 
-    private PostUploadNotificationDto findPostUploadNotificationDto(long mateId) {
-        Mate uploader = findMate(mateId);
-        PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(uploader.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, uploader.getId()));
-        notificationDto.setMateUserIds(findOtherMateUserIds(uploader));
-        return notificationDto;
-    }
-
-    private List<Long> findOtherMateUserIds(Mate uploader) {
-        return mateQueryDao.findOngoingUserIds(uploader.getGoal().getId())
-                .stream()
-                .filter(userId -> !userId.equals(uploader.getUserId()))
-                .collect(Collectors.toList());
-    }
-
-    private Post createNewPost(PostUploadCommand command) {
-        Mate uploader = findMate(command.mateId());
-        checkPostUploadable(uploader);
-        return createAndSavePost(uploader, command);
-    }
-
-    private void checkPostUploadable(Mate uploader) {
-        Uploadable uploadable = uploader.getUploadable();
-        Assert.isTrue(uploadable.isUploadable(), uploadable.toString());
-    }
-
-    private Post createAndSavePost(Mate uploader, PostUploadCommand command) {
-        Post post = createPost(uploader, command.content());
+    private Post createAndSavePost(PostUploadCommand command) {
+        Post post = createPost(findUploader(command), command.content());
         postRepository.save(post);
         saveImages(post, command.images());
         return post;
+    }
+
+    private Mate findUploader(PostUploadCommand command) {
+        Mate uploader = findMate(command.mateId());
+        uploader.validatePostUploadable();
+        return uploader;
     }
 
     private Post createPost(Mate uploader, String content) {
@@ -120,7 +98,7 @@ public class PostCommandService {
             try {
                 publishImageUploadEvent(post, multipartFile);
             } catch (IOException e) {
-                throwRuntimeIOException(e);
+                throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
             }
         });
     }
@@ -129,13 +107,23 @@ public class PostCommandService {
         eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
     }
 
-    private void throwRuntimeIOException(IOException e) {
-        throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
-    }
-
-    private void publishNotificationEvent(long mateId) {
+    private void publishPostUploadEvent(long mateId) {
         PostUploadNotificationDto notificationDto = findPostUploadNotificationDto(mateId);
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, notificationDto));
+    }
+
+    private PostUploadNotificationDto findPostUploadNotificationDto(long mateId) {
+        PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(findMate(mateId).getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, findMate(mateId).getId()));
+        notificationDto.setMateUserIds(findOtherMateUserIds(findMate(mateId)));
+        return notificationDto;
+    }
+
+    private List<Long> findOtherMateUserIds(Mate uploader) {
+        return mateQueryDao.findOngoingUserIds(uploader.getGoal().getId())
+                .stream()
+                .filter(userId -> !userId.equals(uploader.getUserId()))
+                .collect(Collectors.toList());
     }
 
     private Mate findMate(long mateId) {

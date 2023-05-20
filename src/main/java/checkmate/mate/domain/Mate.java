@@ -4,6 +4,7 @@ import checkmate.common.domain.BaseTimeEntity;
 import checkmate.common.util.ProgressCalculator;
 import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
+import io.jsonwebtoken.lang.Assert;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -78,6 +79,10 @@ public class Mate extends BaseTimeEntity {
                 .timeOver(goal.isTimeOver())
                 .workingDay(goal.isTodayWorkingDay())
                 .build();
+    }
+
+    public void validatePostUploadable() {
+        Assert.isTrue(getUploadable().isUploadable(), getUploadable().toString());
     }
 
     public boolean isUploaded() {

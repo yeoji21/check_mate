@@ -56,7 +56,7 @@ public class GoalControllerTest extends ControllerTest {
                         .content(objectMapper.writeValueAsString(getGoalCreateDto())))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(response)))
-                .andDo(document("goal-create",
+                .andDo(document("goal-upload",
                         createRequestFieldsSnippet(),
                         createResponseFieldSnippet())
                 );
