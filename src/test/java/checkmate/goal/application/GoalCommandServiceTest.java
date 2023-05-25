@@ -1,5 +1,12 @@
 package checkmate.goal.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheHandler;
 import checkmate.goal.application.dto.GoalCommandMapper;
@@ -14,6 +21,10 @@ import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.UserRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,20 +35,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 public class GoalCommandServiceTest {
+
     @Mock
     private GoalRepository goalRepository;
     @Mock
@@ -63,7 +63,8 @@ public class GoalCommandServiceTest {
         //given
         Goal goal1 = createGoal(1L);
         Goal goal2 = createGoal(2L);
-        given(goalQueryDao.findYesterdayOveredGoals()).willReturn(List.of(goal1.getId(), goal2.getId()));
+        given(goalQueryDao.findYesterdayOveredGoals()).willReturn(
+            List.of(goal1.getId(), goal2.getId()));
 
         //when
         goalCommandService.updateYesterdayOveredGoals();
@@ -80,12 +81,12 @@ public class GoalCommandServiceTest {
         //given
         Goal goal = createGoal(1L);
         GoalModifyCommand command = createGoalModifyCommand(goal);
-        given(goalRepository.findByIdForUpdate(any(Long.class))).willReturn(Optional.of(goal));
+        given(goalRepository.findByIdWithLock(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
         LocalDate beforeEndDate = goal.getEndDate();
         LocalTime beforeTime = goal.getAppointmentTime();
-        goalCommandService.modifyGoal(command);
+        goalCommandService.modify(command);
 
         //then
         assertThat(command.endDate()).isNotEqualTo(beforeEndDate);
@@ -105,7 +106,7 @@ public class GoalCommandServiceTest {
             return argument;
         }).when(goalRepository).save(any(Goal.class));
         given(userRepository.findById(any(Long.class)))
-                .willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "user")));
+            .willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "user")));
 
         //when
         long goalId = goalCommandService.create(command);
@@ -118,20 +119,20 @@ public class GoalCommandServiceTest {
 
     private GoalCreateCommand createGoalCreateCommand() {
         return GoalCreateCommand.builder()
-                .userId(1L)
-                .category(GoalCategory.LEARNING)
-                .title("goal")
-                .startDate(LocalDate.now().minusDays(10L))
-                .endDate(LocalDate.now().plusDays(30L))
-                .checkDays("월수금")
-                .build();
+            .userId(1L)
+            .category(GoalCategory.LEARNING)
+            .title("goal")
+            .startDate(LocalDate.now().minusDays(10L))
+            .endDate(LocalDate.now().plusDays(30L))
+            .checkDays("월수금")
+            .build();
     }
 
     private GoalModifyCommand createGoalModifyCommand(Goal goal) {
         return GoalModifyCommand.builder()
-                .endDate(goal.getEndDate().plusDays(10L))
-                .appointmentTime(LocalTime.now())
-                .build();
+            .endDate(goal.getEndDate().plusDays(10L))
+            .appointmentTime(LocalTime.now())
+            .build();
     }
 
     private Goal createGoal(long id) {

@@ -60,7 +60,7 @@ public class GoalController {
         @PathVariable long goalId,
         @RequestBody GoalModifyDto dto,
         @AuthenticationPrincipal JwtUserDetails details) {
-        goalCommandService.modifyGoal(toModifyCommand(goalId, dto, details));
+        goalCommandService.modify(toModifyCommand(goalId, dto, details));
     }
 
     @GetMapping("/goals/{goalId}")

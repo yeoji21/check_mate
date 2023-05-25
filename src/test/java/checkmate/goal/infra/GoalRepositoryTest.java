@@ -1,18 +1,24 @@
 package checkmate.goal.infra;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalPeriod;
+import checkmate.goal.domain.GoalStatus;
+import checkmate.goal.domain.LikeCountCondition;
+import checkmate.goal.domain.VerificationCondition;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class GoalRepositoryTest extends RepositoryTest {
+
     @Test
     @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
     void findConditions() throws Exception {
@@ -22,7 +28,7 @@ public class GoalRepositoryTest extends RepositoryTest {
 
         //when
         Goal findGoal = goalRepository.findWithConditions(goal.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         List<VerificationCondition> conditions = getGoalConditions(findGoal);
@@ -30,7 +36,7 @@ public class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("목표 조회 - for update")
+    @DisplayName("목표 조회 - for modify")
     void findByIdForUpdate() throws Exception {
         //given
         Goal goal = createGoal();
@@ -38,8 +44,8 @@ public class GoalRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Goal findGoal = goalRepository.findByIdForUpdate(goal.getId())
-                .orElseThrow(IllegalArgumentException::new);
+        Goal findGoal = goalRepository.findByIdWithLock(goal.getId())
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(findGoal).isEqualTo(goal);
@@ -53,7 +59,7 @@ public class GoalRepositoryTest extends RepositoryTest {
 
         //when
         Goal findGoal = goalRepository.findWithConditions(goal.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         List<VerificationCondition> conditions = getGoalConditions(findGoal);
@@ -72,7 +78,7 @@ public class GoalRepositoryTest extends RepositoryTest {
 
         //then
         Goal findGoal = goalRepository.findWithConditions(goal.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
         LikeCountCondition findCondition = em.find(LikeCountCondition.class, condition.getId());
 
         List<VerificationCondition> conditions = getGoalConditions(findGoal);
@@ -94,8 +100,10 @@ public class GoalRepositoryTest extends RepositoryTest {
         goalRepository.updateTodayStartStatus();
 
         //then
-        assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(GoalStatus.ONGOING);
-        assertThat(em.find(Goal.class, todayStart2.getId()).getStatus()).isEqualTo(GoalStatus.ONGOING);
+        assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(
+            GoalStatus.ONGOING);
+        assertThat(em.find(Goal.class, todayStart2.getId()).getStatus()).isEqualTo(
+            GoalStatus.ONGOING);
         assertThat(em.find(Goal.class, notToday.getId()).getStatus()).isEqualTo(GoalStatus.WAITING);
     }
 
@@ -112,25 +120,25 @@ public class GoalRepositoryTest extends RepositoryTest {
         goalRepository.updateStatusToOver(goalIds);
 
         List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
-                .setParameter("ids", goalIds)
-                .getResultList();
+            .setParameter("ids", goalIds)
+            .getResultList();
         assertThat(goals).allMatch(goal -> goal.getStatus() == GoalStatus.OVER);
     }
 
     private Goal createGoal(LocalDate startDate, LocalDate endDate) {
         Goal goal = Goal.builder()
-                .title("title")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .category(GoalCategory.ETC)
-                .period(new GoalPeriod(startDate, endDate))
-                .build();
+            .title("title")
+            .checkDays(new GoalCheckDays("월화수목금토일"))
+            .category(GoalCategory.ETC)
+            .period(new GoalPeriod(startDate, endDate))
+            .build();
         em.persist(goal);
         return goal;
     }
 
     private List<VerificationCondition> getGoalConditions(Goal findGoal) {
         return (List<VerificationCondition>)
-                ReflectionTestUtils.getField(findGoal, "conditions");
+            ReflectionTestUtils.getField(findGoal, "conditions");
     }
 
     private Goal createGoal() {

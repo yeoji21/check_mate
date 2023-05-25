@@ -62,9 +62,9 @@ public class GoalCommandService {
 
     @CacheEvict(value = CacheKey.GOAL_PERIOD, key = "{#command.goalId}")
     @Transactional
-    public void modifyGoal(GoalModifyCommand command) {
-        Goal goal = findGoalForUpdate(command.goalId());
-        goal.update(mapper.toGoalModifyRequest(command));
+    public void modify(GoalModifyCommand command) {
+        Goal goal = findGoalWithLock(command.goalId());
+        goal.modify(mapper.toGoalModifyRequest(command));
     }
 
     @Transactional
@@ -131,8 +131,8 @@ public class GoalCommandService {
             .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
     }
 
-    private Goal findGoalForUpdate(long goalId) {
-        return goalRepository.findByIdForUpdate(goalId)
+    private Goal findGoalWithLock(long goalId) {
+        return goalRepository.findByIdWithLock(goalId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 }

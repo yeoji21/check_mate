@@ -1,24 +1,24 @@
 package checkmate.goal.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Post;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 class GoalTest {
+
     @Test
     @DisplayName("목표 종료일 업데이트")
     void endDate_update() throws Exception {
@@ -27,7 +27,7 @@ class GoalTest {
         GoalModifyRequest request = getEndDateModifyRequest(goal);
         //when
         LocalDate beforeEndDate = goal.getEndDate();
-        goal.update(request);
+        goal.modify(request);
         //then
         assertThat(beforeEndDate).isNotEqualTo(request.getEndDate());
         assertThat(goal.getEndDate()).isEqualTo(request.getEndDate());
@@ -40,9 +40,9 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> goal.update(GoalModifyRequest.builder()
-                        .endDate(goal.getEndDate().minusDays(1))
-                        .build())
+            () -> goal.modify(GoalModifyRequest.builder()
+                .endDate(goal.getEndDate().minusDays(1))
+                .build())
         );
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
@@ -55,10 +55,10 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
         GoalModifyRequest request = GoalModifyRequest.builder()
-                .timeReset(true)
-                .build();
+            .timeReset(true)
+            .build();
         //when
-        goal.update(request);
+        goal.modify(request);
         //then
         assertThat(goal.getAppointmentTime()).isNull();
     }
@@ -71,10 +71,10 @@ class GoalTest {
         ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
         LocalTime beforeAppointmentTime = goal.getAppointmentTime();
         GoalModifyRequest request = GoalModifyRequest.builder()
-                .appointmentTime(LocalTime.MAX)
-                .build();
+            .appointmentTime(LocalTime.MAX)
+            .build();
         //when
-        goal.update(request);
+        goal.modify(request);
 
         //then
         assertThat(beforeAppointmentTime).isNotEqualTo(request.getAppointmentTime());
@@ -88,11 +88,11 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "modifiedDateTime", LocalDateTime.now().minusDays(1));
         GoalModifyRequest request = GoalModifyRequest.builder()
-                .appointmentTime(LocalTime.MAX)
-                .build();
+            .appointmentTime(LocalTime.MAX)
+            .build();
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> goal.update(request));
+            () -> goal.modify(request));
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.UPDATE_DURATION);
     }
@@ -141,12 +141,14 @@ class GoalTest {
     void isInviteable_false() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(200L));
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
+            LocalDate.now().minusDays(200L));
         //when
         boolean inviteable = goal.isInviteable();
         //then
         assertThat(inviteable).isFalse();
-        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class, goal::joinableCheck);
+        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
+            goal::joinableCheck);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
     }
 
@@ -223,8 +225,8 @@ class GoalTest {
 
     private GoalModifyRequest getEndDateModifyRequest(Goal goal) {
         return GoalModifyRequest.builder()
-                .endDate(goal.getEndDate().plusDays(10))
-                .build();
+            .endDate(goal.getEndDate().plusDays(10))
+            .build();
     }
 
     private Post getCheckedPost(Mate mate) {

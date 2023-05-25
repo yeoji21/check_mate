@@ -7,21 +7,34 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import lombok.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Goal extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -53,10 +66,10 @@ public class Goal extends BaseTimeEntity {
 
     @Builder
     public Goal(GoalCategory category,
-                String title,
-                GoalPeriod period,
-                GoalCheckDays checkDays,
-                LocalTime appointmentTime) {
+        String title,
+        GoalPeriod period,
+        GoalCheckDays checkDays,
+        LocalTime appointmentTime) {
         this.category = category;
         this.title = title;
         this.checkDays = checkDays;
@@ -83,8 +96,11 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTimeOver() {
-        if (this.appointmentTime == null) return false;
-        else return appointmentTime.isBefore(LocalTime.now());
+        if (this.appointmentTime == null) {
+            return false;
+        } else {
+            return appointmentTime.isBefore(LocalTime.now());
+        }
     }
 
     public Mate join(User user) {
@@ -97,20 +113,21 @@ public class Goal extends BaseTimeEntity {
     }
 
     public void joinableCheck() {
-        if (!isInviteable())
+        if (!isInviteable()) {
             throw UnInviteableGoalException.EXCEED_GOAL_INVITEABLE_DATE;
+        }
     }
 
     public String getSchedule() {
         return period.fromStartToEndDate()
-                .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
-                .collect(Collectors.joining());
+            .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
+            .collect(Collectors.joining());
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
         return period.fromStartToEndDate()
-                .map(date -> checkDays.isWorkingDay(date) && uploadedDates.contains(date) ? "1" : "0")
-                .collect(Collectors.joining());
+            .map(date -> checkDays.isWorkingDay(date) && uploadedDates.contains(date) ? "1" : "0")
+            .collect(Collectors.joining());
     }
 
     public int progressedWorkingDaysCount() {
@@ -129,23 +146,28 @@ public class Goal extends BaseTimeEntity {
         return period.getEndDate();
     }
 
-    public void update(GoalModifyRequest request) {
+    public void modify(GoalModifyRequest request) {
         validateModifyRequest(request);
 
-        if (request.getEndDate() != null)
+        if (request.getEndDate() != null) {
             period = new GoalPeriod(period.getStartDate(), request.getEndDate());
+        }
         if (request.isTimeReset()) {
             appointmentTime = null;
         } else {
-            if (request.getAppointmentTime() != null)
+            if (request.getAppointmentTime() != null) {
                 appointmentTime = request.getAppointmentTime();
+            }
         }
     }
 
     private void validateModifyRequest(GoalModifyRequest request) {
-        if (request.getEndDate() != null && getEndDate().isAfter(request.getEndDate()))
+        if (request.getEndDate() != null && getEndDate().isAfter(request.getEndDate())) {
             throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
-        if (getModifiedDateTime() != null && getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now()))
+        }
+        if (getModifiedDateTime() != null && getModifiedDateTime().plusDays(7).toLocalDate()
+            .isAfter(LocalDate.now())) {
             throw new BusinessException(ErrorCode.UPDATE_DURATION);
+        }
     }
 }
