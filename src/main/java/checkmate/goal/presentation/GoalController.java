@@ -5,6 +5,9 @@ import checkmate.common.interceptor.GoalMember;
 import checkmate.config.auth.JwtUserDetails;
 import checkmate.goal.application.GoalCommandService;
 import checkmate.goal.application.GoalQueryService;
+import checkmate.goal.application.dto.request.GoalCreateCommand;
+import checkmate.goal.application.dto.request.GoalModifyCommand;
+import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfoResult;
@@ -36,28 +39,28 @@ public class GoalController {
     private final GoalDtoMapper mapper;
 
     @PostMapping("/goals")
-    public GoalCreateResponse create(@RequestBody @Valid GoalCreateDto dto,
+    public GoalCreateResponse create(
+        @RequestBody @Valid GoalCreateDto dto,
         @AuthenticationPrincipal JwtUserDetails details) {
-        return new GoalCreateResponse(
-            goalCommandService.create(mapper.toCommand(dto, details.getUserId()))
-        );
+        return new GoalCreateResponse(goalCommandService.create(toCreateCommand(dto, details)));
     }
 
     @GoalMember(GoalId.PATH_VARIABLE)
     @PostMapping("/goals/{goalId}/like-condition")
-    public void addLikeCondition(@PathVariable long goalId,
+    public void addLikeCondition(
+        @PathVariable long goalId,
         @RequestBody @Valid LikeCountCreateDto dto,
         @AuthenticationPrincipal JwtUserDetails details) {
-        goalCommandService.addLikeCountCondition(
-            mapper.toCommand(goalId, dto, details.getUserId()));
+        goalCommandService.addLikeCountCondition(toConditionCreateCommand(dto, goalId, details));
     }
 
     @GoalMember(GoalId.PATH_VARIABLE)
     @PatchMapping("/goals/{goalId}")
-    public void modify(@PathVariable long goalId,
+    public void modify(
+        @PathVariable long goalId,
         @RequestBody GoalModifyDto dto,
         @AuthenticationPrincipal JwtUserDetails details) {
-        goalCommandService.modifyGoal(mapper.toCommand(dto, goalId, details.getUserId()));
+        goalCommandService.modifyGoal(toModifyCommand(goalId, dto, details));
     }
 
     @GetMapping("/goals/{goalId}")
@@ -66,7 +69,7 @@ public class GoalController {
     }
 
     @GetMapping("/goals/{goalId}/period")
-    public GoalScheduleInfo findGoalPeriod(@PathVariable long goalId) {
+    public GoalScheduleInfo findGoalSchedule(@PathVariable long goalId) {
         return goalQueryService.findGoalPeriodInfo(goalId);
     }
 
@@ -84,5 +87,21 @@ public class GoalController {
     public GoalHistoryInfoResult findGoalHistoryResult(
         @AuthenticationPrincipal JwtUserDetails details) {
         return goalQueryService.findGoalHistoryResult(details.getUserId());
+    }
+
+    private GoalModifyCommand toModifyCommand(long goalId, GoalModifyDto dto,
+        JwtUserDetails details) {
+        return mapper.toCommand(dto, goalId, details.getUserId());
+    }
+
+    private GoalCreateCommand toCreateCommand(GoalCreateDto dto, JwtUserDetails details) {
+        return mapper.toCommand(dto, details.getUserId());
+    }
+
+    private LikeCountCreateCommand toConditionCreateCommand(
+        LikeCountCreateDto dto,
+        long goalId,
+        JwtUserDetails details) {
+        return mapper.toCommand(goalId, dto, details.getUserId());
     }
 }
