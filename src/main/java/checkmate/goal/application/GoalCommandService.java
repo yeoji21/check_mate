@@ -1,5 +1,8 @@
 package checkmate.goal.application;
 
+import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
+import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
+
 import checkmate.common.cache.CacheHandler;
 import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
@@ -19,6 +22,7 @@ import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,15 +31,11 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
-import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class GoalCommandService {
+
     private final GoalRepository goalRepository;
     private final GoalQueryDao goalQueryDao;
     private final UserRepository userRepository;
@@ -46,16 +46,16 @@ public class GoalCommandService {
     private final GoalCommandMapper mapper;
 
     @Caching(evict = {
-            @CacheEvict(
-                    value = CacheKey.ONGOING_GOALS,
-                    key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
-            @CacheEvict(
-                    value = CacheKey.TODAY_GOALS,
-                    key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
+        @CacheEvict(
+            value = CacheKey.ONGOING_GOALS,
+            key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
+        @CacheEvict(
+            value = CacheKey.TODAY_GOALS,
+            key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @Transactional
     public long create(GoalCreateCommand command) {
-        Goal goal = saveNewGoal(command);
+        Goal goal = createAndSaveGoal(command);
         creatorJoinToGoal(goal, command.userId());
         return goal.getId();
     }
@@ -86,19 +86,26 @@ public class GoalCommandService {
     }
 
     private List<Long> publishComplateNotifications(List<Long> overedGoalIds) {
-        List<CompleteGoalNotificationDto> notificationDto = goalQueryDao.findCompleteNotificationDto(overedGoalIds);
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDto));
+        List<CompleteGoalNotificationDto> notificationDto = goalQueryDao.findCompleteNotificationDto(
+            overedGoalIds);
+        eventPublisher.publishEvent(
+            new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDto));
         return notificationDto.stream().map(dto -> dto.getUserId()).toList();
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {
-        mateInitiateManager.initiate(saveNewMate(goal, userId));
+        mateInitiateManager.initiate(createAndSaveMate(goal, userId));
     }
 
-    private Mate saveNewMate(Goal goal, long userId) {
+    private Mate createAndSaveMate(Goal goal, long userId) {
+        Mate mate = createMate(goal, userId);
+        mateRepository.save(mate);
+        return mate;
+    }
+
+    private Mate createMate(Goal goal, long userId) {
         Mate mate = goal.join(findUser(userId));
         mate.toWaitingStatus();
-        mateRepository.save(mate);
         return mate;
     }
 
@@ -108,20 +115,24 @@ public class GoalCommandService {
 
     private Goal findGoal(long goalId) {
         return goalRepository.findById(goalId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 
-    private Goal saveNewGoal(GoalCreateCommand command) {
-        return goalRepository.save(mapper.toEntity(command));
+    private Goal createAndSaveGoal(GoalCreateCommand command) {
+        return goalRepository.save(createGoal(command));
+    }
+
+    private Goal createGoal(GoalCreateCommand command) {
+        return mapper.toEntity(command);
     }
 
     private User findUser(long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
+            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
     }
 
     private Goal findGoalForUpdate(long goalId) {
         return goalRepository.findByIdForUpdate(goalId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 }

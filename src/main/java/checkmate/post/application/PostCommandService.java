@@ -1,5 +1,7 @@
 package checkmate.post.application;
 
+import static checkmate.notification.domain.NotificationType.POST_UPLOAD;
+
 import checkmate.common.cache.CacheKey;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
@@ -14,6 +16,10 @@ import checkmate.post.application.dto.response.PostCreateResult;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.domain.event.FileUploadedEvent;
+import java.io.IOException;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,25 +28,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static checkmate.notification.domain.NotificationType.POST_UPLOAD;
-
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class PostCommandService {
+
     private final PostRepository postRepository;
     private final MateRepository mateRepository;
     private final MateQueryDao mateQueryDao;
     private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(
-            value = CacheKey.TODAY_GOALS,
-            key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
+        value = CacheKey.TODAY_GOALS,
+        key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional
     public PostCreateResult create(PostCreateCommand command) {
@@ -68,7 +68,7 @@ public class PostCommandService {
 
     private Post findPostWithLikes(long postId) {
         return postRepository.findWithLikes(postId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND, postId));
     }
 
     private Post createAndSavePost(PostCreateCommand command) {
@@ -86,13 +86,15 @@ public class PostCommandService {
 
     private Post createPost(Mate uploader, String content) {
         return Post.builder()
-                .mate(uploader)
-                .content(content)
-                .build();
+            .mate(uploader)
+            .content(content)
+            .build();
     }
 
     private void saveImages(Post post, List<MultipartFile> images) {
-        if (images.size() == 0) return;
+        if (images.size() == 0) {
+            return;
+        }
 
         images.forEach(multipartFile -> {
             try {
@@ -103,8 +105,10 @@ public class PostCommandService {
         });
     }
 
-    private void publishImageUploadEvent(Post post, MultipartFile multipartFile) throws IOException {
-        eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(), multipartFile.getInputStream()));
+    private void publishImageUploadEvent(Post post, MultipartFile multipartFile)
+        throws IOException {
+        eventPublisher.publishEvent(new FileUploadedEvent(post, multipartFile.getOriginalFilename(),
+            multipartFile.getInputStream()));
     }
 
     private void publishPostUploadEvent(long mateId) {
@@ -113,21 +117,23 @@ public class PostCommandService {
     }
 
     private PostUploadNotificationDto findPostUploadNotificationDto(long mateId) {
-        PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(findMate(mateId).getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, findMate(mateId).getId()));
+        PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(
+                findMate(mateId).getId())
+            .orElseThrow(
+                () -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, findMate(mateId).getId()));
         notificationDto.setMateUserIds(findOtherMateUserIds(findMate(mateId)));
         return notificationDto;
     }
 
     private List<Long> findOtherMateUserIds(Mate uploader) {
         return mateQueryDao.findOngoingUserIds(uploader.getGoal().getId())
-                .stream()
-                .filter(userId -> !userId.equals(uploader.getUserId()))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(userId -> !userId.equals(uploader.getUserId()))
+            .collect(Collectors.toList());
     }
 
     private Mate findMate(long mateId) {
         return mateRepository.findWithGoal(mateId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
     }
 }
