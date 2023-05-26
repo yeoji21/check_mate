@@ -310,23 +310,23 @@ include::{snippets}/notifications/http-response.adoc[]
 
 === Request Parameters
 
-include::{snippets}/post-upload/request-parameters.adoc[]
+include::{snippets}/post-create/request-parameters.adoc[]
 
 === Request Parts
 
-include::{snippets}/post-upload/request-parts.adoc[]
+include::{snippets}/post-create/request-parts.adoc[]
 
 === HTTP Request
 
-include::{snippets}/post-upload/http-request.adoc[]
+include::{snippets}/post-create/http-request.adoc[]
 
 === Response Field
 
-include::{snippets}/post-upload/response-fields.adoc[]
+include::{snippets}/post-create/response-fields.adoc[]
 
 === HTTP Response
 
-include::{snippets}/post-upload/http-response.adoc[]
+include::{snippets}/post-create/http-response.adoc[]
 
 // =============================================================
 
