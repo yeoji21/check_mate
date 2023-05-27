@@ -92,7 +92,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTodayWorkingDay() {
-        return period.checkDateRange() && checkDays.isWorkingDay(LocalDate.now());
+        return period.isBelongToPeriod(LocalDate.now()) && checkDays.isWorkingDay(LocalDate.now());
     }
 
     public boolean isTimeOver() {
@@ -119,23 +119,23 @@ public class Goal extends BaseTimeEntity {
     }
 
     public String getSchedule() {
-        return period.fromStartToEndDate()
+        return period.getGoalPeriodStream()
             .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
             .collect(Collectors.joining());
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
-        return period.fromStartToEndDate()
+        return period.getGoalPeriodStream()
             .map(date -> checkDays.isWorkingDay(date) && uploadedDates.contains(date) ? "1" : "0")
             .collect(Collectors.joining());
     }
 
     public int progressedWorkingDaysCount() {
-        return checkDays.calcWorkingDayCount(period.fromStartToToday());
+        return checkDays.calcWorkingDayCount(period.getProgressedDateStream());
     }
 
     public int totalWorkingDaysCount() {
-        return checkDays.calcWorkingDayCount(period.fromStartToEndDate());
+        return checkDays.calcWorkingDayCount(period.getGoalPeriodStream());
     }
 
     public LocalDate getStartDate() {
