@@ -146,28 +146,42 @@ public class Goal extends BaseTimeEntity {
         return period.getEndDate();
     }
 
-    public void modify(GoalModifyRequest request) {
-        validateModifyRequest(request);
+    public void modify(GoalModifyEvent event) {
+        validateModifyDeadline();
+        modifyEndDate(event);
+        modifyAppointmentTime(event);
+    }
 
-        if (request.getEndDate() != null) {
-            period = new GoalPeriod(period.getStartDate(), request.getEndDate());
+    private void validateModifyDeadline() {
+        if (getModifiedDateTime() != null && lessThanModifyDeadline()) {
+            throw new BusinessException(ErrorCode.UPDATE_DURATION);
         }
-        if (request.isTimeReset()) {
+    }
+
+    private void modifyAppointmentTime(GoalModifyEvent event) {
+        if (event.isTimeReset()) {
             appointmentTime = null;
         } else {
-            if (request.getAppointmentTime() != null) {
-                appointmentTime = request.getAppointmentTime();
+            if (event.getAppointmentTime() != null) {
+                appointmentTime = event.getAppointmentTime();
             }
         }
     }
 
-    private void validateModifyRequest(GoalModifyRequest request) {
-        if (request.getEndDate() != null && getEndDate().isAfter(request.getEndDate())) {
-            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
+    private void modifyEndDate(GoalModifyEvent event) {
+        if (event.getEndDate() != null) {
+            validateEndDate(event.getEndDate());
+            period = new GoalPeriod(period.getStartDate(), event.getEndDate());
         }
-        if (getModifiedDateTime() != null && getModifiedDateTime().plusDays(7).toLocalDate()
-            .isAfter(LocalDate.now())) {
-            throw new BusinessException(ErrorCode.UPDATE_DURATION);
+    }
+
+    private boolean lessThanModifyDeadline() {
+        return getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now());
+    }
+
+    private void validateEndDate(LocalDate newEndDate) {
+        if (newEndDate != null && getEndDate().isAfter(newEndDate)) {
+            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
         }
     }
 }

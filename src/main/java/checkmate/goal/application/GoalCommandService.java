@@ -64,7 +64,7 @@ public class GoalCommandService {
     @Transactional
     public void modify(GoalModifyCommand command) {
         Goal goal = findGoalWithLock(command.goalId());
-        goal.modify(mapper.toGoalModifyRequest(command));
+        goal.modify(mapper.toModifyEvent(command));
     }
 
     @Transactional

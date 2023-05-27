@@ -24,7 +24,7 @@ class GoalTest {
     void endDate_update() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        GoalModifyRequest request = getEndDateModifyRequest(goal);
+        GoalModifyEvent request = getEndDateModifyRequest(goal);
         //when
         LocalDate beforeEndDate = goal.getEndDate();
         goal.modify(request);
@@ -40,7 +40,7 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> goal.modify(GoalModifyRequest.builder()
+            () -> goal.modify(GoalModifyEvent.builder()
                 .endDate(goal.getEndDate().minusDays(1))
                 .build())
         );
@@ -54,7 +54,7 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
-        GoalModifyRequest request = GoalModifyRequest.builder()
+        GoalModifyEvent request = GoalModifyEvent.builder()
             .timeReset(true)
             .build();
         //when
@@ -70,7 +70,7 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
         LocalTime beforeAppointmentTime = goal.getAppointmentTime();
-        GoalModifyRequest request = GoalModifyRequest.builder()
+        GoalModifyEvent request = GoalModifyEvent.builder()
             .appointmentTime(LocalTime.MAX)
             .build();
         //when
@@ -87,7 +87,7 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "modifiedDateTime", LocalDateTime.now().minusDays(1));
-        GoalModifyRequest request = GoalModifyRequest.builder()
+        GoalModifyEvent request = GoalModifyEvent.builder()
             .appointmentTime(LocalTime.MAX)
             .build();
         //when
@@ -223,8 +223,8 @@ class GoalTest {
         assertThat(check).isFalse();
     }
 
-    private GoalModifyRequest getEndDateModifyRequest(Goal goal) {
-        return GoalModifyRequest.builder()
+    private GoalModifyEvent getEndDateModifyRequest(Goal goal) {
+        return GoalModifyEvent.builder()
             .endDate(goal.getEndDate().plusDays(10))
             .build();
     }

@@ -4,7 +4,7 @@ import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
-import checkmate.goal.domain.GoalModifyRequest;
+import checkmate.goal.domain.GoalModifyEvent;
 import checkmate.goal.domain.GoalPeriod;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,11 +14,12 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface GoalCommandMapper {
+
     GoalCommandMapper INSTANCE = Mappers.getMapper(GoalCommandMapper.class);
 
     @Mappings({
-            @Mapping(target = "checkDays", source = "checkDays", qualifiedByName = "checkDays"),
-            @Mapping(target = "period", source = "command", qualifiedByName = "goalPeriod")
+        @Mapping(target = "checkDays", source = "checkDays", qualifiedByName = "checkDays"),
+        @Mapping(target = "period", source = "command", qualifiedByName = "goalPeriod")
     })
     Goal toEntity(GoalCreateCommand command);
 
@@ -32,5 +33,5 @@ public interface GoalCommandMapper {
         return new GoalPeriod(command.startDate(), command.endDate());
     }
 
-    GoalModifyRequest toGoalModifyRequest(GoalModifyCommand command);
+    GoalModifyEvent toModifyEvent(GoalModifyCommand command);
 }

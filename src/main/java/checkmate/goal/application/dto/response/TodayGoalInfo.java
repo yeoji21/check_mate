@@ -4,15 +4,15 @@ import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.io.Serializable;
 import java.time.LocalDate;
+import lombok.Builder;
+import lombok.Getter;
 
 
 @Getter
 public class TodayGoalInfo implements Serializable {
+
     private long id;
     private GoalCategory category;
     private String title;
@@ -22,10 +22,10 @@ public class TodayGoalInfo implements Serializable {
     @QueryProjection
     @Builder
     public TodayGoalInfo(long id,
-                         GoalCategory category,
-                         String title,
-                         GoalCheckDays checkDays,
-                         LocalDate lastUploadDate) {
+        GoalCategory category,
+        String title,
+        GoalCheckDays checkDays,
+        LocalDate lastUploadDate) {
         this.id = id;
         this.category = category;
         this.title = title;
