@@ -4,26 +4,26 @@ import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
-import checkmate.goal.domain.GoalCategory;
-import org.junit.jupiter.api.Test;
-
+import checkmate.goal.domain.Goal.GoalCategory;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.junit.jupiter.api.Test;
 
 class GoalDtoMapperTest extends MapperTest {
+
     private static final GoalDtoMapper mapper = GoalDtoMapper.INSTANCE;
 
     @Test
     void goalCreateCommand() throws Exception {
         //given
         GoalCreateDto dto = GoalCreateDto.builder()
-                .category(GoalCategory.ETC)
-                .title("title")
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(10))
-                .checkDays("월수금")
-                .appointmentTime(LocalTime.now())
-                .build();
+            .category(GoalCategory.ETC)
+            .title("title")
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusDays(10))
+            .checkDays("월수금")
+            .appointmentTime(LocalTime.now())
+            .build();
 
         //when
         GoalCreateCommand command = mapper.toCommand(dto, 1L);
@@ -42,10 +42,10 @@ class GoalDtoMapperTest extends MapperTest {
     void goalModifyCommand() throws Exception {
         //given
         GoalModifyDto dto = GoalModifyDto.builder()
-                .endDate(LocalDate.now().plusDays(10))
-                .appointmentTime(LocalTime.now())
-                .timeReset(true)
-                .build();
+            .endDate(LocalDate.now().plusDays(10))
+            .appointmentTime(LocalTime.now())
+            .timeReset(true)
+            .build();
         long goalId = 1L;
         long userId = 2L;
 

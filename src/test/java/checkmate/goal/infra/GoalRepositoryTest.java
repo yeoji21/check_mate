@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
 import checkmate.goal.domain.GoalStatus;

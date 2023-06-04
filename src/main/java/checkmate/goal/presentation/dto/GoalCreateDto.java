@@ -1,21 +1,22 @@
 package checkmate.goal.presentation.dto;
 
-import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.Goal.GoalCategory;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 @Getter
 @NoArgsConstructor
 public class GoalCreateDto {
+
     @NotNull(message = "category is blank")
-    private GoalCategory category;
+    private Goal.GoalCategory category;
     @NotBlank(message = "title is blank")
     @Size(max = 30, message = "title size must be less than 30 char")
     private String title;
@@ -29,11 +30,11 @@ public class GoalCreateDto {
 
     @Builder
     public GoalCreateDto(GoalCategory category,
-                         String title,
-                         LocalDate startDate,
-                         LocalDate endDate,
-                         String checkDays,
-                         LocalTime appointmentTime) {
+        String title,
+        LocalDate startDate,
+        LocalDate endDate,
+        String checkDays,
+        LocalTime appointmentTime) {
         this.category = category;
         this.title = title;
         this.startDate = startDate;

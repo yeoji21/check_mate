@@ -2,18 +2,18 @@ package checkmate.goal.application.dto.response;
 
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.mate.domain.Mate;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Getter;
-
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class GoalHistoryInfo implements Serializable {
+
     private long goalId;
     private GoalCategory category;
     private String title;

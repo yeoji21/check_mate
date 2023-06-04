@@ -28,6 +28,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @EqualsAndHashCode(of = "id")
@@ -183,5 +184,18 @@ public class Goal extends BaseTimeEntity {
         if (newEndDate != null && getEndDate().isAfter(newEndDate)) {
             throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
         }
+    }
+
+    @RequiredArgsConstructor
+    public enum GoalCategory {
+        EXERCISE("운동"),
+        LIFESTYLE("생활습관"),
+        READING("독서"),
+        LEARNING("학습"),
+        HOBBIES("취미 생활"),
+        ETC("기타"),
+        ;
+
+        private final String kor;
     }
 }

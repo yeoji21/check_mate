@@ -13,7 +13,7 @@ import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;

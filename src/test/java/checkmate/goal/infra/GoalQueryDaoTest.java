@@ -1,29 +1,33 @@
 package checkmate.goal.infra;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
-import checkmate.goal.domain.*;
+import checkmate.goal.domain.CheckDaysConverter;
+import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.Goal.GoalCategory;
+import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalPeriod;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
 class GoalQueryDaoTest extends RepositoryTest {
+
     @Test
     @DisplayName("어제가 종료일인 목표 목록 조회")
     void findYesterdayOveredGoals() throws Exception {
@@ -52,14 +56,14 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //when
         List<CompleteGoalNotificationDto> notificationDto =
-                goalQueryDao.findCompleteNotificationDto(List.of(goal1.getId(), goal2.getId()));
+            goalQueryDao.findCompleteNotificationDto(List.of(goal1.getId(), goal2.getId()));
 
         //then
         assertThat(notificationDto).hasSize(4);
         assertThat(notificationDto)
-                .allMatch(dto -> dto.getGoalId() > 0L)
-                .allMatch(dto -> dto.getUserId() > 0L)
-                .allMatch(dto -> dto.getGoalTitle() != null);
+            .allMatch(dto -> dto.getGoalId() > 0L)
+            .allMatch(dto -> dto.getUserId() > 0L)
+            .allMatch(dto -> dto.getGoalTitle() != null);
     }
 
     @Test
@@ -77,10 +81,10 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(ongoingGoals).hasSize(3);
         assertThat(ongoingGoals)
-                .allMatch(info -> info.getId() > 0L)
-                .allMatch(info -> info.getTitle() != null)
-                .allMatch(info -> info.getCategory() != null)
-                .allMatch(info -> info.getWeekDays() != null);
+            .allMatch(info -> info.getId() > 0L)
+            .allMatch(info -> info.getTitle() != null)
+            .allMatch(info -> info.getCategory() != null)
+            .allMatch(info -> info.getWeekDays() != null);
     }
 
     @Test
@@ -91,7 +95,7 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //when
         GoalScheduleInfo goalScheduleInfo = goalQueryDao.findGoalScheduleInfo(goal.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(goalScheduleInfo.getStartDate()).isEqualTo(goal.getStartDate());
@@ -113,7 +117,7 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(todayGoals).hasSize(1);
         assertThat(todayGoals).allMatch(goal -> CheckDaysConverter
-                .isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()));
+            .isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()));
     }
 
     @Test
@@ -127,16 +131,16 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //when
         GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(info.getTitle()).isEqualTo(goal.getTitle());
         assertThat(info.getMates()).hasSize(3);
         assertThat(info.getMates())
-                .allMatch(mate -> mate.getNickname() != null)
-                .allMatch(mate -> !mate.isUploaded())
-                .allMatch(mate -> mate.getMateId() > 0)
-                .allMatch(mate -> mate.getUserId() > 0);
+            .allMatch(mate -> mate.getNickname() != null)
+            .allMatch(mate -> !mate.isUploaded())
+            .allMatch(mate -> mate.getMateId() > 0)
+            .allMatch(mate -> mate.getUserId() > 0);
         assertThat(info.isInviteable()).isTrue();
     }
 
@@ -148,11 +152,11 @@ class GoalQueryDaoTest extends RepositoryTest {
 
     private void createFutureStartGoal(User user) {
         Goal goal = Goal.builder()
-                .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
-                .category(GoalCategory.ETC)
-                .title("futureGoal")
-                .checkDays(new GoalCheckDays("월화수목금토일"))
-                .build();
+            .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
+            .category(GoalCategory.ETC)
+            .title("futureGoal")
+            .checkDays(new GoalCheckDays("월화수목금토일"))
+            .build();
         em.persist(goal);
         createMate(user, goal);
     }

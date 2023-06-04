@@ -2,18 +2,18 @@ package checkmate.mate.application.dto.response;
 
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Uploadable;
-import lombok.Getter;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class SpecifiedGoalDetailInfo {
+
     private final long goalId;
     private final GoalCategory category;
     private final String title;
@@ -30,8 +30,8 @@ public class SpecifiedGoalDetailInfo {
     private final List<MateUploadInfo> mates;
 
     public SpecifiedGoalDetailInfo(Mate mate,
-                                   List<LocalDate> uploadedDates,
-                                   List<MateUploadInfo> mateUploadInfo) {
+        List<LocalDate> uploadedDates,
+        List<MateUploadInfo> mateUploadInfo) {
         Goal goal = mate.getGoal();
 
         this.goalId = goal.getId();

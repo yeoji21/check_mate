@@ -1,7 +1,7 @@
 package checkmate.goal.application.dto.response;
 
 import checkmate.goal.domain.CheckDaysConverter;
-import checkmate.goal.domain.GoalCategory;
+import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import com.querydsl.core.annotations.QueryProjection;
 import java.io.Serializable;

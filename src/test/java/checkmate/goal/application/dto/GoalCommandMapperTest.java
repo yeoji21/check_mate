@@ -4,27 +4,27 @@ import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCategory;
-import org.junit.jupiter.api.Test;
-
+import checkmate.goal.domain.Goal.GoalCategory;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.junit.jupiter.api.Test;
 
 class GoalCommandMapperTest extends MapperTest {
+
     private static final GoalCommandMapper mapper = GoalCommandMapper.INSTANCE;
 
     @Test
-    void goal() throws Exception{
+    void goal() throws Exception {
         //given
         GoalCreateCommand command = GoalCreateCommand.builder()
-                .category(GoalCategory.ETC)
-                .title("title")
-                .startDate(LocalDate.now())
-                .endDate(LocalDate.now().plusDays(10))
-                .checkDays("월수금")
-                .appointmentTime(LocalTime.now())
-                .userId(1L)
-                .build();
+            .category(GoalCategory.ETC)
+            .title("title")
+            .startDate(LocalDate.now())
+            .endDate(LocalDate.now().plusDays(10))
+            .checkDays("월수금")
+            .appointmentTime(LocalTime.now())
+            .userId(1L)
+            .build();
 
         //when
         Goal goal = mapper.toEntity(command);
