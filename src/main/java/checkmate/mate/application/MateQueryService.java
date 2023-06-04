@@ -25,14 +25,17 @@ public class MateQueryService {
             .orElseThrow(IllegalArgumentException::new);
     }
 
-    // TODO: 2023/05/01 조회용 쿼리로 개선
     @Transactional(readOnly = true)
     public SpecifiedGoalDetailInfo findSpecifiedGoalDetailInfo(long goalId, long userId) {
-        Mate mate = mateRepository.findWithGoal(goalId, userId)
-            .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND));
+        return new SpecifiedGoalDetailInfo(
+            findMate(goalId, userId),
+            mateQueryDao.findUploadedDates(findMate(goalId, userId).getId()),
+            mateQueryDao.findUploadInfo(goalId)
+        );
+    }
 
-        return new SpecifiedGoalDetailInfo(mate,
-            mateQueryDao.findUploadedDates(mate.getId()),
-            mateQueryDao.findUploadInfo(goalId));
+    private Mate findMate(long goalId, long userId) {
+        return mateRepository.findWithGoal(goalId, userId)
+            .orElseThrow(() -> new NotFoundException(MATE_NOT_FOUND));
     }
 }
