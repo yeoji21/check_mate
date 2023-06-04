@@ -7,8 +7,6 @@ import java.io.Serializable;
 import lombok.Builder;
 import lombok.Getter;
 
-// TODO: 2023/05/27 클래스명 변경 고려
-// Ongoing에 특화된 DTO가 아님
 @Getter
 public class OngoingGoalInfo implements Serializable {
 
