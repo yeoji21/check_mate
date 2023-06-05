@@ -1,30 +1,30 @@
 package checkmate.mate.infra;
 
+import static checkmate.mate.domain.QMate.mate;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
-import checkmate.goal.domain.GoalStatus;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import static checkmate.mate.domain.QMate.mate;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class MateRepositoryTest extends RepositoryTest {
+
     @Test
     @DisplayName("팀원 조회 - mateId로 조회")
     void find() throws Exception {
@@ -36,7 +36,8 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Mate foundMate = mateRepository.findById(mate.getId()).orElseThrow(IllegalArgumentException::new);
+        Mate foundMate = mateRepository.findById(mate.getId())
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(foundMate).isEqualTo(mate);
@@ -53,7 +54,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
         //when
         Mate findMate = mateRepository.findWithGoal(mate.getId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()));
         //then
         assertThat(findMate.getGoal().getId()).isEqualTo(goal.getId());
         assertThat(findMate.getId()).isEqualTo(mate.getId());
@@ -70,7 +71,7 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
         //when
         Mate findMate = mateRepository.findWithGoal(goal.getId(), mate.getUserId())
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()));
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()));
         //then
         assertThat(findMate.getGoal().getId()).isEqualTo(goal.getId());
         assertThat(findMate.getId()).isEqualTo(mate.getId());
@@ -82,7 +83,8 @@ class MateRepositoryTest extends RepositoryTest {
         //given
         Goal yesterDayGoal = createGoal();
         Goal notYesterDayGoal = createGoal();
-        ReflectionTestUtils.setField(notYesterDayGoal, "checkDays", new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
+        ReflectionTestUtils.setField(notYesterDayGoal, "checkDays",
+            new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
 
         createOngoingMate(yesterDayGoal);
         createOngoingMate(yesterDayGoal);
@@ -99,10 +101,11 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(mates).hasSize(2);
         assertThat(mates)
-                .allMatch(m -> CheckDaysConverter.isWorkingDay(m.getGoal().getCheckDays().intValue(), LocalDate.now().minusDays(1)))
-                .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
-                .allMatch(m -> m.getStatus() == MateStatus.ONGOING)
-                .allMatch(m -> m.getGoal().getStatus() == GoalStatus.ONGOING);
+            .allMatch(m -> CheckDaysConverter.isWorkingDay(m.getGoal().getCheckDays().intValue(),
+                LocalDate.now().minusDays(1)))
+            .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
+            .allMatch(m -> m.getStatus() == MateStatus.ONGOING)
+            .allMatch(m -> m.getGoal().getStatus() == GoalStatus.ONGOING);
     }
 
     @Test
@@ -119,9 +122,11 @@ class MateRepositoryTest extends RepositoryTest {
         mateRepository.increaseSkippedDayCount(List.of(mate1, mate2, mate3, mate4));
 
         //then
-        List<Mate> findMates = em.createQuery("select m from Mate m where m.id in :mateIds", Mate.class)
-                .setParameter("mateIds", List.of(mate1.getId(), mate2.getId(), mate3.getId(), mate4.getId()))
-                .getResultList();
+        List<Mate> findMates = em.createQuery("select m from Mate m where m.id in :mateIds",
+                Mate.class)
+            .setParameter("mateIds",
+                List.of(mate1.getId(), mate2.getId(), mate3.getId(), mate4.getId()))
+            .getResultList();
         assertThat(findMates).allMatch(m -> m.getSkippedDays() == 1);
     }
 
@@ -136,9 +141,9 @@ class MateRepositoryTest extends RepositoryTest {
         em.clear();
 
         queryFactory.update(mate)
-                .where(mate.id.in(mate1.getId(), mate2.getId()))
-                .set(mate.progress.skippedDayCount, 50)
-                .execute();
+            .where(mate.id.in(mate1.getId(), mate2.getId()))
+            .set(mate.progress.skippedDayCount, 50)
+            .execute();
 
         //when
         List<Mate> mates = queryFactory.selectFrom(mate).fetch();

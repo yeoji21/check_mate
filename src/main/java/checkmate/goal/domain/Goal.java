@@ -198,4 +198,8 @@ public class Goal extends BaseTimeEntity {
 
         private final String kor;
     }
+
+    public enum GoalStatus {
+        ONGOING, OVER, WAITING;
+    }
 }

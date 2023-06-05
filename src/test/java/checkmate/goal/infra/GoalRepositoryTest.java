@@ -6,9 +6,9 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
+import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
-import checkmate.goal.domain.GoalStatus;
 import checkmate.goal.domain.LikeCountCondition;
 import checkmate.goal.domain.VerificationCondition;
 import java.time.LocalDate;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class GoalRepositoryTest extends RepositoryTest {
+class GoalRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")

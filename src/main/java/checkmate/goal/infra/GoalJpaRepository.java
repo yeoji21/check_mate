@@ -4,8 +4,8 @@ import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QVerificationCondition.verificationCondition;
 
 import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalRepository;
-import checkmate.goal.domain.GoalStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;

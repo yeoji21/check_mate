@@ -3,7 +3,7 @@ package checkmate.goal.application.dto.response;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
-import checkmate.goal.domain.GoalStatus;
+import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
