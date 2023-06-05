@@ -9,6 +9,7 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate.MateStatus;
+import checkmate.mate.domain.Mate.Uploadable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;

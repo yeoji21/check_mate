@@ -91,19 +91,11 @@ public class Mate extends BaseTimeEntity {
     }
 
     public Uploadable getUploadable() {
-        return Uploadable.builder()
-            .uploaded(isUploaded())
-            .timeOver(goal.isTimeOver())
-            .workingDay(goal.isTodayWorkingDay())
-            .build();
+        return this.new Uploadable();
     }
 
     public void validatePostUploadable() {
         Assert.isTrue(getUploadable().isUploadable(), getUploadable().toString());
-    }
-
-    public boolean isUploaded() {
-        return lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now());
     }
 
     public void updatePostUploadedDate() {
@@ -150,6 +142,31 @@ public class Mate extends BaseTimeEntity {
             if (this != WAITING) {
                 throw new BusinessException(INVALID_MATE_STATUS);
             }
+        }
+    }
+
+    @Getter
+    public class Uploadable {
+
+        private boolean uploadable;
+        private boolean uploaded;
+        private boolean workingDay;
+        private boolean timeOver;
+
+        Uploadable() {
+            this.uploaded = lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now());
+            this.timeOver = goal.isTimeOver();
+            this.workingDay = goal.isTodayWorkingDay();
+            this.uploadable = !uploaded && workingDay && !timeOver;
+        }
+
+        @Override
+        public String toString() {
+            return "{ uploadable = " + uploadable +
+                ", uploaded = " + uploaded +
+                ", workingDay = " + workingDay +
+                ", timeOver = " + timeOver +
+                " }";
         }
     }
 }

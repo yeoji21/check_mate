@@ -5,7 +5,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.Uploadable;
+import checkmate.mate.domain.Mate.Uploadable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -45,7 +45,6 @@ public class SpecifiedGoalDetailInfo {
         this.inviteable = goal.isInviteable();
         this.goalSchedule = goal.getSchedule();
         this.mateSchedule = goal.getSchedule(uploadedDates);
-
         this.uploadable = mate.getUploadable();
         this.progress = mate.calcProgressPercent();
 
