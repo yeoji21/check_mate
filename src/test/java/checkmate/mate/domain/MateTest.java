@@ -1,22 +1,23 @@
 package checkmate.mate.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
+import checkmate.mate.domain.Mate.MateStatus;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 class MateTest {
+
     @Test
     @DisplayName("팀원 목표 진행률 계산")
     void calcProgressPercent() throws Exception {
@@ -87,7 +88,7 @@ class MateTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "checkDays",
-                new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
+            new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
         Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
 
         //when
@@ -117,7 +118,7 @@ class MateTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> created.toOngoingStatus());
+            () -> created.toOngoingStatus());
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
@@ -158,7 +159,7 @@ class MateTest {
     private Mate createWaitingMate() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
-                LocalDate.now().minusDays(10));
+            LocalDate.now().minusDays(10));
         Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
         mate.toWaitingStatus();
         return mate;

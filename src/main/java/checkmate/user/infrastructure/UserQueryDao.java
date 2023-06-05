@@ -6,7 +6,7 @@ import static checkmate.user.domain.QUser.user;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
 import checkmate.goal.domain.Goal.GoalStatus;
-import checkmate.mate.domain.MateStatus;
+import checkmate.mate.domain.Mate.MateStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

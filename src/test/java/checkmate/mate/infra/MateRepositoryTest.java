@@ -12,7 +12,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateStatus;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import java.time.LocalDate;

@@ -18,7 +18,7 @@ import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
-import checkmate.mate.domain.MateStatus;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.QCompleteGoalNotificationDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;

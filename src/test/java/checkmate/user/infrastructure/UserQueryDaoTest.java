@@ -1,16 +1,16 @@
 package checkmate.user.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateStatus;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class UserQueryDaoTest extends RepositoryTest {
 

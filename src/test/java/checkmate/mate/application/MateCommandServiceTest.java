@@ -1,5 +1,11 @@
 package checkmate.mate.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+
 import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheHandler;
 import checkmate.goal.domain.Goal;
@@ -9,14 +15,21 @@ import checkmate.mate.application.dto.request.MateInviteCommand;
 import checkmate.mate.application.dto.request.MateInviteReplyCommand;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.domain.Mate;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateInitiateManager;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.MateStatus;
-import checkmate.notification.domain.*;
+import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
+import checkmate.notification.domain.NotificationReceiver;
+import checkmate.notification.domain.NotificationRepository;
+import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,18 +40,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 public class MateCommandServiceTest {
+
     @Mock
     private GoalRepository goalRepository;
     @Mock
@@ -67,9 +71,11 @@ public class MateCommandServiceTest {
 
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
 
-        given(goalRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate.getGoal()));
+        given(goalRepository.findById(any(Long.class))).willReturn(
+            Optional.of(inviteeMate.getGoal()));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
-        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.empty());
+        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(
+            Optional.empty());
         given(mateRepository.save(any(Mate.class))).willReturn(inviteeMate);
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.of("inviter"));
 
@@ -90,7 +96,8 @@ public class MateCommandServiceTest {
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
 
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
-        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(Optional.of(inviteeMate));
+        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(
+            Optional.of(inviteeMate));
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.of("inviter"));
 
         //when
@@ -108,12 +115,14 @@ public class MateCommandServiceTest {
         Mate inviteeMate = createMate();
         Notification notification = createInviteNotification(inviteeMate);
 
-        MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId());
+        MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(),
+            notification.getId());
 
         given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
-                .willReturn(Optional.of(notification.getReceivers().get(0)));
+            .willReturn(Optional.of(notification.getReceivers().get(0)));
         given(mateRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate));
-        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(
+            Optional.ofNullable("invitee"));
         doAnswer((invocation) -> {
             Mate argument = (Mate) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "status", MateStatus.ONGOING);
@@ -141,12 +150,14 @@ public class MateCommandServiceTest {
         NotificationReceiver receiver = notification.getReceivers().get(0);
 
         given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
-                .willReturn(Optional.of(receiver));
+            .willReturn(Optional.of(receiver));
         given(mateRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate));
-        given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.ofNullable("invitee"));
+        given(userRepository.findNicknameById(any(Long.class))).willReturn(
+            Optional.ofNullable("invitee"));
 
         //when
-        mateCommandService.inviteReject(new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId()));
+        mateCommandService.inviteReject(
+            new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId()));
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.REJECT);
@@ -175,12 +186,12 @@ public class MateCommandServiceTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         NotificationReceiver receiver = new NotificationReceiver(mate.getUserId());
         Notification notification = Notification.builder()
-                .userId(inviter.getId())
-                .type(NotificationType.INVITE_GOAL)
-                .title("title")
-                .content("content")
-                .receivers(List.of(receiver))
-                .build();
+            .userId(inviter.getId())
+            .type(NotificationType.INVITE_GOAL)
+            .title("title")
+            .content("content")
+            .receivers(List.of(receiver))
+            .build();
         notification.addAttribute(NotificationAttributeKey.MATE_ID, mate.getId());
         ReflectionTestUtils.setField(notification, "id", 1L);
         return notification;
@@ -196,7 +207,8 @@ public class MateCommandServiceTest {
     }
 
     private Mate createMate() {
-        Mate mate = TestEntityFactory.goal(1L, "자바의 정석 스터디").join(TestEntityFactory.user(1L, "invitee"));
+        Mate mate = TestEntityFactory.goal(1L, "자바의 정석 스터디")
+            .join(TestEntityFactory.user(1L, "invitee"));
         ReflectionTestUtils.setField(mate, "id", 1L);
         return mate;
     }
@@ -208,11 +220,12 @@ public class MateCommandServiceTest {
         return inviteeMate;
     }
 
-    private MateInviteCommand createMateInviteCommand(User invitee, Mate inviteeMate, long inviterUserId) {
+    private MateInviteCommand createMateInviteCommand(User invitee, Mate inviteeMate,
+        long inviterUserId) {
         return MateInviteCommand.builder()
-                .goalId(inviteeMate.getGoal().getId())
-                .inviterUserId(inviterUserId)
-                .inviteeNickname(invitee.getNickname())
-                .build();
+            .goalId(inviteeMate.getGoal().getId())
+            .inviterUserId(inviterUserId)
+            .inviteeNickname(invitee.getNickname())
+            .build();
     }
 }

@@ -1,15 +1,17 @@
 package checkmate.mate.domain;
 
-import checkmate.exception.BusinessException;
-import checkmate.exception.UnInviteableGoalException;
-import checkmate.exception.code.ErrorCode;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import checkmate.exception.BusinessException;
+import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.code.ErrorCode;
+import checkmate.mate.domain.Mate.MateStatus;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 class MateStatusTest {
+
     @Test
     @DisplayName("초대 가능 여부 검사 - 이미 목표에 참여 중")
     void inviteableCheck_already_in_goal() throws Exception {
@@ -17,9 +19,9 @@ class MateStatusTest {
 
         //when
         UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
-                () -> MateStatus.ONGOING.inviteableCheck());
+            () -> MateStatus.ONGOING.inviteableCheck());
         assertThrows(UnInviteableGoalException.class,
-                () -> MateStatus.SUCCESS.inviteableCheck());
+            () -> MateStatus.SUCCESS.inviteableCheck());
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
@@ -32,7 +34,7 @@ class MateStatusTest {
 
         //when
         UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
-                () -> MateStatus.WAITING.inviteableCheck());
+            () -> MateStatus.WAITING.inviteableCheck());
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
@@ -58,15 +60,15 @@ class MateStatusTest {
 
         //when
         assertThrows(BusinessException.class,
-                () -> MateStatus.CREATED.initiateableCheck());
+            () -> MateStatus.CREATED.initiateableCheck());
         assertThrows(BusinessException.class,
-                () -> MateStatus.ONGOING.initiateableCheck());
+            () -> MateStatus.ONGOING.initiateableCheck());
         assertThrows(BusinessException.class,
-                () -> MateStatus.REJECT.initiateableCheck());
+            () -> MateStatus.REJECT.initiateableCheck());
         assertThrows(BusinessException.class,
-                () -> MateStatus.OUT.initiateableCheck());
+            () -> MateStatus.OUT.initiateableCheck());
         assertThrows(BusinessException.class,
-                () -> MateStatus.SUCCESS.initiateableCheck());
+            () -> MateStatus.SUCCESS.initiateableCheck());
 
         //then
     }

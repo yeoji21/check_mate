@@ -1,9 +1,15 @@
 package checkmate.mate.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.UserQueryDao;
@@ -15,13 +21,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
 @ExtendWith(MockitoExtension.class)
 class MateInitiateManagerTest {
+
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -56,7 +58,7 @@ class MateInitiateManagerTest {
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> mateInitiateManager.initiate(mate));
+            () -> mateInitiateManager.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 
@@ -70,7 +72,7 @@ class MateInitiateManagerTest {
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> mateInitiateManager.initiate(mate));
+            () -> mateInitiateManager.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 

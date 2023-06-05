@@ -1,26 +1,26 @@
 package checkmate.mate.infra;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateStatus;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class MateQueryDaoTest extends RepositoryTest {
+
     @Test
     @DisplayName("존재하는 팀원인지 여부 조회 - 존재")
     void isExistMate() throws Exception {
@@ -76,7 +76,7 @@ class MateQueryDaoTest extends RepositoryTest {
 
         //when
         MateScheduleInfo info = mateQueryDao.findScheduleInfo(mate.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(info.getStartDate()).isEqualTo(goal.getStartDate());

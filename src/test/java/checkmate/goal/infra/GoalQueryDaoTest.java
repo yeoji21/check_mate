@@ -14,7 +14,7 @@ import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateStatus;
+import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import java.time.LocalDate;

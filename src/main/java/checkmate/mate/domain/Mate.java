@@ -1,30 +1,46 @@
 package checkmate.mate.domain;
 
+import static checkmate.exception.code.ErrorCode.INVALID_MATE_STATUS;
+
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.common.util.ProgressCalculator;
+import checkmate.exception.BusinessException;
+import checkmate.exception.UnInviteableGoalException;
 import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
 import io.jsonwebtoken.lang.Assert;
+import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "mate", indexes = {
-        @Index(name = "goalId_userId_status_idx", columnList = "goal_id, user_id, status"),
-        @Index(name = "userId_idx", columnList = "user_id"),
-        @Index(name = "goalId_idx", columnList = "goal_id")
+    @Index(name = "goalId_userId_status_idx", columnList = "goal_id, user_id, status"),
+    @Index(name = "userId_idx", columnList = "user_id"),
+    @Index(name = "goalId_idx", columnList = "goal_id")
 })
 @Entity
 public class Mate extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -70,15 +86,16 @@ public class Mate extends BaseTimeEntity {
     }
 
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(progress.getCheckDayCount(), goal.totalWorkingDaysCount());
+        return ProgressCalculator.calculate(progress.getCheckDayCount(),
+            goal.totalWorkingDaysCount());
     }
 
     public Uploadable getUploadable() {
         return Uploadable.builder()
-                .uploaded(isUploaded())
-                .timeOver(goal.isTimeOver())
-                .workingDay(goal.isTodayWorkingDay())
-                .build();
+            .uploaded(isUploaded())
+            .timeOver(goal.isTimeOver())
+            .workingDay(goal.isTodayWorkingDay())
+            .build();
     }
 
     public void validatePostUploadable() {
@@ -111,5 +128,28 @@ public class Mate extends BaseTimeEntity {
 
     public int getSkippedDays() {
         return progress.getSkippedDayCount();
+    }
+
+    public enum MateStatus {
+        CREATED,
+        WAITING,
+        ONGOING,
+        REJECT,
+        OUT,
+        SUCCESS;
+
+        void inviteableCheck() {
+            if (this == ONGOING || this == SUCCESS) {
+                throw UnInviteableGoalException.ALREADY_IN_GOAL;
+            } else if (this == WAITING) {
+                throw UnInviteableGoalException.DUPLICATED_INVITE_REQUEST;
+            }
+        }
+
+        void initiateableCheck() {
+            if (this != WAITING) {
+                throw new BusinessException(INVALID_MATE_STATUS);
+            }
+        }
     }
 }
