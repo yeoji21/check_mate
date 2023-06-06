@@ -3,12 +3,21 @@ package checkmate.user.domain;
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
-import lombok.*;
-
-import javax.persistence.*;
+import java.time.LocalDate;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Table(name = "users")
@@ -16,6 +25,7 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class User extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -42,11 +52,11 @@ public class User extends BaseTimeEntity {
 
     @Builder
     protected User(String username,
-                   String emailAddress,
-                   String nickname,
-                   String password,
-                   String identifier,
-                   String fcmToken) {
+        String emailAddress,
+        String nickname,
+        String password,
+        String identifier,
+        String fcmToken) {
         this.username = username;
         this.emailAddress = emailAddress;
         this.nickname = nickname;
@@ -57,8 +67,10 @@ public class User extends BaseTimeEntity {
     }
 
     public void changeNickname(String nickname) {
-        if (nicknameUpdatedDate != null && nicknameUpdatedDate.plusDays(30L).isAfter(LocalDate.now()))
+        if (nicknameUpdatedDate != null && nicknameUpdatedDate.plusDays(30L)
+            .isAfter(LocalDate.now())) {
             throw new BusinessException(ErrorCode.UPDATE_DURATION);
+        }
         this.nickname = nickname;
         this.nicknameUpdatedDate = LocalDate.now();
     }
@@ -66,4 +78,13 @@ public class User extends BaseTimeEntity {
     public void updateFcmToken(String fcmToken) {
         this.fcmToken = fcmToken;
     }
+
+    @Getter
+    @RequiredArgsConstructor
+    public enum UserRole {
+        USER("ROLE_USER");
+
+        private final String role;
+    }
+
 }
