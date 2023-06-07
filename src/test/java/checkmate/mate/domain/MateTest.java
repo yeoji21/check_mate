@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
+import checkmate.exception.UnInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
@@ -23,23 +24,20 @@ class MateTest {
     @DisplayName("팀원 목표 진행률 계산")
     void calcProgressPercent() throws Exception {
         //given
-        Mate createdMate = createMate();
+        Mate mate = createMate();
         Mate progressedMate = createMate();
         ReflectionTestUtils.setField(progressedMate.getProgress(), "checkDayCount", 10);
 
-        //when then
-        assertThat(createdMate.calcProgressPercent()).isEqualTo(0);
-        assertThat(progressedMate.calcProgressPercent()).isGreaterThan(0);
+        //when //then
+        assertThat(mate.calcProgressPercent()).isZero();
+        assertThat(progressedMate.calcProgressPercent()).isPositive();
     }
 
     @Test
     @DisplayName("Uploadable 객체 생성 - 업로드 가능")
-    void getUploadable_uploadable() throws Exception {
-        //given
-        Mate mate = createMate();
-
-        //when
-        Uploadable uploadable = mate.getUploadable();
+    void uploadable() throws Exception {
+        //given //when
+        Uploadable uploadable = createMate().getUploadable();
 
         //then
         assertThat(uploadable.isUploadable()).isTrue();
@@ -50,7 +48,7 @@ class MateTest {
 
     @Test
     @DisplayName("Uploadable 객체 생성 - 이미 업로드")
-    void getUploadable_uploaded() throws Exception {
+    void uploaded() throws Exception {
         //given
         Mate mate = createMate();
         mate.updatePostUploadedDate();
@@ -67,9 +65,9 @@ class MateTest {
 
     @Test
     @DisplayName("Uploadable 객체 생성 - 인증 시간 초과")
-    void getUploadable_time_over() throws Exception {
+    void uploadableTimeOver() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Goal goal = createGoal();
         ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
         Mate mate = createMate(goal);
 
@@ -80,14 +78,15 @@ class MateTest {
         assertThat(uploadable.isUploadable()).isFalse();
         assertThat(uploadable.isUploaded()).isFalse();
         assertThat(uploadable.isWorkingDay()).isTrue();
-        assertThat(mate.getUploadable().isTimeOver()).isTrue();
+        assertThat(uploadable.isTimeOver()).isTrue();
     }
 
     @Test
     @DisplayName("Uploadable 객체 생성 - 인증 요일이 아님")
-    void getUploadable_not_working_day() throws Exception {
+    void isNotWorkingDay() throws Exception {
         //given
-        Goal goal = createTomorrowCheckGoal();
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal, "checkDays", tomorrowCheckDay());
         Mate mate = createMate(goal);
 
         //when
@@ -96,49 +95,25 @@ class MateTest {
         //then
         assertThat(uploadable.isUploadable()).isFalse();
         assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(mate.getUploadable().isWorkingDay()).isFalse();
-        assertThat(mate.getUploadable().isTimeOver()).isFalse();
+        assertThat(uploadable.isWorkingDay()).isFalse();
+        assertThat(uploadable.isTimeOver()).isFalse();
     }
 
     @Test
-    @DisplayName("초대 응답 거절")
+    @DisplayName("Reject Status로 변경")
     void toRejectStatus() throws Exception {
+        //given
         Mate mate = createMate();
+
+        //when
         mate.toRejectStatus();
 
+        //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.REJECT);
     }
 
     @Test
-    @DisplayName("ONGOING 상태로 변경 실패 - status")
-    void toOngoingStatus_fail_status() throws Exception {
-        //given
-        Mate created = createMate();
-
-        //when
-        BusinessException exception = assertThrows(BusinessException.class,
-            () -> created.toOngoingStatus());
-
-        //then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
-    }
-
-    @Test
-    @DisplayName("ONGOING 상태로 변경 성공")
-    void toOngoingStatus_success() throws Exception {
-        //given
-        Mate mate = createWaitingStatusMate();
-
-        //when
-        mate.toOngoingStatus();
-
-        //then
-        assertThat(mate.getStatus()).isEqualTo(MateStatus.ONGOING);
-        assertThat(mate.calcProgressPercent()).isGreaterThan(0);
-    }
-
-    @Test
-    @DisplayName("WAITING 상태로 변경")
+    @DisplayName("WAITING Status로 변경")
     void toWaitingStatus() throws Exception {
         //given
         Mate mate = createMate();
@@ -150,10 +125,79 @@ class MateTest {
         assertThat(mate.getStatus()).isEqualTo(MateStatus.WAITING);
     }
 
-    private Goal createTomorrowCheckGoal() {
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal, "checkDays", tomorrowCheckDay());
-        return goal;
+    @Test
+    @DisplayName("WAITING Status로 변경 실패 - 이미 목표에 속한 팀원")
+    void failToWaitingStatusBecauseAlreadyInGoal() throws Exception {
+        //given
+        Mate ongoingMate = createMate(createGoal(), MateStatus.ONGOING);
+        Mate successMate = createMate(createGoal(), MateStatus.SUCCESS);
+
+        //when //then
+        assertThat(assertThrows(
+            UnInviteableGoalException.class, () -> ongoingMate.toWaitingStatus())
+            .getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
+        assertThat(assertThrows(
+            UnInviteableGoalException.class, () -> successMate.toWaitingStatus())
+            .getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
+    }
+
+    @Test
+    @DisplayName("WAITING Status로 변경 실패 - 이미 Waiting Status")
+    void failToWaitingStatusBecauseAlreadyWaitingStatus() throws Exception {
+        //given
+        Mate waitingMate = createMate(createGoal(), MateStatus.WAITING);
+
+        //when //then
+        assertThat(assertThrows(
+            UnInviteableGoalException.class, () -> waitingMate.toWaitingStatus())
+            .getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
+    }
+
+    @Test
+    @DisplayName("WAITING Status로 변경 실패 - 목표 진행률 초과")
+    void failToWaitingStatusBecauseProgressedGoal() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(20));
+
+        //when //then
+        assertThat(assertThrows(
+            UnInviteableGoalException.class, () -> mate.toWaitingStatus())
+            .getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
+    }
+
+    @Test
+    @DisplayName("ONGOING Status로 변경")
+    void changeToOngoingStatus() throws Exception {
+        //given
+        Mate mate = createWaitingStatusMate();
+
+        //when
+        mate.toOngoingStatus();
+
+        //then
+        assertThat(mate.getStatus()).isEqualTo(MateStatus.ONGOING);
+    }
+
+    @Test
+    @DisplayName("ONGOING Status로 변경 실패")
+    void failToChangeToOngoingStatus() throws Exception {
+        //given
+        Mate created = createMate();
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+            () -> created.toOngoingStatus());
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+    }
+
+    private Mate createMate(Goal goal, MateStatus status) {
+        Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(mate, "status", status);
+        return mate;
     }
 
     private GoalCheckDays tomorrowCheckDay() {
@@ -164,15 +208,16 @@ class MateTest {
         return goal.join(TestEntityFactory.user(1L, "user"));
     }
 
+    private Goal createGoal() {
+        return TestEntityFactory.goal(1L, "goal");
+    }
+
     private Mate createMate() {
-        return createMate(TestEntityFactory.goal(1L, "goal"));
+        return createMate(createGoal());
     }
 
     private Mate createWaitingStatusMate() {
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
-            LocalDate.now().minusDays(10));
-        Mate mate = createMate(goal);
+        Mate mate = createMate(createGoal());
         mate.toWaitingStatus();
         return mate;
     }
