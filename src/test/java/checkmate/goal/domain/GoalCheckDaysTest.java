@@ -1,17 +1,16 @@
 package checkmate.goal.domain;
 
-import checkmate.exception.BusinessException;
-import checkmate.exception.code.ErrorCode;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.time.LocalDate;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import checkmate.exception.BusinessException;
+import checkmate.exception.code.ErrorCode;
+import java.time.LocalDate;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 class GoalCheckDaysTest {
+
     @Test
     @DisplayName("LocalDate 사용하는 생성자")
     void constructor_v2() throws Exception {
@@ -52,12 +51,13 @@ class GoalCheckDaysTest {
 
     private void invalidKorWeekDay(String weekDay) {
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> new GoalCheckDays(weekDay));
+            () -> new GoalCheckDays(weekDay));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_WEEK_DAYS);
     }
 
     private void isEqualTo(LocalDate localDate, int value) {
-        assertThat(new GoalCheckDays(List.of(localDate)).intValue()).isEqualTo(value);
+        assertThat(new GoalCheckDays(CheckDaysConverter.toKorWeekDay(localDate)).intValue())
+            .isEqualTo(value);
     }
 
     private void duplicateDayThrowException(String weekDays) {

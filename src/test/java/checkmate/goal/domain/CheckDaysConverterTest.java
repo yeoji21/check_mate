@@ -1,13 +1,13 @@
 package checkmate.goal.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class CheckDaysConverterTest {
+
     @Test
     @DisplayName("단일 요일 변환 테스트")
     void test_v1() throws Exception {
@@ -85,6 +85,6 @@ public class CheckDaysConverterTest {
     }
 
     private void isEqualTo(int value, String weekDays) {
-        assertThat(CheckDaysConverter.toDays(value)).isEqualTo(weekDays);
+        assertThat(CheckDaysConverter.toKorWeekDays(value)).isEqualTo(weekDays);
     }
 }

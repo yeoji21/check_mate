@@ -29,7 +29,7 @@ public class TodayGoalInfo implements Serializable {
         this.id = id;
         this.category = category;
         this.title = title;
-        this.checkDays = CheckDaysConverter.toDays(checkDays.intValue());
+        this.checkDays = CheckDaysConverter.toKorWeekDays(checkDays.intValue());
         this.checked = lastUploadDate != null && lastUploadDate.equals(LocalDate.now());
     }
 }

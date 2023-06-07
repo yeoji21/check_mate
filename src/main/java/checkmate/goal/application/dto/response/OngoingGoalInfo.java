@@ -21,6 +21,6 @@ public class OngoingGoalInfo implements Serializable {
         this.id = id;
         this.category = category;
         this.title = title;
-        this.weekDays = CheckDaysConverter.toDays(weekDays);
+        this.weekDays = CheckDaysConverter.toKorWeekDays(weekDays);
     }
 }

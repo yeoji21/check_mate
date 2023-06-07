@@ -33,7 +33,7 @@ public class GoalHistoryInfo implements Serializable {
         this.startDate = goal.getStartDate();
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
-        this.checkDays = CheckDaysConverter.toDays(goal.getCheckDays().intValue());
+        this.checkDays = CheckDaysConverter.toKorWeekDays(goal.getCheckDays().intValue());
         this.achievementRate = finder.calcProgressPercent();
     }
 

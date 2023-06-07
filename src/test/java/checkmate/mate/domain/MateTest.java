@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.Mate.Uploadable;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -71,7 +71,7 @@ class MateTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate mate = createMate(goal);
 
         //when
         Uploadable uploadable = mate.getUploadable();
@@ -87,10 +87,8 @@ class MateTest {
     @DisplayName("Uploadable 객체 생성 - 인증 요일이 아님")
     void getUploadable_not_working_day() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal, "checkDays",
-            new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Goal goal = createTomorrowCheckGoal();
+        Mate mate = createMate(goal);
 
         //when
         Uploadable uploadable = mate.getUploadable();
@@ -129,7 +127,7 @@ class MateTest {
     @DisplayName("ONGOING 상태로 변경 성공")
     void toOngoingStatus_success() throws Exception {
         //given
-        Mate mate = createWaitingMate();
+        Mate mate = createWaitingStatusMate();
 
         //when
         mate.toOngoingStatus();
@@ -152,16 +150,29 @@ class MateTest {
         assertThat(mate.getStatus()).isEqualTo(MateStatus.WAITING);
     }
 
-    private Mate createMate() {
+    private Goal createTomorrowCheckGoal() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
+        ReflectionTestUtils.setField(goal, "checkDays", tomorrowCheckDay());
+        return goal;
+    }
+
+    private GoalCheckDays tomorrowCheckDay() {
+        return new GoalCheckDays(CheckDaysConverter.toKorWeekDay(LocalDate.now().plusDays(1)));
+    }
+
+    private Mate createMate(Goal goal) {
         return goal.join(TestEntityFactory.user(1L, "user"));
     }
 
-    private Mate createWaitingMate() {
+    private Mate createMate() {
+        return createMate(TestEntityFactory.goal(1L, "goal"));
+    }
+
+    private Mate createWaitingStatusMate() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
             LocalDate.now().minusDays(10));
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate mate = createMate(goal);
         mate.toWaitingStatus();
         return mate;
     }

@@ -34,7 +34,8 @@ class GoalCommandMapperTest extends MapperTest {
         isEqualTo(goal.getTitle(), command.title());
         isEqualTo(goal.getStartDate(), command.startDate());
         isEqualTo(goal.getEndDate(), command.endDate());
-        isEqualTo(CheckDaysConverter.toDays(goal.getCheckDays().intValue()), command.checkDays());
+        isEqualTo(CheckDaysConverter.toKorWeekDays(goal.getCheckDays().intValue()),
+            command.checkDays());
         isEqualTo(goal.getAppointmentTime(), command.appointmentTime());
     }
 }

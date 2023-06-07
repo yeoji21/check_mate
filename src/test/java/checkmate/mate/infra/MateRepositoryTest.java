@@ -16,7 +16,6 @@ import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -83,8 +82,7 @@ class MateRepositoryTest extends RepositoryTest {
         //given
         Goal yesterDayGoal = createGoal();
         Goal notYesterDayGoal = createGoal();
-        ReflectionTestUtils.setField(notYesterDayGoal, "checkDays",
-            new GoalCheckDays(Collections.singletonList(LocalDate.now().plusDays(1))));
+        ReflectionTestUtils.setField(notYesterDayGoal, "checkDays", tomorrowCheckDay());
 
         createOngoingMate(yesterDayGoal);
         createOngoingMate(yesterDayGoal);
@@ -152,6 +150,10 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(mates.size()).isEqualTo(2);
         assertThat(mates).contains(mate1, mate2);
+    }
+
+    private GoalCheckDays tomorrowCheckDay() {
+        return new GoalCheckDays(CheckDaysConverter.toKorWeekDay(LocalDate.now().plusDays(1)));
     }
 
     private Mate createMate(Goal goal) {

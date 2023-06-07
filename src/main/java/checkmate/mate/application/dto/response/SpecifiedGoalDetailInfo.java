@@ -40,7 +40,7 @@ public class SpecifiedGoalDetailInfo {
         this.startDate = goal.getStartDate();
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
-        this.weekDays = CheckDaysConverter.toDays(goal.getCheckDays().intValue());
+        this.weekDays = CheckDaysConverter.toKorWeekDays(goal.getCheckDays().intValue());
         this.status = goal.getStatus();
         this.inviteable = goal.isInviteable();
         this.goalSchedule = goal.getSchedule();
