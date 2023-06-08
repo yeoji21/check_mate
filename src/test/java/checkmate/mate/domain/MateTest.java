@@ -133,12 +133,12 @@ class MateTest {
         Mate successMate = createMate(createGoal(), MateStatus.SUCCESS);
 
         //when //then
-        assertThat(assertThrows(
-            UnInviteableGoalException.class, () -> ongoingMate.toWaitingStatus())
-            .getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
-        assertThat(assertThrows(
-            UnInviteableGoalException.class, () -> successMate.toWaitingStatus())
-            .getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
+        assertThat(assertThrows(UnInviteableGoalException.class,
+            () -> ongoingMate.toWaitingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
+        assertThat(assertThrows(UnInviteableGoalException.class,
+            () -> successMate.toWaitingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
     }
 
     @Test
@@ -148,9 +148,9 @@ class MateTest {
         Mate waitingMate = createMate(createGoal(), MateStatus.WAITING);
 
         //when //then
-        assertThat(assertThrows(
-            UnInviteableGoalException.class, () -> waitingMate.toWaitingStatus())
-            .getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
+        assertThat(assertThrows(UnInviteableGoalException.class,
+            () -> waitingMate.toWaitingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
     }
 
     @Test
@@ -159,19 +159,20 @@ class MateTest {
         //given
         Goal goal = createGoal();
         Mate mate = createMate(goal);
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(20));
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
+            LocalDate.now().minusDays(20));
 
         //when //then
-        assertThat(assertThrows(
-            UnInviteableGoalException.class, () -> mate.toWaitingStatus())
-            .getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
+        assertThat(assertThrows(UnInviteableGoalException.class,
+            () -> mate.toWaitingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
     }
 
     @Test
     @DisplayName("ONGOING Status로 변경")
     void changeToOngoingStatus() throws Exception {
         //given
-        Mate mate = createWaitingStatusMate();
+        Mate mate = createMate(createGoal(), MateStatus.WAITING);
 
         //when
         mate.toOngoingStatus();
@@ -182,16 +183,56 @@ class MateTest {
 
     @Test
     @DisplayName("ONGOING Status로 변경 실패")
-    void failToChangeToOngoingStatus() throws Exception {
+    void failToOngoingStatusBecauseStatus() throws Exception {
         //given
-        Mate created = createMate();
+        Mate created = createMate(createGoal(), MateStatus.CREATED);
+        Mate rejected = createMate(createGoal(), MateStatus.REJECT);
+        Mate ongoing = createMate(createGoal(), MateStatus.ONGOING);
+        Mate succeeded = createMate(createGoal(), MateStatus.SUCCESS);
+
+        //when //then
+        assertThat(assertThrows(BusinessException.class,
+            () -> created.toOngoingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+        assertThat(assertThrows(BusinessException.class,
+            () -> rejected.toOngoingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+        assertThat(assertThrows(BusinessException.class,
+            () -> ongoing.toOngoingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+        assertThat(assertThrows(BusinessException.class,
+            () -> succeeded.toOngoingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+    }
+
+    @Test
+    void failToOngoingStatusBecauseProgressedGoal() throws Exception {
+        //given
+        Goal goal = createGoal();
+        Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
+            LocalDate.now().minusDays(20));
+
+        //when //then
+        assertThat(assertThrows(UnInviteableGoalException.class,
+            () -> mate.toOngoingStatus()).getErrorCode())
+            .isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
+    }
+
+    @Test
+    void whenChangeToOngoingStatusSetWorkingDays() throws Exception {
+        //given
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
+            LocalDate.now().minusDays(5));
+        Mate mate = createMate(goal, MateStatus.WAITING);
 
         //when
-        BusinessException exception = assertThrows(BusinessException.class,
-            () -> created.toOngoingStatus());
+        mate.toOngoingStatus();
 
         //then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
+        assertThat(mate.getWorkingDays()).isPositive();
+        assertThat(mate.getSkippedDays()).isZero();
     }
 
     private Mate createMate(Goal goal, MateStatus status) {
