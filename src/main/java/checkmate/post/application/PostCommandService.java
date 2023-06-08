@@ -16,6 +16,7 @@ import checkmate.post.application.dto.response.PostCreateResult;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
 import checkmate.post.domain.event.FileUploadedEvent;
+import io.jsonwebtoken.lang.Assert;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
@@ -26,6 +27,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -80,7 +82,7 @@ public class PostCommandService {
 
     private Mate findUploader(PostCreateCommand command) {
         Mate uploader = findMate(command.mateId());
-        uploader.validatePostUploadable();
+        validatePostUploadable(uploader);
         return uploader;
     }
 
@@ -92,7 +94,7 @@ public class PostCommandService {
     }
 
     private void saveImages(Post post, List<MultipartFile> images) {
-        if (images.size() == 0) {
+        if (CollectionUtils.isEmpty(images)) {
             return;
         }
 
@@ -103,6 +105,10 @@ public class PostCommandService {
                 throw new RuntimeIOException(e, ErrorCode.IMAGE_PROCESSING_IO);
             }
         });
+    }
+
+    private void validatePostUploadable(Mate uploader) {
+        Assert.isTrue(uploader.getUploadable().isUploadable(), uploader.getUploadable().toString());
     }
 
     private void publishImageUploadEvent(Post post, MultipartFile multipartFile)

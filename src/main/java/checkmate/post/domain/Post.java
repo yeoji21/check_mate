@@ -4,13 +4,29 @@ import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
-import lombok.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @AllArgsConstructor
@@ -18,11 +34,12 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "post", indexes = {
-        @Index(name = "mateId_idx", columnList = "mate_id"),
-        @Index(name = "createdDate_idx", columnList = "created_date")
+    @Index(name = "mateId_idx", columnList = "mate_id"),
+    @Index(name = "createdDate_idx", columnList = "created_date")
 })
 @Entity
 public class Post extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -66,10 +83,12 @@ public class Post extends BaseTimeEntity {
     }
 
     void checkLikesUpdatable() {
-        if (createdDate.plusDays(1).isBefore(LocalDate.now()))
+        if (createdDate.plusDays(1).isBefore(LocalDate.now())) {
             throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+        }
     }
 
+    // TODO: 2023/06/08 메소드명 변경
     private void createNewLike(long userId) {
         Likes likes = new Likes(userId);
         this.likes.add(likes);
@@ -78,18 +97,25 @@ public class Post extends BaseTimeEntity {
 
     private void removeLiked(long userId) {
         boolean isRemoved = likes.removeIf(like -> like.getUserId() == userId);
-        if (!isRemoved) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+        if (!isRemoved) {
+            throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+        }
     }
 
     public void updateCheckStatus() {
         boolean verified = verifyGoalConditions();
-        if (!checked && verified) check();
-        else if (checked && !verified) uncheck();
+        if (!checked && verified) {
+            check();
+        } else if (checked && !verified) {
+            uncheck();
+        }
     }
 
     private void checkAlreadyLiked(long userId) {
         boolean exist = likes.stream().anyMatch(like -> like.getUserId() == userId);
-        if (exist) throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+        if (exist) {
+            throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
+        }
     }
 
     private boolean verifyGoalConditions() {

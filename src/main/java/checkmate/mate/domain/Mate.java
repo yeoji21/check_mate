@@ -8,7 +8,6 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.UnInviteableGoalException;
 import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
-import io.jsonwebtoken.lang.Assert;
 import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -68,10 +67,6 @@ public class Mate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    public void setGoal(Goal goal) {
-        this.goal = goal;
-    }
-
     // TODO: 2023/06/08 메소드명 변경 고려
     void toOngoingStatus() {
         goal.joinableCheck();
@@ -93,10 +88,6 @@ public class Mate extends BaseTimeEntity {
 
     public Uploadable getUploadable() {
         return this.new Uploadable();
-    }
-
-    public void validatePostUploadable() {
-        Assert.isTrue(getUploadable().isUploadable(), getUploadable().toString());
     }
 
     public void updatePostUploadedDate() {
