@@ -11,7 +11,6 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.user.domain.User;
-import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.UserQueryDao;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,14 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class MateInitiateManagerTest {
+class MateInitiateServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
     @Mock
     private UserQueryDao userQueryDao;
     @InjectMocks
-    private MateInitiateManager mateInitiateManager;
+    private MateInitiateService mateInitiateService;
 
     @Test
     @DisplayName("목표 시작 성공")
@@ -41,7 +38,7 @@ class MateInitiateManagerTest {
 
         //when
         MateStatus before = mate.getStatus();
-        mateInitiateManager.initiate(mate);
+        mateInitiateService.initiate(mate);
 
         //then
         MateStatus after = mate.getStatus();
@@ -58,7 +55,7 @@ class MateInitiateManagerTest {
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> mateInitiateManager.initiate(mate));
+            () -> mateInitiateService.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 
@@ -72,7 +69,7 @@ class MateInitiateManagerTest {
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> mateInitiateManager.initiate(mate));
+            () -> mateInitiateService.initiate(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 

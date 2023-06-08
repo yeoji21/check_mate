@@ -16,7 +16,7 @@ import checkmate.mate.application.dto.request.MateInviteReplyCommand;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
-import checkmate.mate.domain.MateInitiateManager;
+import checkmate.mate.domain.MateInitiateService;
 import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeKey;
@@ -52,7 +52,7 @@ public class MateCommandServiceTest {
     @Mock
     private NotificationRepository notificationRepository;
     @Mock
-    private MateInitiateManager mateInitiateManager;
+    private MateInitiateService mateInitiateService;
     @Mock
     private CacheHandler cacheHandler;
     @Mock
@@ -127,7 +127,7 @@ public class MateCommandServiceTest {
             Mate argument = (Mate) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "status", MateStatus.ONGOING);
             return argument;
-        }).when(mateInitiateManager).initiate(any(Mate.class));
+        }).when(mateInitiateService).initiate(any(Mate.class));
 
         //when
         MateAcceptResult result = mateCommandService.inviteAccept(command);
@@ -137,7 +137,7 @@ public class MateCommandServiceTest {
         assertThat(result.goalId()).isEqualTo(inviteeMate.getGoal().getId());
         assertThat(result.mateId()).isEqualTo(inviteeMate.getId());
 
-        verify(mateInitiateManager).initiate(any(Mate.class));
+        verify(mateInitiateService).initiate(any(Mate.class));
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 

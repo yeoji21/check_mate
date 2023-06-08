@@ -16,7 +16,7 @@ import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.LikeCountCondition;
 import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateInitiateManager;
+import checkmate.mate.domain.MateInitiateService;
 import checkmate.mate.domain.MateRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
@@ -40,7 +40,7 @@ public class GoalCommandService {
     private final GoalQueryDao goalQueryDao;
     private final UserRepository userRepository;
     private final MateRepository mateRepository;
-    private final MateInitiateManager mateInitiateManager;
+    private final MateInitiateService mateInitiateService;
     private final ApplicationEventPublisher eventPublisher;
     private final CacheHandler cacheHandler;
     private final GoalCommandMapper mapper;
@@ -94,7 +94,7 @@ public class GoalCommandService {
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {
-        mateInitiateManager.initiate(createAndSaveMate(goal, userId));
+        mateInitiateService.initiate(createAndSaveMate(goal, userId));
     }
 
     private Mate createAndSaveMate(Goal goal, long userId) {

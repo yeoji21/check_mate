@@ -7,7 +7,8 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class MateInitiateManager {
+public class MateInitiateService {
+
     private final UserQueryDao userQueryDao;
 
     public void initiate(Mate mate) {
