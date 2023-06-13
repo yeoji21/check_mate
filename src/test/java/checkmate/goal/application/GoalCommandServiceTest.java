@@ -17,8 +17,8 @@ import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateInitiateService;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.MateStartingService;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.UserRepository;
 import java.time.LocalDate;
@@ -47,7 +47,7 @@ public class GoalCommandServiceTest {
     @Mock
     private MateRepository mateRepository;
     @Mock
-    private MateInitiateService mateInitiateService;
+    private MateStartingService mateStartingService;
     @Mock
     private CacheHandler cacheHandler;
     @Mock
@@ -114,7 +114,7 @@ public class GoalCommandServiceTest {
         //then
         assertThat(goalId).isGreaterThan(0L);
         verify(mateRepository).save(any(Mate.class));
-        verify(mateInitiateService).initiate(any(Mate.class));
+        verify(mateStartingService).startToGoal(any(Mate.class));
     }
 
     private GoalCreateCommand createGoalCreateCommand() {

@@ -67,7 +67,6 @@ public class Mate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    // TODO: 2023/06/08 메소드명 변경 고려
     void startToGoal() {
         goal.joinableCheck();
         status.checkStartable();

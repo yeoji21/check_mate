@@ -16,8 +16,8 @@ import checkmate.mate.application.dto.request.MateInviteCommand;
 import checkmate.mate.application.dto.request.MateInviteReplyCommand;
 import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.domain.Mate;
-import checkmate.mate.domain.MateInitiateService;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.MateStartingService;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
@@ -47,7 +47,7 @@ public class MateCommandService {
     private final GoalRepository goalRepository;
     private final MateRepository mateRepository;
     private final NotificationRepository notificationRepository;
-    private final MateInitiateService mateInitiateService;
+    private final MateStartingService mateStartingService;
     private final CacheHandler cacheHandler;
     private final ApplicationEventPublisher eventPublisher;
     private final MateCommandMapper mapper;
@@ -73,7 +73,7 @@ public class MateCommandService {
         Notification notification = findAndReadNotification(command.notificationId(),
             command.userId());
         Mate mate = find(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
-        mateInitiateService.initiate(mate);
+        mateStartingService.startToGoal(mate);
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
             createInviteAcceptNotificationDto(mate, notification.getUserId())));

@@ -21,12 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-class MateInitiateServiceTest {
+class MateStartingServiceTest {
 
     @Mock
     private UserQueryDao userQueryDao;
     @InjectMocks
-    private MateInitiateService mateInitiateService;
+    private MateStartingService mateStartingService;
 
     @Test
     @DisplayName("목표 시작 성공")
@@ -38,7 +38,7 @@ class MateInitiateServiceTest {
 
         //when
         MateStatus before = mate.getStatus();
-        mateInitiateService.initiate(mate);
+        mateStartingService.startToGoal(mate);
 
         //then
         MateStatus after = mate.getStatus();
@@ -55,7 +55,7 @@ class MateInitiateServiceTest {
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> mateInitiateService.initiate(mate));
+            () -> mateStartingService.startToGoal(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
     }
 
@@ -69,7 +69,7 @@ class MateInitiateServiceTest {
 
         //when then
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> mateInitiateService.initiate(mate));
+            () -> mateStartingService.startToGoal(mate));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 
