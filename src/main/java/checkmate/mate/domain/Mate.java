@@ -74,10 +74,14 @@ public class Mate extends BaseTimeEntity {
         progress = new MateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
-    public void toWaitingStatus() {
+    public void invitedToGoal() {
         goal.joinableCheck();
         status.checkInviteable();
         status = MateStatus.WAITING;
+    }
+
+    public void rejectInvite() {
+        status = MateStatus.REJECT;
     }
 
     public double calcProgressPercent() {
@@ -91,10 +95,6 @@ public class Mate extends BaseTimeEntity {
 
     public void updatePostUploadedDate() {
         lastUploadDate = LocalDate.now();
-    }
-
-    public void toRejectStatus() {
-        status = MateStatus.REJECT;
     }
 
     public void plusWorkingDay() {

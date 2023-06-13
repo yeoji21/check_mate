@@ -55,7 +55,7 @@ public class MateCommandService {
     @Transactional
     public void inviteMate(MateInviteCommand command) {
         Mate invitee = findOrCreateMate(command.goalId(), command.inviteeNickname());
-        invitee.toWaitingStatus();
+        invitee.invitedToGoal();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
             createInviteGoalNotificationDto(invitee, command)));
     }
@@ -85,7 +85,7 @@ public class MateCommandService {
         Notification notification = findAndReadNotification(command.notificationId(),
             command.userId());
         Mate mate = find(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
-        mate.toRejectStatus();
+        mate.rejectInvite();
 
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,
             createInviteRejectNotificationDto(mate, notification.getUserId())));

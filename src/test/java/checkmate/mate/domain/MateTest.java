@@ -106,7 +106,7 @@ class MateTest {
         Mate mate = createMate();
 
         //when
-        mate.toRejectStatus();
+        mate.rejectInvite();
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.REJECT);
@@ -119,7 +119,7 @@ class MateTest {
         Mate mate = createMate();
 
         //when
-        mate.toWaitingStatus();
+        mate.invitedToGoal();
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.WAITING);
@@ -134,10 +134,10 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(UnInviteableGoalException.class,
-            () -> ongoingMate.toWaitingStatus()).getErrorCode())
+            () -> ongoingMate.invitedToGoal()).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
         assertThat(assertThrows(UnInviteableGoalException.class,
-            () -> successMate.toWaitingStatus()).getErrorCode())
+            () -> successMate.invitedToGoal()).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
     }
 
@@ -149,7 +149,7 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(UnInviteableGoalException.class,
-            () -> waitingMate.toWaitingStatus()).getErrorCode())
+            () -> waitingMate.invitedToGoal()).getErrorCode())
             .isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
     }
 
@@ -164,7 +164,7 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(UnInviteableGoalException.class,
-            () -> mate.toWaitingStatus()).getErrorCode())
+            () -> mate.invitedToGoal()).getErrorCode())
             .isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
     }
 
@@ -259,7 +259,7 @@ class MateTest {
 
     private Mate createWaitingStatusMate() {
         Mate mate = createMate(createGoal());
-        mate.toWaitingStatus();
+        mate.invitedToGoal();
         return mate;
     }
 }

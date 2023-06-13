@@ -33,7 +33,7 @@ class MateStartingServiceTest {
     void initiate_success() throws Exception {
         //given
         Mate mate = createMate();
-        mate.toWaitingStatus();
+        mate.invitedToGoal();
         given(userQueryDao.countOngoingGoals(any(Long.class))).willReturn(1);
 
         //when
