@@ -68,16 +68,16 @@ public class Mate extends BaseTimeEntity {
     }
 
     // TODO: 2023/06/08 메소드명 변경 고려
-    void toOngoingStatus() {
+    void startToGoal() {
         goal.joinableCheck();
-        status.initiateableCheck();
+        status.checkStartable();
         status = MateStatus.ONGOING;
         progress = new MateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
     public void toWaitingStatus() {
         goal.joinableCheck();
-        status.inviteableCheck();
+        status.checkInviteable();
         status = MateStatus.WAITING;
     }
 
@@ -122,7 +122,7 @@ public class Mate extends BaseTimeEntity {
         OUT,
         SUCCESS;
 
-        void inviteableCheck() {
+        void checkInviteable() {
             if (this == ONGOING || this == SUCCESS) {
                 throw UnInviteableGoalException.ALREADY_IN_GOAL;
             } else if (this == WAITING) {
@@ -130,7 +130,7 @@ public class Mate extends BaseTimeEntity {
             }
         }
 
-        void initiateableCheck() {
+        void checkStartable() {
             if (this != WAITING) {
                 throw new BusinessException(INVALID_MATE_STATUS);
             }

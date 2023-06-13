@@ -19,9 +19,9 @@ class MateStatusTest {
 
         //when
         UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
-            () -> MateStatus.ONGOING.inviteableCheck());
+            () -> MateStatus.ONGOING.checkInviteable());
         assertThrows(UnInviteableGoalException.class,
-            () -> MateStatus.SUCCESS.inviteableCheck());
+            () -> MateStatus.SUCCESS.checkInviteable());
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.ALREADY_IN_GOAL);
@@ -34,7 +34,7 @@ class MateStatusTest {
 
         //when
         UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
-            () -> MateStatus.WAITING.inviteableCheck());
+            () -> MateStatus.WAITING.checkInviteable());
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
@@ -46,9 +46,9 @@ class MateStatusTest {
         //given
 
         //when
-        MateStatus.CREATED.inviteableCheck();
-        MateStatus.REJECT.inviteableCheck();
-        MateStatus.OUT.inviteableCheck();
+        MateStatus.CREATED.checkInviteable();
+        MateStatus.REJECT.checkInviteable();
+        MateStatus.OUT.checkInviteable();
 
         //then
     }
@@ -60,15 +60,15 @@ class MateStatusTest {
 
         //when
         assertThrows(BusinessException.class,
-            () -> MateStatus.CREATED.initiateableCheck());
+            () -> MateStatus.CREATED.checkStartable());
         assertThrows(BusinessException.class,
-            () -> MateStatus.ONGOING.initiateableCheck());
+            () -> MateStatus.ONGOING.checkStartable());
         assertThrows(BusinessException.class,
-            () -> MateStatus.REJECT.initiateableCheck());
+            () -> MateStatus.REJECT.checkStartable());
         assertThrows(BusinessException.class,
-            () -> MateStatus.OUT.initiateableCheck());
+            () -> MateStatus.OUT.checkStartable());
         assertThrows(BusinessException.class,
-            () -> MateStatus.SUCCESS.initiateableCheck());
+            () -> MateStatus.SUCCESS.checkStartable());
 
         //then
     }
@@ -79,7 +79,7 @@ class MateStatusTest {
         //given
 
         //when
-        MateStatus.WAITING.initiateableCheck();
+        MateStatus.WAITING.checkStartable();
 
         //then
 
