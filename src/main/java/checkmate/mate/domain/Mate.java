@@ -67,14 +67,14 @@ public class Mate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    void startToGoal() {
+    void acceptInvite() {
         goal.joinableCheck();
         status.checkStartable();
         status = MateStatus.ONGOING;
         progress = new MateProgress(goal.progressedWorkingDaysCount(), 0);
     }
 
-    public void invitedToGoal() {
+    public void receivedInvite() {
         goal.joinableCheck();
         status.checkInviteable();
         status = MateStatus.WAITING;

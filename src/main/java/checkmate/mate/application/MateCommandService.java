@@ -55,7 +55,7 @@ public class MateCommandService {
     @Transactional
     public void inviteMate(MateInviteCommand command) {
         Mate invitee = findOrCreateMate(command.goalId(), command.inviteeNickname());
-        invitee.invitedToGoal();
+        invitee.receivedInvite();
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
             createInviteGoalNotificationDto(invitee, command)));
     }

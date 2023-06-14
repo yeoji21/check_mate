@@ -14,6 +14,6 @@ public class MateStartingService {
     public void startToGoal(Mate mate) {
         int ongoingGoalCount = userQueryDao.countOngoingGoals(mate.getUserId());
         GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
-        mate.startToGoal();
+        mate.acceptInvite();
     }
 }
