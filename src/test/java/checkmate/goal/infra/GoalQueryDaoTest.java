@@ -168,7 +168,7 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     private void createMate(User user, Goal goal) {
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
     }

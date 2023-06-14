@@ -76,6 +76,6 @@ class MateStartingServiceTest {
     private Mate createMate() {
         Goal goal = TestEntityFactory.goal(1L, "title");
         User user = TestEntityFactory.user(2L, "user");
-        return goal.join(user);
+        return goal.createMate(user);
     }
 }

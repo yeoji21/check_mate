@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class MateCommandMapperTest extends MapperTest {
+
     private static final MateCommandMapper mapper = MateCommandMapper.INSTANCE;
 
     @Test
@@ -22,11 +23,11 @@ class MateCommandMapperTest extends MapperTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
         User receiver = TestEntityFactory.user(3L, "receiver");
-        Mate invitee = goal.join(receiver);
+        Mate invitee = goal.createMate(receiver);
 
         //when
         InviteAcceptNotificationDto dto =
-                mapper.toAcceptNotificationDto(invitee, receiver.getNickname(), inviter.getId());
+            mapper.toAcceptNotificationDto(invitee, receiver.getNickname(), inviter.getId());
 
         //then
         isEqualTo(dto.goalId(), goal.getId());
@@ -42,11 +43,11 @@ class MateCommandMapperTest extends MapperTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
         User receiver = TestEntityFactory.user(3L, "receiver");
-        Mate invitee = goal.join(receiver);
+        Mate invitee = goal.createMate(receiver);
 
         //when
         InviteRejectNotificationDto dto =
-                mapper.toRejectNotificationDto(invitee, receiver.getNickname(), inviter.getId());
+            mapper.toRejectNotificationDto(invitee, receiver.getNickname(), inviter.getId());
 
         //then
         isEqualTo(dto.goalId(), goal.getId());
@@ -62,11 +63,12 @@ class MateCommandMapperTest extends MapperTest {
         User inviter = TestEntityFactory.user(1L, "inviter");
         Goal goal = TestEntityFactory.goal(2L, "goal");
         User receiver = TestEntityFactory.user(3L, "receiver");
-        Mate invitee = goal.join(receiver);
+        Mate invitee = goal.createMate(receiver);
         ReflectionTestUtils.setField(invitee, "id", 4L);
 
         //when
-        MateInviteNotificationDto dto = mapper.toNotificationDto(inviter.getId(), inviter.getNickname(), invitee);
+        MateInviteNotificationDto dto = mapper.toNotificationDto(inviter.getId(),
+            inviter.getNickname(), invitee);
 
         //then
         isEqualTo(dto.inviterUserId(), inviter.getId());
@@ -80,7 +82,7 @@ class MateCommandMapperTest extends MapperTest {
     void expulsionGoalNotificationDto() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        Mate mate = goal.join(TestEntityFactory.user(2L, "receiver"));
+        Mate mate = goal.createMate(TestEntityFactory.user(2L, "receiver"));
         ReflectionTestUtils.setField(mate, "id", 3L);
 
         //when
@@ -96,7 +98,7 @@ class MateCommandMapperTest extends MapperTest {
     void teamMateAcceptResult() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        Mate mate = goal.join(TestEntityFactory.user(2L, "receiver"));
+        Mate mate = goal.createMate(TestEntityFactory.user(2L, "receiver"));
         ReflectionTestUtils.setField(mate, "id", 3L);
 
         //when

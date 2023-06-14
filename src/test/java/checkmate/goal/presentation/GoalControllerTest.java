@@ -199,9 +199,9 @@ public class GoalControllerTest extends ControllerTest {
 
     private List<GoalHistoryInfo> createGoalHistoryInfoList() {
         Mate mate1 = TestEntityFactory.goal(1L, "goal1")
-            .join(TestEntityFactory.user(1L, "user1"));
+            .createMate(TestEntityFactory.user(1L, "user1"));
         Mate mate2 = TestEntityFactory.goal(2L, "goal2")
-            .join(TestEntityFactory.user(2L, "user2"));
+            .createMate(TestEntityFactory.user(2L, "user2"));
 
         GoalHistoryInfo info1 = new GoalHistoryInfo(mate1);
         info1.setMateNicknames(List.of("nickname1", "nickname2", "nickname3"));

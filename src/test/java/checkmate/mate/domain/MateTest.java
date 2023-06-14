@@ -246,7 +246,7 @@ class MateTest {
     }
 
     private Mate createMate(Goal goal) {
-        return goal.join(TestEntityFactory.user(1L, "user"));
+        return goal.createMate(TestEntityFactory.user(1L, "user"));
     }
 
     private Goal createGoal() {

@@ -67,7 +67,7 @@ public class MateCommandServiceTest {
     void inviteTeamMate() throws Exception {
         //given
         User invitee = TestEntityFactory.user(5L, "invitee");
-        Mate inviteeMate = TestEntityFactory.goal(1L, "goal").join(invitee);
+        Mate inviteeMate = TestEntityFactory.goal(1L, "goal").createMate(invitee);
 
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
 
@@ -201,21 +201,21 @@ public class MateCommandServiceTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         List<Mate> skippedMates = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            skippedMates.add(goal.join(TestEntityFactory.user((long) i, "user" + i)));
+            skippedMates.add(goal.createMate(TestEntityFactory.user((long) i, "user" + i)));
         }
         return skippedMates;
     }
 
     private Mate createMate() {
         Mate mate = TestEntityFactory.goal(1L, "자바의 정석 스터디")
-            .join(TestEntityFactory.user(1L, "invitee"));
+            .createMate(TestEntityFactory.user(1L, "invitee"));
         ReflectionTestUtils.setField(mate, "id", 1L);
         return mate;
     }
 
     private Mate createRejectStatusMate(User user) {
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        Mate inviteeMate = goal.join(user);
+        Mate inviteeMate = goal.createMate(user);
         ReflectionTestUtils.setField(inviteeMate, "status", MateStatus.REJECT);
         return inviteeMate;
     }

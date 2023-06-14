@@ -50,7 +50,7 @@ class UserQueryDaoTest extends RepositoryTest {
     }
 
     private void createMate(User user, Goal goal1) {
-        Mate mate1 = goal1.join(user);
+        Mate mate1 = goal1.createMate(user);
         ReflectionTestUtils.setField(mate1, "status", MateStatus.ONGOING);
         em.persist(mate1);
     }

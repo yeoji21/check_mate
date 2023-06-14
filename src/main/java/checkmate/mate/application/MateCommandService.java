@@ -129,7 +129,7 @@ public class MateCommandService {
             .orElseGet(() -> {
                 Goal goal = goalRepository.findById(goalId)
                     .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-                return mateRepository.save(goal.join(invitee));
+                return mateRepository.save(goal.createMate(invitee));
             });
     }
 

@@ -1,22 +1,22 @@
 package checkmate.post.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.LikeCountCondition;
 import checkmate.mate.domain.Mate;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 class PostTest {
+
     @Test
     @DisplayName("게시글 좋아요 추가")
     void addLikes() throws Exception {
@@ -42,7 +42,7 @@ class PostTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> post.addLikes(1L));
+            () -> post.addLikes(1L));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
@@ -57,7 +57,7 @@ class PostTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> post.addLikes(1L));
+            () -> post.addLikes(1L));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
@@ -91,7 +91,7 @@ class PostTest {
 
         //when //then
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> post.removeLikes(3L));
+            () -> post.removeLikes(3L));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
 
@@ -104,7 +104,7 @@ class PostTest {
         ReflectionTestUtils.setField(post, "createdDate", LocalDate.now().minusDays(5));
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> post.removeLikes(1L));
+            () -> post.removeLikes(1L));
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
@@ -148,7 +148,7 @@ class PostTest {
 
     private Post createPost() {
         Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.join(TestEntityFactory.user(1L, "user"));
+        Mate mate = goal.createMate(TestEntityFactory.user(1L, "user"));
         return TestEntityFactory.post(mate);
     }
 }

@@ -89,7 +89,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public int getSkippedDayLimit() {
-        return (int) (totalWorkingDaysCount() * 0.1 + 1);
+        return (int) (getTotalWorkingDaysCount() * 0.1 + 1);
     }
 
     public boolean isTodayWorkingDay() {
@@ -104,8 +104,9 @@ public class Goal extends BaseTimeEntity {
         }
     }
 
-    public Mate join(User user) {
-        joinableCheck();
+    // TODO: 2023/06/14 checkInviteable() 중복 호출 제거
+    public Mate createMate(User user) {
+        checkInviteable();
         return new Mate(this, user);
     }
 
@@ -113,12 +114,13 @@ public class Goal extends BaseTimeEntity {
         return GoalJoiningPolicy.progressedPercent(period.calcProgressedPercent());
     }
 
-    public void joinableCheck() {
+    public void checkInviteable() {
         if (!isInviteable()) {
             throw UnInviteableGoalException.EXCEED_GOAL_INVITEABLE_DATE;
         }
     }
 
+    // TODO: 2023/06/14 GoalSchedule 클래스 생성 고려
     public String getSchedule() {
         return period.getGoalPeriodStream()
             .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
@@ -131,11 +133,11 @@ public class Goal extends BaseTimeEntity {
             .collect(Collectors.joining());
     }
 
-    public int progressedWorkingDaysCount() {
+    public int getProgressedWorkingDaysCount() {
         return checkDays.calcWorkingDayCount(period.getProgressedDateStream());
     }
 
-    public int totalWorkingDaysCount() {
+    public int getTotalWorkingDaysCount() {
         return checkDays.calcWorkingDayCount(period.getGoalPeriodStream());
     }
 
@@ -148,13 +150,13 @@ public class Goal extends BaseTimeEntity {
     }
 
     public void modify(GoalModifyEvent event) {
-        validateModifyDeadline();
+        checkModifyDeadline();
         modifyEndDate(event);
         modifyAppointmentTime(event);
     }
 
-    private void validateModifyDeadline() {
-        if (getModifiedDateTime() != null && lessThanModifyDeadline()) {
+    private void checkModifyDeadline() {
+        if (getModifiedDateTime() != null && isTodayModifyable()) {
             throw new BusinessException(ErrorCode.UPDATE_DURATION);
         }
     }
@@ -176,7 +178,7 @@ public class Goal extends BaseTimeEntity {
         }
     }
 
-    private boolean lessThanModifyDeadline() {
+    private boolean isTodayModifyable() {
         return getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now());
     }
 

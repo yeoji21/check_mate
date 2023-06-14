@@ -68,14 +68,14 @@ public class Mate extends BaseTimeEntity {
     }
 
     void acceptInvite() {
-        goal.joinableCheck();
+        goal.checkInviteable();
         status.checkStartable();
         status = MateStatus.ONGOING;
-        progress = new MateProgress(goal.progressedWorkingDaysCount(), 0);
+        progress = new MateProgress(goal.getProgressedWorkingDaysCount(), 0);
     }
 
     public void receivedInvite() {
-        goal.joinableCheck();
+        goal.checkInviteable();
         status.checkInviteable();
         status = MateStatus.WAITING;
     }
@@ -85,8 +85,9 @@ public class Mate extends BaseTimeEntity {
     }
 
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(progress.getCheckDayCount(),
-            goal.totalWorkingDaysCount());
+        return ProgressCalculator.calculate(
+            progress.getCheckDayCount(),
+            goal.getTotalWorkingDaysCount());
     }
 
     public Uploadable getUploadable() {

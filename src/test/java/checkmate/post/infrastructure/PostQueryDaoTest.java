@@ -1,5 +1,7 @@
 package checkmate.post.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
@@ -8,12 +10,9 @@ import checkmate.post.application.dto.response.PostInfo;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
-import org.junit.jupiter.api.Test;
-
 import java.time.LocalDate;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class PostQueryDaoTest extends RepositoryTest {
 
@@ -51,10 +50,10 @@ class PostQueryDaoTest extends RepositoryTest {
 
     private Image getImage(Post post2) {
         return Image.builder()
-                .post(post2)
-                .originalName("filename")
-                .storedName("filename")
-                .build();
+            .post(post2)
+            .originalName("filename")
+            .storedName("filename")
+            .build();
     }
 
     private Post getPost(Mate mate) {
@@ -66,7 +65,7 @@ class PostQueryDaoTest extends RepositoryTest {
     private Mate getMate(Goal goal) {
         User user = TestEntityFactory.user(null, "tester");
         em.persist(user);
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         em.persist(mate);
         return mate;
     }

@@ -162,7 +162,7 @@ class MateQueryDaoTest extends RepositoryTest {
     private Mate createOngoingMate(Goal goal) {
         User user = TestEntityFactory.user(null, "user" + Math.random() % 100);
         em.persist(user);
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;
@@ -189,7 +189,7 @@ class MateQueryDaoTest extends RepositoryTest {
     private Mate createMate(Goal goal, String nickname) {
         User user = TestEntityFactory.user(null, nickname);
         em.persist(user);
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;

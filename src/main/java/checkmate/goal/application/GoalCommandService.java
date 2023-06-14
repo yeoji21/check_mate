@@ -104,7 +104,7 @@ public class GoalCommandService {
     }
 
     private Mate createMate(Goal goal, long userId) {
-        Mate mate = goal.join(findUser(userId));
+        Mate mate = goal.createMate(findUser(userId));
         mate.receivedInvite();
         return mate;
     }

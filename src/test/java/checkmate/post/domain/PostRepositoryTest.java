@@ -1,5 +1,7 @@
 package checkmate.post.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
@@ -8,9 +10,8 @@ import checkmate.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class PostRepositoryTest extends RepositoryTest {
+
     @Test
     @DisplayName("게시글과 좋아요 목록 조회 - postId")
     void findWithLikes() throws Exception {
@@ -21,7 +22,7 @@ class PostRepositoryTest extends RepositoryTest {
 
         //when
         Post findPost = postRepository.findWithLikes(post.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         //then
         assertThat(post).isEqualTo(findPost);
@@ -43,7 +44,7 @@ class PostRepositoryTest extends RepositoryTest {
     private Mate createMate() {
         Goal goal = createGoal();
         User user = createUser();
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         em.persist(mate);
         return mate;
     }

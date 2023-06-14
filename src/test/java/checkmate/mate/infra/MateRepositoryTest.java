@@ -43,7 +43,7 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("팀원 조회 (목표 fetch join) - mateId로 조회")
+    @DisplayName("팀원 조회 (목표 fetch createMate) - mateId로 조회")
     void findWithGoal_mateId() throws Exception {
         //given
         Goal goal = createGoal();
@@ -60,7 +60,7 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("팀원 조회 (목표 fetch join) - goalId, userId로 조회")
+    @DisplayName("팀원 조회 (목표 fetch createMate) - goalId, userId로 조회")
     void findWithGoal_goalId_userId() throws Exception {
         //given
         Goal goal = createGoal();
@@ -159,7 +159,7 @@ class MateRepositoryTest extends RepositoryTest {
     private Mate createMate(Goal goal) {
         User user = TestEntityFactory.user(null, "user");
         em.persist(user);
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         em.persist(mate);
         return mate;
     }
@@ -173,7 +173,7 @@ class MateRepositoryTest extends RepositoryTest {
     private Mate createOngoingMate(Goal goal) {
         User user = TestEntityFactory.user(null, UUID.randomUUID().toString());
         em.persist(user);
-        Mate mate = goal.join(user);
+        Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;

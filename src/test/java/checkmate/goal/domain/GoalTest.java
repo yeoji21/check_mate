@@ -133,7 +133,7 @@ class GoalTest {
         boolean inviteable = goal.isInviteable();
         //then
         assertThat(inviteable).isTrue();
-        assertDoesNotThrow(goal::joinableCheck);
+        assertDoesNotThrow(goal::checkInviteable);
     }
 
     @Test
@@ -148,7 +148,7 @@ class GoalTest {
         //then
         assertThat(inviteable).isFalse();
         UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
-            goal::joinableCheck);
+            goal::checkInviteable);
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
     }
 
@@ -159,7 +159,7 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
         //when
-        int futureCount = goal.progressedWorkingDaysCount();
+        int futureCount = goal.getProgressedWorkingDaysCount();
         //then
         assertThat(futureCount).isEqualTo(10);
     }
@@ -169,7 +169,7 @@ class GoalTest {
     void checkConditions() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
-        Post post = TestEntityFactory.post(goal.join(TestEntityFactory.user(1L, "user")));
+        Post post = TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
 
         //when
         boolean check = goal.checkConditions(post);
@@ -184,7 +184,7 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         goal.addCondition(new LikeCountCondition(5));
-        Post post = TestEntityFactory.post(goal.join(TestEntityFactory.user(1L, "user")));
+        Post post = TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
         for (int i = 0; i < 5; i++) {
             post.addLikes(i);
         }
@@ -202,7 +202,7 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         goal.addCondition(new LikeCountCondition(5));
-        Post post = TestEntityFactory.post(goal.join(TestEntityFactory.user(1L, "user")));
+        Post post = TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
         //when
         goal.checkConditions(post);
         //then
@@ -215,7 +215,7 @@ class GoalTest {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
         goal.addCondition(new LikeCountCondition(3));
-        Post post = getCheckedPost(goal.join(TestEntityFactory.user(1L, "user")));
+        Post post = getCheckedPost(goal.createMate(TestEntityFactory.user(1L, "user")));
         ReflectionTestUtils.setField(post, "checked", true);
         //when
         boolean check = goal.checkConditions(post);

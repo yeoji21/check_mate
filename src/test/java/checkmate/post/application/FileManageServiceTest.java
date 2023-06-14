@@ -1,5 +1,8 @@
 package checkmate.post.application;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.mate.domain.Mate;
@@ -7,6 +10,7 @@ import checkmate.post.domain.FileStore;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.ImageRepository;
 import checkmate.post.domain.Post;
+import java.io.InputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,13 +19,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.InputStream;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 class FileManageServiceTest {
+
     @Mock
     private ImageRepository imageRepository;
     @Mock
@@ -55,6 +55,6 @@ class FileManageServiceTest {
 
     private Mate createMate() {
         Goal goal = TestEntityFactory.goal(1L, "test");
-        return goal.join(TestEntityFactory.user(1L, "user"));
+        return goal.createMate(TestEntityFactory.user(1L, "user"));
     }
 }
