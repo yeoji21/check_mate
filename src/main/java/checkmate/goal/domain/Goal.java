@@ -104,9 +104,7 @@ public class Goal extends BaseTimeEntity {
         }
     }
 
-    // TODO: 2023/06/14 checkInviteable() 중복 호출 제거
     public Mate createMate(User user) {
-        checkInviteable();
         return new Mate(this, user);
     }
 
