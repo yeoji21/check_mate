@@ -3,7 +3,6 @@ package checkmate.goal.domain;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import com.mysema.commons.lang.Assert;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +17,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
-public class GoalCheckDays implements Serializable {
+public class GoalCheckDays {
 
     @Column(name = "check_days", nullable = false)
     private int checkDays;
