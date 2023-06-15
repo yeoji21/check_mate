@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
-import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
@@ -133,10 +133,10 @@ class MateTest {
         Mate successMate = createMate(createGoal(), MateStatus.SUCCESS);
 
         //when //then
-        assertThat(assertThrows(UnInviteableGoalException.class,
+        assertThat(assertThrows(NotInviteableGoalException.class,
             () -> ongoingMate.receivedInvite()).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
-        assertThat(assertThrows(UnInviteableGoalException.class,
+        assertThat(assertThrows(NotInviteableGoalException.class,
             () -> successMate.receivedInvite()).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
     }
@@ -148,9 +148,9 @@ class MateTest {
         Mate waitingMate = createMate(createGoal(), MateStatus.WAITING);
 
         //when //then
-        assertThat(assertThrows(UnInviteableGoalException.class,
+        assertThat(assertThrows(NotInviteableGoalException.class,
             () -> waitingMate.receivedInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
+            .isEqualTo(ErrorCode.DUPLICATED_INVITE);
     }
 
     @Test
@@ -163,9 +163,9 @@ class MateTest {
             LocalDate.now().minusDays(20));
 
         //when //then
-        assertThat(assertThrows(UnInviteableGoalException.class,
+        assertThat(assertThrows(NotInviteableGoalException.class,
             () -> mate.receivedInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
+            .isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
     @Test
@@ -214,9 +214,9 @@ class MateTest {
             LocalDate.now().minusDays(20));
 
         //when //then
-        assertThat(assertThrows(UnInviteableGoalException.class,
+        assertThat(assertThrows(NotInviteableGoalException.class,
             () -> mate.acceptInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
+            .isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
     @Test

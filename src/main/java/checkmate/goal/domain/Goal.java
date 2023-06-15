@@ -2,7 +2,7 @@ package checkmate.goal.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
-import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Post;
@@ -114,7 +114,7 @@ public class Goal extends BaseTimeEntity {
 
     public void checkInviteable() {
         if (!isInviteable()) {
-            throw UnInviteableGoalException.EXCEED_GOAL_INVITEABLE_DATE;
+            throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
         }
     }
 

@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.exception.BusinessException;
-import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate.MateStatus;
 import org.junit.jupiter.api.DisplayName;
@@ -18,9 +18,9 @@ class MateStatusTest {
         //given
 
         //when
-        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
+        NotInviteableGoalException exception = assertThrows(NotInviteableGoalException.class,
             () -> MateStatus.ONGOING.checkInviteable());
-        assertThrows(UnInviteableGoalException.class,
+        assertThrows(NotInviteableGoalException.class,
             () -> MateStatus.SUCCESS.checkInviteable());
 
         //then
@@ -33,11 +33,11 @@ class MateStatusTest {
         //given
 
         //when
-        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
+        NotInviteableGoalException exception = assertThrows(NotInviteableGoalException.class,
             () -> MateStatus.WAITING.checkInviteable());
 
         //then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_INVITE_REQUEST);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.DUPLICATED_INVITE);
     }
 
     @Test

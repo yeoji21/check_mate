@@ -5,7 +5,7 @@ import static checkmate.exception.code.ErrorCode.INVALID_MATE_STATUS;
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.common.util.ProgressCalculator;
 import checkmate.exception.BusinessException;
-import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.NotInviteableGoalException;
 import checkmate.goal.domain.Goal;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
@@ -124,9 +124,9 @@ public class Mate extends BaseTimeEntity {
 
         void checkInviteable() {
             if (this == ONGOING || this == SUCCESS) {
-                throw UnInviteableGoalException.ALREADY_IN_GOAL;
+                throw NotInviteableGoalException.ALREADY_IN_GOAL;
             } else if (this == WAITING) {
-                throw UnInviteableGoalException.DUPLICATED_INVITE_REQUEST;
+                throw NotInviteableGoalException.DUPLICATED_INVITE;
             }
         }
 

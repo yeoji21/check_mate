@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
-import checkmate.exception.UnInviteableGoalException;
+import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Post;
@@ -129,10 +129,9 @@ class GoalTest {
     void isInviteable_true() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        //when
-        boolean inviteable = goal.isInviteable();
-        //then
-        assertThat(inviteable).isTrue();
+
+        //when //then
+        assertThat(goal.isInviteable()).isTrue();
         assertDoesNotThrow(goal::checkInviteable);
     }
 
@@ -143,13 +142,12 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
             LocalDate.now().minusDays(200L));
-        //when
-        boolean inviteable = goal.isInviteable();
-        //then
-        assertThat(inviteable).isFalse();
-        UnInviteableGoalException exception = assertThrows(UnInviteableGoalException.class,
+
+        //when //then
+        assertThat(goal.isInviteable()).isFalse();
+        NotInviteableGoalException exception = assertThrows(NotInviteableGoalException.class,
             goal::checkInviteable);
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_INVITEABLE_DATE);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
     @Test
