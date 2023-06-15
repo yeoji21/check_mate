@@ -23,9 +23,9 @@ public class GoalCheckDays implements Serializable {
     @Column(name = "check_days", nullable = false)
     private int checkDays;
 
+    // TODO: 2023/06/15 정적 팩토리 메소드로 변경 고려
     public GoalCheckDays(String korWeekDays) {
-        correctDayCheck(korWeekDays);
-        duplicateDayCheck(korWeekDays);
+        validateKorWeekDay(korWeekDays);
         this.checkDays = CheckDaysConverter.toValue(korWeekDays);
     }
 
@@ -37,23 +37,25 @@ public class GoalCheckDays implements Serializable {
         return checkDays;
     }
 
-    boolean isWorkingDay(LocalDate date) {
-        return CheckDaysConverter.isWorkingDay(checkDays, date);
-    }
-
     int calcWorkingDayCount(Stream<LocalDate> dateStream) {
         return (int) dateStream.filter(this::isWorkingDay).count();
     }
 
-    private void correctDayCheck(String korWeekDays) {
+    boolean isWorkingDay(LocalDate date) {
+        return CheckDaysConverter.isWorkingDay(checkDays, date);
+    }
+
+    private void validateKorWeekDay(String korWeekDays) {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find()) {
             throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
         }
+        checkDuplicateWeekDay(korWeekDays);
     }
 
-    private void duplicateDayCheck(String korWeekDays) {
-        String[] split = korWeekDays.split("");
-        Assert.isTrue(split.length == new HashSet<>(List.of(split)).size(), "중복 요일");
+    private void checkDuplicateWeekDay(String korWeekDays) {
+        Assert.isTrue(
+            korWeekDays.length() == new HashSet<>(List.of(korWeekDays.split(""))).size(),
+            "중복 요일");
     }
 
     @Override
