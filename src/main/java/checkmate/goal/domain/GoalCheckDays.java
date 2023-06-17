@@ -30,7 +30,7 @@ public class GoalCheckDays {
     }
 
     public GoalCheckDays(int value) {
-        this(CheckDaysConverter.toKorWeekDays(value));
+        this(CheckDaysConverter.toKorean(value));
     }
 
     public static GoalCheckDays ofKorean(String korWeekDays) {
@@ -38,12 +38,12 @@ public class GoalCheckDays {
     }
 
     public static GoalCheckDays ofValue(int value) {
-        return new GoalCheckDays(CheckDaysConverter.toKorWeekDays(value));
+        return new GoalCheckDays(CheckDaysConverter.toKorean(value));
     }
 
     public static GoalCheckDays ofLocalDates(LocalDate... dates) {
         return new GoalCheckDays(Arrays.stream(dates)
-            .map(CheckDaysConverter::toKoreanWeekDay)
+            .map(CheckDaysConverter::toKorean)
             .collect(Collectors.joining()));
     }
 
@@ -69,7 +69,7 @@ public class GoalCheckDays {
     }
 
     public String toKorean() {
-        return CheckDaysConverter.toKorWeekDays(checkDays);
+        return CheckDaysConverter.toKorean(checkDays);
     }
 
     int getWorkingDayCount(Stream<LocalDate> dateStream) {

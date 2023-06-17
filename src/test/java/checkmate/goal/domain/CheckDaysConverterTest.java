@@ -85,6 +85,6 @@ public class CheckDaysConverterTest {
     }
 
     private void isEqualTo(int value, String weekDays) {
-        assertThat(CheckDaysConverter.toKorWeekDays(value)).isEqualTo(weekDays);
+        assertThat(CheckDaysConverter.toKorean(value)).isEqualTo(weekDays);
     }
 }

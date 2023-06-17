@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
 @RequiredArgsConstructor
 public enum CheckDaysConverter {
     MONDAY(0, "월"),
@@ -23,42 +23,47 @@ public enum CheckDaysConverter {
     private static final Map<String, CheckDaysConverter> KOR_MAP =
         Stream.of(values()).collect(Collectors.toMap(CheckDaysConverter::getKor, e -> e));
     private final int shift;
+    @Getter(AccessLevel.PRIVATE)
     private final String kor;
 
-    static String toKoreanWeekDay(LocalDate date) {
-        return CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).kor;
+    static String toKorean(LocalDate... dates) {
+        return Arrays.stream(dates)
+            .map(date -> valueOf(date).kor)
+            .collect(Collectors.joining());
     }
 
-    static int toValue(String korWeekDays) {
-        int value = 0;
-        for (String weekDay : korWeekDays.split("")) {
-            value |= (1 << KOR_MAP.get(weekDay).shift);
-        }
-        return value;
-    }
-
-    static String toKorWeekDays(int value) {
+    static String toKorean(int weekDays) {
         return Arrays.stream(values())
-            .filter(day -> isWorkingDay(value, day.shift))
+            .filter(day -> isWorkingDay(weekDays, day.shift))
             .map(day -> day.kor)
             .collect(Collectors.joining());
     }
 
-    static boolean isWorkingDay(int weekDays, LocalDate date) {
-        return isWorkingDay(weekDays,
-            CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).shift);
+    static int toValue(String korWeekDays) {
+        int weekDays = 0;
+        for (String weekDay : korWeekDays.split("")) {
+            weekDays |= (1 << KOR_MAP.get(weekDay).shift);
+        }
+        return weekDays;
     }
 
     public static List<Integer> matchingDateValues(LocalDate localDate) {
-        int dateValue = CheckDaysConverter.valueOf(localDate.getDayOfWeek().toString()).getShift();
         return IntStream.rangeClosed(1, 128)
-            .filter(value -> isWorkingDay(value, dateValue))
-            .mapToObj(Integer::valueOf)
+            .filter(value -> isWorkingDay(value, localDate))
+            .boxed()
             .toList();
 
     }
 
-    private static boolean isWorkingDay(int value, int weekDays) {
-        return (value & (1 << weekDays)) != 0;
+    static boolean isWorkingDay(int weekDays, LocalDate date) {
+        return isWorkingDay(weekDays, valueOf(date).shift);
+    }
+
+    static CheckDaysConverter valueOf(LocalDate date) {
+        return CheckDaysConverter.valueOf(date.getDayOfWeek().toString());
+    }
+
+    private static boolean isWorkingDay(int weekDays, int date) {
+        return (weekDays & (1 << date)) != 0;
     }
 }
