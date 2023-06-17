@@ -8,7 +8,6 @@ import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
@@ -116,8 +115,8 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(todayGoals).hasSize(1);
-        assertThat(todayGoals).allMatch(goal -> CheckDaysConverter
-            .isWorkingDay(GoalCheckDays.ofKorean(goal.getCheckDays()).toInt(), LocalDate.now()));
+        assertThat(todayGoals).allMatch(goal ->
+            GoalCheckDays.ofKorean(goal.getCheckDays()).isWorkingDay(LocalDate.now()));
     }
 
     @Test

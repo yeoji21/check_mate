@@ -60,6 +60,10 @@ public class GoalCheckDays {
             "중복 요일");
     }
 
+    public boolean isWorkingDay(LocalDate date) {
+        return CheckDaysConverter.isWorkingDay(checkDays, date);
+    }
+
     public int toInt() {
         return checkDays;
     }
@@ -70,10 +74,6 @@ public class GoalCheckDays {
 
     int getWorkingDayCount(Stream<LocalDate> dateStream) {
         return (int) dateStream.filter(this::isWorkingDay).count();
-    }
-
-    boolean isWorkingDay(LocalDate date) {
-        return CheckDaysConverter.isWorkingDay(checkDays, date);
     }
 
     @Override

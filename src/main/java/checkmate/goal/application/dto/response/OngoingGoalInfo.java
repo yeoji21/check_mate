@@ -1,7 +1,7 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal.GoalCategory;
+import checkmate.goal.domain.GoalCheckDays;
 import com.querydsl.core.annotations.QueryProjection;
 import java.io.Serializable;
 import lombok.Builder;
@@ -21,6 +21,6 @@ public class OngoingGoalInfo implements Serializable {
         this.id = id;
         this.category = category;
         this.title = title;
-        this.weekDays = CheckDaysConverter.toKorWeekDays(weekDays);
+        this.weekDays = GoalCheckDays.ofValue(weekDays).toKorean();
     }
 }

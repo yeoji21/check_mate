@@ -29,7 +29,7 @@ public enum CheckDaysConverter {
         return CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).kor;
     }
 
-    public static int toValue(String korWeekDays) {
+    static int toValue(String korWeekDays) {
         int value = 0;
         for (String weekDay : korWeekDays.split("")) {
             value |= (1 << KOR_MAP.get(weekDay).shift);
@@ -37,19 +37,15 @@ public enum CheckDaysConverter {
         return value;
     }
 
-    public static String toKorWeekDays(int value) {
+    static String toKorWeekDays(int value) {
         return Arrays.stream(values())
             .filter(day -> isWorkingDay(value, day.shift))
             .map(day -> day.kor)
             .collect(Collectors.joining());
     }
 
-    private static boolean isWorkingDay(int value, int weekDays) {
-        return (value & (1 << weekDays)) != 0;
-    }
-
-    public static boolean isWorkingDay(int value, LocalDate date) {
-        return isWorkingDay(value,
+    static boolean isWorkingDay(int weekDays, LocalDate date) {
+        return isWorkingDay(weekDays,
             CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).shift);
     }
 
@@ -60,5 +56,9 @@ public enum CheckDaysConverter {
             .mapToObj(Integer::valueOf)
             .toList();
 
+    }
+
+    private static boolean isWorkingDay(int value, int weekDays) {
+        return (value & (1 << weekDays)) != 0;
     }
 }
