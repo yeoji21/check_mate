@@ -23,17 +23,20 @@ public class GoalCheckDays {
     private int checkDays;
 
     private GoalCheckDays(String korWeekDays) {
+        validateKorWeekDay(korWeekDays);
         this.checkDays = CheckDaysConverter.toValue(korWeekDays);
     }
 
-    // TODO: 2023/06/15 정적 팩토리 메소드로 변경 고려
     public GoalCheckDays(int value) {
         this(CheckDaysConverter.toKorWeekDays(value));
     }
 
     public static GoalCheckDays ofKorean(String korWeekDays) {
-        validateKorWeekDay(korWeekDays);
         return new GoalCheckDays(korWeekDays);
+    }
+
+    public static GoalCheckDays ofValue(int value) {
+        return new GoalCheckDays(CheckDaysConverter.toKorWeekDays(value));
     }
 
     private static void validateKorWeekDay(String korWeekDays) {

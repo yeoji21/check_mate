@@ -30,7 +30,7 @@ public class BatchInsertComponent {
                 .title(UUID.randomUUID().toString().substring(0, 10))
                 .period(new GoalPeriod(LocalDate.now().minusDays((int) (Math.random() * 10)),
                     LocalDate.now().plusDays((int) (Math.random() * 30))))
-                .checkDays(new GoalCheckDays((int) (Math.random() * 126) + 1))
+                .checkDays(GoalCheckDays.ofValue((int) (Math.random() * 126) + 1))
                 .build();
             goals.add(goal);
             if (goals.size() == batchSize) {
