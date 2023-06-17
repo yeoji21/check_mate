@@ -56,7 +56,7 @@ class GoalCheckDaysTest {
     }
 
     private void isEqualTo(LocalDate localDate, int value) {
-        assertThat(GoalCheckDays.ofKorean(CheckDaysConverter.toKorWeekDay(localDate)).intValue())
+        assertThat(GoalCheckDays.ofKorean(CheckDaysConverter.toKorWeekDay(localDate)).toInt())
             .isEqualTo(value);
     }
 

@@ -52,7 +52,7 @@ public class BatchInsertComponent {
                 ps.setString(2, argument.getTitle());
                 ps.setString(3, argument.getStartDate().toString());
                 ps.setString(4, argument.getEndDate().toString());
-                ps.setInt(5, argument.getCheckDays().intValue());
+                ps.setInt(5, argument.getCheckDays().toInt());
                 ps.setString(6, argument.getStatus().name());
             });
     }

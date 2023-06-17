@@ -35,6 +35,7 @@ public class GoalPeriod {
         return startDate.datesUntil(endDate.plusDays(1));
     }
 
+    // TODO: 2023/06/17 메소드명 변경 고려
     Stream<LocalDate> getProgressedDateStream() {
         return isUninitiated() ? Stream.empty() : startDate.datesUntil(LocalDate.now());
     }

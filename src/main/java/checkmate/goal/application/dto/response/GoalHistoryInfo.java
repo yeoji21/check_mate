@@ -1,6 +1,5 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.mate.domain.Mate;
@@ -33,7 +32,8 @@ public class GoalHistoryInfo implements Serializable {
         this.startDate = goal.getStartDate();
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
-        this.checkDays = CheckDaysConverter.toKorWeekDays(goal.getCheckDays().intValue());
+        this.checkDays = goal.getCheckDays().toKorean();
+        ;
         this.achievementRate = finder.calcProgressPercent();
     }
 

@@ -2,7 +2,6 @@ package checkmate.goal.application.dto;
 
 import checkmate.MapperTest;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import java.time.LocalDate;
@@ -34,8 +33,7 @@ class GoalCommandMapperTest extends MapperTest {
         isEqualTo(goal.getTitle(), command.title());
         isEqualTo(goal.getStartDate(), command.startDate());
         isEqualTo(goal.getEndDate(), command.endDate());
-        isEqualTo(CheckDaysConverter.toKorWeekDays(goal.getCheckDays().intValue()),
-            command.checkDays());
+        isEqualTo(goal.getCheckDays().toKorean(), command.checkDays());
         isEqualTo(goal.getAppointmentTime(), command.appointmentTime());
     }
 }

@@ -52,11 +52,15 @@ public class GoalCheckDays {
             "중복 요일");
     }
 
-    public int intValue() {
+    public int toInt() {
         return checkDays;
     }
 
-    int calcWorkingDayCount(Stream<LocalDate> dateStream) {
+    public String toKorean() {
+        return CheckDaysConverter.toKorWeekDays(checkDays);
+    }
+
+    int getWorkingDayCount(Stream<LocalDate> dateStream) {
         return (int) dateStream.filter(this::isWorkingDay).count();
     }
 

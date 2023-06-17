@@ -99,7 +99,7 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(mates).hasSize(2);
         assertThat(mates)
-            .allMatch(m -> CheckDaysConverter.isWorkingDay(m.getGoal().getCheckDays().intValue(),
+            .allMatch(m -> CheckDaysConverter.isWorkingDay(m.getGoal().getCheckDays().toInt(),
                 LocalDate.now().minusDays(1)))
             .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
             .allMatch(m -> m.getStatus() == MateStatus.ONGOING)

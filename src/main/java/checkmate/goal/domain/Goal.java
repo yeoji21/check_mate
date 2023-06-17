@@ -119,6 +119,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     // TODO: 2023/06/14 GoalSchedule 클래스 생성 고려
+    // 책임 위임
     public String getSchedule() {
         return period.getGoalPeriodStream()
             .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
@@ -132,11 +133,11 @@ public class Goal extends BaseTimeEntity {
     }
 
     public int getProgressedWorkingDaysCount() {
-        return checkDays.calcWorkingDayCount(period.getProgressedDateStream());
+        return checkDays.getWorkingDayCount(period.getProgressedDateStream());
     }
 
     public int getTotalWorkingDaysCount() {
-        return checkDays.calcWorkingDayCount(period.getGoalPeriodStream());
+        return checkDays.getWorkingDayCount(period.getGoalPeriodStream());
     }
 
     public LocalDate getStartDate() {
