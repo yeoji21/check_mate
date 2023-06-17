@@ -22,14 +22,31 @@ public class GoalCheckDays {
     @Column(name = "check_days", nullable = false)
     private int checkDays;
 
-    // TODO: 2023/06/15 정적 팩토리 메소드로 변경 고려
-    public GoalCheckDays(String korWeekDays) {
-        validateKorWeekDay(korWeekDays);
+    private GoalCheckDays(String korWeekDays) {
         this.checkDays = CheckDaysConverter.toValue(korWeekDays);
     }
 
+    // TODO: 2023/06/15 정적 팩토리 메소드로 변경 고려
     public GoalCheckDays(int value) {
         this(CheckDaysConverter.toKorWeekDays(value));
+    }
+
+    public static GoalCheckDays ofKorean(String korWeekDays) {
+        validateKorWeekDay(korWeekDays);
+        return new GoalCheckDays(korWeekDays);
+    }
+
+    private static void validateKorWeekDay(String korWeekDays) {
+        if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find()) {
+            throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
+        }
+        checkDuplicateWeekDay(korWeekDays);
+    }
+
+    private static void checkDuplicateWeekDay(String korWeekDays) {
+        Assert.isTrue(
+            korWeekDays.length() == new HashSet<>(List.of(korWeekDays.split(""))).size(),
+            "중복 요일");
     }
 
     public int intValue() {
@@ -42,19 +59,6 @@ public class GoalCheckDays {
 
     boolean isWorkingDay(LocalDate date) {
         return CheckDaysConverter.isWorkingDay(checkDays, date);
-    }
-
-    private void validateKorWeekDay(String korWeekDays) {
-        if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find()) {
-            throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
-        }
-        checkDuplicateWeekDay(korWeekDays);
-    }
-
-    private void checkDuplicateWeekDay(String korWeekDays) {
-        Assert.isTrue(
-            korWeekDays.length() == new HashSet<>(List.of(korWeekDays.split(""))).size(),
-            "중복 요일");
     }
 
     @Override

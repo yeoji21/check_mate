@@ -128,7 +128,7 @@ class GoalRepositoryTest extends RepositoryTest {
     private Goal createGoal(LocalDate startDate, LocalDate endDate) {
         Goal goal = Goal.builder()
             .title("title")
-            .checkDays(new GoalCheckDays("월화수목금토일"))
+            .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
             .category(GoalCategory.ETC)
             .period(new GoalPeriod(startDate, endDate))
             .build();

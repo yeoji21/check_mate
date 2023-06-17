@@ -20,7 +20,7 @@ public class TestEntityFactory {
             .category(GoalCategory.ETC)
             .title(title)
             .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(30L)))
-            .checkDays(new GoalCheckDays("월화수목금토일"))
+            .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
             .build();
         ReflectionTestUtils.setField(goal, "id", id);
         return goal;

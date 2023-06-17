@@ -51,16 +51,16 @@ class GoalCheckDaysTest {
 
     private void invalidKorWeekDay(String weekDay) {
         BusinessException exception = assertThrows(BusinessException.class,
-            () -> new GoalCheckDays(weekDay));
+            () -> GoalCheckDays.ofKorean(weekDay));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_WEEK_DAYS);
     }
 
     private void isEqualTo(LocalDate localDate, int value) {
-        assertThat(new GoalCheckDays(CheckDaysConverter.toKorWeekDay(localDate)).intValue())
+        assertThat(GoalCheckDays.ofKorean(CheckDaysConverter.toKorWeekDay(localDate)).intValue())
             .isEqualTo(value);
     }
 
     private void duplicateDayThrowException(String weekDays) {
-        assertThrows(IllegalArgumentException.class, () -> new GoalCheckDays(weekDays));
+        assertThrows(IllegalArgumentException.class, () -> GoalCheckDays.ofKorean(weekDays));
     }
 }

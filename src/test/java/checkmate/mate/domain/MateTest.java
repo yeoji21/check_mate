@@ -242,7 +242,7 @@ class MateTest {
     }
 
     private GoalCheckDays tomorrowCheckDay() {
-        return new GoalCheckDays(CheckDaysConverter.toKorWeekDay(LocalDate.now().plusDays(1)));
+        return GoalCheckDays.ofKorean(CheckDaysConverter.toKorWeekDay(LocalDate.now().plusDays(1)));
     }
 
     private Mate createMate(Goal goal) {

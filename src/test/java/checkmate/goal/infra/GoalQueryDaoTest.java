@@ -117,7 +117,7 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(todayGoals).hasSize(1);
         assertThat(todayGoals).allMatch(goal -> CheckDaysConverter
-            .isWorkingDay(new GoalCheckDays(goal.getCheckDays()).intValue(), LocalDate.now()));
+            .isWorkingDay(GoalCheckDays.ofKorean(goal.getCheckDays()).intValue(), LocalDate.now()));
     }
 
     @Test
@@ -155,7 +155,7 @@ class GoalQueryDaoTest extends RepositoryTest {
             .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
             .category(GoalCategory.ETC)
             .title("futureGoal")
-            .checkDays(new GoalCheckDays("월화수목금토일"))
+            .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
             .build();
         em.persist(goal);
         createMate(user, goal);

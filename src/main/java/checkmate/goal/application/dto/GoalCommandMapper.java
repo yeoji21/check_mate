@@ -25,7 +25,7 @@ public interface GoalCommandMapper {
 
     @Named("checkDays")
     default GoalCheckDays checkDays(String checkDays) {
-        return new GoalCheckDays(checkDays);
+        return GoalCheckDays.ofKorean(checkDays);
     }
 
     @Named("goalPeriod")
