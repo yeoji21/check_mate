@@ -153,7 +153,7 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     private GoalCheckDays tomorrowCheckDay() {
-        return GoalCheckDays.ofKorean(CheckDaysConverter.toKorWeekDay(LocalDate.now().plusDays(1)));
+        return GoalCheckDays.ofLocalDates(LocalDate.now().plusDays(1));
     }
 
     private Mate createMate(Goal goal) {

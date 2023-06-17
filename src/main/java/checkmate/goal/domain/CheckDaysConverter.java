@@ -25,7 +25,7 @@ public enum CheckDaysConverter {
     private final int shift;
     private final String kor;
 
-    public static String toKorWeekDay(LocalDate date) {
+    static String toKoreanWeekDay(LocalDate date) {
         return CheckDaysConverter.valueOf(date.getDayOfWeek().toString()).kor;
     }
 

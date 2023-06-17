@@ -4,9 +4,11 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import com.mysema.commons.lang.Assert;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -37,6 +39,12 @@ public class GoalCheckDays {
 
     public static GoalCheckDays ofValue(int value) {
         return new GoalCheckDays(CheckDaysConverter.toKorWeekDays(value));
+    }
+
+    public static GoalCheckDays ofLocalDates(LocalDate... dates) {
+        return new GoalCheckDays(Arrays.stream(dates)
+            .map(CheckDaysConverter::toKoreanWeekDay)
+            .collect(Collectors.joining()));
     }
 
     private static void validateKorWeekDay(String korWeekDays) {

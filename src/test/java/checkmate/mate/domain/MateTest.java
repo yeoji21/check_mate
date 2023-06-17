@@ -7,7 +7,6 @@ import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate.MateStatus;
@@ -242,7 +241,7 @@ class MateTest {
     }
 
     private GoalCheckDays tomorrowCheckDay() {
-        return GoalCheckDays.ofKorean(CheckDaysConverter.toKorWeekDay(LocalDate.now().plusDays(1)));
+        return GoalCheckDays.ofLocalDates(LocalDate.now().plusDays(1));
     }
 
     private Mate createMate(Goal goal) {
