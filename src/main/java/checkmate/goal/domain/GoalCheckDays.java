@@ -29,12 +29,8 @@ public class GoalCheckDays {
     private int checkDays;
 
     private GoalCheckDays(String korWeekDays) {
-        validateKorWeekDay(korWeekDays);
+        validateKorWeekDayFormat(korWeekDays);
         this.checkDays = CheckDaysConverter.toValue(korWeekDays);
-    }
-
-    public GoalCheckDays(int value) {
-        this(CheckDaysConverter.toKorean(value));
     }
 
     public static GoalCheckDays ofKorean(String korWeekDays) {
@@ -58,7 +54,7 @@ public class GoalCheckDays {
             .toList();
     }
 
-    private static void validateKorWeekDay(String korWeekDays) {
+    private static void validateKorWeekDayFormat(String korWeekDays) {
         if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find()) {
             throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
         }
@@ -85,11 +81,6 @@ public class GoalCheckDays {
 
     int getWorkingDayCount(Stream<LocalDate> dateStream) {
         return (int) dateStream.filter(this::isWorkingDay).count();
-    }
-
-    @Override
-    public String toString() {
-        return String.valueOf(checkDays);
     }
 
     @RequiredArgsConstructor
