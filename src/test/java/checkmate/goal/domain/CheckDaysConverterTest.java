@@ -2,11 +2,12 @@ package checkmate.goal.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class CheckDaysConverterTest {
+class CheckDaysConverterTest {
 
     @Test
     @DisplayName("단일 요일 변환 테스트")
