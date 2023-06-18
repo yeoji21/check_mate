@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -45,6 +46,13 @@ public class GoalCheckDays {
         return new GoalCheckDays(Arrays.stream(dates)
             .map(CheckDaysConverter::toKorean)
             .collect(Collectors.joining()));
+    }
+
+    public static List<Integer> getAllMatchingWeekDayValues(LocalDate date) {
+        return IntStream.rangeClosed(1, 128)
+            .filter(weekDays -> CheckDaysConverter.isWorkingDay(weekDays, date))
+            .boxed()
+            .toList();
     }
 
     private static void validateKorWeekDay(String korWeekDays) {

@@ -2,10 +2,8 @@ package checkmate.goal.domain;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,14 +43,6 @@ public enum CheckDaysConverter {
             weekDays |= (1 << KOR_MAP.get(weekDay).shift);
         }
         return weekDays;
-    }
-
-    public static List<Integer> matchingDateValues(LocalDate localDate) {
-        return IntStream.rangeClosed(1, 128)
-            .filter(value -> isWorkingDay(value, localDate))
-            .boxed()
-            .toList();
-
     }
 
     static boolean isWorkingDay(int weekDays, LocalDate date) {

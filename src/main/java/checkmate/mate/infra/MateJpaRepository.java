@@ -4,8 +4,8 @@ import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QPost.post;
 
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal.GoalStatus;
+import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
@@ -57,7 +57,7 @@ public class MateJpaRepository implements MateRepository {
     @Override
     public List<Mate> findYesterdaySkippedMates() {
         LocalDate yesterDay = LocalDate.now().minusDays(1);
-        List<Integer> checkDays = CheckDaysConverter.matchingDateValues(yesterDay);
+        List<Integer> checkDays = GoalCheckDays.getAllMatchingWeekDayValues(yesterDay);
         List<Mate> mates = queryFactory.select(mate)
             .from(mate)
             .where(goal.checkDays.checkDays.in(checkDays),

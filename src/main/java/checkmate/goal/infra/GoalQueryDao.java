@@ -14,8 +14,8 @@ import checkmate.goal.application.dto.response.QGoalScheduleInfo;
 import checkmate.goal.application.dto.response.QOngoingGoalInfo;
 import checkmate.goal.application.dto.response.QTodayGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
-import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal.GoalStatus;
+import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.application.dto.response.QMateUploadInfo;
 import checkmate.mate.domain.Mate.MateStatus;
@@ -44,7 +44,8 @@ public class GoalQueryDao {
             .where(mate.userId.eq(userId),
                 mate.status.eq(MateStatus.ONGOING),
                 goal.status.eq(GoalStatus.ONGOING),
-                goal.checkDays.checkDays.in(CheckDaysConverter.matchingDateValues(LocalDate.now())))
+                goal.checkDays.checkDays.in(
+                    GoalCheckDays.getAllMatchingWeekDayValues(LocalDate.now())))
             .fetch();
     }
 
