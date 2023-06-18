@@ -109,7 +109,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isInviteable() {
-        return GoalJoiningPolicy.progressedPercent(period.calcProgressedPercent());
+        return GoalJoiningPolicy.progressedPercent(period.getProgressedPercent());
     }
 
     public void checkInviteable() {
@@ -121,23 +121,25 @@ public class Goal extends BaseTimeEntity {
     // TODO: 2023/06/14 GoalSchedule 클래스 생성 고려
     // 책임 위임
     public String getSchedule() {
-        return period.getGoalPeriodStream()
+        return period.getFullPeriodStream()
             .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
             .collect(Collectors.joining());
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
-        return period.getGoalPeriodStream()
+        return period.getFullPeriodStream()
             .map(date -> checkDays.isWorkingDay(date) && uploadedDates.contains(date) ? "1" : "0")
             .collect(Collectors.joining());
     }
 
-    public int getProgressedWorkingDaysCount() {
-        return checkDays.getWorkingDayCount(period.getProgressedDateStream());
+    public int getTotalWorkingDaysCount() {
+        return (int) period.getFullPeriodStream()
+            .filter(date -> checkDays.isWorkingDay(date)).count();
     }
 
-    public int getTotalWorkingDaysCount() {
-        return checkDays.getWorkingDayCount(period.getGoalPeriodStream());
+    public int getProgressedWorkingDaysCount() {
+        return (int) period.getUntilTodayPeriodStream()
+            .filter(date -> checkDays.isWorkingDay(date)).count();
     }
 
     public LocalDate getStartDate() {

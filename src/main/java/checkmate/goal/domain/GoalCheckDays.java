@@ -79,10 +79,6 @@ public class GoalCheckDays {
         return CheckDaysConverter.toKorean(checkDays);
     }
 
-    int getWorkingDayCount(Stream<LocalDate> dateStream) {
-        return (int) dateStream.filter(this::isWorkingDay).count();
-    }
-
     @RequiredArgsConstructor
     public enum CheckDaysConverter {
         MONDAY(0, "월"),

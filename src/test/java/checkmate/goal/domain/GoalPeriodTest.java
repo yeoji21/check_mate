@@ -34,13 +34,13 @@ class GoalPeriodTest {
     @DisplayName("목표 진행률 계산")
     void progressPercent() throws Exception {
         GoalPeriod uninitiated = new GoalPeriod(today().plusDays(1), today().plusDays(10));
-        assertThat(uninitiated.calcProgressedPercent()).isZero();
+        assertThat(uninitiated.getProgressedPercent()).isZero();
 
         GoalPeriod halfProgressed = new GoalPeriod(today().minusDays(10), today().plusDays(9));
-        assertThat(halfProgressed.calcProgressedPercent()).isEqualTo(50);
+        assertThat(halfProgressed.getProgressedPercent()).isEqualTo(50);
 
         GoalPeriod ended = new GoalPeriod(today().minusDays(10), today().minusDays(1));
-        assertThat(ended.calcProgressedPercent()).isEqualTo(100);
+        assertThat(ended.getProgressedPercent()).isEqualTo(100);
     }
 
     private LocalDate today() {

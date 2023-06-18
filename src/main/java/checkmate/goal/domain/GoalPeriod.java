@@ -27,16 +27,15 @@ public class GoalPeriod {
         this.endDate = endDate;
     }
 
-    double calcProgressedPercent() {
+    double getProgressedPercent() {
         return ProgressCalculator.calculate(getProgressedCount(), getTotalCount());
     }
 
-    Stream<LocalDate> getGoalPeriodStream() {
+    Stream<LocalDate> getFullPeriodStream() {
         return startDate.datesUntil(endDate.plusDays(1));
     }
 
-    // TODO: 2023/06/17 메소드명 변경 고려
-    Stream<LocalDate> getProgressedDateStream() {
+    Stream<LocalDate> getUntilTodayPeriodStream() {
         return isUninitiated() ? Stream.empty() : startDate.datesUntil(LocalDate.now());
     }
 
