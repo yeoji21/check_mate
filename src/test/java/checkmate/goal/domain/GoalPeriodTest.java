@@ -26,8 +26,8 @@ class GoalPeriodTest {
         GoalPeriod tomorrowStart = new GoalPeriod(today().plusDays(1), today().plusDays(2));
         GoalPeriod todayStart = new GoalPeriod(today(), today().plusDays(2));
 
-        assertThat(tomorrowStart.isUninitiated()).isTrue();
-        assertThat(todayStart.isUninitiated()).isFalse();
+        assertThat(tomorrowStart.isInitiated()).isFalse();
+        assertThat(todayStart.isInitiated()).isTrue();
     }
 
     @Test

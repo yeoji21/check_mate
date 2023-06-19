@@ -22,13 +22,15 @@ public class GoalPeriod {
     private LocalDate endDate;
 
     public GoalPeriod(LocalDate startDate, LocalDate endDate) {
-        validatePeriod(startDate, endDate);
         this.startDate = startDate;
         this.endDate = endDate;
+        if (isIncorrectPeriod()) {
+            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
+        }
     }
 
     double getProgressedPercent() {
-        return ProgressCalculator.calculate(getProgressedCount(), getTotalCount());
+        return ProgressCalculator.calculate(getPastDaysCount(), getTotalCount());
     }
 
     Stream<LocalDate> getFullPeriodStream() {
@@ -36,28 +38,26 @@ public class GoalPeriod {
     }
 
     Stream<LocalDate> getUntilTodayPeriodStream() {
-        return isUninitiated() ? Stream.empty() : startDate.datesUntil(LocalDate.now());
+        return isInitiated() ? startDate.datesUntil(LocalDate.now()) : Stream.empty();
     }
 
     boolean isBelongToPeriod(LocalDate date) {
-        return !isUninitiated() && !endDate.isBefore(date);
+        return isInitiated() && !endDate.isBefore(date);
     }
 
-    boolean isUninitiated() {
-        return startDate.isAfter(LocalDate.now());
+    boolean isInitiated() {
+        return !startDate.isAfter(LocalDate.now());
     }
 
-    private void validatePeriod(LocalDate startDate, LocalDate endDate) {
-        if (startDate.isAfter(endDate)) {
-            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
-        }
-    }
-
-    private int getProgressedCount() {
-        return isUninitiated() ? 0 : (int) (startDate.datesUntil(LocalDate.now()).count());
+    private int getPastDaysCount() {
+        return isInitiated() ? (int) (startDate.datesUntil(LocalDate.now()).count()) : 0;
     }
 
     private int getTotalCount() {
         return (int) (startDate.datesUntil(endDate.plusDays(1)).count());
+    }
+
+    private boolean isIncorrectPeriod() {
+        return startDate.isAfter(endDate);
     }
 }

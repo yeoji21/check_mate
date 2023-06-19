@@ -10,8 +10,9 @@ public class GoalJoiningPolicy {
     private static final double MAX_ACCEPTABLE_PERCENT = 25.0;
 
     public static void ongoingGoalCount(int count) {
-        if (count >= MAX_ONGOING_COUNT)
+        if (count >= MAX_ONGOING_COUNT) {
             throw new BusinessException(ErrorCode.EXCEED_GOAL_LIMIT);
+        }
     }
 
     public static boolean progressedPercent(double rate) {

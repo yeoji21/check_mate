@@ -76,7 +76,7 @@ public class Goal extends BaseTimeEntity {
         this.checkDays = checkDays;
         this.period = period;
         this.appointmentTime = appointmentTime;
-        this.status = period.isUninitiated() ? GoalStatus.WAITING : GoalStatus.ONGOING;
+        this.status = period.isInitiated() ? GoalStatus.ONGOING : GoalStatus.WAITING;
     }
 
     public void addCondition(VerificationCondition condition) {
