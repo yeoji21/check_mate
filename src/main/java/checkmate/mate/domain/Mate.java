@@ -99,11 +99,11 @@ public class Mate extends BaseTimeEntity {
     }
 
     public void plusCheckDayCount() {
-        attendance.plusCheckDayCount();
+        this.attendance = attendance.plusCheckDayCount();
     }
 
     public void minusCheckDayCount() {
-        attendance.minusCheckDayCount();
+        this.attendance = attendance.minusCheckDayCount();
     }
 
     public int getCheckDayCount() {
@@ -137,6 +137,7 @@ public class Mate extends BaseTimeEntity {
         }
     }
 
+    // TODO: 2023/06/21 Inner class가 맞는지
     @Getter
     public class Uploadable {
 

@@ -109,6 +109,7 @@ class PostTest {
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
 
+    // TODO: 2023/06/21 check, uncheck 테스트 목적 불분명
     @Test
     @DisplayName("게시글 인증 완료")
     void check() throws Exception {

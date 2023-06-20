@@ -17,11 +17,11 @@ public class MateAttendance {
     @Column(name = "skipped_day_count")
     private int skippedDayCount;
 
-    void plusCheckDayCount() {
-        checkDayCount++;
+    MateAttendance plusCheckDayCount() {
+        return new MateAttendance(checkDayCount + 1, skippedDayCount);
     }
 
-    void minusCheckDayCount() {
-        checkDayCount--;
+    MateAttendance minusCheckDayCount() {
+        return new MateAttendance(checkDayCount - 1, skippedDayCount);
     }
 }
