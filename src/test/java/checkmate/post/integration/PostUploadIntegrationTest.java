@@ -35,7 +35,7 @@ public class PostUploadIntegrationTest extends IntegrationTest {
         entityManager.persist(user);
         Mate mate = goal.createMate(user);
         entityManager.persist(mate);
-        int beforeWorkingDays = mate.getWorkingDays();
+        int beforeWorkingDays = mate.getCheckDayCount();
 
         entityManager.flush();
         entityManager.clear();
@@ -58,7 +58,7 @@ public class PostUploadIntegrationTest extends IntegrationTest {
 //        TestTransaction.end();
 
         Mate findMate = entityManager.find(Mate.class, mate.getId());
-        assertThat(findMate.getWorkingDays()).isGreaterThan(beforeWorkingDays);
+        assertThat(findMate.getCheckDayCount()).isGreaterThan(beforeWorkingDays);
     }
 
     private MockMultipartFile getMockMultipartFile(String filename) {

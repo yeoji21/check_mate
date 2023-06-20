@@ -57,13 +57,13 @@ public class Mate extends BaseTimeEntity {
     private MateStatus status;
     @NotNull
     @Embedded
-    private MateAttendance progress;
+    private MateAttendance attendance;
     private LocalDate lastUploadDate;
 
     public Mate(Goal goal, User user) {
         this.userId = user.getId();
         this.status = MateStatus.CREATED;
-        this.progress = new MateAttendance();
+        this.attendance = new MateAttendance();
         this.goal = goal;
     }
 
@@ -71,7 +71,7 @@ public class Mate extends BaseTimeEntity {
         goal.checkInviteable();
         status.checkStartable();
         status = MateStatus.ONGOING;
-        progress = new MateAttendance(goal.getProgressedWorkingDaysCount(), 0);
+        attendance = new MateAttendance(goal.getProgressedWorkingDaysCount(), 0);
     }
 
     public void receivedInvite() {
@@ -86,7 +86,7 @@ public class Mate extends BaseTimeEntity {
 
     // TODO: 2023/06/20 Progress? Check? Working? 용어 정리 필요
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(progress.getCheckDayCount(),
+        return ProgressCalculator.calculate(attendance.getCheckDayCount(),
             goal.getTotalWorkingDaysCount());
     }
 
@@ -99,19 +99,19 @@ public class Mate extends BaseTimeEntity {
     }
 
     public void plusCheckDayCount() {
-        progress.plusCheckDayCount();
+        attendance.plusCheckDayCount();
     }
 
     public void minusCheckDayCount() {
-        progress.minusCheckDayCount();
+        attendance.minusCheckDayCount();
     }
 
-    public int getWorkingDays() {
-        return progress.getCheckDayCount();
+    public int getCheckDayCount() {
+        return attendance.getCheckDayCount();
     }
 
-    public int getSkippedDays() {
-        return progress.getSkippedDayCount();
+    public int getSkippedDayCount() {
+        return attendance.getSkippedDayCount();
     }
 
     public enum MateStatus {

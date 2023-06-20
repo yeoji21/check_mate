@@ -124,7 +124,7 @@ class MateRepositoryTest extends RepositoryTest {
             .setParameter("mateIds",
                 List.of(mate1.getId(), mate2.getId(), mate3.getId(), mate4.getId()))
             .getResultList();
-        assertThat(findMates).allMatch(m -> m.getSkippedDays() == 1);
+        assertThat(findMates).allMatch(m -> m.getSkippedDayCount() == 1);
     }
 
     @Test
@@ -139,7 +139,7 @@ class MateRepositoryTest extends RepositoryTest {
 
         queryFactory.update(mate)
             .where(mate.id.in(mate1.getId(), mate2.getId()))
-            .set(mate.progress.skippedDayCount, 50)
+            .set(mate.attendance.skippedDayCount, 50)
             .execute();
 
         //when

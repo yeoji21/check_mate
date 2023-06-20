@@ -25,7 +25,7 @@ class MateTest {
         //given
         Mate mate = createMate();
         Mate progressedMate = createMate();
-        ReflectionTestUtils.setField(progressedMate.getProgress(), "checkDayCount", 10);
+        ReflectionTestUtils.setField(progressedMate.getAttendance(), "checkDayCount", 10);
 
         //when //then
         assertThat(mate.calcProgressPercent()).isZero();
@@ -230,8 +230,8 @@ class MateTest {
         mate.acceptInvite();
 
         //then
-        assertThat(mate.getWorkingDays()).isPositive();
-        assertThat(mate.getSkippedDays()).isZero();
+        assertThat(mate.getCheckDayCount()).isPositive();
+        assertThat(mate.getSkippedDayCount()).isZero();
     }
 
     private Mate createMate(Goal goal, MateStatus status) {

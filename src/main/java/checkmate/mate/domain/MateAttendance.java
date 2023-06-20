@@ -2,12 +2,13 @@ package checkmate.mate.domain;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@NoArgsConstructor
 @Embeddable
 public class MateAttendance {
 
@@ -15,11 +16,6 @@ public class MateAttendance {
     private int checkDayCount;
     @Column(name = "skipped_day_count")
     private int skippedDayCount;
-
-    public MateAttendance(int checkDayCount, int skippedDayCount) {
-        this.checkDayCount = checkDayCount;
-        this.skippedDayCount = skippedDayCount;
-    }
 
     void plusCheckDayCount() {
         checkDayCount++;

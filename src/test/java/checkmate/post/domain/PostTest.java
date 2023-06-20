@@ -114,14 +114,14 @@ class PostTest {
     void check() throws Exception {
         //given
         Post post = createPost();
-        int before = post.getMate().getWorkingDays();
+        int before = post.getMate().getCheckDayCount();
 
         //when
         post.updateCheckStatus();
 
         //then
         assertThat(post.isChecked()).isTrue();
-        assertThat(post.getMate().getWorkingDays()).isGreaterThan(before);
+        assertThat(post.getMate().getCheckDayCount()).isGreaterThan(before);
     }
 
     @Test
@@ -131,14 +131,14 @@ class PostTest {
         Post post = createPost();
         ReflectionTestUtils.setField(post, "checked", true);
         addConditionToGoal(post);
-        int before = post.getMate().getWorkingDays();
+        int before = post.getMate().getCheckDayCount();
 
         //when
         post.updateCheckStatus();
 
         //then
         assertThat(post.isChecked()).isFalse();
-        assertThat(post.getMate().getWorkingDays()).isLessThan(before);
+        assertThat(post.getMate().getCheckDayCount()).isLessThan(before);
     }
 
     private void addConditionToGoal(Post post) {

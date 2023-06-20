@@ -116,7 +116,7 @@ public class MateCommandService {
 
     private List<Mate> filterLimitOveredMates(List<Mate> hookyMates) {
         return hookyMates.stream()
-            .filter(tm -> tm.getSkippedDays() >= tm.getGoal().getSkippedDayLimit())
+            .filter(tm -> tm.getSkippedDayCount() >= tm.getGoal().getSkippedDayLimit())
             .toList();
     }
 
