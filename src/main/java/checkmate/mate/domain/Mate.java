@@ -57,13 +57,13 @@ public class Mate extends BaseTimeEntity {
     private MateStatus status;
     @NotNull
     @Embedded
-    private MateProgress progress;
+    private MateAttendance progress;
     private LocalDate lastUploadDate;
 
     public Mate(Goal goal, User user) {
         this.userId = user.getId();
         this.status = MateStatus.CREATED;
-        this.progress = new MateProgress();
+        this.progress = new MateAttendance();
         this.goal = goal;
     }
 
@@ -71,7 +71,7 @@ public class Mate extends BaseTimeEntity {
         goal.checkInviteable();
         status.checkStartable();
         status = MateStatus.ONGOING;
-        progress = new MateProgress(goal.getProgressedWorkingDaysCount(), 0);
+        progress = new MateAttendance(goal.getProgressedWorkingDaysCount(), 0);
     }
 
     public void receivedInvite() {
@@ -84,9 +84,9 @@ public class Mate extends BaseTimeEntity {
         status = MateStatus.REJECT;
     }
 
+    // TODO: 2023/06/20 Progress? Check? Working? 용어 정리 필요
     public double calcProgressPercent() {
-        return ProgressCalculator.calculate(
-            progress.getCheckDayCount(),
+        return ProgressCalculator.calculate(progress.getCheckDayCount(),
             goal.getTotalWorkingDaysCount());
     }
 
@@ -98,12 +98,12 @@ public class Mate extends BaseTimeEntity {
         lastUploadDate = LocalDate.now();
     }
 
-    public void plusWorkingDay() {
-        progress.plusWorkingDay();
+    public void plusCheckDayCount() {
+        progress.plusCheckDayCount();
     }
 
-    public void minusWorkingDay() {
-        progress.minusWorkingDay();
+    public void minusCheckDayCount() {
+        progress.minusCheckDayCount();
     }
 
     public int getWorkingDays() {

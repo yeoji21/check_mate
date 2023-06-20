@@ -132,6 +132,7 @@ public class Goal extends BaseTimeEntity {
             .collect(Collectors.joining());
     }
 
+    // TODO: 2023/06/20 메소드명 변경
     public int getTotalWorkingDaysCount() {
         return (int) period.getFullPeriodStream()
             .filter(date -> checkDays.isWorkingDay(date)).count();
