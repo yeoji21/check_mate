@@ -8,6 +8,7 @@ import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.Uploadable;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
@@ -108,7 +109,8 @@ public class PostCommandService {
     }
 
     private void validatePostUploadable(Mate uploader) {
-        Assert.isTrue(uploader.getUploadable().isUploadable(), uploader.getUploadable().toString());
+        Uploadable uploadable = new Uploadable(uploader);
+        Assert.isTrue(uploadable.isUploadable(), uploadable.toString());
     }
 
     private void publishImageUploadEvent(Post post, MultipartFile multipartFile)

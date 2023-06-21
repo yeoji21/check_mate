@@ -10,7 +10,6 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate.MateStatus;
-import checkmate.mate.domain.Mate.Uploadable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
@@ -36,12 +35,12 @@ class MateTest {
     @DisplayName("Uploadable 객체 생성 - 업로드 가능")
     void uploadable() throws Exception {
         //given //when
-        Uploadable uploadable = createMate().getUploadable();
+        Uploadable uploadable = new Uploadable(createMate());
 
         //then
         assertThat(uploadable.isUploadable()).isTrue();
         assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(uploadable.isWorkingDay()).isTrue();
+        assertThat(uploadable.isCheckDay()).isTrue();
         assertThat(uploadable.isTimeOver()).isFalse();
     }
 
@@ -53,12 +52,12 @@ class MateTest {
         mate.updatePostUploadedDate();
 
         //when
-        Uploadable uploadable = mate.getUploadable();
+        Uploadable uploadable = new Uploadable(mate);
 
         //then
         assertThat(uploadable.isUploadable()).isFalse();
         assertThat(uploadable.isUploaded()).isTrue();
-        assertThat(uploadable.isWorkingDay()).isTrue();
+        assertThat(uploadable.isCheckDay()).isTrue();
         assertThat(uploadable.isTimeOver()).isFalse();
     }
 
@@ -71,12 +70,12 @@ class MateTest {
         Mate mate = createMate(goal);
 
         //when
-        Uploadable uploadable = mate.getUploadable();
+        Uploadable uploadable = new Uploadable(mate);
 
         //then
         assertThat(uploadable.isUploadable()).isFalse();
         assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(uploadable.isWorkingDay()).isTrue();
+        assertThat(uploadable.isCheckDay()).isTrue();
         assertThat(uploadable.isTimeOver()).isTrue();
     }
 
@@ -89,12 +88,12 @@ class MateTest {
         Mate mate = createMate(goal);
 
         //when
-        Uploadable uploadable = mate.getUploadable();
+        Uploadable uploadable = new Uploadable(mate);
 
         //then
         assertThat(uploadable.isUploadable()).isFalse();
         assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(uploadable.isWorkingDay()).isFalse();
+        assertThat(uploadable.isCheckDay()).isFalse();
         assertThat(uploadable.isTimeOver()).isFalse();
     }
 

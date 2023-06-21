@@ -90,10 +90,6 @@ public class Mate extends BaseTimeEntity {
             goal.getTotalCheckDayCount());
     }
 
-    public Uploadable getUploadable() {
-        return this.new Uploadable();
-    }
-
     public void updatePostUploadedDate() {
         lastUploadDate = LocalDate.now();
     }
@@ -137,29 +133,4 @@ public class Mate extends BaseTimeEntity {
         }
     }
 
-    // TODO: 2023/06/21 Inner class가 맞는지
-    @Getter
-    public class Uploadable {
-
-        private boolean uploadable;
-        private boolean uploaded;
-        private boolean workingDay;
-        private boolean timeOver;
-
-        Uploadable() {
-            this.uploaded = lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now());
-            this.timeOver = goal.isTimeOver();
-            this.workingDay = goal.isTodayCheckDay();
-            this.uploadable = !uploaded && workingDay && !timeOver;
-        }
-
-        @Override
-        public String toString() {
-            return "{ uploadable = " + uploadable +
-                ", uploaded = " + uploaded +
-                ", workingDay = " + workingDay +
-                ", timeOver = " + timeOver +
-                " }";
-        }
-    }
 }

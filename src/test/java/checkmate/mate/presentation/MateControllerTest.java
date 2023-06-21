@@ -188,7 +188,7 @@ class MateControllerTest extends ControllerTest {
             fieldWithPath("inviteable").type(JsonFieldType.BOOLEAN).description("초대할 수 있는 목표인지"),
             fieldWithPath("uploadable.uploaded").description("목표를 조회한 유저가 이미 인증했는지"),
             fieldWithPath("uploadable.uploadable").description("목표를 조회한 유저가 목표를 인증할 수 있는지"),
-            fieldWithPath("uploadable.workingDay").description("인증하는 날이 맞는지"),
+            fieldWithPath("uploadable.checkDay").description("인증하는 날이 맞는지"),
             fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지"),
             fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
             fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
