@@ -20,7 +20,7 @@ public class GoalHistoryInfo implements Serializable {
     private LocalDate endDate;
     private LocalTime appointmentTime;
     private String checkDays;
-    private double achievementRate;
+    private double achievementPercent;
     private List<String> mateNicknames;
 
     @QueryProjection
@@ -33,8 +33,7 @@ public class GoalHistoryInfo implements Serializable {
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
         this.checkDays = goal.getCheckDays().toKorean();
-        ;
-        this.achievementRate = finder.calcProgressPercent();
+        this.achievementPercent = finder.calculateAchievementPercent();
     }
 
     public void setMateNicknames(List<String> mateNicknames) {

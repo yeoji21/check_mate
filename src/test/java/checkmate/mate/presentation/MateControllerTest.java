@@ -192,7 +192,8 @@ class MateControllerTest extends ControllerTest {
             fieldWithPath("uploadable.timeOver").description("인증 시간이 초과되었는지"),
             fieldWithPath("goalSchedule").type(JsonFieldType.STRING).description("목표 수행 일정"),
             fieldWithPath("mateSchedule").type(JsonFieldType.STRING).description("팀원의 목표 수행 일정"),
-            fieldWithPath("progress").type(JsonFieldType.NUMBER).description("팀원의 목표 수행 진행률")
+            fieldWithPath("achievementPercent").type(JsonFieldType.NUMBER)
+                .description("팀원의 목표 수행 진행률")
         );
     }
 

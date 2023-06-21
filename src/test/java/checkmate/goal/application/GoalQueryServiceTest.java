@@ -43,7 +43,7 @@ class GoalQueryServiceTest {
 
         //then
         assertThat(result.goals()).hasSize(2);
-        assertThat(result.goals()).allMatch(info -> info.getAchievementRate() >= 0.0);
+        assertThat(result.goals()).allMatch(info -> info.getAchievementPercent() >= 0.0);
         assertThat(result.goals()).allMatch(info -> info.getCheckDays() != null);
         assertThat(result.goals()).allMatch(info -> info.getMateNicknames().size() == 2);
     }

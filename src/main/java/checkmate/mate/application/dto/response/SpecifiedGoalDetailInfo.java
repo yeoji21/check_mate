@@ -25,7 +25,7 @@ public class SpecifiedGoalDetailInfo {
     private final Uploadable uploadable;
     private final String goalSchedule;
     private final String mateSchedule;
-    private final double progress;
+    private final double achievementPercent;
     private final List<MateUploadInfo> mates;
 
     public SpecifiedGoalDetailInfo(Mate mate,
@@ -45,8 +45,7 @@ public class SpecifiedGoalDetailInfo {
         this.goalSchedule = goal.getSchedule();
         this.mateSchedule = goal.getSchedule(uploadedDates);
         this.uploadable = mate.getUploadable();
-        this.progress = mate.calcProgressPercent();
-
+        this.achievementPercent = mate.calculateAchievementPercent();
         this.mates = mateUploadInfo;
     }
 

@@ -220,7 +220,7 @@ public class GoalControllerTest extends ControllerTest {
             fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
             fieldWithPath("goals[].appointmentTime").type(JsonFieldType.STRING)
                 .description("목표 인증 시간").optional(),
-            fieldWithPath("goals[].achievementRate").type(JsonFieldType.NUMBER)
+            fieldWithPath("goals[].achievementPercent").type(JsonFieldType.NUMBER)
                 .description("유저의 최종 성취율"),
             fieldWithPath("goals[].mateNicknames").type(JsonFieldType.ARRAY).description("팀원들의 닉네임")
         );
