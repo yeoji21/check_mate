@@ -157,7 +157,7 @@ class GoalTest {
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
         //when
-        int futureCount = goal.getProgressedWorkingDaysCount();
+        int futureCount = goal.getProgressedCheckDayCount();
         //then
         assertThat(futureCount).isEqualTo(10);
     }

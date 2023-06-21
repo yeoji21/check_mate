@@ -49,7 +49,7 @@ public class GoalCheckDays {
 
     public static List<Integer> getAllMatchingWeekDayValues(LocalDate date) {
         return IntStream.rangeClosed(1, 128)
-            .filter(weekDays -> CheckDaysConverter.isWorkingDay(weekDays, date))
+            .filter(weekDays -> CheckDaysConverter.isCheckDay(weekDays, date))
             .boxed()
             .toList();
     }
@@ -67,8 +67,8 @@ public class GoalCheckDays {
             "중복 요일");
     }
 
-    public boolean isWorkingDay(LocalDate date) {
-        return CheckDaysConverter.isWorkingDay(checkDays, date);
+    public boolean isCheckDay(LocalDate date) {
+        return CheckDaysConverter.isCheckDay(checkDays, date);
     }
 
     public int toInt() {
@@ -102,7 +102,7 @@ public class GoalCheckDays {
 
         static String toKorean(int weekDays) {
             return Arrays.stream(values())
-                .filter(day -> isWorkingDay(weekDays, day.shift))
+                .filter(day -> isCheckDay(weekDays, day.shift))
                 .map(day -> day.kor)
                 .collect(Collectors.joining());
         }
@@ -115,15 +115,15 @@ public class GoalCheckDays {
             return weekDays;
         }
 
-        static boolean isWorkingDay(int weekDays, LocalDate date) {
-            return isWorkingDay(weekDays, valueOf(date).shift);
+        static boolean isCheckDay(int weekDays, LocalDate date) {
+            return isCheckDay(weekDays, valueOf(date).shift);
         }
 
         static CheckDaysConverter valueOf(LocalDate date) {
             return CheckDaysConverter.valueOf(date.getDayOfWeek().toString());
         }
 
-        private static boolean isWorkingDay(int weekDays, int date) {
+        private static boolean isCheckDay(int weekDays, int date) {
             return (weekDays & (1 << date)) != 0;
         }
     }

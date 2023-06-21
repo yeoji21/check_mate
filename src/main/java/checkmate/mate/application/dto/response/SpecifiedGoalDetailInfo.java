@@ -45,7 +45,7 @@ public class SpecifiedGoalDetailInfo {
         this.goalSchedule = goal.getSchedule();
         this.mateSchedule = goal.getSchedule(uploadedDates);
         this.uploadable = mate.getUploadable();
-        this.achievementPercent = mate.calculateAchievementPercent();
+        this.achievementPercent = mate.getAchievementPercent();
         this.mates = mateUploadInfo;
     }
 

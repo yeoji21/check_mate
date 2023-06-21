@@ -74,11 +74,11 @@ class CheckDaysConverterTest {
     }
 
     private void isNotWorkingDay(int value, LocalDate date) {
-        assertThat(CheckDaysConverter.isWorkingDay(value, date)).isFalse();
+        assertThat(CheckDaysConverter.isCheckDay(value, date)).isFalse();
     }
 
     private void isWorkingDay(int value, LocalDate date) {
-        assertThat(CheckDaysConverter.isWorkingDay(value, date)).isTrue();
+        assertThat(CheckDaysConverter.isCheckDay(value, date)).isTrue();
     }
 
     private void isEqualTo(String weekDay, int value) {

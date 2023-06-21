@@ -89,11 +89,11 @@ public class Goal extends BaseTimeEntity {
     }
 
     public int getSkippedDayLimit() {
-        return (int) (getTotalWorkingDaysCount() * 0.1 + 1);
+        return getTotalCheckDayCount() / 10 + 1;
     }
 
-    public boolean isTodayWorkingDay() {
-        return period.isBelongToPeriod(LocalDate.now()) && checkDays.isWorkingDay(LocalDate.now());
+    public boolean isTodayCheckDay() {
+        return period.isBelongToPeriod(LocalDate.now()) && checkDays.isCheckDay(LocalDate.now());
     }
 
     public boolean isTimeOver() {
@@ -122,25 +122,24 @@ public class Goal extends BaseTimeEntity {
     // 책임 위임
     public String getSchedule() {
         return period.getFullPeriodStream()
-            .map(date -> checkDays.isWorkingDay(date) ? "1" : "0")
+            .map(date -> checkDays.isCheckDay(date) ? "1" : "0")
             .collect(Collectors.joining());
     }
 
     public String getSchedule(List<LocalDate> uploadedDates) {
         return period.getFullPeriodStream()
-            .map(date -> checkDays.isWorkingDay(date) && uploadedDates.contains(date) ? "1" : "0")
+            .map(date -> checkDays.isCheckDay(date) && uploadedDates.contains(date) ? "1" : "0")
             .collect(Collectors.joining());
     }
 
-    // TODO: 2023/06/20 메소드명 변경
-    public int getTotalWorkingDaysCount() {
+    public int getTotalCheckDayCount() {
         return (int) period.getFullPeriodStream()
-            .filter(date -> checkDays.isWorkingDay(date)).count();
+            .filter(date -> checkDays.isCheckDay(date)).count();
     }
 
-    public int getProgressedWorkingDaysCount() {
+    public int getProgressedCheckDayCount() {
         return (int) period.getUntilTodayPeriodStream()
-            .filter(date -> checkDays.isWorkingDay(date)).count();
+            .filter(date -> checkDays.isCheckDay(date)).count();
     }
 
     public LocalDate getStartDate() {

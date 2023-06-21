@@ -116,7 +116,7 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(todayGoals).hasSize(1);
         assertThat(todayGoals).allMatch(goal ->
-            GoalCheckDays.ofKorean(goal.getCheckDays()).isWorkingDay(LocalDate.now()));
+            GoalCheckDays.ofKorean(goal.getCheckDays()).isCheckDay(LocalDate.now()));
     }
 
     @Test

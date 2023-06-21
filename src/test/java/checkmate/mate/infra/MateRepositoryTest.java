@@ -99,7 +99,7 @@ class MateRepositoryTest extends RepositoryTest {
         assertThat(mates).hasSize(2);
         assertThat(mates)
             .allMatch(m -> GoalCheckDays.ofKorean(m.getGoal().getCheckDays().toKorean())
-                .isWorkingDay(LocalDate.now().minusDays(1)))
+                .isCheckDay(LocalDate.now().minusDays(1)))
             .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
             .allMatch(m -> m.getStatus() == MateStatus.ONGOING)
             .allMatch(m -> m.getGoal().getStatus() == GoalStatus.ONGOING);

@@ -33,7 +33,7 @@ public class GoalHistoryInfo implements Serializable {
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
         this.checkDays = goal.getCheckDays().toKorean();
-        this.achievementPercent = finder.calculateAchievementPercent();
+        this.achievementPercent = finder.getAchievementPercent();
     }
 
     public void setMateNicknames(List<String> mateNicknames) {

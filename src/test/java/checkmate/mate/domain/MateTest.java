@@ -28,8 +28,8 @@ class MateTest {
         ReflectionTestUtils.setField(progressedMate.getAttendance(), "checkDayCount", 10);
 
         //when //then
-        assertThat(mate.calculateAchievementPercent()).isZero();
-        assertThat(progressedMate.calculateAchievementPercent()).isPositive();
+        assertThat(mate.getAchievementPercent()).isZero();
+        assertThat(progressedMate.getAchievementPercent()).isPositive();
     }
 
     @Test
