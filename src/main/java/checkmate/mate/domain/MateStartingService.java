@@ -1,6 +1,8 @@
 package checkmate.mate.domain;
 
-import checkmate.goal.domain.GoalJoiningPolicy;
+import checkmate.exception.BusinessException;
+import checkmate.exception.code.ErrorCode;
+import checkmate.goal.domain.GoalPolicyConstants;
 import checkmate.user.infrastructure.UserQueryDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,8 +14,14 @@ public class MateStartingService {
     private final UserQueryDao userQueryDao;
 
     public void startToGoal(Mate mate) {
-        int ongoingGoalCount = userQueryDao.countOngoingGoals(mate.getUserId());
-        GoalJoiningPolicy.ongoingGoalCount(ongoingGoalCount);
+        if (isOverOngoingGoalLimit(mate)) {
+            throw new BusinessException(ErrorCode.EXCEED_GOAL_LIMIT);
+        }
         mate.acceptInvite();
+    }
+
+    private boolean isOverOngoingGoalLimit(Mate mate) {
+        return userQueryDao.countOngoingGoals(mate.getUserId())
+            >= GoalPolicyConstants.ONGOING_GOAL_COUNT_LIMIT;
     }
 }
