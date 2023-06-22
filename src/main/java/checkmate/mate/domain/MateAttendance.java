@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
-public class MateAttendance {
+class MateAttendance {
 
     @Column(name = "check_day_count")
     private int checkDayCount;

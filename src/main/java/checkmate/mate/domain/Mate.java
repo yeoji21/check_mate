@@ -84,7 +84,6 @@ public class Mate extends BaseTimeEntity {
         status = MateStatus.REJECT;
     }
 
-    // TODO: 2023/06/20 Progress? Check? Working? 용어 정리 필요
     public double getAchievementPercent() {
         return ProgressCalculator.calculate(attendance.getCheckDayCount(),
             goal.getTotalCheckDayCount());
