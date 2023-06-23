@@ -88,7 +88,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public int getSkippedDayLimit() {
-        return getTotalCheckDayCount() / 10 + 1;
+        return getTotalCheckDayCount() / GoalPolicyConstants.GOAL_SKIP_LIMIT_PERCENT + 1;
     }
 
     public boolean isTodayCheckDay() {
