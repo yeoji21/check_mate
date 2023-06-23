@@ -15,5 +15,5 @@ public interface GoalRepository {
 
     void updateStatusToOver(List<Long> goalIds);
 
-    void updateTodayStartStatus();
+    void updateTodayStartGoalsToOngoing();
 }

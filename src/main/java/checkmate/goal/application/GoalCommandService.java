@@ -70,27 +70,28 @@ public class GoalCommandService {
     @Transactional
     public void addLikeCountCondition(LikeCountCreateCommand command) {
         Goal goal = findGoal(command.goalId());
-        goal.addCondition(createLikeCountCondition(command.likeCount()));
+        goal.addCondition(new LikeCountCondition(command.likeCount()));
     }
 
     @Transactional
     public void updateTodayStartGoals() {
-        goalRepository.updateTodayStartStatus();
+        goalRepository.updateTodayStartGoalsToOngoing();
     }
 
     @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
         goalRepository.updateStatusToOver(overedGoalIds);
-        cacheHandler.deleteUserCaches(publishCompleteGoalNotifications(overedGoalIds));
+        publishCompleteGoalEvent(overedGoalIds);
     }
 
-    private List<Long> publishCompleteGoalNotifications(List<Long> overedGoalIds) {
-        List<CompleteGoalNotificationDto> notificationDtos = goalQueryDao.findCompleteNotificationDto(
-            overedGoalIds);
+    private void publishCompleteGoalEvent(List<Long> overedGoalIds) {
+        List<CompleteGoalNotificationDto> notificationDtos =
+            goalQueryDao.findCompleteNotificationDto(overedGoalIds);
         eventPublisher.publishEvent(
             new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDtos));
-        return notificationDtos.stream().map(dto -> dto.getUserId()).toList();
+        cacheHandler.deleteUserCaches(
+            notificationDtos.stream().map(dto -> dto.getUserId()).toList());
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {
@@ -107,10 +108,6 @@ public class GoalCommandService {
         Mate mate = goal.createMate(findUser(userId));
         mate.receivedInvite();
         return mate;
-    }
-
-    private LikeCountCondition createLikeCountCondition(int count) {
-        return new LikeCountCondition(count);
     }
 
     private Goal findGoal(long goalId) {

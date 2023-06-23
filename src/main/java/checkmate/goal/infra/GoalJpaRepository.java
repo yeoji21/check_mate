@@ -47,7 +47,7 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public void updateTodayStartStatus() {
+    public void updateTodayStartGoalsToOngoing() {
         queryFactory.update(goal)
             .where(goal.period.startDate.eq(LocalDate.now()),
                 goal.status.eq(GoalStatus.WAITING))

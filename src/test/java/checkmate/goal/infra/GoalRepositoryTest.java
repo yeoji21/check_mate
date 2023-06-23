@@ -97,7 +97,7 @@ class GoalRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        goalRepository.updateTodayStartStatus();
+        goalRepository.updateTodayStartGoalsToOngoing();
 
         //then
         assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(
