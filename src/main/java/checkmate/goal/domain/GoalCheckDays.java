@@ -80,7 +80,7 @@ public class GoalCheckDays {
     }
 
     @RequiredArgsConstructor
-    public enum CheckDaysConverter {
+    enum CheckDaysConverter {
         MONDAY(0, "월"),
         TUESDAY(1, "화"),
         WEDNESDAY(2, "수"),
