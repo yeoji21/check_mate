@@ -1,8 +1,8 @@
 package checkmate.mate.application.dto.response;
 
-import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
+import checkmate.goal.domain.GoalScheduleService;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,24 +19,17 @@ public class MateScheduleInfo {
 
     @QueryProjection
     @Builder
-    public MateScheduleInfo(LocalDate startDate,
+    public MateScheduleInfo(
+        LocalDate startDate,
         LocalDate endDate,
         int weekDays,
         List<LocalDate> uploadedDates) {
-        Goal goal = createGoal(startDate, endDate, weekDays);
         this.startDate = startDate;
         this.endDate = endDate;
-        this.goalSchedule = goal.getSchedule();
-        this.mateSchedule = goal.getSchedule(uploadedDates);
-        if (goalSchedule.length() != mateSchedule.length()) {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    private Goal createGoal(LocalDate startDate, LocalDate endDate, int weekDays) {
-        return Goal.builder()
-            .checkDays(GoalCheckDays.ofValue(weekDays))
-            .period(new GoalPeriod(startDate, endDate))
-            .build();
+        GoalCheckDays checkDays = GoalCheckDays.ofValue(weekDays);
+        GoalPeriod period = new GoalPeriod(startDate, endDate);
+        this.goalSchedule = GoalScheduleService.createGoalSchedule(period, checkDays);
+        this.mateSchedule = GoalScheduleService.createCheckedSchedule(period, checkDays,
+            uploadedDates);
     }
 }

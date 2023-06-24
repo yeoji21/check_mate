@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -115,20 +114,6 @@ public class Goal extends BaseTimeEntity {
         if (!isInviteable()) {
             throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
         }
-    }
-
-    // TODO: 2023/06/14 GoalSchedule 클래스 생성 고려
-    // 책임 위임
-    public String getSchedule() {
-        return period.getFullPeriodStream()
-            .map(date -> checkDays.isCheckDay(date) ? "1" : "0")
-            .collect(Collectors.joining());
-    }
-
-    public String getSchedule(List<LocalDate> uploadedDates) {
-        return period.getFullPeriodStream()
-            .map(date -> checkDays.isCheckDay(date) && uploadedDates.contains(date) ? "1" : "0")
-            .collect(Collectors.joining());
     }
 
     public int getTotalCheckDayCount() {

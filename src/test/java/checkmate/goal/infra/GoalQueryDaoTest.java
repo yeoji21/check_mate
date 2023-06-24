@@ -12,6 +12,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
+import checkmate.goal.domain.GoalScheduleService;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
@@ -99,7 +100,9 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(goalScheduleInfo.getStartDate()).isEqualTo(goal.getStartDate());
         assertThat(goalScheduleInfo.getEndDate()).isEqualTo(goal.getEndDate());
-        assertThat(goalScheduleInfo.getSchedule()).isEqualTo(goal.getSchedule());
+        assertThat(goalScheduleInfo.getSchedule())
+            .isEqualTo(
+                GoalScheduleService.createGoalSchedule(goal.getPeriod(), goal.getCheckDays()));
     }
 
     @Test

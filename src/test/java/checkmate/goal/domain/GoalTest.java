@@ -110,18 +110,19 @@ class GoalTest {
         assertThat(goal.getAppointmentTime().isBefore(LocalTime.now())).isTrue();
     }
 
+    // TODO: 2023/06/25 개선
     @Test
     @DisplayName("땡땡이 최대치 조회")
     void getHookyDayLimit() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
+
         //when
         int skippedDayLimit = goal.getSkippedDayLimit();
+
         //then
         assertThat(skippedDayLimit).isEqualTo(5);
-        assertThat(skippedDayLimit).isLessThan(goal.getSchedule().length());
-        assertThat(skippedDayLimit).isGreaterThan(goal.getSchedule().length() / 10);
     }
 
     @Test

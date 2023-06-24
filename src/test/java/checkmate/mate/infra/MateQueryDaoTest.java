@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
+import checkmate.goal.domain.GoalScheduleService;
 import checkmate.mate.application.dto.response.MateScheduleInfo;
 import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.domain.Mate;
@@ -69,7 +70,7 @@ class MateQueryDaoTest extends RepositoryTest {
         //given
         Goal goal = createGoal();
         Mate mate = createMate(goal, "user");
-        createPost(mate);
+        Post post = createPost(mate);
 
         em.flush();
         em.clear();
@@ -80,8 +81,13 @@ class MateQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(info.getStartDate()).isEqualTo(goal.getStartDate());
-        assertThat(info.getGoalSchedule()).isEqualTo(goal.getSchedule());
-        assertThat(info.getMateSchedule().length()).isEqualTo(info.getGoalSchedule().length());
+        assertThat(info.getGoalSchedule())
+            .isEqualTo(
+                GoalScheduleService.createGoalSchedule(goal.getPeriod(), goal.getCheckDays()));
+        assertThat(info.getMateSchedule())
+            .isEqualTo(
+                GoalScheduleService.createCheckedSchedule(goal.getPeriod(), goal.getCheckDays(),
+                    List.of(post.getCreatedDate())));
     }
 
     @Test
