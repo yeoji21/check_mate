@@ -1,8 +1,8 @@
 package checkmate.goal.application.dto.response;
 
-import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
+import checkmate.goal.domain.GoalScheduleService;
 import com.querydsl.core.annotations.QueryProjection;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -18,19 +18,17 @@ public class GoalScheduleInfo implements Serializable {
 
     @Builder
     @QueryProjection
-    public GoalScheduleInfo(LocalDate startDate,
+    public GoalScheduleInfo(
+        LocalDate startDate,
         LocalDate endDate,
         int weekDays) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.schedule = getSchedule(startDate, endDate, weekDays);
+        this.schedule = getGoalSchedule(startDate, endDate, weekDays);
     }
 
-    private String getSchedule(LocalDate startDate, LocalDate endDate, int weekDays) {
-        return Goal.builder()
-            .checkDays(GoalCheckDays.ofValue(weekDays))
-            .period(new GoalPeriod(startDate, endDate))
-            .build()
-            .getSchedule();
+    private String getGoalSchedule(LocalDate startDate, LocalDate endDate, int weekDays) {
+        return GoalScheduleService.createGoalSchedule(new GoalPeriod(startDate, endDate),
+            GoalCheckDays.ofValue(weekDays));
     }
 }
