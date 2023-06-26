@@ -1,15 +1,15 @@
 package checkmate.notification.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import checkmate.TestEntityFactory;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 class NotificationTest {
+
     @Test
     @DisplayName("attribute 값 추가")
     void addAttribute() throws Exception {
@@ -22,7 +22,8 @@ class NotificationTest {
 
         //then
         assertThat(notification.getLongAttribute(NotificationAttributeKey.GOAL_ID)).isEqualTo(123);
-        assertThat(notification.getStringAttribute(NotificationAttributeKey.MATE_ID)).isEqualTo("value");
+        assertThat(notification.getStringAttribute(NotificationAttributeKey.MATE_ID)).isEqualTo(
+            "value");
     }
 
     @Test
@@ -33,12 +34,12 @@ class NotificationTest {
 
         //when
         Notification notification = Notification.builder()
-                .userId(1L)
-                .type(NotificationType.INVITE_GOAL)
-                .title("title")
-                .content("content")
-                .receivers(receivers)
-                .build();
+            .userId(1L)
+            .type(NotificationType.INVITE_SEND)
+            .title("title")
+            .content("content")
+            .receivers(receivers)
+            .build();
 
         //then
         assertThat(notification.getReceivers()).hasSameElementsAs(receivers);
@@ -54,6 +55,6 @@ class NotificationTest {
     }
 
     private Notification createNotification() {
-        return TestEntityFactory.notification(1L, 1L, NotificationType.INVITE_GOAL);
+        return TestEntityFactory.notification(1L, 1L, NotificationType.INVITE_SEND);
     }
 }

@@ -1,11 +1,24 @@
 package checkmate.notification.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+
 import checkmate.notification.application.dto.NotificationQueryMapper;
 import checkmate.notification.application.dto.response.NotificationAttributeInfo;
-import checkmate.notification.domain.*;
+import checkmate.notification.domain.Notification;
+import checkmate.notification.domain.NotificationAttributeKey;
+import checkmate.notification.domain.NotificationReceiver;
+import checkmate.notification.domain.NotificationRepository;
+import checkmate.notification.domain.NotificationType;
 import checkmate.notification.infrastructure.NotificationQueryDao;
 import checkmate.notification.presentation.dto.NotificationAttributeInfoResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,18 +29,9 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-
 @ExtendWith(MockitoExtension.class)
 class NotificationQueryServiceTest {
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Mock
     private NotificationRepository notificationRepository;
@@ -51,11 +55,13 @@ class NotificationQueryServiceTest {
         Notification notification = createNotification(receiver, NotificationType.POST_UPLOAD);
         notification.addAttribute(NotificationAttributeKey.GOAL_ID, 1L);
 
-        given(notificationRepository.findReceiver(any(Long.class), any(Long.class))).willReturn(Optional.of(receiver));
+        given(notificationRepository.findReceiver(any(Long.class), any(Long.class))).willReturn(
+            Optional.of(receiver));
 
         //when
         NotificationAttributeInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
-        HashMap<String, Long> attributes = objectMapper.readValue(info.getAttributes(), HashMap.class);
+        HashMap<String, Long> attributes = objectMapper.readValue(info.getAttributes(),
+            HashMap.class);
 
         //then
         assertThat(receiver.isChecked()).isTrue();
@@ -69,10 +75,10 @@ class NotificationQueryServiceTest {
     void findNotificationReceiver_invite_goal() throws Exception {
         //given
         NotificationReceiver receiver = new NotificationReceiver(1L);
-        Notification notification = createNotification(receiver, NotificationType.INVITE_GOAL);
+        Notification notification = createNotification(receiver, NotificationType.INVITE_SEND);
 
         given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
-                .willReturn(Optional.of(receiver));
+            .willReturn(Optional.of(receiver));
 
         //when
         NotificationAttributeInfo info = notificationQueryService.findNotificationInfo(1L, 2L);
@@ -88,15 +94,18 @@ class NotificationQueryServiceTest {
     void findGoalCompleteNotifications() throws Exception {
         //given
         List<NotificationReceiver> receivers = createNotificationReceivers();
-        given(notificationRepository.findUncheckedReceivers(anyLong(), any())).willReturn(receivers);
+        given(notificationRepository.findUncheckedReceivers(anyLong(), any())).willReturn(
+            receivers);
 
         //when
-        NotificationAttributeInfoResult result = notificationQueryService.findGoalCompleteNotifications(1L);
+        NotificationAttributeInfoResult result = notificationQueryService.findGoalCompleteNotifications(
+            1L);
 
         //then
         assertThat(result.getNotifications().size()).isEqualTo(receivers.size());
         assertThat(receivers).allMatch(receiver -> receiver.isChecked());
-        assertThat(result.getNotifications()).allMatch(noti -> noti.getType().equals(NotificationType.COMPLETE_GOAL.name()));
+        assertThat(result.getNotifications()).allMatch(
+            noti -> noti.getType().equals(NotificationType.COMPLETE_GOAL.name()));
     }
 
     private List<NotificationReceiver> createNotificationReceivers() {
@@ -105,23 +114,23 @@ class NotificationQueryServiceTest {
             receivers.add(new NotificationReceiver(i));
         }
         Notification.builder()
-                .title("title")
-                .content("content")
-                .type(NotificationType.COMPLETE_GOAL)
-                .userId(1L)
-                .receivers(receivers)
-                .build();
+            .title("title")
+            .content("content")
+            .type(NotificationType.COMPLETE_GOAL)
+            .userId(1L)
+            .receivers(receivers)
+            .build();
         return receivers;
     }
 
     private Notification createNotification(NotificationReceiver receiver,
-                                            NotificationType type) {
+        NotificationType type) {
         return Notification.builder()
-                .userId(1L)
-                .title("title")
-                .content("body")
-                .type(type)
-                .receivers(List.of(receiver))
-                .build();
+            .userId(1L)
+            .title("title")
+            .content("body")
+            .type(type)
+            .receivers(List.of(receiver))
+            .build();
     }
 }

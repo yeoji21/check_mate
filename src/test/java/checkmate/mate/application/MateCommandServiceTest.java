@@ -187,7 +187,7 @@ public class MateCommandServiceTest {
         NotificationReceiver receiver = new NotificationReceiver(mate.getUserId());
         Notification notification = Notification.builder()
             .userId(inviter.getId())
-            .type(NotificationType.INVITE_GOAL)
+            .type(NotificationType.INVITE_SEND)
             .title("title")
             .content("content")
             .receivers(List.of(receiver))

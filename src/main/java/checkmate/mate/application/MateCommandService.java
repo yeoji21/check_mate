@@ -2,8 +2,8 @@ package checkmate.mate.application;
 
 import static checkmate.notification.domain.NotificationType.EXPULSION_GOAL;
 import static checkmate.notification.domain.NotificationType.INVITE_ACCEPT;
-import static checkmate.notification.domain.NotificationType.INVITE_GOAL;
 import static checkmate.notification.domain.NotificationType.INVITE_REJECT;
+import static checkmate.notification.domain.NotificationType.INVITE_SEND;
 
 import checkmate.common.cache.CacheHandler;
 import checkmate.common.cache.CacheKey;
@@ -128,7 +128,7 @@ public class MateCommandService {
     }
 
     private void publishInviteSendEvent(MateInviteCommand command, Mate invitee) {
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_SEND,
             createInviteSendNotificationDto(invitee, command)));
     }
 

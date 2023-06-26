@@ -9,11 +9,11 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MateInviteNotificationFactory extends NotificationFactory<InviteSendNotificationDto> {
+public class InviteSendNotificationFactory extends NotificationFactory<InviteSendNotificationDto> {
 
     @Override
     public NotificationType getType() {
-        return NotificationType.INVITE_GOAL;
+        return NotificationType.INVITE_SEND;
     }
 
     @Override
