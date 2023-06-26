@@ -80,7 +80,7 @@ public class MateCommandServiceTest {
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.of("inviter"));
 
         //when
-        mateCommandService.inviteMate(command);
+        mateCommandService.sendInvite(command);
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.WAITING);
@@ -101,7 +101,7 @@ public class MateCommandServiceTest {
         given(userRepository.findNicknameById(any(Long.class))).willReturn(Optional.of("inviter"));
 
         //when
-        mateCommandService.inviteMate(command);
+        mateCommandService.sendInvite(command);
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.WAITING);
@@ -130,7 +130,7 @@ public class MateCommandServiceTest {
         }).when(mateStartingService).startToGoal(any(Mate.class));
 
         //when
-        MateAcceptResult result = mateCommandService.inviteAccept(command);
+        MateAcceptResult result = mateCommandService.acceptInvite(command);
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.ONGOING);
@@ -156,7 +156,7 @@ public class MateCommandServiceTest {
             Optional.ofNullable("invitee"));
 
         //when
-        mateCommandService.inviteReject(
+        mateCommandService.rejectInvite(
             new MateInviteReplyCommand(inviteeMate.getUserId(), notification.getId()));
 
         //then

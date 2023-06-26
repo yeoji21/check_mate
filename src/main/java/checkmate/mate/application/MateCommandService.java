@@ -24,9 +24,9 @@ import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
+import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
 import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
-import checkmate.notification.domain.factory.dto.NotificationCreateDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import java.util.List;
@@ -53,11 +53,10 @@ public class MateCommandService {
     private final MateCommandMapper mapper;
 
     @Transactional
-    public void inviteMate(MateInviteCommand command) {
-        Mate invitee = findOrCreateMate(command.goalId(), command.inviteeNickname());
+    public void sendInvite(MateInviteCommand command) {
+        Mate invitee = findOrCreateMateToInvite(command.goalId(), command.inviteeNickname());
         invitee.receivedInvite();
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
-            createInviteGoalNotificationDto(invitee, command)));
+        publishInviteSendEvent(command, invitee);
     }
 
     @Caching(evict = {
@@ -69,26 +68,22 @@ public class MateCommandService {
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @Transactional
-    public MateAcceptResult inviteAccept(MateInviteReplyCommand command) {
+    public MateAcceptResult acceptInvite(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(),
             command.userId());
-        Mate mate = find(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
+        Mate mate = findMate(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
         mateStartingService.startToGoal(mate);
-
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
-            createInviteAcceptNotificationDto(mate, notification.getUserId())));
+        publishInviteAcceptEvent(notification, mate);
         return mapper.toResult(mate);
     }
 
     @Transactional
-    public void inviteReject(MateInviteReplyCommand command) {
+    public void rejectInvite(MateInviteReplyCommand command) {
         Notification notification = findAndReadNotification(command.notificationId(),
             command.userId());
-        Mate mate = find(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
+        Mate mate = findMate(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
         mate.rejectInvite();
-
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,
-            createInviteRejectNotificationDto(mate, notification.getUserId())));
+        publishInviteRejectEvent(notification, mate);
     }
 
     @Transactional
@@ -99,6 +94,42 @@ public class MateCommandService {
 
         publishExpulsionNotifications(limitOveredMates);
         cacheHandler.deleteUserCaches(limitOveredMates.stream().map(Mate::getUserId).toList());
+    }
+
+    private Mate findOrCreateMateToInvite(long goalId, String inviteeNickname) {
+        User invitee = userRepository.findByNickname(inviteeNickname)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        return mateRepository.findWithGoal(goalId, invitee.getId())
+            .orElseGet(() -> createAndSaveMate(goalId, invitee));
+    }
+
+    private Mate createAndSaveMate(long goalId, User invitee) {
+        Goal goal = goalRepository.findById(goalId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+        return mateRepository.save(goal.createMate(invitee));
+    }
+
+    private Notification findAndReadNotification(long notificationId, long userId) {
+        NotificationReceiver receiver = notificationRepository.findReceiver(notificationId, userId)
+            .orElseThrow(
+                () -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
+        receiver.read();
+        return receiver.getNotification();
+    }
+
+    private void publishInviteRejectEvent(Notification notification, Mate mate) {
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_REJECT,
+            createInviteRejectNotificationDto(mate, notification.getUserId())));
+    }
+
+    private void publishInviteAcceptEvent(Notification notification, Mate mate) {
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_ACCEPT,
+            createInviteAcceptNotificationDto(mate, notification.getUserId())));
+    }
+
+    private void publishInviteSendEvent(MateInviteCommand command, Mate invitee) {
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_GOAL,
+            createInviteSendNotificationDto(invitee, command)));
     }
 
     private List<Mate> updateYesterdaySkippedMates() {
@@ -120,35 +151,13 @@ public class MateCommandService {
             .toList();
     }
 
-    private Mate findOrCreateMate(long goalId, String inviteeNickname) {
-        User invitee = userRepository.findByNickname(inviteeNickname)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
-
-        // TODO: 2023/05/01 로직
-        return mateRepository.findWithGoal(goalId, invitee.getId())
-            .orElseGet(() -> {
-                Goal goal = goalRepository.findById(goalId)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-                return mateRepository.save(goal.createMate(invitee));
-            });
-    }
-
-    private Notification findAndReadNotification(long notificationId, long inviteeUserId) {
-        NotificationReceiver receiver = notificationRepository.findReceiver(notificationId,
-                inviteeUserId)
-            .orElseThrow(
-                () -> new NotFoundException(ErrorCode.NOTIFICATION_NOT_FOUND, notificationId));
-        receiver.read();
-        return receiver.getNotification();
-    }
-
-    private MateInviteNotificationDto createInviteGoalNotificationDto(Mate inviteeMate,
+    private MateInviteNotificationDto createInviteSendNotificationDto(Mate inviteeMate,
         MateInviteCommand command) {
         return mapper.toNotificationDto(command.inviterUserId(),
             findNickname(command.inviterUserId()), inviteeMate);
     }
 
-    private NotificationCreateDto createInviteAcceptNotificationDto(Mate invitee,
+    private InviteAcceptNotificationDto createInviteAcceptNotificationDto(Mate invitee,
         long inviterUserId) {
         return mapper.toAcceptNotificationDto(invitee, findNickname(invitee.getUserId()),
             inviterUserId);
@@ -165,8 +174,8 @@ public class MateCommandService {
             .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND, userId));
     }
 
-    private Mate find(long teamMateId) {
-        return mateRepository.findById(teamMateId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, teamMateId));
+    private Mate findMate(long mateId) {
+        return mateRepository.findById(mateId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mateId));
     }
 }

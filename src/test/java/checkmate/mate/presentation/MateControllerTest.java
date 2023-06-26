@@ -72,7 +72,7 @@ class MateControllerTest extends ControllerTest {
                 pathParameters(parameterWithName("goalId").description("목표 ID")),
                 inviteRequestFieldsSnippet()
             ));
-        verify(mateCommandService).inviteMate(any());
+        verify(mateCommandService).sendInvite(any());
     }
 
     @WithMockAuthUser
@@ -81,7 +81,7 @@ class MateControllerTest extends ControllerTest {
     void inviteAccept() throws Exception {
         MateInviteReplyDto dto = new MateInviteReplyDto(1L);
         MateAcceptResult result = new MateAcceptResult(1L, 1L);
-        given(mateCommandService.inviteAccept(any())).willReturn(result);
+        given(mateCommandService.acceptInvite(any())).willReturn(result);
 
         mockMvc.perform(RestDocumentationRequestBuilders.patch("/mates/accept")
                 .with(csrf())
