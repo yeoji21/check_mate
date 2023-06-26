@@ -26,7 +26,7 @@ import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
-import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
+import checkmate.notification.domain.factory.dto.InviteSendNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import java.util.List;
@@ -151,10 +151,10 @@ public class MateCommandService {
             .toList();
     }
 
-    private MateInviteNotificationDto createInviteSendNotificationDto(Mate inviteeMate,
+    private InviteSendNotificationDto createInviteSendNotificationDto(Mate invitee,
         MateInviteCommand command) {
         return mapper.toNotificationDto(command.inviterUserId(),
-            findNickname(command.inviterUserId()), inviteeMate);
+            findNickname(command.inviterUserId()), invitee);
     }
 
     private InviteAcceptNotificationDto createInviteAcceptNotificationDto(Mate invitee,

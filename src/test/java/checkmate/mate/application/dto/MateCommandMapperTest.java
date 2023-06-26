@@ -8,7 +8,7 @@ import checkmate.mate.domain.Mate;
 import checkmate.notification.domain.factory.dto.ExpulsionGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
-import checkmate.notification.domain.factory.dto.MateInviteNotificationDto;
+import checkmate.notification.domain.factory.dto.InviteSendNotificationDto;
 import checkmate.user.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -67,7 +67,7 @@ class MateCommandMapperTest extends MapperTest {
         ReflectionTestUtils.setField(invitee, "id", 4L);
 
         //when
-        MateInviteNotificationDto dto = mapper.toNotificationDto(inviter.getId(),
+        InviteSendNotificationDto dto = mapper.toNotificationDto(inviter.getId(),
             inviter.getNickname(), invitee);
 
         //then
