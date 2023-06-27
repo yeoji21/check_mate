@@ -2,6 +2,8 @@ package checkmate.goal.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class GoalTest {
@@ -41,10 +44,9 @@ class GoalTest {
 
         //when //then
         assertThat(assertThrows(BusinessException.class,
-            () -> goal.modify(
-                GoalModifyEvent.builder()
-                    .endDate(goal.getEndDate().minusDays(1))
-                    .build())
+            () -> goal.modify(GoalModifyEvent.builder()
+                .endDate(goal.getEndDate().minusDays(1))
+                .build())
         ).getErrorCode()).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
     }
 
@@ -91,15 +93,13 @@ class GoalTest {
 
         //when //then
         assertThat(assertThrows(BusinessException.class,
-            () -> goal.modify(
-                GoalModifyEvent.builder()
-                    .appointmentTime(LocalTime.MAX)
-                    .build())).getErrorCode())
+            () -> goal.modify(GoalModifyEvent.builder()
+                .appointmentTime(LocalTime.MAX)
+                .build())).getErrorCode())
             .isEqualTo(ErrorCode.UPDATE_DURATION);
     }
 
     @Test
-    @DisplayName("인증 시간 경과")
     void isTimeOverTrue() throws Exception {
         //given
         Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
@@ -113,7 +113,6 @@ class GoalTest {
     }
 
     @Test
-    @DisplayName("인증 시간 경과")
     void isTimeOverFalse() throws Exception {
         //given
         Goal goal = createGoalWithAppointmentTime(LocalTime.MAX);
@@ -124,6 +123,18 @@ class GoalTest {
         //then
         assertThat(timeOver).isFalse();
         assertThat(goal.getAppointmentTime().isAfter(LocalTime.now())).isTrue();
+    }
+
+    @Test
+    void isTimeOverWhenEmptyAppointmentTime() throws Exception {
+        //given
+        Goal goal = createGoal();
+
+        //when
+        boolean timeOver = goal.isTimeOver();
+
+        //then
+        assertThat(timeOver).isFalse();
     }
 
     @Test
@@ -191,17 +202,47 @@ class GoalTest {
     }
 
     @Test
-    @DisplayName("기본 인증 조건 검사")
-    void checkConditions() throws Exception {
+    void checkConditionsTrue() throws Exception {
         //given
         Goal goal = createGoal();
-        Post post = createPost(goal);
+
+        goal.addCondition(createSuccessCondition());
+        goal.addCondition(createSuccessCondition());
+        goal.addCondition(createSuccessCondition());
 
         //when
-        boolean check = goal.checkConditions(post);
+        boolean check = goal.checkConditions(createPost(goal));
 
         //then
         assertThat(check).isTrue();
+    }
+
+    @Test
+    void checkConditionsFalse() throws Exception {
+        //given
+        Goal goal = createGoal();
+
+        goal.addCondition(createFailCondition());
+        goal.addCondition(createSuccessCondition());
+        goal.addCondition(createSuccessCondition());
+
+        //when
+        boolean check = goal.checkConditions(createPost(goal));
+
+        //then
+        assertThat(check).isFalse();
+    }
+
+    private VerificationCondition createFailCondition() {
+        VerificationCondition condition = Mockito.mock(VerificationCondition.class);
+        when(condition.satisfy(any(Post.class))).thenReturn(false);
+        return condition;
+    }
+
+    private VerificationCondition createSuccessCondition() {
+        VerificationCondition condition = Mockito.mock(VerificationCondition.class);
+        when(condition.satisfy(any(Post.class))).thenReturn(true);
+        return condition;
     }
 
     @Test
@@ -250,9 +291,36 @@ class GoalTest {
 
         //when
         boolean check = goal.checkConditions(post);
-        
+
         //then
         assertThat(check).isFalse();
+    }
+
+    @Test
+    void isTodayCheckDayTrue() throws Exception {
+        //given
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal, "checkDays", GoalCheckDays.ofKorean("월화수목금토일"));
+
+        //when
+        boolean isCheckDay = goal.isTodayCheckDay();
+
+        //then
+        assertThat(isCheckDay).isTrue();
+    }
+
+    @Test
+    void isTodayCheckDayFalse() throws Exception {
+        //given
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal, "checkDays",
+            GoalCheckDays.ofLocalDates(LocalDate.now().minusDays(1)));
+
+        //when
+        boolean isCheckDay = goal.isTodayCheckDay();
+
+        //then
+        assertThat(isCheckDay).isFalse();
     }
 
     private Post createPost(Goal goal) {
