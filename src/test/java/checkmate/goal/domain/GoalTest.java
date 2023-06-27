@@ -1,14 +1,12 @@
 package checkmate.goal.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.mate.domain.Mate;
 import checkmate.post.domain.Post;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,154 +19,183 @@ class GoalTest {
 
     @Test
     @DisplayName("목표 종료일 업데이트")
-    void endDate_update() throws Exception {
+    void modifyEndDateSuccess() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        GoalModifyEvent request = getEndDateModifyRequest(goal);
+        Goal goal = createGoal();
+        GoalModifyEvent modifyEvent = GoalModifyEvent.builder()
+            .endDate(goal.getEndDate().plusDays(10))
+            .build();
+
         //when
-        LocalDate beforeEndDate = goal.getEndDate();
-        goal.modify(request);
+        goal.modify(modifyEvent);
+
         //then
-        assertThat(beforeEndDate).isNotEqualTo(request.getEndDate());
-        assertThat(goal.getEndDate()).isEqualTo(request.getEndDate());
+        assertThat(goal.getEndDate()).isEqualTo(modifyEvent.getEndDate());
     }
 
     @Test
     @DisplayName("목표 종료일 업데이트 실패 - 기존 종료일 이전으로 변경할 수 없음")
-    void endDate_update_fail() throws Exception {
+    void modifyEndDateWhenEarlyEndDate() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        //when
-        BusinessException exception = assertThrows(BusinessException.class,
-            () -> goal.modify(GoalModifyEvent.builder()
-                .endDate(goal.getEndDate().minusDays(1))
-                .build())
-        );
-        //then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
+        Goal goal = createGoal();
+
+        //when //then
+        assertThat(assertThrows(BusinessException.class,
+            () -> goal.modify(
+                GoalModifyEvent.builder()
+                    .endDate(goal.getEndDate().minusDays(1))
+                    .build())
+        ).getErrorCode()).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
     }
 
     @Test
     @DisplayName("목표 수행 제한시간 제거 업데이트 성공")
-    void timeReset_update() throws Exception {
+    void modifyRemoveAppointmentTime() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
-        GoalModifyEvent request = GoalModifyEvent.builder()
+        Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
+
+        GoalModifyEvent modifyEvent = GoalModifyEvent.builder()
             .timeReset(true)
             .build();
+
         //when
-        goal.modify(request);
+        goal.modify(modifyEvent);
+
         //then
         assertThat(goal.getAppointmentTime()).isNull();
     }
 
     @Test
     @DisplayName("목표 수행 제한시간 업데이트 성공")
-    void appointmentTime_update() throws Exception {
+    void modifyAppointmentTime() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
-        LocalTime beforeAppointmentTime = goal.getAppointmentTime();
-        GoalModifyEvent request = GoalModifyEvent.builder()
+        Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
+
+        GoalModifyEvent modifyEvent = GoalModifyEvent.builder()
             .appointmentTime(LocalTime.MAX)
             .build();
+
         //when
-        goal.modify(request);
+        goal.modify(modifyEvent);
 
         //then
-        assertThat(beforeAppointmentTime).isNotEqualTo(request.getAppointmentTime());
-        assertThat(goal.getAppointmentTime()).isEqualTo(request.getAppointmentTime());
+        assertThat(goal.getAppointmentTime()).isEqualTo(modifyEvent.getAppointmentTime());
     }
 
     @Test
     @DisplayName("목표 업데이트 실패 - 업데이트 가능한 기간이 아닌 경우")
-    void update_fail() throws Exception {
+    void modifyFailBecauseModifyDeadline() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Goal goal = createGoal();
         ReflectionTestUtils.setField(goal, "modifiedDateTime", LocalDateTime.now().minusDays(1));
-        GoalModifyEvent request = GoalModifyEvent.builder()
-            .appointmentTime(LocalTime.MAX)
-            .build();
-        //when
-        BusinessException exception = assertThrows(BusinessException.class,
-            () -> goal.modify(request));
-        //then
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.UPDATE_DURATION);
+
+        //when //then
+        assertThat(assertThrows(BusinessException.class,
+            () -> goal.modify(
+                GoalModifyEvent.builder()
+                    .appointmentTime(LocalTime.MAX)
+                    .build())).getErrorCode())
+            .isEqualTo(ErrorCode.UPDATE_DURATION);
     }
 
     @Test
     @DisplayName("인증 시간 경과")
-    void isTimeOver() throws Exception {
+    void isTimeOverTrue() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
-        ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
+        Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
+
         //when
         boolean timeOver = goal.isTimeOver();
+
         //then
         assertThat(timeOver).isTrue();
         assertThat(goal.getAppointmentTime().isBefore(LocalTime.now())).isTrue();
     }
 
-    // TODO: 2023/06/25 개선
+    @Test
+    @DisplayName("인증 시간 경과")
+    void isTimeOverFalse() throws Exception {
+        //given
+        Goal goal = createGoalWithAppointmentTime(LocalTime.MAX);
+
+        //when
+        boolean timeOver = goal.isTimeOver();
+
+        //then
+        assertThat(timeOver).isFalse();
+        assertThat(goal.getAppointmentTime().isAfter(LocalTime.now())).isTrue();
+    }
+
     @Test
     @DisplayName("땡땡이 최대치 조회")
-    void getHookyDayLimit() throws Exception {
+    void getSkippedDayLimit() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal, "period", new GoalPeriod(
+            LocalDate.now().minusDays(10),
+            LocalDate.now().plusDays(10)));
 
         //when
         int skippedDayLimit = goal.getSkippedDayLimit();
 
         //then
-        assertThat(skippedDayLimit).isEqualTo(5);
+        assertThat(skippedDayLimit).isEqualTo(3);
     }
 
     @Test
     @DisplayName("목표 초대 가능 여부 - 초대 가능")
-    void isInviteable_true() throws Exception {
+    void isInviteableTrue() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Goal goal = createGoal();
 
-        //when //then
-        assertThat(goal.isInviteable()).isTrue();
-        assertDoesNotThrow(goal::checkInviteable);
+        //when
+        boolean inviteable = goal.isInviteable();
+
+        // then
+        assertThat(inviteable).isTrue();
+        assertThat(goal.getPeriod().getProgressedPercent()).isLessThan(
+            GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT);
     }
 
     @Test
     @DisplayName("목표 초대 가능 여부 - 초대 불가능")
-    void isInviteable_false() throws Exception {
+    void isInviteableFalseBecauseProgressPercent() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
             LocalDate.now().minusDays(200L));
 
-        //when //then
-        assertThat(goal.isInviteable()).isFalse();
-        NotInviteableGoalException exception = assertThrows(NotInviteableGoalException.class,
-            goal::checkInviteable);
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
+        //when
+        boolean inviteable = goal.isInviteable();
+
+        // then
+        assertThat(inviteable).isFalse();
+        assertThat(
+            assertThrows(NotInviteableGoalException.class, goal::checkInviteable).getErrorCode()
+        ).isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
     @Test
     @DisplayName("목표 진행 일 수")
-    void progressedWorkingDaysCount() throws Exception {
+    void getProgressedCheckDayCount() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
+        Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
+        ReflectionTestUtils.setField(goal, "checkDays", GoalCheckDays.ofKorean("월화수목금토일"));
+
         //when
-        int futureCount = goal.getProgressedCheckDayCount();
+        int progressedCheckDayCount = goal.getProgressedCheckDayCount();
+
         //then
-        assertThat(futureCount).isEqualTo(10);
+        assertThat(progressedCheckDayCount).isEqualTo(10);
     }
 
     @Test
     @DisplayName("기본 인증 조건 검사")
     void checkConditions() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Post post = TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
+        Goal goal = createGoal();
+        Post post = createPost(goal);
 
         //when
         boolean check = goal.checkConditions(post);
@@ -179,16 +206,17 @@ class GoalTest {
 
     @Test
     @DisplayName("좋아요 개수 인증 조건 검사 - 성공")
-    void checkLikeConditions_success() throws Exception {
+    void checkLikeConditionsSuccess() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         goal.addCondition(new LikeCountCondition(5));
-        Post post = TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
+
+        Post post = createPost(goal);
         for (int i = 0; i < 5; i++) {
             post.addLikes(i);
         }
-        //when
 
+        //when
         boolean check = goal.checkConditions(post);
 
         //then
@@ -197,41 +225,48 @@ class GoalTest {
 
     @Test
     @DisplayName("좋아요 개수 인증 조건 검사 - 실패")
-    void checkLikeConditions_fail() throws Exception {
+    void checkLikeConditionsFailWhenInsufficientLikes() throws Exception {
         //given
         Goal goal = TestEntityFactory.goal(1L, "test");
         goal.addCondition(new LikeCountCondition(5));
-        Post post = TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
+
+        Post post = createPost(goal);
+
         //when
         goal.checkConditions(post);
+
         //then
         assertThat(post.isChecked()).isFalse();
     }
 
     @Test
     @DisplayName("좋아요 개수 인증 조건 검사 - 성공 후 실패")
-    void checkLikeConditions_fail_after_success() throws Exception {
+    void checkLikeConditionsFailAfterSuccess() throws Exception {
         //given
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Goal goal = createGoal();
         goal.addCondition(new LikeCountCondition(3));
-        Post post = getCheckedPost(goal.createMate(TestEntityFactory.user(1L, "user")));
+        Post post = createPost(goal);
         ReflectionTestUtils.setField(post, "checked", true);
+
         //when
         boolean check = goal.checkConditions(post);
+        
         //then
         assertThat(check).isFalse();
     }
 
-    private GoalModifyEvent getEndDateModifyRequest(Goal goal) {
-        return GoalModifyEvent.builder()
-            .endDate(goal.getEndDate().plusDays(10))
-            .build();
+    private Post createPost(Goal goal) {
+        return TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
     }
 
-    private Post getCheckedPost(Mate mate) {
-        Post post = TestEntityFactory.post(mate);
-        ReflectionTestUtils.setField(post, "checked", true);
-        return post;
+    private Goal createGoal() {
+        return TestEntityFactory.goal(1L, "goal");
+    }
+
+    private Goal createGoalWithAppointmentTime(LocalTime appointmentTime) {
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal, "appointmentTime", appointmentTime);
+        return goal;
     }
 
 }

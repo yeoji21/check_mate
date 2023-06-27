@@ -74,7 +74,7 @@ public class Mate extends BaseTimeEntity {
         attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
     }
 
-    public void receivedInvite() {
+    public void receiveInvite() {
         goal.checkInviteable();
         status.checkInviteable();
         status = MateStatus.WAITING;
@@ -89,7 +89,7 @@ public class Mate extends BaseTimeEntity {
             goal.getTotalCheckDayCount());
     }
 
-    public void updatePostUploadedDate() {
+    public void updateLastUpdateDate() {
         lastUploadDate = LocalDate.now();
     }
 

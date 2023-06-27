@@ -49,7 +49,7 @@ class MateTest {
     void uploaded() throws Exception {
         //given
         Mate mate = createMate();
-        mate.updatePostUploadedDate();
+        mate.updateLastUpdateDate();
 
         //when
         Uploadable uploadable = new Uploadable(mate);
@@ -117,7 +117,7 @@ class MateTest {
         Mate mate = createMate();
 
         //when
-        mate.receivedInvite();
+        mate.receiveInvite();
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.WAITING);
@@ -132,10 +132,10 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> ongoingMate.receivedInvite()).getErrorCode())
+            () -> ongoingMate.receiveInvite()).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
         assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> successMate.receivedInvite()).getErrorCode())
+            () -> successMate.receiveInvite()).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
     }
 
@@ -147,7 +147,7 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> waitingMate.receivedInvite()).getErrorCode())
+            () -> waitingMate.receiveInvite()).getErrorCode())
             .isEqualTo(ErrorCode.DUPLICATED_INVITE);
     }
 
@@ -162,7 +162,7 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> mate.receivedInvite()).getErrorCode())
+            () -> mate.receiveInvite()).getErrorCode())
             .isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
@@ -257,7 +257,7 @@ class MateTest {
 
     private Mate createWaitingStatusMate() {
         Mate mate = createMate(createGoal());
-        mate.receivedInvite();
+        mate.receiveInvite();
         return mate;
     }
 }

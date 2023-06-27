@@ -107,7 +107,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isInviteable() {
-        return period.getProgressedPercent() <= GoalPolicyConstants.MAX_ACCEPTABLE_PERCENT;
+        return period.getProgressedPercent() <= GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT;
     }
 
     public void checkInviteable() {

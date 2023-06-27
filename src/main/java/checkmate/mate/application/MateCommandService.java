@@ -55,7 +55,7 @@ public class MateCommandService {
     @Transactional
     public void sendInvite(MateInviteCommand command) {
         Mate invitee = findOrCreateMateToInvite(command.goalId(), command.inviteeNickname());
-        invitee.receivedInvite();
+        invitee.receiveInvite();
         publishInviteSendEvent(command, invitee);
     }
 

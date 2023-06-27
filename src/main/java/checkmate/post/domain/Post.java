@@ -60,11 +60,11 @@ public class Post extends BaseTimeEntity {
     private List<Likes> likes = new ArrayList<>();
 
     @Builder
-    protected Post(Mate mate, String content) {
+    public Post(Mate mate, String content) {
         this.mate = mate;
         this.content = content;
         images = new Images();
-        mate.updatePostUploadedDate();
+        mate.updateLastUpdateDate();
     }
 
     void addImage(Image image) {
