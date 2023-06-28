@@ -42,7 +42,7 @@ public class GoalPeriod {
     }
 
     boolean isBelongToPeriod(LocalDate date) {
-        return isInitiated() && !endDate.isBefore(date);
+        return !startDate.isAfter(date) && !endDate.isBefore(date);
     }
 
     boolean isInitiated() {
