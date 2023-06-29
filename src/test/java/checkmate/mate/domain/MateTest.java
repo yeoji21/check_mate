@@ -8,10 +8,9 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalPeriod;
 import checkmate.mate.domain.Mate.MateStatus;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -19,82 +18,54 @@ import org.springframework.test.util.ReflectionTestUtils;
 class MateTest {
 
     @Test
-    @DisplayName("팀원 목표 진행률 계산")
-    void calcProgressPercent() throws Exception {
-        //given
-        Mate mate = createMate();
-        Mate progressedMate = createMate();
-        ReflectionTestUtils.setField(progressedMate.getAttendance(), "checkDayCount", 10);
-
-        //when //then
-        assertThat(mate.getAchievementPercent()).isZero();
-        assertThat(progressedMate.getAchievementPercent()).isPositive();
-    }
-
-    @Test
-    @DisplayName("Uploadable 객체 생성 - 업로드 가능")
-    void uploadable() throws Exception {
-        //given //when
-        Uploadable uploadable = new Uploadable(createMate());
-
-        //then
-        assertThat(uploadable.isUploadable()).isTrue();
-        assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(uploadable.isCheckDay()).isTrue();
-        assertThat(uploadable.isTimeOver()).isFalse();
-    }
-
-    @Test
-    @DisplayName("Uploadable 객체 생성 - 이미 업로드")
-    void uploaded() throws Exception {
-        //given
-        Mate mate = createMate();
-        mate.updateLastUpdateDate();
-
-        //when
-        Uploadable uploadable = new Uploadable(mate);
-
-        //then
-        assertThat(uploadable.isUploadable()).isFalse();
-        assertThat(uploadable.isUploaded()).isTrue();
-        assertThat(uploadable.isCheckDay()).isTrue();
-        assertThat(uploadable.isTimeOver()).isFalse();
-    }
-
-    @Test
-    @DisplayName("Uploadable 객체 생성 - 인증 시간 초과")
-    void uploadableTimeOver() throws Exception {
+    void getAchievementPercentAs100() throws Exception {
         //given
         Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "appointmentTime", LocalTime.MIN);
+        GoalPeriod period = new GoalPeriod(todayMinusDays(9), today());
+        ReflectionTestUtils.setField(goal, "period", period);
+
         Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(mate.getAttendance(), "checkDayCount", 10);
 
         //when
-        Uploadable uploadable = new Uploadable(mate);
+        double achievementPercent = mate.getAchievementPercent();
 
         //then
-        assertThat(uploadable.isUploadable()).isFalse();
-        assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(uploadable.isCheckDay()).isTrue();
-        assertThat(uploadable.isTimeOver()).isTrue();
+        assertThat(achievementPercent).isEqualTo(100.0);
     }
 
     @Test
-    @DisplayName("Uploadable 객체 생성 - 인증 요일이 아님")
-    void isNotWorkingDay() throws Exception {
+    void getAchievementPercentAs0() throws Exception {
         //given
         Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "checkDays", tomorrowCheckDay());
+        GoalPeriod period = new GoalPeriod(todayMinusDays(9), today());
+        ReflectionTestUtils.setField(goal, "period", period);
+
         Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(mate.getAttendance(), "checkDayCount", 0);
 
         //when
-        Uploadable uploadable = new Uploadable(mate);
+        double achievementPercent = mate.getAchievementPercent();
 
         //then
-        assertThat(uploadable.isUploadable()).isFalse();
-        assertThat(uploadable.isUploaded()).isFalse();
-        assertThat(uploadable.isCheckDay()).isFalse();
-        assertThat(uploadable.isTimeOver()).isFalse();
+        assertThat(achievementPercent).isZero();
+    }
+
+    @Test
+    void getAchievementPercentAs50() throws Exception {
+        //given
+        Goal goal = createGoal();
+        GoalPeriod period = new GoalPeriod(todayMinusDays(9), today());
+        ReflectionTestUtils.setField(goal, "period", period);
+
+        Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(mate.getAttendance(), "checkDayCount", 5);
+
+        //when
+        double achievementPercent = mate.getAchievementPercent();
+
+        //then
+        assertThat(achievementPercent).isEqualTo(50.0);
     }
 
     @Test
@@ -158,7 +129,7 @@ class MateTest {
         Goal goal = createGoal();
         Mate mate = createMate(goal);
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
-            LocalDate.now().minusDays(20));
+            todayMinusDays(20));
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
@@ -209,7 +180,7 @@ class MateTest {
         Goal goal = createGoal();
         Mate mate = createMate(goal);
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
-            LocalDate.now().minusDays(20));
+            todayMinusDays(20));
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
@@ -222,7 +193,7 @@ class MateTest {
         //given
         Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
-            LocalDate.now().minusDays(5));
+            todayMinusDays(5));
         Mate mate = createMate(goal, MateStatus.WAITING);
 
         //when
@@ -233,14 +204,18 @@ class MateTest {
         assertThat(mate.getSkippedDayCount()).isZero();
     }
 
+    private LocalDate todayMinusDays(int daysToSubtract) {
+        return today().minusDays(daysToSubtract);
+    }
+
+    private LocalDate today() {
+        return LocalDate.now();
+    }
+
     private Mate createMate(Goal goal, MateStatus status) {
         Mate mate = createMate(goal);
         ReflectionTestUtils.setField(mate, "status", status);
         return mate;
-    }
-
-    private GoalCheckDays tomorrowCheckDay() {
-        return GoalCheckDays.ofLocalDates(LocalDate.now().plusDays(1));
     }
 
     private Mate createMate(Goal goal) {
@@ -253,11 +228,5 @@ class MateTest {
 
     private Mate createMate() {
         return createMate(createGoal());
-    }
-
-    private Mate createWaitingStatusMate() {
-        Mate mate = createMate(createGoal());
-        mate.receiveInvite();
-        return mate;
     }
 }
