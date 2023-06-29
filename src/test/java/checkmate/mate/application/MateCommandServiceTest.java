@@ -146,6 +146,7 @@ public class MateCommandServiceTest {
     void inviteReject() throws Exception {
         //given
         Mate inviteeMate = createMate();
+        ReflectionTestUtils.setField(inviteeMate, "status", MateStatus.WAITING);
         Notification notification = createInviteNotification(inviteeMate);
         NotificationReceiver receiver = notification.getReceivers().get(0);
 

@@ -69,16 +69,27 @@ class MateTest {
     }
 
     @Test
-    @DisplayName("Reject Status로 변경")
-    void toRejectStatus() throws Exception {
+    void rejectInviteWhenWaitingStatus() throws Exception {
         //given
-        Mate mate = createMate();
+        Mate mate = createMate(createGoal(), MateStatus.WAITING);
 
         //when
         mate.rejectInvite();
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.REJECT);
+    }
+
+    @Test
+    void rejectInviteWhenInvalidStatus() throws Exception {
+        //given
+        Mate mate = createMate(createGoal(), MateStatus.ONGOING);
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class, mate::rejectInvite);
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 
     @Test

@@ -81,6 +81,7 @@ public class Mate extends BaseTimeEntity {
     }
 
     public void rejectInvite() {
+        status.checkRejectable();
         status = MateStatus.REJECT;
     }
 
@@ -126,6 +127,12 @@ public class Mate extends BaseTimeEntity {
         }
 
         void checkStartable() {
+            if (this != WAITING) {
+                throw new BusinessException(INVALID_MATE_STATUS);
+            }
+        }
+
+        public void checkRejectable() {
             if (this != WAITING) {
                 throw new BusinessException(INVALID_MATE_STATUS);
             }
