@@ -6,10 +6,11 @@ import checkmate.mate.application.dto.request.MateInviteReplyCommand;
 import org.junit.jupiter.api.Test;
 
 class MateDtoMapperTest extends MapperTest {
+
     private static final MateDtoMapper mapper = MateDtoMapper.INSTANCE;
 
     @Test
-    void teamMateInviteCommand() throws Exception {
+    void toMateInviteCommand() throws Exception {
         //given
         MateInviteDto dto = new MateInviteDto("nickname");
         long goalId = 1L;
@@ -25,7 +26,7 @@ class MateDtoMapperTest extends MapperTest {
     }
 
     @Test
-    void teamMateInviteReplyCommand() throws Exception {
+    void toMateInviteReplyCommand() throws Exception {
         //given
         MateInviteReplyDto dto = new MateInviteReplyDto(1L);
         long userId = 2L;

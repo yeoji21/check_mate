@@ -5,6 +5,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -29,7 +32,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
 import org.springframework.restdocs.payload.ResponseFieldsSnippet;
@@ -45,8 +47,7 @@ class MateControllerTest extends ControllerTest {
         given(mateQueryService.findSpecifiedGoalDetailInfo(any(Long.class), any(Long.class)))
             .willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders
-                .get("/goals/{goalId}/detail", 1L)
+        mockMvc.perform(get("/goals/{goalId}/detail", 1L)
                 .with(csrf())
                 .contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -61,15 +62,15 @@ class MateControllerTest extends ControllerTest {
     @Test
     @DisplayName("팀원 초대 API")
     void inviteToGoal() throws Exception {
-        MateInviteDto request = new MateInviteDto("yeoz1");
+        MateInviteDto dto = new MateInviteDto("yeoz1");
 
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/goals/{goalId}/mates", 1L)
+        mockMvc.perform(post("/goals/{goalId}/mates", 1L)
                 .with(csrf())
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isOk())
             .andDo(document("mate-invite",
-                pathParameters(parameterWithName("goalId").description("목표 ID")),
+                goalIdPathParametersSnippet(),
                 inviteRequestFieldsSnippet()
             ));
         verify(mateCommandService).sendInvite(any());
@@ -83,7 +84,7 @@ class MateControllerTest extends ControllerTest {
         MateAcceptResult result = new MateAcceptResult(1L, 1L);
         given(mateCommandService.acceptInvite(any())).willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mates/accept")
+        mockMvc.perform(patch("/mates/accept")
                 .with(csrf())
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dto)))
@@ -98,12 +99,12 @@ class MateControllerTest extends ControllerTest {
     @Test
     @DisplayName("초대 응답 거절")
     void inviteReject() throws Exception {
-        MateInviteReplyDto request = new MateInviteReplyDto(1L);
+        MateInviteReplyDto dto = new MateInviteReplyDto(1L);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.patch("/mates/reject")
+        mockMvc.perform(patch("/mates/reject")
                 .with(csrf())
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(dto)))
             .andExpect(status().isOk())
             .andDo(document("mate-invite-reject",
                 inviteReplyRequestFieldsSnippet()
@@ -114,14 +115,14 @@ class MateControllerTest extends ControllerTest {
     @Test
     @DisplayName("목표 수행 캘린더 조회 API")
     void findMateCalender() throws Exception {
-        MateScheduleInfo calendarInfo = getMateScheduleInfo();
-        given(mateQueryService.findCalenderInfo(1L)).willReturn(calendarInfo);
+        MateScheduleInfo result = getMateScheduleInfo();
+        given(mateQueryService.findCalenderInfo(1L)).willReturn(result);
 
-        mockMvc.perform(RestDocumentationRequestBuilders.get("/mates/{mateId}/calendar", 1L)
+        mockMvc.perform(get("/mates/{mateId}/calendar", 1L)
                 .with(csrf())
                 .contentType(APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(content().json(objectMapper.writeValueAsString(calendarInfo)))
+            .andExpect(content().json(objectMapper.writeValueAsString(result)))
             .andDo(document("mate-calender",
                 mateCalenderPathParametersSnippet(),
                 nateCalenderResponseFieldsSnippet()
