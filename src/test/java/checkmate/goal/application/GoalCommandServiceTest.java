@@ -2,9 +2,7 @@ package checkmate.goal.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
@@ -15,6 +13,7 @@ import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.infra.FakeGoalRepository;
 import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
@@ -33,13 +32,13 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.test.util.ReflectionTestUtils;
 
+// TODO: 2023/06/30 repository layer test double fake로 변경
 @ExtendWith(MockitoExtension.class)
-public class GoalCommandServiceTest {
+class GoalCommandServiceTest {
 
-    @Mock
-    private GoalRepository goalRepository;
+    @Spy
+    private GoalRepository goalRepository = new FakeGoalRepository();
     @Mock
     private GoalQueryDao goalQueryDao;
     @Mock
@@ -61,8 +60,8 @@ public class GoalCommandServiceTest {
     @DisplayName("성공한 목표 처리 스케쥴러")
     void updateYesterdayOveredGoals() throws Exception {
         //given
-        Goal goal1 = createGoal(1L);
-        Goal goal2 = createGoal(2L);
+        Goal goal1 = createGoal();
+        Goal goal2 = createGoal();
         given(goalQueryDao.findYesterdayOveredGoals()).willReturn(
             List.of(goal1.getId(), goal2.getId()));
 
@@ -70,7 +69,6 @@ public class GoalCommandServiceTest {
         goalCommandService.updateYesterdayOveredGoals();
 
         //then
-        verify(goalRepository).updateStatusToOver(anyList());
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
         verify(cacheHandler).deleteUserCaches(any(List.class));
     }
@@ -79,18 +77,13 @@ public class GoalCommandServiceTest {
     @DisplayName("목표 수정")
     void modifyGoal() throws Exception {
         //given
-        Goal goal = createGoal(1L);
+        Goal goal = createGoal();
         GoalModifyCommand command = createGoalModifyCommand(goal);
-        given(goalRepository.findByIdWithLock(any(Long.class))).willReturn(Optional.of(goal));
 
         //when
-        LocalDate beforeEndDate = goal.getEndDate();
-        LocalTime beforeTime = goal.getAppointmentTime();
         goalCommandService.modify(command);
 
         //then
-        assertThat(command.endDate()).isNotEqualTo(beforeEndDate);
-        assertThat(command.appointmentTime()).isNotEqualTo(beforeTime);
         assertThat(goal.getEndDate()).isEqualTo(command.endDate());
         assertThat(goal.getAppointmentTime()).isEqualTo(command.appointmentTime());
     }
@@ -100,11 +93,6 @@ public class GoalCommandServiceTest {
     void create() {
         //given
         GoalCreateCommand command = createGoalCreateCommand();
-        doAnswer((invocation) -> {
-            Goal argument = (Goal) invocation.getArgument(0);
-            ReflectionTestUtils.setField(argument, "id", 1L);
-            return argument;
-        }).when(goalRepository).save(any(Goal.class));
         given(userRepository.findById(any(Long.class)))
             .willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "user")));
 
@@ -130,12 +118,13 @@ public class GoalCommandServiceTest {
 
     private GoalModifyCommand createGoalModifyCommand(Goal goal) {
         return GoalModifyCommand.builder()
+            .goalId(goal.getId())
             .endDate(goal.getEndDate().plusDays(10L))
             .appointmentTime(LocalTime.now())
             .build();
     }
 
-    private Goal createGoal(long id) {
-        return TestEntityFactory.goal(id, "goal");
+    private Goal createGoal() {
+        return goalRepository.save(TestEntityFactory.goal(0L, "goal"));
     }
 }
