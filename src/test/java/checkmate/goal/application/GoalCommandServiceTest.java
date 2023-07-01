@@ -19,11 +19,12 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStartingService;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
+import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
+import checkmate.user.infrastructure.FakeUserRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,10 +40,10 @@ class GoalCommandServiceTest {
 
     @Spy
     private GoalRepository goalRepository = new FakeGoalRepository();
+    @Spy
+    private UserRepository userRepository = new FakeUserRepository();
     @Mock
     private GoalQueryDao goalQueryDao;
-    @Mock
-    private UserRepository userRepository;
     @Mock
     private MateRepository mateRepository;
     @Mock
@@ -93,8 +94,6 @@ class GoalCommandServiceTest {
     void create() {
         //given
         GoalCreateCommand command = createGoalCreateCommand();
-        given(userRepository.findById(any(Long.class)))
-            .willReturn(Optional.ofNullable(TestEntityFactory.user(1L, "user")));
 
         //when
         long goalId = goalCommandService.create(command);
@@ -106,8 +105,9 @@ class GoalCommandServiceTest {
     }
 
     private GoalCreateCommand createGoalCreateCommand() {
+        User user = createAndSaveUser();
         return GoalCreateCommand.builder()
-            .userId(1L)
+            .userId(user.getId())
             .category(GoalCategory.LEARNING)
             .title("goal")
             .startDate(LocalDate.now().minusDays(10L))
@@ -126,5 +126,9 @@ class GoalCommandServiceTest {
 
     private Goal createGoal() {
         return goalRepository.save(TestEntityFactory.goal(0L, "goal"));
+    }
+
+    private User createAndSaveUser() {
+        return userRepository.save(TestEntityFactory.user(0L, "nickname"));
     }
 }
