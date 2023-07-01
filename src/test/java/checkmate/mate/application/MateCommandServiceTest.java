@@ -10,6 +10,7 @@ import checkmate.TestEntityFactory;
 import checkmate.common.cache.CacheHandler;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.infra.FakeGoalRepository;
 import checkmate.mate.application.dto.MateCommandMapper;
 import checkmate.mate.application.dto.request.MateInviteCommand;
 import checkmate.mate.application.dto.request.MateInviteReplyCommand;
@@ -41,10 +42,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class MateCommandServiceTest {
+class MateCommandServiceTest {
 
-    @Mock
-    private GoalRepository goalRepository;
+    @Spy
+    private GoalRepository goalRepository = new FakeGoalRepository();
     @Mock
     private UserRepository userRepository;
     @Mock
@@ -67,12 +68,9 @@ public class MateCommandServiceTest {
     void inviteTeamMate() throws Exception {
         //given
         User invitee = TestEntityFactory.user(5L, "invitee");
-        Mate inviteeMate = TestEntityFactory.goal(1L, "goal").createMate(invitee);
+        Mate inviteeMate = createAndSaveGoal().createMate(invitee);
 
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, 2L);
-
-        given(goalRepository.findById(any(Long.class))).willReturn(
-            Optional.of(inviteeMate.getGoal()));
         given(userRepository.findByNickname(any(String.class))).willReturn(Optional.of(invitee));
         given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(
             Optional.empty());
@@ -196,6 +194,10 @@ public class MateCommandServiceTest {
         notification.addAttribute(NotificationAttributeKey.MATE_ID, mate.getId());
         ReflectionTestUtils.setField(notification, "id", 1L);
         return notification;
+    }
+
+    private Goal createAndSaveGoal() {
+        return goalRepository.save(TestEntityFactory.goal(0L, "goal"));
     }
 
     private List<Mate> createUploadSkippedMates() {
