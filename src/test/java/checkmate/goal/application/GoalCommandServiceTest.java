@@ -18,6 +18,7 @@ import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStartingService;
+import checkmate.mate.infra.FakeMateRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
@@ -42,10 +43,10 @@ class GoalCommandServiceTest {
     private GoalRepository goalRepository = new FakeGoalRepository();
     @Spy
     private UserRepository userRepository = new FakeUserRepository();
+    @Spy
+    private MateRepository mateRepository = new FakeMateRepository();
     @Mock
     private GoalQueryDao goalQueryDao;
-    @Mock
-    private MateRepository mateRepository;
     @Mock
     private MateStartingService mateStartingService;
     @Mock
@@ -100,7 +101,6 @@ class GoalCommandServiceTest {
 
         //then
         assertThat(goalId).isGreaterThan(0L);
-        verify(mateRepository).save(any(Mate.class));
         verify(mateStartingService).startToGoal(any(Mate.class));
     }
 

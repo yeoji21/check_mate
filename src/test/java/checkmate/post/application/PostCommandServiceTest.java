@@ -9,6 +9,7 @@ import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.infra.FakeMateRepository;
 import checkmate.mate.infra.MateQueryDao;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockMultipartFile;
@@ -37,8 +39,8 @@ class PostCommandServiceTest {
     private PostCommandService postCommandService;
     @Mock
     private PostRepository postRepository;
-    @Mock
-    private MateRepository mateRepository;
+    @Spy
+    private MateRepository mateRepository = new FakeMateRepository();
     @Mock
     private MateQueryDao mateQueryDao;
     @Mock
@@ -48,8 +50,7 @@ class PostCommandServiceTest {
     @DisplayName("목표 인증 업로드")
     void upload() throws Exception {
         //given
-        Mate mate = createMate();
-        given(mateRepository.findWithGoal(any(Long.class))).willReturn(Optional.ofNullable(mate));
+        Mate mate = createAndSaveMate();
         given(mateQueryDao.findPostUploadNotificationDto(any(Long.class))).willReturn(
             createNotificationDto(mate));
         given(mateQueryDao.findOngoingUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
@@ -66,7 +67,7 @@ class PostCommandServiceTest {
     @DisplayName("좋아요 추가")
     void like() throws Exception {
         //given
-        Mate mate = createMate();
+        Mate mate = createAndSaveMate();
         Post post = createPost(mate);
 
         given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
@@ -82,7 +83,7 @@ class PostCommandServiceTest {
     @DisplayName("좋아요 취소")
     void unlike() throws Exception {
         //given
-        Mate mate = createMate();
+        Mate mate = createAndSaveMate();
         Post post = createPost(mate);
         post.addLikes(mate.getUserId());
 
@@ -113,11 +114,10 @@ class PostCommandServiceTest {
         return post;
     }
 
-    private Mate createMate() {
+    private Mate createAndSaveMate() {
         Goal goal = TestEntityFactory.goal(1L, "자바의 정석 스터디");
         Mate mate = goal.createMate(TestEntityFactory.user(1L, "user"));
-        ReflectionTestUtils.setField(mate, "id", 1L);
-        return mate;
+        return mateRepository.save(mate);
     }
 
     private PostCreateCommand createPostUploadCommand(Mate mate) throws IOException {

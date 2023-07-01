@@ -19,6 +19,7 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStartingService;
+import checkmate.mate.infra.FakeMateRepository;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
@@ -49,8 +50,8 @@ class MateCommandServiceTest {
     private GoalRepository goalRepository = new FakeGoalRepository();
     @Spy
     private UserRepository userRepository = new FakeUserRepository();
-    @Mock
-    private MateRepository mateRepository;
+    @Spy
+    private MateRepository mateRepository = new FakeMateRepository();
     @Mock
     private NotificationRepository notificationRepository;
     @Mock
@@ -70,12 +71,9 @@ class MateCommandServiceTest {
         //given
         User invitee = createAndSaveUser();
         User inviter = createAndSaveUser();
-        Mate inviteeMate = createAndSaveGoal().createMate(invitee);
+        Mate inviteeMate = createAndSaveMate(createAndSaveGoal(), invitee);
 
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, inviter);
-        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(
-            Optional.empty());
-        given(mateRepository.save(any(Mate.class))).willReturn(inviteeMate);
 
         //when
         mateCommandService.sendInvite(command);
@@ -93,9 +91,6 @@ class MateCommandServiceTest {
         User inviter = createAndSaveUser();
         Mate inviteeMate = createRejectStatusMate(invitee);
         MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, inviter);
-
-        given(mateRepository.findWithGoal(any(Long.class), any(Long.class))).willReturn(
-            Optional.of(inviteeMate));
 
         //when
         mateCommandService.sendInvite(command);
@@ -117,7 +112,6 @@ class MateCommandServiceTest {
 
         given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
             .willReturn(Optional.of(notification.getReceivers().get(0)));
-        given(mateRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate));
         doAnswer((invocation) -> {
             Mate argument = (Mate) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "status", MateStatus.ONGOING);
@@ -147,7 +141,6 @@ class MateCommandServiceTest {
 
         given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
             .willReturn(Optional.of(receiver));
-        given(mateRepository.findById(any(Long.class))).willReturn(Optional.of(inviteeMate));
 
         //when
         mateCommandService.rejectInvite(
@@ -170,8 +163,6 @@ class MateCommandServiceTest {
         mateCommandService.updateUploadSkippedMates();
 
         //then
-        verify(mateRepository).increaseSkippedDayCount(any(List.class));
-        verify(mateRepository).updateLimitOveredMates(any(List.class));
         verify(cacheHandler).deleteUserCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
@@ -199,25 +190,29 @@ class MateCommandServiceTest {
         return goalRepository.save(TestEntityFactory.goal(0L, "goal"));
     }
 
+    private Mate createAndSaveMate(Goal goal, User user) {
+        return mateRepository.save(goal.createMate(user));
+    }
+
     private List<Mate> createUploadSkippedMates() {
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+        Goal goal = createAndSaveGoal();
         List<Mate> skippedMates = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            skippedMates.add(goal.createMate(TestEntityFactory.user((long) i, "user" + i)));
+            skippedMates.add(createAndSaveMate(goal, createAndSaveUser()));
         }
         return skippedMates;
     }
 
     private Mate createMate() {
-        Mate mate = TestEntityFactory.goal(1L, "자바의 정석 스터디")
-            .createMate(createAndSaveUser());
+        Mate mate = createAndSaveMate(TestEntityFactory.goal(1L, "자바의 정석 스터디"),
+            createAndSaveUser());
         ReflectionTestUtils.setField(mate, "id", 1L);
         return mate;
     }
 
     private Mate createRejectStatusMate(User user) {
         Goal goal = TestEntityFactory.goal(1L, "goal");
-        Mate inviteeMate = goal.createMate(user);
+        Mate inviteeMate = createAndSaveMate(goal, user);
         ReflectionTestUtils.setField(inviteeMate, "status", MateStatus.REJECT);
         return inviteeMate;
     }
