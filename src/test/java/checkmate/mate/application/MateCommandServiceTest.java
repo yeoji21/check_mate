@@ -2,7 +2,6 @@ package checkmate.mate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
@@ -27,12 +26,12 @@ import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
+import checkmate.notification.infrastructure.FakeNotificationRepository;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.FakeUserRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,8 +51,8 @@ class MateCommandServiceTest {
     private UserRepository userRepository = new FakeUserRepository();
     @Spy
     private MateRepository mateRepository = new FakeMateRepository();
-    @Mock
-    private NotificationRepository notificationRepository;
+    @Spy
+    private NotificationRepository notificationRepository = new FakeNotificationRepository();
     @Mock
     private MateStartingService mateStartingService;
     @Mock
@@ -104,14 +103,11 @@ class MateCommandServiceTest {
     @DisplayName("팀원 초대 수락")
     void inviteAccpet() throws Exception {
         //given
-        Mate inviteeMate = createMate();
-        Notification notification = createInviteNotification(inviteeMate);
+        Mate inviteeMate = createAndSaveMate();
+        Notification notification = createAndSaveInviteNotification(inviteeMate);
 
         MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(),
             notification.getId());
-
-        given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
-            .willReturn(Optional.of(notification.getReceivers().get(0)));
         doAnswer((invocation) -> {
             Mate argument = (Mate) invocation.getArgument(0);
             ReflectionTestUtils.setField(argument, "status", MateStatus.ONGOING);
@@ -134,13 +130,10 @@ class MateCommandServiceTest {
     @DisplayName("팀원 초대 거절")
     void inviteReject() throws Exception {
         //given
-        Mate inviteeMate = createMate();
+        Mate inviteeMate = createAndSaveMate();
         ReflectionTestUtils.setField(inviteeMate, "status", MateStatus.WAITING);
-        Notification notification = createInviteNotification(inviteeMate);
+        Notification notification = createAndSaveInviteNotification(inviteeMate);
         NotificationReceiver receiver = notification.getReceivers().get(0);
-
-        given(notificationRepository.findReceiver(any(Long.class), any(Long.class)))
-            .willReturn(Optional.of(receiver));
 
         //when
         mateCommandService.rejectInvite(
@@ -167,8 +160,8 @@ class MateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
     }
 
-    private Notification createInviteNotification(Mate mate) {
-        User inviter = TestEntityFactory.user(1L, "inviter");
+    private Notification createAndSaveInviteNotification(Mate mate) {
+        User inviter = createAndSaveUser();
         NotificationReceiver receiver = new NotificationReceiver(mate.getUserId());
         Notification notification = Notification.builder()
             .userId(inviter.getId())
@@ -179,7 +172,12 @@ class MateCommandServiceTest {
             .build();
         notification.addAttribute(NotificationAttributeKey.MATE_ID, mate.getId());
         ReflectionTestUtils.setField(notification, "id", 1L);
+        notificationRepository.save(notification);
         return notification;
+    }
+
+    private Mate createAndSaveMate() {
+        return createAndSaveMate(createAndSaveGoal(), createAndSaveUser());
     }
 
     private User createAndSaveUser() {
@@ -194,13 +192,12 @@ class MateCommandServiceTest {
         return mateRepository.save(goal.createMate(user));
     }
 
-    private List<Mate> createUploadSkippedMates() {
+    private void createUploadSkippedMates() {
         Goal goal = createAndSaveGoal();
         List<Mate> skippedMates = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             skippedMates.add(createAndSaveMate(goal, createAndSaveUser()));
         }
-        return skippedMates;
     }
 
     private Mate createMate() {
