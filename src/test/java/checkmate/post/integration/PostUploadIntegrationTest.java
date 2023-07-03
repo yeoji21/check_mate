@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
+// TODO: 2023/07/03 개선
 @Disabled
 public class PostUploadIntegrationTest extends IntegrationTest {
 

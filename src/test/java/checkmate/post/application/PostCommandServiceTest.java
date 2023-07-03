@@ -16,6 +16,7 @@ import checkmate.notification.domain.factory.dto.PostUploadNotificationDto;
 import checkmate.post.application.dto.request.PostCreateCommand;
 import checkmate.post.domain.Post;
 import checkmate.post.domain.PostRepository;
+import checkmate.post.infrastructure.FakePostRepository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -29,7 +30,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.util.ReflectionTestUtils;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -37,8 +37,8 @@ class PostCommandServiceTest {
 
     @InjectMocks
     private PostCommandService postCommandService;
-    @Mock
-    private PostRepository postRepository;
+    @Spy
+    private PostRepository postRepository = new FakePostRepository();
     @Spy
     private MateRepository mateRepository = new FakeMateRepository();
     @Mock
@@ -68,9 +68,7 @@ class PostCommandServiceTest {
     void like() throws Exception {
         //given
         Mate mate = createAndSaveMate();
-        Post post = createPost(mate);
-
-        given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
+        Post post = createAndSavePost(mate);
 
         //when
         postCommandService.like(mate.getUserId(), post.getId());
@@ -84,10 +82,8 @@ class PostCommandServiceTest {
     void unlike() throws Exception {
         //given
         Mate mate = createAndSaveMate();
-        Post post = createPost(mate);
+        Post post = createAndSavePost(mate);
         post.addLikes(mate.getUserId());
-
-        given(postRepository.findWithLikes(any(Long.class))).willReturn(Optional.of(post));
 
         //when
         postCommandService.unlike(mate.getUserId(), post.getId());
@@ -108,9 +104,9 @@ class PostCommandServiceTest {
         return Optional.of(dto);
     }
 
-    private Post createPost(Mate mate) {
+    private Post createAndSavePost(Mate mate) {
         Post post = TestEntityFactory.post(mate);
-        ReflectionTestUtils.setField(post, "id", 1L);
+        postRepository.save(post);
         return post;
     }
 

@@ -10,20 +10,22 @@ import checkmate.post.domain.FileStore;
 import checkmate.post.domain.Image;
 import checkmate.post.domain.ImageRepository;
 import checkmate.post.domain.Post;
+import checkmate.post.infrastructure.FakeImageRepository;
 import java.io.InputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class FileManageServiceTest {
 
-    @Mock
-    private ImageRepository imageRepository;
+    @Spy
+    private ImageRepository imageRepository = new FakeImageRepository();
     @Mock
     private FileStore fileStore;
     @InjectMocks
