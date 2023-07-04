@@ -35,7 +35,6 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
-// TODO: 2023/06/30 repository layer test double fake로 변경
 @ExtendWith(MockitoExtension.class)
 class GoalCommandServiceTest {
 

@@ -11,17 +11,20 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 @Component
 public class NotificationCreatedEventListener {
+
     private final NotificationCommandService notificationCommandService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void pushNotification(PushNotificationCreatedEvent event) {
-        notificationCommandService.savePushNotification(event.getNotificationType(), event.getCreateDto());
+        notificationCommandService.savePushNotification(event.getNotificationType(),
+            event.getCreateDto());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void notPushNotification(NotPushNotificationCreatedEvent event) {
-        notificationCommandService.saveNotPushNotifications(event.getNotificationType(), event.getCreateDto());
+        notificationCommandService.saveNotPushNotifications(event.getNotificationType(),
+            event.getCreateDto());
     }
 }
