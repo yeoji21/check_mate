@@ -96,14 +96,24 @@ public class MateQueryDao {
     }
 
     public Optional<PostUploadNotificationDto> findPostUploadNotificationDto(long mateId) {
-        return Optional.ofNullable(
-            queryFactory
-                .select(new QPostUploadNotificationDto(mate.userId, user.nickname, mate.goal.id,
-                    mate.goal.title))
-                .from(mate)
-                .join(user).on(mate.userId.eq(user.id))
-                .where(mate.id.eq(mateId))
-                .fetchOne()
-        );
+        PostUploadNotificationDto dto = queryFactory
+            .select(new QPostUploadNotificationDto(mate.userId, user.nickname, mate.goal.id,
+                mate.goal.title))
+            .from(mate)
+            .join(user).on(mate.userId.eq(user.id))
+            .where(mate.id.eq(mateId))
+            .fetchOne();
+        if (dto == null) {
+            return Optional.empty();
+        }
+        dto.setMateUserIds(findOtherMateUserIds(dto.getGoalId(), dto.getSenderUserId()));
+        return Optional.of(dto);
+    }
+
+    private List<Long> findOtherMateUserIds(long goalId, long userId) {
+        return findOngoingUserIds(goalId)
+            .stream()
+            .filter(uId -> !uId.equals(userId))
+            .toList();
     }
 }

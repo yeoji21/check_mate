@@ -21,7 +21,6 @@ import io.jsonwebtoken.lang.Assert;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -120,24 +119,13 @@ public class PostCommandService {
     }
 
     private void publishPostUploadEvent(long mateId) {
-        PostUploadNotificationDto notificationDto = findPostUploadNotificationDto(mateId);
-        eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, notificationDto));
+        PostUploadNotificationDto dto = findPostUploadNotificationDto(mateId);
+        eventPublisher.publishEvent(new PushNotificationCreatedEvent(POST_UPLOAD, dto));
     }
 
     private PostUploadNotificationDto findPostUploadNotificationDto(long mateId) {
-        PostUploadNotificationDto notificationDto = mateQueryDao.findPostUploadNotificationDto(
-                findMate(mateId).getId())
-            .orElseThrow(
-                () -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, findMate(mateId).getId()));
-        notificationDto.setMateUserIds(findOtherMateUserIds(findMate(mateId)));
-        return notificationDto;
-    }
-
-    private List<Long> findOtherMateUserIds(Mate uploader) {
-        return mateQueryDao.findOngoingUserIds(uploader.getGoal().getId())
-            .stream()
-            .filter(userId -> !userId.equals(uploader.getUserId()))
-            .collect(Collectors.toList());
+        return mateQueryDao.findPostUploadNotificationDto(mateId).orElseThrow(
+            () -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, findMate(mateId).getId()));
     }
 
     private Mate findMate(long mateId) {

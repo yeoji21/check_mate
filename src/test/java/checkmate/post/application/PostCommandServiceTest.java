@@ -53,7 +53,6 @@ class PostCommandServiceTest {
         Mate mate = createAndSaveMate();
         given(mateQueryDao.findPostUploadNotificationDto(any(Long.class))).willReturn(
             createNotificationDto(mate));
-        given(mateQueryDao.findOngoingUserIds(any(Long.class))).willReturn(List.of(1L, 2L, 3L));
 
         //when
         postCommandService.create(createPostUploadCommand(mate));
