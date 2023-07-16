@@ -1,8 +1,5 @@
 package checkmate.notification.domain.factory.dto;
 
-import lombok.Builder;
-
-@Builder
 public record InviteSendNotificationDto(
 
     long inviterUserId,

@@ -94,12 +94,11 @@ class PostCommandServiceTest {
 
 
     private Optional<PostUploadNotificationDto> createNotificationDto(Mate mate) {
-        PostUploadNotificationDto dto = PostUploadNotificationDto.builder()
-            .uploaderUserId(mate.getUserId())
-            .uploaderNickname("nickname")
-            .goalId(mate.getGoal().getId())
-            .goalTitle(mate.getGoal().getTitle())
-            .build();
+        PostUploadNotificationDto dto = new PostUploadNotificationDto(
+            mate.getUserId(),
+            "nickname",
+            mate.getGoal().getId(),
+            mate.getGoal().getTitle());
         dto.setMateUserIds(List.of(1L, 2L));
         return Optional.of(dto);
     }
