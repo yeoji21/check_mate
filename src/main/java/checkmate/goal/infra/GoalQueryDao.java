@@ -3,6 +3,8 @@ package checkmate.goal.infra;
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.mate.domain.QMate.mate;
 import static checkmate.user.domain.QUser.user;
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
@@ -24,7 +26,9 @@ import checkmate.notification.domain.factory.dto.QCompleteGoalNotificationDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -115,10 +119,32 @@ public class GoalQueryDao {
     }
 
     public List<GoalHistoryInfo> findGoalHistoryInfo(long userId) {
-        return queryFactory.select(new QGoalHistoryInfo(mate))
+        List<GoalHistoryInfo> historyInfo = queryFactory.select(new QGoalHistoryInfo(mate))
             .from(mate)
             .join(mate.goal, goal).fetchJoin()
             .where(mate.userId.eq(userId))
             .fetch();
+        Map<Long, List<String>> mateNicknames = findMateNicknames(mapToGoalId(historyInfo));
+        historyInfo.forEach(setNicknamesToHistoryInfo(mateNicknames));
+        return historyInfo;
+    }
+
+    private List<Long> mapToGoalId(List<GoalHistoryInfo> historyInfo) {
+        return historyInfo.stream().map(GoalHistoryInfo::getGoalId).toList();
+    }
+
+    private Map<Long, List<String>> findMateNicknames(List<Long> goalIds) {
+        return queryFactory
+            .from(goal)
+            .leftJoin(mate).on(mate.goal.eq(goal))
+            .join(user).on(mate.userId.eq(user.id))
+            .where(goal.id.in(goalIds))
+            .transform(groupBy(goal.id).as(list(user.nickname)));
+    }
+
+    private Consumer<GoalHistoryInfo> setNicknamesToHistoryInfo(
+        Map<Long, List<String>> mateNicknames) {
+        return historyInfo -> historyInfo.setMateNicknames(
+            mateNicknames.get(historyInfo.getGoalId()));
     }
 }

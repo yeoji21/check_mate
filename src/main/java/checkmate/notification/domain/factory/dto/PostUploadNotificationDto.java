@@ -24,7 +24,6 @@ public class PostUploadNotificationDto implements NotificationCreateDto {
         this.goalTitle = goalTitle;
     }
 
-    // TODO: 2023/07/04 개선
     public void setMateUserIds(List<Long> mateUserIds) {
         this.mateUserIds = mateUserIds;
     }
