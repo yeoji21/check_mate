@@ -2,12 +2,16 @@ package checkmate.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.LikeCountCondition;
 import checkmate.mate.domain.Mate;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,8 +33,9 @@ class PostTest {
 
         //then
         List<Likes> likes = post.getLikes();
-        assertThat(likes).hasSize(2);
-        assertThat(likes).allMatch(like -> like.getPost() == post);
+        assertThat(likes)
+            .hasSize(2)
+            .allMatch(like -> like.getPost() == post);
     }
 
     @Test
@@ -109,48 +114,78 @@ class PostTest {
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
 
-    // TODO: 2023/06/21 check, uncheck 테스트 목적 불분명
     @Test
-    @DisplayName("게시글 인증 완료")
-    void check() throws Exception {
+    void updateCheckStatusWhenTrueCondition() throws Exception {
         //given
-        Post post = createPost();
-        int before = post.getMate().getCheckDayCount();
+        Goal goal = createMockTrueConditionGoal();
+        Mate mate = createMockMate(goal);
+        Post post = createPost(mate);
 
         //when
         post.updateCheckStatus();
 
         //then
         assertThat(post.isChecked()).isTrue();
-        assertThat(post.getMate().getCheckDayCount()).isGreaterThan(before);
+        verify(mate).plusCheckDayCount();
     }
 
     @Test
-    @DisplayName("게시글 인증 취소")
-    void uncheck() throws Exception {
+    void updateCheckStatusWhenFalseCondition() throws Exception {
         //given
-        Post post = createPost();
-        ReflectionTestUtils.setField(post, "checked", true);
-        addConditionToGoal(post);
-        int before = post.getMate().getCheckDayCount();
+        Goal goal = createMockFalseConditionGoal();
+        Mate mate = createMockMate(goal);
+        Post post = createPost(mate);
 
         //when
         post.updateCheckStatus();
 
         //then
         assertThat(post.isChecked()).isFalse();
-        assertThat(post.getMate().getCheckDayCount()).isLessThan(before);
+        verify(mate, times(0)).plusCheckDayCount();
     }
 
-    private void addConditionToGoal(Post post) {
-        Goal goal = post.getMate().getGoal();
-        goal.addCondition(new LikeCountCondition(5));
+    @Test
+    void updateCheckStatusToCheckedMateWhenFalseCondition() throws Exception {
+        //given
+        Goal goal = createMockFalseConditionGoal();
+        Mate mate = createMockMate(goal);
+        Post post = createPost(mate);
+        ReflectionTestUtils.setField(post, "checked", true);
+
+        //when
+        post.updateCheckStatus();
+
+        //then
+        assertThat(post.isChecked()).isFalse();
+        verify(mate).minusCheckDayCount();
+
+    }
+
+    private Goal createMockFalseConditionGoal() {
+        Goal goal = mock(Goal.class);
+        when(goal.checkConditions(any())).thenReturn(false);
+        return goal;
+    }
+
+    private Mate createMockMate(Goal goal) {
+        Mate mate = mock(Mate.class);
+        when(mate.getGoal()).thenReturn(goal);
+        return mate;
+    }
+
+    private Goal createMockTrueConditionGoal() {
+        Goal goal = mock(Goal.class);
+        when(goal.checkConditions(any())).thenReturn(true);
+        return goal;
+    }
+
+    private Post createPost(Mate mate) {
+        return TestEntityFactory.post(mate);
     }
 
     private Post createPost() {
-        Goal goal = TestEntityFactory.goal(1L, "test");
-        Mate mate = goal.createMate(TestEntityFactory.user(1L, "user"));
-        return TestEntityFactory.post(mate);
+        Goal goal = createMockTrueConditionGoal();
+        return TestEntityFactory.post(createMockMate(goal));
     }
 }
 
