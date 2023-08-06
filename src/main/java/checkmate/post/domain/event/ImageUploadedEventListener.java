@@ -12,6 +12,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 @Service
 public class ImageUploadedEventListener {
+
     private final FileManageService fileManageService;
 
     @Async

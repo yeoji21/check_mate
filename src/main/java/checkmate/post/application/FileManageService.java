@@ -1,14 +1,18 @@
 package checkmate.post.application;
 
-import checkmate.post.domain.*;
+import checkmate.post.domain.FileStore;
+import checkmate.post.domain.Image;
+import checkmate.post.domain.ImageFileUtil;
+import checkmate.post.domain.ImageRepository;
+import checkmate.post.domain.Post;
+import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
 
 @RequiredArgsConstructor
 @Service
 public class FileManageService {
+
     private final ImageRepository imageRepository;
     private final FileStore fileStore;
 
@@ -20,10 +24,10 @@ public class FileManageService {
 
     private void saveImage(Post post, String imageName, String storedFilename) {
         Image image = Image.builder()
-                .post(post)
-                .originalName(imageName)
-                .storedName(storedFilename)
-                .build();
+            .post(post)
+            .originalName(imageName)
+            .storedName(storedFilename)
+            .build();
         imageRepository.save(image);
     }
 }
