@@ -47,6 +47,7 @@ public class PostCommandService {
     @Transactional
     public PostCreateResult create(PostCreateCommand command) {
         Post post = createAndSavePost(command);
+        // TODO: 2023/08/07 Mate, Goal, VerificationCondition 지연로딩 문제
         post.updateCheckStatus();
         publishPostUploadEvent(command.mateId());
         return new PostCreateResult(post.getId());

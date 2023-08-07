@@ -22,6 +22,9 @@ public class FakeGoalRepository implements GoalRepository {
     public Goal save(Goal goal) {
         ReflectionTestUtils.setField(goal, "id", goalId.getAndIncrement());
         goalMap.put(goal.getId(), goal);
+        List<VerificationCondition> conditions = (List<VerificationCondition>) ReflectionTestUtils.getField(
+            goal, "conditions");
+        conditions.forEach(condition -> conditionMap.put(goal.getId(), conditions));
         return goal;
     }
 

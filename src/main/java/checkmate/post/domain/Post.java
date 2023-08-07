@@ -116,12 +116,12 @@ public class Post extends BaseTimeEntity {
         return mate.getGoal().checkConditions(this);
     }
 
-    private void check() {
+    public void check() {
         checked = true;
         mate.plusCheckDayCount();
     }
 
-    private void uncheck() {
+    public void uncheck() {
         checked = false;
         mate.minusCheckDayCount();
     }
