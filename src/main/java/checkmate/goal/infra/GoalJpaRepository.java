@@ -6,6 +6,7 @@ import static checkmate.goal.domain.QVerificationCondition.verificationCondition
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalRepository;
+import checkmate.goal.domain.VerificationCondition;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
@@ -56,6 +57,14 @@ public class GoalJpaRepository implements GoalRepository {
 
         entityManager.flush();
         entityManager.clear();
+    }
+
+    @Override
+    public List<VerificationCondition> findConditions(long goalId) {
+        return queryFactory.select(verificationCondition)
+            .from(verificationCondition)
+            .where(verificationCondition.goal.id.eq(goalId))
+            .fetch();
     }
 
     public void updateStatusToOver(List<Long> goalIds) {

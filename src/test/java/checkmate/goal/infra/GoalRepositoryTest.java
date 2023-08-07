@@ -21,7 +21,7 @@ class GoalRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
-    void findConditions() throws Exception {
+    void findGoalWithConditions() throws Exception {
         //given
         Goal goal = createGoal();
         goal.addCondition(new LikeCountCondition(5));
@@ -32,6 +32,20 @@ class GoalRepositoryTest extends RepositoryTest {
 
         //then
         List<VerificationCondition> conditions = getGoalConditions(findGoal);
+        assertThat(conditions.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
+    void findConditions() throws Exception {
+        //given
+        Goal goal = createGoal();
+        goal.addCondition(new LikeCountCondition(5));
+
+        //when
+        List<VerificationCondition> conditions = goalRepository.findConditions(goal.getId());
+
+        //then
         assertThat(conditions.size()).isEqualTo(1);
     }
 
