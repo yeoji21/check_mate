@@ -117,12 +117,16 @@ public class Post extends BaseTimeEntity {
     }
 
     public void check() {
-        checked = true;
-        mate.plusCheckDayCount();
+        if (!isChecked()) {
+            checked = true;
+            mate.plusCheckDayCount();
+        }
     }
 
     public void uncheck() {
-        checked = false;
-        mate.minusCheckDayCount();
+        if (isChecked()) {
+            checked = false;
+            mate.minusCheckDayCount();
+        }
     }
 }

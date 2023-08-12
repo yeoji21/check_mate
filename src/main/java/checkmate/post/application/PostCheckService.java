@@ -14,11 +14,9 @@ public class PostCheckService {
     private final GoalRepository goalRepository;
 
     public void updateCheckStatus(Post post) {
-        boolean satisfy = isSatisfyAllConditions(post);
-        // TODO: 2023/08/07 post check 상태는 check 메소드 내부로 캡슐화
-        if (!post.isChecked() && satisfy) {
+        if (isSatisfyAllConditions(post)) {
             post.check();
-        } else if (post.isChecked() && !satisfy) {
+        } else {
             post.uncheck();
         }
     }
