@@ -38,6 +38,7 @@ public class PostCommandService {
     private final PostRepository postRepository;
     private final MateRepository mateRepository;
     private final MateQueryDao mateQueryDao;
+    private final PostCheckService postCheckService;
     private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(
@@ -47,8 +48,7 @@ public class PostCommandService {
     @Transactional
     public PostCreateResult create(PostCreateCommand command) {
         Post post = createAndSavePost(command);
-        // TODO: 2023/08/07 Mate, Goal, VerificationCondition 지연로딩 문제
-        post.updateCheckStatus();
+        postCheckService.updateCheckStatus(post);
         publishPostUploadEvent(command.mateId());
         return new PostCreateResult(post.getId());
     }
@@ -66,7 +66,7 @@ public class PostCommandService {
     public void updateLikes(long postId, Consumer<Post> action) {
         Post post = findPostWithLikes(postId);
         action.accept(post);
-        post.updateCheckStatus();
+        postCheckService.updateCheckStatus(post);
     }
 
     private Post findPostWithLikes(long postId) {

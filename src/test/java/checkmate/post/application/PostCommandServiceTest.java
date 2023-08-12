@@ -44,6 +44,8 @@ class PostCommandServiceTest {
     @Mock
     private MateQueryDao mateQueryDao;
     @Mock
+    private PostCheckService postCheckService;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
 
     @Test
@@ -59,6 +61,7 @@ class PostCommandServiceTest {
 
         //then
         verify(postRepository).save(any());
+        verify(postCheckService).updateCheckStatus(any());
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
@@ -73,6 +76,7 @@ class PostCommandServiceTest {
         postCommandService.like(mate.getUserId(), post.getId());
 
         //then
+        verify(postCheckService).updateCheckStatus(any());
         assertThat(post.getLikes().size()).isEqualTo(1);
     }
 
@@ -88,6 +92,7 @@ class PostCommandServiceTest {
         postCommandService.unlike(mate.getUserId(), post.getId());
 
         //then
+        verify(postCheckService).updateCheckStatus(any());
         assertThat(post.getLikes().size()).isEqualTo(0);
     }
 
