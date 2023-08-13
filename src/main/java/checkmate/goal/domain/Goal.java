@@ -5,7 +5,6 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
-import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -59,6 +58,8 @@ public class Goal extends BaseTimeEntity {
     // TODO: 2023/02/27 목표 인증 조건으로 분리 가능
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
+
+    // TODO: 2023/08/13 연관관계 제거
     @Getter(value = AccessLevel.PRIVATE)
     @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VerificationCondition> conditions = new ArrayList<>();
@@ -80,10 +81,6 @@ public class Goal extends BaseTimeEntity {
     public void addCondition(VerificationCondition condition) {
         conditions.add(condition);
         condition.setGoal(this);
-    }
-
-    public boolean checkConditions(Post post) {
-        return conditions.stream().allMatch(condition -> condition.satisfy(post));
     }
 
     public int getSkippedDayLimit() {

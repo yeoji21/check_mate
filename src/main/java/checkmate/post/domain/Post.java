@@ -96,24 +96,11 @@ public class Post extends BaseTimeEntity {
         likes.setPost(this);
     }
 
-    public void updateCheckStatus() {
-        boolean verified = verifyGoalConditions();
-        if (!checked && verified) {
-            check();
-        } else if (checked && !verified) {
-            uncheck();
-        }
-    }
-
     private void checkAlreadyLiked(long userId) {
         boolean exist = likes.stream().anyMatch(like -> like.getUserId() == userId);
         if (exist) {
             throw new BusinessException(ErrorCode.POST_LIKES_UPDATE);
         }
-    }
-
-    private boolean verifyGoalConditions() {
-        return mate.getGoal().checkConditions(this);
     }
 
     public void check() {

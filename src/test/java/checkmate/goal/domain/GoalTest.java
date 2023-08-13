@@ -2,20 +2,16 @@ package checkmate.goal.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.post.domain.Post;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class GoalTest {
@@ -202,50 +198,6 @@ class GoalTest {
     }
 
     @Test
-    void checkConditionsTrue() throws Exception {
-        //given
-        Goal goal = createGoal();
-
-        goal.addCondition(createSuccessCondition());
-        goal.addCondition(createSuccessCondition());
-        goal.addCondition(createSuccessCondition());
-
-        //when
-        boolean check = goal.checkConditions(createPost(goal));
-
-        //then
-        assertThat(check).isTrue();
-    }
-
-    @Test
-    void checkConditionsFalse() throws Exception {
-        //given
-        Goal goal = createGoal();
-
-        goal.addCondition(createFailCondition());
-        goal.addCondition(createSuccessCondition());
-        goal.addCondition(createSuccessCondition());
-
-        //when
-        boolean check = goal.checkConditions(createPost(goal));
-
-        //then
-        assertThat(check).isFalse();
-    }
-
-    private VerificationCondition createFailCondition() {
-        VerificationCondition condition = Mockito.mock(VerificationCondition.class);
-        when(condition.satisfy(any(Post.class))).thenReturn(false);
-        return condition;
-    }
-
-    private VerificationCondition createSuccessCondition() {
-        VerificationCondition condition = Mockito.mock(VerificationCondition.class);
-        when(condition.satisfy(any(Post.class))).thenReturn(true);
-        return condition;
-    }
-
-    @Test
     void isTodayCheckDayTrue() throws Exception {
         //given
         Goal goal = createGoal();
@@ -270,10 +222,6 @@ class GoalTest {
 
         //then
         assertThat(isCheckDay).isFalse();
-    }
-
-    private Post createPost(Goal goal) {
-        return TestEntityFactory.post(goal.createMate(TestEntityFactory.user(1L, "user")));
     }
 
     private Goal createGoal() {

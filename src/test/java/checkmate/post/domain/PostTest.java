@@ -2,10 +2,7 @@ package checkmate.post.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import checkmate.TestEntityFactory;
@@ -114,77 +111,14 @@ class PostTest {
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.POST_LIKES_UPDATE);
     }
 
-    @Test
-    void updateCheckStatusWhenTrueCondition() throws Exception {
-        //given
-        Goal goal = createMockTrueConditionGoal();
-        Mate mate = createMockMate(goal);
-        Post post = createPost(mate);
-
-        //when
-        post.updateCheckStatus();
-
-        //then
-        assertThat(post.isChecked()).isTrue();
-        verify(mate).plusCheckDayCount();
-    }
-
-    @Test
-    void updateCheckStatusWhenFalseCondition() throws Exception {
-        //given
-        Goal goal = createMockFalseConditionGoal();
-        Mate mate = createMockMate(goal);
-        Post post = createPost(mate);
-
-        //when
-        post.updateCheckStatus();
-
-        //then
-        assertThat(post.isChecked()).isFalse();
-        verify(mate, times(0)).plusCheckDayCount();
-    }
-
-    @Test
-    void updateCheckStatusToCheckedMateWhenFalseCondition() throws Exception {
-        //given
-        Goal goal = createMockFalseConditionGoal();
-        Mate mate = createMockMate(goal);
-        Post post = createPost(mate);
-        ReflectionTestUtils.setField(post, "checked", true);
-
-        //when
-        post.updateCheckStatus();
-
-        //then
-        assertThat(post.isChecked()).isFalse();
-        verify(mate).minusCheckDayCount();
-
-    }
-
-    private Goal createMockFalseConditionGoal() {
-        Goal goal = mock(Goal.class);
-        when(goal.checkConditions(any())).thenReturn(false);
-        return goal;
-    }
-
     private Mate createMockMate(Goal goal) {
         Mate mate = mock(Mate.class);
         when(mate.getGoal()).thenReturn(goal);
         return mate;
     }
 
-    private Goal createMockTrueConditionGoal() {
-        Goal goal = mock(Goal.class);
-        when(goal.checkConditions(any())).thenReturn(true);
-        return goal;
-    }
-
-    private Post createPost(Mate mate) {
-        return TestEntityFactory.post(mate);
-    }
-
     private Post createPost() {
-        Goal goal = createMockTrueConditionGoal();
+        Goal goal = TestEntityFactory.goal(1L, "goal");
         return TestEntityFactory.post(createMockMate(goal));
     }
 }
