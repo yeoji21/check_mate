@@ -1,6 +1,6 @@
 package checkmate.goal.application;
 
-import checkmate.common.cache.CacheKey;
+import checkmate.common.cache.CacheKeyUtil;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
@@ -31,7 +31,7 @@ public class GoalQueryService {
     }
 
     @Cacheable(
-        value = CacheKey.ONGOING_GOALS,
+        value = CacheKeyUtil.ONGOING_GOALS,
         key = "{#userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional(readOnly = true)
@@ -39,7 +39,7 @@ public class GoalQueryService {
         return new OngoingGoalInfoResult(goalQueryDao.findOngoingSimpleInfo(userId));
     }
 
-    @Cacheable(value = CacheKey.GOAL_PERIOD, key = "{#goalId}")
+    @Cacheable(value = CacheKeyUtil.GOAL_PERIOD, key = "{#goalId}")
     @Transactional(readOnly = true)
     public GoalScheduleInfo findGoalPeriodInfo(long goalId) {
         return goalQueryDao.findGoalScheduleInfo(goalId)
@@ -47,7 +47,7 @@ public class GoalQueryService {
     }
 
     @Cacheable(
-        value = CacheKey.TODAY_GOALS,
+        value = CacheKeyUtil.TODAY_GOALS,
         key = "{#userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional(readOnly = true)
@@ -55,7 +55,7 @@ public class GoalQueryService {
         return new TodayGoalInfoResult(goalQueryDao.findTodayGoalInfo(userId));
     }
 
-    @Cacheable(value = CacheKey.HISTORY_GOALS, key = "{#userId}")
+    @Cacheable(value = CacheKeyUtil.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
     public GoalHistoryInfoResult findGoalHistoryResult(long userId) {
         List<GoalHistoryInfo> historyInfo = goalQueryDao.findGoalHistoryInfo(userId);

@@ -5,8 +5,8 @@ import static checkmate.notification.domain.NotificationType.INVITE_ACCEPT;
 import static checkmate.notification.domain.NotificationType.INVITE_REJECT;
 import static checkmate.notification.domain.NotificationType.INVITE_SEND;
 
-import checkmate.common.cache.CacheHandler;
-import checkmate.common.cache.CacheKey;
+import checkmate.common.cache.CacheKeyUtil;
+import checkmate.common.cache.KeyValueStorage;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
@@ -48,7 +48,7 @@ public class MateCommandService {
     private final MateRepository mateRepository;
     private final NotificationRepository notificationRepository;
     private final MateStartingService mateStartingService;
-    private final CacheHandler cacheHandler;
+    private final KeyValueStorage keyValueStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final MateCommandMapper mapper;
 
@@ -61,10 +61,10 @@ public class MateCommandService {
 
     @Caching(evict = {
         @CacheEvict(
-            value = CacheKey.ONGOING_GOALS,
+            value = CacheKeyUtil.ONGOING_GOALS,
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
         @CacheEvict(value =
-            CacheKey.TODAY_GOALS,
+            CacheKeyUtil.TODAY_GOALS,
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @Transactional
@@ -91,9 +91,9 @@ public class MateCommandService {
         List<Mate> skippedMates = updateYesterdaySkippedMates();
         List<Mate> limitOveredMates = filterLimitOveredMates(skippedMates);
         mateRepository.updateLimitOveredMates(limitOveredMates);
-
         publishExpulsionNotifications(limitOveredMates);
-        cacheHandler.deleteUserCaches(limitOveredMates.stream().map(Mate::getUserId).toList());
+        limitOveredMates.stream().map(Mate::getUserId)
+            .forEach(keyValueStorage::deleteAll);
     }
 
     private Mate findOrCreateMateToInvite(long goalId, String inviteeNickname) {

@@ -2,11 +2,13 @@ package checkmate.goal.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.cache.CacheHandler;
+import checkmate.common.cache.KeyValueStorage;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
@@ -20,6 +22,7 @@ import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStartingService;
 import checkmate.mate.infra.FakeMateRepository;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
+import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.FakeUserRepository;
@@ -49,7 +52,7 @@ class GoalCommandServiceTest {
     @Mock
     private MateStartingService mateStartingService;
     @Mock
-    private CacheHandler cacheHandler;
+    private KeyValueStorage keyValueStorage;
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Spy
@@ -65,13 +68,15 @@ class GoalCommandServiceTest {
         Goal goal2 = createGoal();
         given(goalQueryDao.findYesterdayOveredGoals()).willReturn(
             List.of(goal1.getId(), goal2.getId()));
-
+        given(goalQueryDao.findCompleteNotificationDto(anyList()))
+            .willReturn(List.of(new CompleteGoalNotificationDto(1L, 1L, "title")));
+            
         //when
         goalCommandService.updateYesterdayOveredGoals();
 
         //then
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(cacheHandler).deleteUserCaches(any(List.class));
+        verify(keyValueStorage).deleteAll(anyLong());
     }
 
     @Test

@@ -2,7 +2,7 @@ package checkmate.post.application;
 
 import static checkmate.notification.domain.NotificationType.POST_UPLOAD;
 
-import checkmate.common.cache.CacheKey;
+import checkmate.common.cache.CacheKeyUtil;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.RuntimeIOException;
 import checkmate.exception.code.ErrorCode;
@@ -42,7 +42,7 @@ public class PostCommandService {
     private final ApplicationEventPublisher eventPublisher;
 
     @CacheEvict(
-        value = CacheKey.TODAY_GOALS,
+        value = CacheKeyUtil.TODAY_GOALS,
         key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"
     )
     @Transactional

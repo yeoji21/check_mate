@@ -2,11 +2,12 @@ package checkmate.mate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.cache.CacheHandler;
+import checkmate.common.cache.KeyValueStorage;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.FakeGoalRepository;
@@ -56,7 +57,7 @@ class MateCommandServiceTest {
     @Mock
     private MateStartingService mateStartingService;
     @Mock
-    private CacheHandler cacheHandler;
+    private KeyValueStorage keyValueStorage;
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Spy
@@ -156,8 +157,8 @@ class MateCommandServiceTest {
         mateCommandService.updateUploadSkippedMates();
 
         //then
-        verify(cacheHandler).deleteUserCaches(any(List.class));
         verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
+        verify(keyValueStorage).deleteAll(anyLong());
     }
 
     private Notification createAndSaveInviteNotification(Mate mate) {
@@ -198,13 +199,7 @@ class MateCommandServiceTest {
         for (int i = 0; i < 10; i++) {
             skippedMates.add(createAndSaveMate(goal, createAndSaveUser()));
         }
-    }
-
-    private Mate createMate() {
-        Mate mate = createAndSaveMate(TestEntityFactory.goal(1L, "자바의 정석 스터디"),
-            createAndSaveUser());
-        ReflectionTestUtils.setField(mate, "id", 1L);
-        return mate;
+        ReflectionTestUtils.setField(skippedMates.get(0).getAttendance(), "skippedDayCount", 100);
     }
 
     private Mate createRejectStatusMate(User user) {

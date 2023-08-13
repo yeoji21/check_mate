@@ -3,8 +3,8 @@ package checkmate.goal.application;
 import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
 import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 
-import checkmate.common.cache.CacheHandler;
-import checkmate.common.cache.CacheKey;
+import checkmate.common.cache.CacheKeyUtil;
+import checkmate.common.cache.KeyValueStorage;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.GoalCommandMapper;
@@ -42,15 +42,15 @@ public class GoalCommandService {
     private final MateRepository mateRepository;
     private final MateStartingService mateStartingService;
     private final ApplicationEventPublisher eventPublisher;
-    private final CacheHandler cacheHandler;
+    private final KeyValueStorage keyValueStorage;
     private final GoalCommandMapper mapper;
 
     @Caching(evict = {
         @CacheEvict(
-            value = CacheKey.ONGOING_GOALS,
+            value = CacheKeyUtil.ONGOING_GOALS,
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}"),
         @CacheEvict(
-            value = CacheKey.TODAY_GOALS,
+            value = CacheKeyUtil.TODAY_GOALS,
             key = "{#command.userId, T(java.time.LocalDate).now().format(@dateFormatter)}")
     })
     @Transactional
@@ -60,7 +60,7 @@ public class GoalCommandService {
         return goal.getId();
     }
 
-    @CacheEvict(value = CacheKey.GOAL_PERIOD, key = "{#command.goalId}")
+    @CacheEvict(value = CacheKeyUtil.GOAL_PERIOD, key = "{#command.goalId}")
     @Transactional
     public void modify(GoalModifyCommand command) {
         Goal goal = findGoalWithLock(command.goalId());
@@ -85,13 +85,14 @@ public class GoalCommandService {
         publishCompleteGoalEvent(overedGoalIds);
     }
 
+    // TODO: 2023/08/13 추상화 레벨
     private void publishCompleteGoalEvent(List<Long> overedGoalIds) {
         List<CompleteGoalNotificationDto> notificationDtos =
             goalQueryDao.findCompleteNotificationDto(overedGoalIds);
         eventPublisher.publishEvent(
             new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDtos));
-        cacheHandler.deleteUserCaches(
-            notificationDtos.stream().map(dto -> dto.getUserId()).toList());
+        notificationDtos.stream().map(CompleteGoalNotificationDto::getUserId)
+            .forEach(keyValueStorage::deleteAll);
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {
