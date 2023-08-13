@@ -69,8 +69,7 @@ public class GoalCommandService {
 
     @Transactional
     public void addLikeCountCondition(LikeCountCreateCommand command) {
-        Goal goal = findGoal(command.goalId());
-        goal.addCondition(new LikeCountCondition(command.likeCount()));
+        goalRepository.saveCondition(createLikeCountCondition(command));
     }
 
     @Transactional
@@ -93,6 +92,10 @@ public class GoalCommandService {
             new NotPushNotificationCreatedEvent(COMPLETE_GOAL, notificationDtos));
         notificationDtos.stream().map(CompleteGoalNotificationDto::getUserId)
             .forEach(keyValueStorage::deleteAll);
+    }
+
+    private LikeCountCondition createLikeCountCondition(LikeCountCreateCommand command) {
+        return new LikeCountCondition(findGoal(command.goalId()), command.likeCount());
     }
 
     private void creatorJoinToGoal(Goal goal, long userId) {

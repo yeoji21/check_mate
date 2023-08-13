@@ -33,6 +33,11 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
+    public void saveCondition(VerificationCondition condition) {
+        entityManager.persist(condition);
+    }
+
+    @Override
     public Optional<Goal> findById(long goalId) {
         return Optional.ofNullable(entityManager.find(Goal.class, goalId));
     }
@@ -78,16 +83,5 @@ public class GoalJpaRepository implements GoalRepository {
 
         entityManager.flush();
         entityManager.clear();
-    }
-
-    @Override
-    public Optional<Goal> findWithConditions(long goalId) {
-        return Optional.ofNullable(
-            queryFactory.select(goal).distinct()
-                .from(goal)
-                .leftJoin(goal.conditions, verificationCondition).fetchJoin()
-                .where(goal.id.eq(goalId))
-                .fetchOne()
-        );
     }
 }

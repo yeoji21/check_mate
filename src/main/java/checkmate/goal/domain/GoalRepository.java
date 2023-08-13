@@ -7,11 +7,11 @@ public interface GoalRepository {
 
     Goal save(Goal goal);
 
+    void saveCondition(VerificationCondition condition);
+
     Optional<Goal> findById(long goalId);
 
     Optional<Goal> findByIdWithLock(long goalId);
-
-    Optional<Goal> findWithConditions(long goalId);
 
     void updateStatusToOver(List<Long> goalIds);
 

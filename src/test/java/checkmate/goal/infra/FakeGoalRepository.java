@@ -22,10 +22,12 @@ public class FakeGoalRepository implements GoalRepository {
     public Goal save(Goal goal) {
         ReflectionTestUtils.setField(goal, "id", goalId.getAndIncrement());
         goalMap.put(goal.getId(), goal);
-        List<VerificationCondition> conditions = (List<VerificationCondition>) ReflectionTestUtils.getField(
-            goal, "conditions");
-        conditions.forEach(condition -> conditionMap.put(goal.getId(), conditions));
         return goal;
+    }
+
+    @Override
+    public void saveCondition(VerificationCondition condition) {
+        conditionMap.put(condition.getGoalId(), List.of(condition));
     }
 
     @Override
@@ -35,11 +37,6 @@ public class FakeGoalRepository implements GoalRepository {
 
     @Override
     public Optional<Goal> findByIdWithLock(long goalId) {
-        return Optional.ofNullable(goalMap.get(goalId));
-    }
-
-    @Override
-    public Optional<Goal> findWithConditions(long goalId) {
         return Optional.ofNullable(goalMap.get(goalId));
     }
 

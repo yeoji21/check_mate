@@ -8,9 +8,6 @@ import checkmate.mate.domain.Mate;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -19,7 +16,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -59,11 +55,6 @@ public class Goal extends BaseTimeEntity {
     @Column(name = "appointment_time")
     private LocalTime appointmentTime;
 
-    // TODO: 2023/08/13 연관관계 제거
-    @Getter(value = AccessLevel.PRIVATE)
-    @OneToMany(mappedBy = "goal", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<VerificationCondition> conditions = new ArrayList<>();
-
     @Builder
     public Goal(GoalCategory category,
         String title,
@@ -76,11 +67,6 @@ public class Goal extends BaseTimeEntity {
         this.period = period;
         this.appointmentTime = appointmentTime;
         this.status = period.isInitiated() ? GoalStatus.ONGOING : GoalStatus.WAITING;
-    }
-
-    public void addCondition(VerificationCondition condition) {
-        conditions.add(condition);
-        condition.setGoal(this);
     }
 
     public int getSkippedDayLimit() {

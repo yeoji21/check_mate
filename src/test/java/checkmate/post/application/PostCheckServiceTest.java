@@ -55,8 +55,8 @@ class PostCheckServiceTest {
 
     private Goal createLikeConditionGoal() {
         Goal goal = TestEntityFactory.goal(null, "title");
-        goal.addCondition(new LikeCountCondition(1));
         goalRepository.save(goal);
+        goalRepository.saveCondition(new LikeCountCondition(goal, 1));
         return goal;
     }
 }

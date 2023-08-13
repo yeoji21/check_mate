@@ -17,7 +17,8 @@ public class LikeCountCondition extends VerificationCondition {
     @Column(name = "minimum_like")
     private int minimumLike;
 
-    public LikeCountCondition(int minimumLike) {
+    public LikeCountCondition(Goal goal, int minimumLike) {
+        super(goal);
         this.minimumLike = minimumLike;
     }
 

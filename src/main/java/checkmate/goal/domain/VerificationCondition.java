@@ -37,10 +37,18 @@ public abstract class VerificationCondition extends BaseTimeEntity {
     @JoinColumn(name = "goal_id", unique = true, nullable = false)
     private Goal goal;
 
+    protected VerificationCondition(Goal goal) {
+        this.goal = goal;
+    }
+
     public abstract boolean satisfy(Post post);
 
     public Long getId() {
         return id;
+    }
+
+    public Long getGoalId() {
+        return goal.getId();
     }
 
     void setGoal(Goal goal) {

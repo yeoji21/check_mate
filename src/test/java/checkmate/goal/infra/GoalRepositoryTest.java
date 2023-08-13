@@ -20,27 +20,12 @@ import org.springframework.test.util.ReflectionTestUtils;
 class GoalRepositoryTest extends RepositoryTest {
 
     @Test
-    @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
-    void findGoalWithConditions() throws Exception {
-        //given
-        Goal goal = createGoal();
-        goal.addCondition(new LikeCountCondition(5));
-
-        //when
-        Goal findGoal = goalRepository.findWithConditions(goal.getId())
-            .orElseThrow(IllegalArgumentException::new);
-
-        //then
-        List<VerificationCondition> conditions = getGoalConditions(findGoal);
-        assertThat(conditions.size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("목표와 조건 함께 조회 - 조건이 존재하는 경우")
     void findConditions() throws Exception {
         //given
         Goal goal = createGoal();
-        goal.addCondition(new LikeCountCondition(5));
+        goalRepository.saveCondition(new LikeCountCondition(goal, 5));
+        em.flush();
+        em.clear();
 
         //when
         List<VerificationCondition> conditions = goalRepository.findConditions(goal.getId());
@@ -66,38 +51,20 @@ class GoalRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("목표와 조건 함께 조회 - 조건이 없는 경우")
-    void findConditionsWithNoConditions() throws Exception {
-        //given
-        Goal goal = createGoal();
-
-        //when
-        Goal findGoal = goalRepository.findWithConditions(goal.getId())
-            .orElseThrow(IllegalArgumentException::new);
-
-        //then
-        List<VerificationCondition> conditions = getGoalConditions(findGoal);
-        assertThat(conditions.size()).isEqualTo(0);
-    }
-
-    @Test
     @DisplayName("목표 인증 조건 추가")
     void addCondition() throws Exception {
         //given
         Goal goal = createGoal();
-        LikeCountCondition condition = new LikeCountCondition(5);
+        LikeCountCondition condition = new LikeCountCondition(goal, 5);
+        em.flush();
+        em.clear();
 
         //when
-        goal.addCondition(condition);
+        goalRepository.saveCondition(condition);
 
         //then
-        Goal findGoal = goalRepository.findWithConditions(goal.getId())
-            .orElseThrow(IllegalArgumentException::new);
-        LikeCountCondition findCondition = em.find(LikeCountCondition.class, condition.getId());
-
-        List<VerificationCondition> conditions = getGoalConditions(findGoal);
-        assertThat(conditions).contains(findCondition);
-        assertThat(findCondition.getMinimumLike()).isEqualTo(5);
+        List<VerificationCondition> findCondition = goalRepository.findConditions(goal.getId());
+        assertThat(findCondition).contains(condition);
     }
 
     @Test
@@ -148,11 +115,6 @@ class GoalRepositoryTest extends RepositoryTest {
             .build();
         em.persist(goal);
         return goal;
-    }
-
-    private List<VerificationCondition> getGoalConditions(Goal findGoal) {
-        return (List<VerificationCondition>)
-            ReflectionTestUtils.getField(findGoal, "conditions");
     }
 
     private Goal createGoal() {
