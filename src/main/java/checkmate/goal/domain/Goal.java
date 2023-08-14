@@ -56,7 +56,8 @@ public class Goal extends BaseTimeEntity {
     private LocalTime appointmentTime;
 
     @Builder
-    public Goal(GoalCategory category,
+    public Goal(
+        GoalCategory category,
         String title,
         GoalPeriod period,
         GoalCheckDays checkDays,

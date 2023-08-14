@@ -1,6 +1,7 @@
 package checkmate.goal.domain;
 
 import checkmate.post.domain.Post;
+import java.time.LocalDate;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -24,9 +25,13 @@ public class LikeCountCondition extends VerificationCondition {
 
     @Override
     public boolean satisfy(Post post) {
-        if (post.getCreatedDate().plusDays(1).isBefore(post.getCreatedDate())) {
+        if (isPastThanYesterDay(post.getCreatedDate())) {
             return false;
         }
         return post.getLikes().size() >= minimumLike;
+    }
+
+    private boolean isPastThanYesterDay(LocalDate date) {
+        return date.isBefore(LocalDate.now().minusDays(1));
     }
 }

@@ -50,8 +50,4 @@ public abstract class VerificationCondition extends BaseTimeEntity {
     public Long getGoalId() {
         return goal.getId();
     }
-
-    void setGoal(Goal goal) {
-        this.goal = goal;
-    }
 }
