@@ -7,6 +7,7 @@ import checkmate.user.infrastructure.UserQueryDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+// TODO: 2023/08/15 클래스명
 @RequiredArgsConstructor
 @Component
 public class MateStartingService {

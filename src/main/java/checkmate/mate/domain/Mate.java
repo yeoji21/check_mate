@@ -68,16 +68,23 @@ public class Mate extends BaseTimeEntity {
     }
 
     void acceptInvite() {
-        goal.checkInviteable();
-        status.checkStartable();
-        status = MateStatus.ONGOING;
-        attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
+        if (goal.isInviteableProgress()) {
+            // TODO: 2023/08/15 status 메소드로 캡슐화
+            status.checkStartable();
+            status = MateStatus.ONGOING;
+            attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
+            return;
+        }
+        throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
     }
 
     public void receiveInvite() {
-        goal.checkInviteable();
-        status.checkInviteable();
-        status = MateStatus.WAITING;
+        if (goal.isInviteableProgress()) {
+            status.checkInviteable();
+            status = MateStatus.WAITING;
+            return;
+        }
+        throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
     }
 
     public void rejectInvite() {

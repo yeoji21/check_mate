@@ -42,7 +42,7 @@ public class SpecifiedGoalDetailInfo {
         this.appointmentTime = goal.getAppointmentTime();
         this.weekDays = goal.getCheckDays().toKorean();
         this.status = goal.getStatus();
-        this.inviteable = goal.isInviteable();
+        this.inviteable = goal.isInviteableProgress();
         this.goalSchedule = GoalScheduleService.createGoalSchedule(goal.getPeriod(),
             goal.getCheckDays());
         this.mateSchedule = GoalScheduleService.createCheckedSchedule(goal.getPeriod(),

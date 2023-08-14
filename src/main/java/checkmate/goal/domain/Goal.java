@@ -2,7 +2,6 @@ package checkmate.goal.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
-import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.user.domain.User;
@@ -90,14 +89,8 @@ public class Goal extends BaseTimeEntity {
         return new Mate(this, user);
     }
 
-    public boolean isInviteable() {
+    public boolean isInviteableProgress() {
         return period.getProgressedPercent() <= GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT;
-    }
-
-    public void checkInviteable() {
-        if (!isInviteable()) {
-            throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
-        }
     }
 
     public int getTotalCheckDayCount() {

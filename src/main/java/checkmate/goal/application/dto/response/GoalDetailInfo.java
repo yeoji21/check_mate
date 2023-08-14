@@ -35,7 +35,7 @@ public class GoalDetailInfo {
         this.appointmentTime = goal.getAppointmentTime();
         this.weekDays = goal.getCheckDays().toKorean();
         this.status = goal.getStatus();
-        this.inviteable = goal.isInviteable();
+        this.inviteable = goal.isInviteableProgress();
     }
 
     public void setMates(List<MateUploadInfo> mates) {

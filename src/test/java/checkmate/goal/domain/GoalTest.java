@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
-import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -156,7 +155,7 @@ class GoalTest {
         Goal goal = createGoal();
 
         //when
-        boolean inviteable = goal.isInviteable();
+        boolean inviteable = goal.isInviteableProgress();
 
         // then
         assertThat(inviteable).isTrue();
@@ -173,13 +172,10 @@ class GoalTest {
             LocalDate.now().minusDays(200L));
 
         //when
-        boolean inviteable = goal.isInviteable();
+        boolean inviteable = goal.isInviteableProgress();
 
         // then
         assertThat(inviteable).isFalse();
-        assertThat(
-            assertThrows(NotInviteableGoalException.class, goal::checkInviteable).getErrorCode()
-        ).isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
     @Test

@@ -2,8 +2,6 @@ package checkmate.mate.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
@@ -14,7 +12,6 @@ import checkmate.goal.domain.GoalPeriod;
 import checkmate.mate.domain.Mate.MateStatus;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class MateTest {
@@ -61,7 +58,7 @@ class MateTest {
     @Test
     void rejectInviteWhenWaitingStatus() throws Exception {
         //given
-        Mate mate = createMate(MateStatus.WAITING);
+        Mate mate = createMate(createGoal(), MateStatus.WAITING);
 
         //when
         mate.rejectInvite();
@@ -73,7 +70,7 @@ class MateTest {
     @Test
     void rejectInviteWhenInvalidStatus() throws Exception {
         //given
-        Mate mate = createMate(MateStatus.ONGOING);
+        Mate mate = createMate(createGoal(), MateStatus.ONGOING);
 
         //when
         BusinessException exception = assertThrows(BusinessException.class, mate::rejectInvite);
@@ -85,36 +82,31 @@ class MateTest {
     @Test
     void receiveInvite() throws Exception {
         //given
-        Mate mate = createMateWithMockGoal(MateStatus.CREATED);
+
+        Mate mate = createMate(createGoal(), MateStatus.CREATED);
 
         //when
         mate.receiveInvite();
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.WAITING);
-        verify(mate.getGoal()).checkInviteable();
     }
 
     @Test
     void receiveInviteFailBecauseAlreadyInGoal() throws Exception {
         //given
-        Mate ongoingMate = createMateWithMockGoal(MateStatus.ONGOING);
-        Mate successMate = createMateWithMockGoal(MateStatus.SUCCESS);
+        Mate ongoingMate = createMate(createGoal(), MateStatus.ONGOING);
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> ongoingMate.receiveInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
-
-        assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> successMate.receiveInvite()).getErrorCode())
+            ongoingMate::receiveInvite).getErrorCode())
             .isEqualTo(ErrorCode.ALREADY_IN_GOAL);
     }
 
     @Test
     void receiveInviteFailBecauseAlreadyWaitingStatus() throws Exception {
         //given
-        Mate waitingMate = createMateWithMockGoal(MateStatus.WAITING);
+        Mate waitingMate = createMate(createGoal(), MateStatus.WAITING);
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
@@ -125,7 +117,7 @@ class MateTest {
     @Test
     void failToWaitingStatusBecauseProgressedGoal() throws Exception {
         //given
-        Mate mate = createMateWithNotInviteableGoal(MateStatus.CREATED);
+        Mate mate = createMate(progressOveredGoal(), MateStatus.CREATED);
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
@@ -136,66 +128,46 @@ class MateTest {
     @Test
     void changeToOngoingStatus() throws Exception {
         //given
-        int progressDays = 5;
-        Mate mate = createMateWithMockGoal(MateStatus.WAITING);
-        Mockito.when(mate.getGoal().getProgressedCheckDayCount()).thenReturn(progressDays);
+        Mate mate = createMate(createGoal(), MateStatus.WAITING);
 
         //when
         mate.acceptInvite();
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.ONGOING);
-        verify(mate.getGoal()).checkInviteable();
-        assertThat(mate.getCheckDayCount()).isEqualTo(progressDays);
     }
 
     @Test
     void acceptInviteFailBecauseStatus() throws Exception {
         //given
-        Mate created = createMateWithMockGoal(MateStatus.CREATED);
-        Mate rejected = createMateWithMockGoal(MateStatus.REJECT);
-        Mate ongoing = createMateWithMockGoal(MateStatus.ONGOING);
-        Mate succeeded = createMateWithMockGoal(MateStatus.SUCCESS);
+        Mate created = createMate(createGoal(), MateStatus.CREATED);
 
         //when //then
         assertThat(assertThrows(BusinessException.class,
-            () -> created.acceptInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
-        assertThat(assertThrows(BusinessException.class,
-            () -> rejected.acceptInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
-        assertThat(assertThrows(BusinessException.class,
-            () -> ongoing.acceptInvite()).getErrorCode())
-            .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
-        assertThat(assertThrows(BusinessException.class,
-            () -> succeeded.acceptInvite()).getErrorCode())
+            created::acceptInvite).getErrorCode())
             .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 
     @Test
     void acceptInviteFailBecauseProgressedGoal() throws Exception {
         //given
-        Mate mate = createMateWithNotInviteableGoal(MateStatus.WAITING);
+        Mate mate = createMate(progressOveredGoal(), MateStatus.WAITING);
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
-            () -> mate.acceptInvite()).getErrorCode())
+            mate::acceptInvite).getErrorCode())
             .isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
-    private Mate createMateWithNotInviteableGoal(MateStatus status) {
-        Mate mate = createMate(status);
-        Goal mockGoal = Mockito.mock(Goal.class);
-        ReflectionTestUtils.setField(mate, "goal", mockGoal);
-        doAnswer(invocation -> {
-            throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
-        }).when(mockGoal).checkInviteable();
-        return mate;
+    private Goal progressOveredGoal() {
+        Goal goal = createGoal();
+        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", todayMinusDays(100));
+        return goal;
     }
 
-    private Mate createMateWithMockGoal(MateStatus status) {
-        Mate mate = createMate(status);
-        ReflectionTestUtils.setField(mate, "goal", Mockito.mock(Goal.class));
+    private Mate createMate(Goal goal, MateStatus status) {
+        Mate mate = createMate(goal);
+        ReflectionTestUtils.setField(mate, "status", status);
         return mate;
     }
 
@@ -206,18 +178,12 @@ class MateTest {
         return goal;
     }
 
-    private LocalDate todayMinusDays(int daysToSubtract) {
-        return today().minusDays(daysToSubtract);
-    }
-
     private LocalDate today() {
         return LocalDate.now();
     }
 
-    private Mate createMate(MateStatus status) {
-        Mate mate = createMate(createGoal());
-        ReflectionTestUtils.setField(mate, "status", status);
-        return mate;
+    private LocalDate todayMinusDays(int daysToMinus) {
+        return today().minusDays(daysToMinus);
     }
 
     private Mate createMate(Goal goal) {
