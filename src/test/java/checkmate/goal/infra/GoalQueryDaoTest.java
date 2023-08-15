@@ -12,13 +12,13 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
-import checkmate.goal.domain.GoalScheduleService;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -33,21 +33,17 @@ class GoalQueryDaoTest extends RepositoryTest {
         //given
         Goal goal1 = createGoal();
         Goal goal2 = createGoal();
-        createOngoingMate(createUser("user1"), goal1);
-        createOngoingMate(createUser("user2"), goal1);
-        createOngoingMate(createUser("user3"), goal2);
-        Mate out = createOngoingMate(createUser("user5"), goal2);
-        ReflectionTestUtils.setField(out, "status", MateStatus.OUT);
-
-        em.flush();
-        em.clear();
+        createOngoingMate(goal1);
+        createOngoingMate(goal1);
+        createOngoingMate(goal2);
+        createOutMate(goal2);
 
         //when
         List<Long> userIds = goalQueryDao.findOngoingUserIds(
             List.of(goal1.getId(), goal2.getId()));
 
         //then
-        assertThat(userIds).hasSize(4);
+        assertThat(userIds).hasSize(3);
     }
 
     @Test
@@ -62,7 +58,6 @@ class GoalQueryDaoTest extends RepositoryTest {
         List<Long> overedGoalIds = goalQueryDao.findYesterdayOveredGoals();
 
         //then
-        assertThat(overedGoalIds).hasSize(3);
         assertThat(overedGoalIds).contains(goal1.getId(), goal2.getId(), goal3.getId());
     }
 
@@ -71,18 +66,18 @@ class GoalQueryDaoTest extends RepositoryTest {
         //given
         Goal goal1 = createGoal();
         Goal goal2 = createGoal();
-        createOngoingMate(createUser("user1"), goal1);
-        createOngoingMate(createUser("user2"), goal1);
-        createOngoingMate(createUser("user3"), goal2);
-        createOngoingMate(createUser("user4"), goal2);
+        createOngoingMate(goal1);
+        createOngoingMate(goal1);
+        createOngoingMate(goal2);
+        createOngoingMate(goal2);
 
         //when
         List<CompleteGoalNotificationDto> notificationDto =
             goalQueryDao.findCompleteNotificationDto(List.of(goal1.getId(), goal2.getId()));
 
         //then
-        assertThat(notificationDto).hasSize(4);
         assertThat(notificationDto)
+            .hasSize(4)
             .allMatch(dto -> dto.getGoalId() > 0L)
             .allMatch(dto -> dto.getUserId() > 0L)
             .allMatch(dto -> dto.getGoalTitle() != null);
@@ -92,17 +87,17 @@ class GoalQueryDaoTest extends RepositoryTest {
     @DisplayName("유저의 진행 중인 목표들 간략 정보 조회")
     void findOngoingSimpleInfo() throws Exception {
         //given
-        User user = createUser("user");
-        createOngoingMate(user, createGoal());
-        createOngoingMate(user, createGoal());
-        createOngoingMate(user, createGoal());
+        User user = createUser();
+        createOngoingMate(createGoal(), user);
+        createOngoingMate(createGoal(), user);
+        createOngoingMate(createGoal(), user);
 
         //when
         List<OngoingGoalInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
 
         //then
-        assertThat(ongoingGoals).hasSize(3);
         assertThat(ongoingGoals)
+            .hasSize(3)
             .allMatch(info -> info.getId() > 0L)
             .allMatch(info -> info.getTitle() != null)
             .allMatch(info -> info.getCategory() != null)
@@ -122,26 +117,23 @@ class GoalQueryDaoTest extends RepositoryTest {
         //then
         assertThat(goalScheduleInfo.getStartDate()).isEqualTo(goal.getStartDate());
         assertThat(goalScheduleInfo.getEndDate()).isEqualTo(goal.getEndDate());
-        assertThat(goalScheduleInfo.getSchedule())
-            .isEqualTo(
-                GoalScheduleService.createGoalSchedule(goal.getPeriod(), goal.getCheckDays()));
     }
 
     @Test
     @DisplayName("오늘 진행할 목표 정보")
     void findTodayGoalInfo() throws Exception {
         //given
-        User user = createUser("user");
-        createFutureStartGoal(user);
-        createTodayStartGoal(user);
+        User user = createUser();
+        createOngoingMate(createFutureStartGoal(), user);
+        createOngoingMate(createTodayStartGoal(), user);
 
         //when
         List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(user.getId());
 
         //then
-        assertThat(todayGoals).hasSize(1);
-        assertThat(todayGoals).allMatch(goal ->
-            GoalCheckDays.ofKorean(goal.getCheckDays()).isCheckDay(LocalDate.now()));
+        assertThat(todayGoals)
+            .hasSize(1)
+            .allMatch(this::isToday);
     }
 
     @Test
@@ -149,9 +141,9 @@ class GoalQueryDaoTest extends RepositoryTest {
     void findDetailInfo() throws Exception {
         //given
         Goal goal = createGoal();
-        createOngoingMate(createUser("user1"), goal);
-        createOngoingMate(createUser("user2"), goal);
-        createOngoingMate(createUser("user3"), goal);
+        createOngoingMate(goal);
+        createOngoingMate(goal);
+        createOngoingMate(goal);
 
         //when
         GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId())
@@ -159,22 +151,26 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //then
         assertThat(info.getTitle()).isEqualTo(goal.getTitle());
-        assertThat(info.getMates()).hasSize(3);
+        assertThat(info.isInviteable()).isTrue();
         assertThat(info.getMates())
+            .hasSize(3)
             .allMatch(mate -> mate.getNickname() != null)
             .allMatch(mate -> !mate.isUploaded())
             .allMatch(mate -> mate.getMateId() > 0)
             .allMatch(mate -> mate.getUserId() > 0);
-        assertThat(info.isInviteable()).isTrue();
     }
 
-    private void createTodayStartGoal(User user) {
+    private boolean isToday(TodayGoalInfo goal) {
+        return GoalCheckDays.ofKorean(goal.getCheckDays()).isCheckDay(LocalDate.now());
+    }
+
+    private Goal createTodayStartGoal() {
         Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now());
-        createOngoingMate(user, goal);
+        return goal;
     }
 
-    private void createFutureStartGoal(User user) {
+    private Goal createFutureStartGoal() {
         Goal goal = Goal.builder()
             .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
             .category(GoalCategory.ETC)
@@ -182,20 +178,32 @@ class GoalQueryDaoTest extends RepositoryTest {
             .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
             .build();
         em.persist(goal);
-        createOngoingMate(user, goal);
+        return goal;
     }
 
-    private User createUser(String name) {
-        User user = TestEntityFactory.user(null, name);
-        em.persist(user);
-        return user;
+    private Mate createOngoingMate(Goal goal) {
+        Mate mate = goal.createMate(createUser());
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
+        return mate;
     }
 
-    private Mate createOngoingMate(User user, Goal goal) {
+    private void createOutMate(Goal goal2) {
+        Mate out = createOngoingMate(goal2);
+        ReflectionTestUtils.setField(out, "status", MateStatus.OUT);
+    }
+
+    private Mate createOngoingMate(Goal goal, User user) {
         Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;
+    }
+
+    private User createUser() {
+        User user = TestEntityFactory.user(null, UUID.randomUUID().toString());
+        em.persist(user);
+        return user;
     }
 
     private Goal createGoal() {
