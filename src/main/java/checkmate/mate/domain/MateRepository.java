@@ -4,7 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MateRepository {
+
     Optional<Mate> findById(long mateId);
+
+    Optional<UninitiatedMate> findUninitiateMate(long mateId);
 
     Optional<Mate> findWithGoal(long mateId);
 

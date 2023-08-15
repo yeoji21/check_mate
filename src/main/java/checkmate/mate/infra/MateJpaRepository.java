@@ -3,12 +3,14 @@ package checkmate.mate.infra;
 import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QPost.post;
+import static com.querydsl.core.types.ExpressionUtils.count;
 
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.UninitiatedMate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +31,13 @@ public class MateJpaRepository implements MateRepository {
     @Override
     public Optional<Mate> findById(long mateId) {
         return Optional.ofNullable(entityManager.find(Mate.class, mateId));
+    }
+
+    @Override
+    public Optional<UninitiatedMate> findUninitiateMate(long mateId) {
+        Optional<Mate> optionalMate = Optional.ofNullable(entityManager.find(Mate.class, mateId));
+        return optionalMate.map(
+            findMate -> new UninitiatedMate(optionalMate.get(), selectOngoingGoalCount(findMate)));
     }
 
     @Override
@@ -101,6 +110,7 @@ public class MateJpaRepository implements MateRepository {
     }
 
     // TODO: 2022/08/25 TM의 skippedCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
+
     @Override
     public void updateLimitOveredMates(List<Mate> limitOveredMates) {
         jdbcTemplate.batchUpdate(
@@ -117,6 +127,14 @@ public class MateJpaRepository implements MateRepository {
         return mate;
     }
 
+    private int selectOngoingGoalCount(Mate findMate) {
+        return queryFactory.select(count(mate.id))
+            .from(mate)
+            .where(mate.userId.eq(findMate.getUserId()),
+                mate.status.eq(MateStatus.ONGOING))
+            .fetchOne()
+            .intValue();
+    }
 }
 
 

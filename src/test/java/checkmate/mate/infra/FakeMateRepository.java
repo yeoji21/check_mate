@@ -3,6 +3,7 @@ package checkmate.mate.infra;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.UninitiatedMate;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,12 @@ public class FakeMateRepository implements MateRepository {
     @Override
     public Optional<Mate> findById(long mateId) {
         return Optional.ofNullable(map.get(mateId));
+    }
+
+    @Override
+    public Optional<UninitiatedMate> findUninitiateMate(long mateId) {
+        Optional<Mate> mate = Optional.ofNullable(map.get(mateId));
+        return mate.map(m -> new UninitiatedMate(m, getOngoingCount(m)));
     }
 
     @Override
@@ -68,5 +75,13 @@ public class FakeMateRepository implements MateRepository {
         return mateIds.stream()
             .map(map::get)
             .toList();
+    }
+
+    private int getOngoingCount(Mate m) {
+        return (int) map.values()
+            .stream()
+            .filter(mt -> m.getUserId().equals(mt.getUserId()))
+            .filter(mt -> mt.getStatus().equals(MateStatus.ONGOING))
+            .count();
     }
 }

@@ -160,6 +160,8 @@ public class Goal extends BaseTimeEntity {
         ;
     }
 
+    // TODO: 2023/08/16 GoalStatus를 유지할 필요가 있을까?
+    // 목표 수행 기간으로 검증 가능한 값
     public enum GoalStatus {
         ONGOING, OVER, WAITING;
     }

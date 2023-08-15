@@ -3,14 +3,14 @@ package checkmate.mate.domain;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.GoalPolicyConstants;
-import com.querydsl.core.annotations.QueryProjection;
+import lombok.Getter;
 
 public class UninitiatedMate {
 
     private final Mate mate;
+    @Getter
     private final int ongoingGoalCount;
 
-    @QueryProjection
     public UninitiatedMate(Mate mate, int ongoingGoalCount) {
         this.mate = mate;
         this.ongoingGoalCount = ongoingGoalCount;

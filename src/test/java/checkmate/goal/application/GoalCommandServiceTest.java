@@ -1,8 +1,6 @@
 package checkmate.goal.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
 import checkmate.goal.application.dto.GoalCommandMapper;
@@ -12,9 +10,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.FakeGoalRepository;
-import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.MateStartingService;
 import checkmate.mate.infra.FakeMateRepository;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
@@ -25,7 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -38,8 +33,6 @@ class GoalCommandServiceTest {
     private UserRepository userRepository = new FakeUserRepository();
     @Spy
     private MateRepository mateRepository = new FakeMateRepository();
-    @Mock
-    private MateStartingService mateStartingService;
     @Spy
     private GoalCommandMapper commandMapper = GoalCommandMapper.INSTANCE;
     @InjectMocks
@@ -71,7 +64,6 @@ class GoalCommandServiceTest {
 
         //then
         assertThat(goalId).isGreaterThan(0L);
-        verify(mateStartingService).startToGoal(any(Mate.class));
     }
 
     private GoalCreateCommand createGoalCreateCommand() {

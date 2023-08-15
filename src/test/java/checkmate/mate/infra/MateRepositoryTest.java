@@ -12,19 +12,33 @@ import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
+import checkmate.mate.domain.UninitiatedMate;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class MateRepositoryTest extends RepositoryTest {
 
     @Test
-    @DisplayName("팀원 조회 - mateId로 조회")
+    void select_mate_with_ongoing_goal_count() throws Exception {
+        //given
+        User user = createUser();
+        Mate mate = createMate(user, MateStatus.ONGOING);
+        createMate(user, MateStatus.ONGOING);
+        createMate(user, MateStatus.OUT);
+
+        //when
+        UninitiatedMate uninitiatedMate = mateRepository.findUninitiateMate(mate.getId()).get();
+
+        //then
+        assertThat(uninitiatedMate.getOngoingGoalCount()).isEqualTo(2);
+    }
+
+    @Test
     void find() throws Exception {
         //given
         Goal goal = createGoal();
@@ -42,7 +56,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("팀원 조회 (목표 fetch createMate) - mateId로 조회")
     void findWithGoal_mateId() throws Exception {
         //given
         Goal goal = createGoal();
@@ -59,7 +72,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("팀원 조회 (목표 fetch createMate) - goalId, userId로 조회")
     void findWithGoal_goalId_userId() throws Exception {
         //given
         Goal goal = createGoal();
@@ -76,7 +88,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("어제가 인증하지 않은 팀원 목록 조회")
     void findYesterdaySkippedMates() throws Exception {
         //given
         Goal yesterDayGoal = createGoal();
@@ -106,7 +117,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("인증하지 않은 팀원들 검사 스케쥴러")
     void increaseSkippedDayCount() throws Exception {
         //given
         Goal goal = createGoal();
@@ -128,7 +138,6 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     @Test
-    @DisplayName("팀원 제거 스케쥴러")
     void eliminateOveredMates() throws Exception {
         //given
         Goal goal = createGoal();
@@ -156,9 +165,14 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     private Mate createMate(Goal goal) {
-        User user = TestEntityFactory.user(null, "user");
-        em.persist(user);
-        Mate mate = goal.createMate(user);
+        Mate mate = goal.createMate(createUser());
+        em.persist(mate);
+        return mate;
+    }
+
+    private Mate createMate(User user, MateStatus status) {
+        Mate mate = createGoal().createMate(user);
+        ReflectionTestUtils.setField(mate, "status", status);
         em.persist(mate);
         return mate;
     }
@@ -170,12 +184,16 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     private Mate createOngoingMate(Goal goal) {
-        User user = TestEntityFactory.user(null, UUID.randomUUID().toString());
-        em.persist(user);
-        Mate mate = goal.createMate(user);
+        Mate mate = goal.createMate(createUser());
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;
+    }
+
+    private User createUser() {
+        User user = TestEntityFactory.user(null, UUID.randomUUID().toString());
+        em.persist(user);
+        return user;
     }
 
     private void createYesterDayUploadedPost(Mate mate) {

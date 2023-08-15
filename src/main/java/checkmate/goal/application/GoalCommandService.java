@@ -14,7 +14,6 @@ import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.LikeCountCondition;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.MateStartingService;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +31,6 @@ public class GoalCommandService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
     private final MateRepository mateRepository;
-    private final MateStartingService mateStartingService;
     private final GoalCommandMapper mapper;
 
     @Caching(evict = {
@@ -46,7 +44,7 @@ public class GoalCommandService {
     @Transactional
     public long create(GoalCreateCommand command) {
         Goal goal = createAndSaveGoal(command);
-        creatorJoinToGoal(goal, command.userId());
+        initateToGoal(createAndSaveMate(goal, command.userId()));
         return goal.getId();
     }
 
@@ -76,8 +74,10 @@ public class GoalCommandService {
         return mate;
     }
 
-    private void creatorJoinToGoal(Goal goal, long userId) {
-        mateStartingService.startToGoal(createAndSaveMate(goal, userId));
+    private void initateToGoal(Mate mate) {
+        mateRepository.findUninitiateMate(mate.getId())
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()))
+            .initiate();
     }
 
     private Mate createMate(Goal goal, long userId) {

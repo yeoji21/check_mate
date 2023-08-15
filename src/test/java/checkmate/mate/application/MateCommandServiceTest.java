@@ -3,7 +3,6 @@ package checkmate.mate.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
@@ -18,7 +17,6 @@ import checkmate.mate.application.dto.response.MateAcceptResult;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
-import checkmate.mate.domain.MateStartingService;
 import checkmate.mate.infra.FakeMateRepository;
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeKey;
@@ -54,8 +52,6 @@ class MateCommandServiceTest {
     private MateRepository mateRepository = new FakeMateRepository();
     @Spy
     private NotificationRepository notificationRepository = new FakeNotificationRepository();
-    @Mock
-    private MateStartingService mateStartingService;
     @Mock
     private KeyValueStorage keyValueStorage;
     @Mock
@@ -105,15 +101,11 @@ class MateCommandServiceTest {
     void inviteAccpet() throws Exception {
         //given
         Mate inviteeMate = createAndSaveMate();
+        inviteeMate.receiveInvite();
         Notification notification = createAndSaveInviteNotification(inviteeMate);
 
         MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(),
             notification.getId());
-        doAnswer((invocation) -> {
-            Mate argument = (Mate) invocation.getArgument(0);
-            ReflectionTestUtils.setField(argument, "status", MateStatus.ONGOING);
-            return argument;
-        }).when(mateStartingService).startToGoal(any(Mate.class));
 
         //when
         MateAcceptResult result = mateCommandService.acceptInvite(command);
@@ -122,8 +114,6 @@ class MateCommandServiceTest {
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.ONGOING);
         assertThat(result.goalId()).isEqualTo(inviteeMate.getGoal().getId());
         assertThat(result.mateId()).isEqualTo(inviteeMate.getId());
-
-        verify(mateStartingService).startToGoal(any(Mate.class));
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
