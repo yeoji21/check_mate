@@ -31,12 +31,12 @@ public class FakeGoalRepository implements GoalRepository {
     }
 
     @Override
-    public Optional<Goal> findById(long goalId) {
+    public Optional<Goal> find(long goalId) {
         return Optional.ofNullable(goalMap.get(goalId));
     }
 
     @Override
-    public Optional<Goal> findByIdWithLock(long goalId) {
+    public Optional<Goal> findForUpdate(long goalId) {
         return Optional.ofNullable(goalMap.get(goalId));
     }
 

@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.experimental.UtilityClass;
 
 
+@UtilityClass
 public class GoalScheduleService {
 
     public static String createGoalSchedule(GoalPeriod period, GoalCheckDays checkDays) {

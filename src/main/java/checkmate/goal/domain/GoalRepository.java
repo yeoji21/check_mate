@@ -9,13 +9,13 @@ public interface GoalRepository {
 
     void saveCondition(VerificationCondition condition);
 
-    Optional<Goal> findById(long goalId);
+    Optional<Goal> find(long goalId);
 
-    Optional<Goal> findByIdWithLock(long goalId);
+    Optional<Goal> findForUpdate(long goalId);
+
+    List<VerificationCondition> findConditions(long goalId);
 
     void updateStatusToOver(List<Long> goalIds);
 
     void updateTodayStartGoalsToOngoing();
-
-    List<VerificationCondition> findConditions(long goalId);
 }

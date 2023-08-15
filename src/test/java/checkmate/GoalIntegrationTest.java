@@ -84,7 +84,7 @@ public class GoalIntegrationTest {
 //        assertThat(response.getTitle()).isEqualTo(request.getTitle());
 //        assertThat(response.getGoalMethod()).isEqualTo(request.getGoalMethod());
 
-//        List<TeamMate> teamMates = goalRepository.findById(response.getId()).orElseThrow().getTeamMates();
+//        List<TeamMate> teamMates = goalRepository.find(response.getId()).orElseThrow().getTeamMates();
 //        assertThat(teamMates).hasSize(1);
 //        assertThat(teamMates.get(0).getTeamMateStatus()).isEqualTo(TeamMateStatus.ONGOING);
 //        assertThat(teamMates).extracting("user").containsExactly(goalCreator);

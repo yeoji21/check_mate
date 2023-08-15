@@ -43,7 +43,7 @@ class GoalRepositoryTest extends RepositoryTest {
         em.clear();
 
         //when
-        Goal findGoal = goalRepository.findByIdWithLock(goal.getId())
+        Goal findGoal = goalRepository.findForUpdate(goal.getId())
             .orElseThrow(IllegalArgumentException::new);
 
         //then

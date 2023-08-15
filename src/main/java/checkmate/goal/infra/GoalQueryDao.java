@@ -38,7 +38,6 @@ public class GoalQueryDao {
 
     private final JPAQueryFactory queryFactory;
 
-    // 오늘 진행할 목표 정보 조회
     public List<TodayGoalInfo> findTodayGoalInfo(long userId) {
         return queryFactory.select(
                 new QTodayGoalInfo(goal.id, goal.category, goal.title, goal.checkDays,
@@ -66,7 +65,6 @@ public class GoalQueryDao {
         return goalDetailInfo;
     }
 
-    // 목표 진행 일정 관련 정보 조회
     public Optional<GoalScheduleInfo> findGoalScheduleInfo(long goalId) {
         return Optional.ofNullable(
             queryFactory
@@ -78,7 +76,6 @@ public class GoalQueryDao {
         );
     }
 
-    // 진행중인 목표들 정보 조회
     public List<OngoingGoalInfo> findOngoingSimpleInfo(long userId) {
         return queryFactory.select(
                 new QOngoingGoalInfo(goal.id, goal.category, goal.title, goal.checkDays.checkDays))

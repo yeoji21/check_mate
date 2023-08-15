@@ -22,9 +22,12 @@ public class PostCheckService {
     }
 
     private boolean isSatisfyAllConditions(Post post) {
-        List<VerificationCondition> conditions = goalRepository.findConditions(
-            post.getMate().getGoal().getId());
+        List<VerificationCondition> conditions = goalRepository.findConditions(getGoalId(post));
         return conditions.isEmpty() || conditions.stream()
             .allMatch(condition -> condition.satisfy(post));
+    }
+
+    private Long getGoalId(Post post) {
+        return post.getMate().getGoal().getId();
     }
 }

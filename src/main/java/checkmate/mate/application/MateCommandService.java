@@ -104,7 +104,7 @@ public class MateCommandService {
     }
 
     private Mate createAndSaveMate(long goalId, User invitee) {
-        Goal goal = goalRepository.findById(goalId)
+        Goal goal = goalRepository.find(goalId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
         return mateRepository.save(goal.createMate(invitee));
     }

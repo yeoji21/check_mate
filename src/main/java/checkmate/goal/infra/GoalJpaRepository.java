@@ -38,12 +38,12 @@ public class GoalJpaRepository implements GoalRepository {
     }
 
     @Override
-    public Optional<Goal> findById(long goalId) {
+    public Optional<Goal> find(long goalId) {
         return Optional.ofNullable(entityManager.find(Goal.class, goalId));
     }
 
     @Override
-    public Optional<Goal> findByIdWithLock(long goalId) {
+    public Optional<Goal> findForUpdate(long goalId) {
         return Optional.ofNullable(
             queryFactory.selectFrom(goal)
                 .where(goal.id.eq(goalId))
@@ -52,6 +52,7 @@ public class GoalJpaRepository implements GoalRepository {
         );
     }
 
+    // TODO: 2023/08/15 batch insert로 업데이트
     @Override
     public void updateTodayStartGoalsToOngoing() {
         queryFactory.update(goal)

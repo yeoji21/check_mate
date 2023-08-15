@@ -2,13 +2,9 @@ package checkmate.goal.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.cache.KeyValueStorage;
 import checkmate.goal.application.dto.GoalCommandMapper;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
@@ -16,19 +12,15 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.FakeGoalRepository;
-import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.MateStartingService;
 import checkmate.mate.infra.FakeMateRepository;
-import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
-import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.FakeUserRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 @ExtendWith(MockitoExtension.class)
 class GoalCommandServiceTest {
@@ -48,36 +39,11 @@ class GoalCommandServiceTest {
     @Spy
     private MateRepository mateRepository = new FakeMateRepository();
     @Mock
-    private GoalQueryDao goalQueryDao;
-    @Mock
     private MateStartingService mateStartingService;
-    @Mock
-    private KeyValueStorage keyValueStorage;
-    @Mock
-    private ApplicationEventPublisher eventPublisher;
     @Spy
     private GoalCommandMapper commandMapper = GoalCommandMapper.INSTANCE;
     @InjectMocks
     private GoalCommandService goalCommandService;
-
-    @Test
-    @DisplayName("성공한 목표 처리 스케쥴러")
-    void updateYesterdayOveredGoals() throws Exception {
-        //given
-        Goal goal1 = createGoal();
-        Goal goal2 = createGoal();
-        given(goalQueryDao.findYesterdayOveredGoals()).willReturn(
-            List.of(goal1.getId(), goal2.getId()));
-        given(goalQueryDao.findCompleteNotificationDto(anyList()))
-            .willReturn(List.of(new CompleteGoalNotificationDto(1L, 1L, "title")));
-            
-        //when
-        goalCommandService.updateYesterdayOveredGoals();
-
-        //then
-        verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(keyValueStorage).deleteAll(anyLong());
-    }
 
     @Test
     @DisplayName("목표 수정")
