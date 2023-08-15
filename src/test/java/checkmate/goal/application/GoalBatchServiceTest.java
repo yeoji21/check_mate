@@ -50,7 +50,8 @@ class GoalBatchServiceTest {
             List.of(goal1.getId(), goal2.getId()));
         given(goalQueryDao.findCompleteNotificationDto(anyList()))
             .willReturn(List.of(new CompleteGoalNotificationDto(1L, 1L, "title")));
-
+        given(goalQueryDao.findOngoingUserIds(anyList())).willReturn(List.of(1L));
+        
         //when
         goalBatchService.updateYesterdayOveredGoals();
 

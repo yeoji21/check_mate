@@ -29,6 +29,28 @@ import org.springframework.test.util.ReflectionTestUtils;
 class GoalQueryDaoTest extends RepositoryTest {
 
     @Test
+    void findOngoingUserIds() throws Exception {
+        //given
+        Goal goal1 = createGoal();
+        Goal goal2 = createGoal();
+        createOngoingMate(createUser("user1"), goal1);
+        createOngoingMate(createUser("user2"), goal1);
+        createOngoingMate(createUser("user3"), goal2);
+        Mate out = createOngoingMate(createUser("user5"), goal2);
+        ReflectionTestUtils.setField(out, "status", MateStatus.OUT);
+
+        em.flush();
+        em.clear();
+
+        //when
+        List<Long> userIds = goalQueryDao.findOngoingUserIds(
+            List.of(goal1.getId(), goal2.getId()));
+
+        //then
+        assertThat(userIds).hasSize(4);
+    }
+
+    @Test
     @DisplayName("어제가 종료일인 목표 목록 조회")
     void findYesterdayOveredGoals() throws Exception {
         //given
@@ -49,10 +71,10 @@ class GoalQueryDaoTest extends RepositoryTest {
         //given
         Goal goal1 = createGoal();
         Goal goal2 = createGoal();
-        createMate(createUser("user1"), goal1);
-        createMate(createUser("user2"), goal1);
-        createMate(createUser("user3"), goal2);
-        createMate(createUser("user4"), goal2);
+        createOngoingMate(createUser("user1"), goal1);
+        createOngoingMate(createUser("user2"), goal1);
+        createOngoingMate(createUser("user3"), goal2);
+        createOngoingMate(createUser("user4"), goal2);
 
         //when
         List<CompleteGoalNotificationDto> notificationDto =
@@ -71,9 +93,9 @@ class GoalQueryDaoTest extends RepositoryTest {
     void findOngoingSimpleInfo() throws Exception {
         //given
         User user = createUser("user");
-        createMate(user, createGoal());
-        createMate(user, createGoal());
-        createMate(user, createGoal());
+        createOngoingMate(user, createGoal());
+        createOngoingMate(user, createGoal());
+        createOngoingMate(user, createGoal());
 
         //when
         List<OngoingGoalInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
@@ -127,9 +149,9 @@ class GoalQueryDaoTest extends RepositoryTest {
     void findDetailInfo() throws Exception {
         //given
         Goal goal = createGoal();
-        createMate(createUser("user1"), goal);
-        createMate(createUser("user2"), goal);
-        createMate(createUser("user3"), goal);
+        createOngoingMate(createUser("user1"), goal);
+        createOngoingMate(createUser("user2"), goal);
+        createOngoingMate(createUser("user3"), goal);
 
         //when
         GoalDetailInfo info = goalQueryDao.findDetailInfo(goal.getId())
@@ -149,7 +171,7 @@ class GoalQueryDaoTest extends RepositoryTest {
     private void createTodayStartGoal(User user) {
         Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now());
-        createMate(user, goal);
+        createOngoingMate(user, goal);
     }
 
     private void createFutureStartGoal(User user) {
@@ -160,7 +182,7 @@ class GoalQueryDaoTest extends RepositoryTest {
             .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
             .build();
         em.persist(goal);
-        createMate(user, goal);
+        createOngoingMate(user, goal);
     }
 
     private User createUser(String name) {
@@ -169,10 +191,11 @@ class GoalQueryDaoTest extends RepositoryTest {
         return user;
     }
 
-    private void createMate(User user, Goal goal) {
+    private Mate createOngoingMate(User user, Goal goal) {
         Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
+        return mate;
     }
 
     private Goal createGoal() {

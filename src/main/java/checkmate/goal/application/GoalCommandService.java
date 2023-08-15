@@ -62,12 +62,12 @@ public class GoalCommandService {
         goalRepository.saveCondition(createLikeCountCondition(command));
     }
 
-    private LikeCountCondition createLikeCountCondition(LikeCountCreateCommand command) {
-        return new LikeCountCondition(findGoal(command.goalId()), command.likeCount());
+    private Goal createAndSaveGoal(GoalCreateCommand command) {
+        return goalRepository.save(createGoal(command));
     }
 
-    private void creatorJoinToGoal(Goal goal, long userId) {
-        mateStartingService.startToGoal(createAndSaveMate(goal, userId));
+    private Goal createGoal(GoalCreateCommand command) {
+        return mapper.toEntity(command);
     }
 
     private Mate createAndSaveMate(Goal goal, long userId) {
@@ -76,23 +76,14 @@ public class GoalCommandService {
         return mate;
     }
 
+    private void creatorJoinToGoal(Goal goal, long userId) {
+        mateStartingService.startToGoal(createAndSaveMate(goal, userId));
+    }
+
     private Mate createMate(Goal goal, long userId) {
         Mate mate = goal.createMate(findUser(userId));
         mate.receiveInvite();
         return mate;
-    }
-
-    private Goal findGoal(long goalId) {
-        return goalRepository.find(goalId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-    }
-
-    private Goal createAndSaveGoal(GoalCreateCommand command) {
-        return goalRepository.save(createGoal(command));
-    }
-
-    private Goal createGoal(GoalCreateCommand command) {
-        return mapper.toEntity(command);
     }
 
     private User findUser(long userId) {
@@ -102,6 +93,15 @@ public class GoalCommandService {
 
     private Goal findGoalForUpdate(long goalId) {
         return goalRepository.findForUpdate(goalId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+    }
+
+    private LikeCountCondition createLikeCountCondition(LikeCountCreateCommand command) {
+        return new LikeCountCondition(findGoal(command.goalId()), command.likeCount());
+    }
+
+    private Goal findGoal(long goalId) {
+        return goalRepository.find(goalId)
             .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
     }
 }

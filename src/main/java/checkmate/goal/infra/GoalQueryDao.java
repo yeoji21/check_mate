@@ -144,4 +144,11 @@ public class GoalQueryDao {
         return historyInfo -> historyInfo.setMateNicknames(
             mateNicknames.get(historyInfo.getGoalId()));
     }
+
+    public List<Long> findOngoingUserIds(List<Long> goalIds) {
+        return queryFactory.select(mate.userId)
+            .from(mate)
+            .where(mate.goal.id.in(goalIds), mate.status.eq(MateStatus.ONGOING))
+            .fetch();
+    }
 }
