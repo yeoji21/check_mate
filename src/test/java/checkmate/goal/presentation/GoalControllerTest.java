@@ -21,6 +21,7 @@ import checkmate.ControllerTest;
 import checkmate.TestEntityFactory;
 import checkmate.config.WithMockAuthUser;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
+import checkmate.goal.application.dto.response.GoalDetailInfo.MateInfo;
 import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
@@ -34,7 +35,6 @@ import checkmate.goal.presentation.dto.GoalCreateResponse;
 import checkmate.goal.presentation.dto.GoalModifyDto;
 import checkmate.goal.presentation.dto.LikeCountCreateDto;
 import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
-import checkmate.mate.application.dto.response.MateUploadInfo;
 import checkmate.mate.domain.Mate;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -368,13 +368,13 @@ public class GoalControllerTest extends ControllerTest {
         Goal goal = TestEntityFactory.goal(1L, "testGoal");
         GoalDetailInfo info = new GoalDetailInfo(goal);
         info.setMates(List.of(
-            MateUploadInfo.builder()
+            MateInfo.builder()
                 .mateId(1L)
                 .userId(2L)
                 .lastUploadDate(LocalDate.now().minusDays(1))
                 .nickname("tester1")
                 .build(),
-            MateUploadInfo.builder()
+            MateInfo.builder()
                 .mateId(3L)
                 .userId(4L)
                 .lastUploadDate(LocalDate.now())

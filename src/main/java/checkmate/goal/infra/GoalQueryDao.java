@@ -11,6 +11,7 @@ import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.QGoalDetailInfo;
+import checkmate.goal.application.dto.response.QGoalDetailInfo_MateInfo;
 import checkmate.goal.application.dto.response.QGoalHistoryInfo;
 import checkmate.goal.application.dto.response.QGoalScheduleInfo;
 import checkmate.goal.application.dto.response.QOngoingGoalInfo;
@@ -18,8 +19,6 @@ import checkmate.goal.application.dto.response.QTodayGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
-import checkmate.mate.application.dto.response.MateUploadInfo;
-import checkmate.mate.application.dto.response.QMateUploadInfo;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.QCompleteGoalNotificationDto;
@@ -61,7 +60,7 @@ public class GoalQueryDao {
                     goal.status.eq(GoalStatus.ONGOING))
                 .fetchOne()
         );
-        goalDetailInfo.ifPresent(info -> info.setMates(findMatesInfo(goalId)));
+        goalDetailInfo.ifPresent(info -> info.setMates(findMateInfo(goalId)));
         return goalDetailInfo;
     }
 
@@ -86,9 +85,10 @@ public class GoalQueryDao {
             .fetch();
     }
 
-    private List<MateUploadInfo> findMatesInfo(long goalId) {
+    private List<GoalDetailInfo.MateInfo> findMateInfo(long goalId) {
         return queryFactory
-            .select(new QMateUploadInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
+            .select(
+                new QGoalDetailInfo_MateInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
             .from(mate)
             .join(user).on(mate.userId.eq(user.id))
             .where(mate.goal.id.eq(goalId),

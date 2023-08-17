@@ -155,7 +155,7 @@ class GoalTest {
         Goal goal = createGoal();
 
         //when
-        boolean inviteable = goal.isInviteableProgress();
+        boolean inviteable = goal.isInviteable();
 
         // then
         assertThat(inviteable).isTrue();
@@ -172,7 +172,7 @@ class GoalTest {
             LocalDate.now().minusDays(200L));
 
         //when
-        boolean inviteable = goal.isInviteableProgress();
+        boolean inviteable = goal.isInviteable();
 
         // then
         assertThat(inviteable).isFalse();

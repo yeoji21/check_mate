@@ -68,7 +68,7 @@ public class Mate extends BaseTimeEntity {
     }
 
     void acceptInvite() {
-        if (goal.isInviteableProgress()) {
+        if (goal.isInviteable()) {
             status = status.toOngoing();
             attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
             return;
@@ -77,7 +77,7 @@ public class Mate extends BaseTimeEntity {
     }
 
     public void receiveInvite() {
-        if (goal.isInviteableProgress()) {
+        if (goal.isInviteable()) {
             status = status.toWaiting();
             return;
         }

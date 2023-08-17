@@ -89,7 +89,7 @@ public class Goal extends BaseTimeEntity {
         return new Mate(this, user);
     }
 
-    public boolean isInviteableProgress() {
+    public boolean isInviteable() {
         return period.getProgressedPercent() <= GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT;
     }
 

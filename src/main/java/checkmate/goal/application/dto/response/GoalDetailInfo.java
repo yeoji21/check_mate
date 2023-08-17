@@ -3,11 +3,11 @@ package checkmate.goal.application.dto.response;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.Goal.GoalStatus;
-import checkmate.mate.application.dto.response.MateUploadInfo;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 
 
@@ -15,7 +15,7 @@ import lombok.Getter;
 public class GoalDetailInfo {
 
     private long goalId;
-    private List<MateUploadInfo> mates;
+    private List<MateInfo> mates;
     private GoalCategory category;
     private String title;
     private LocalDate startDate;
@@ -35,10 +35,31 @@ public class GoalDetailInfo {
         this.appointmentTime = goal.getAppointmentTime();
         this.weekDays = goal.getCheckDays().toKorean();
         this.status = goal.getStatus();
-        this.inviteable = goal.isInviteableProgress();
+        this.inviteable = goal.isInviteable();
     }
 
-    public void setMates(List<MateUploadInfo> mates) {
+    public void setMates(List<MateInfo> mates) {
         this.mates = mates;
+    }
+
+    @Getter
+    public static class MateInfo {
+
+        private long userId;
+        private long mateId;
+        private String nickname;
+        private boolean uploaded;
+
+        @QueryProjection
+        @Builder
+        public MateInfo(long mateId,
+            long userId,
+            LocalDate lastUploadDate,
+            String nickname) {
+            this.mateId = mateId;
+            this.userId = userId;
+            this.uploaded = lastUploadDate != null && lastUploadDate.isEqual(LocalDate.now());
+            this.nickname = nickname;
+        }
     }
 }
