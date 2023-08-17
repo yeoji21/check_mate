@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class GoalScheduleServiceTest {
+class GoalSchedulerTest {
 
     @Test
     void createGoalSchedule() throws Exception {
@@ -15,7 +15,7 @@ class GoalScheduleServiceTest {
         GoalCheckDays checkDays = GoalCheckDays.ofKorean("월수금");
 
         //when
-        String goalSchedule = GoalScheduleService.createGoalSchedule(period, checkDays);
+        String goalSchedule = GoalScheduler.getTotalSchedule(period, checkDays);
 
         //then
         assertThat(goalSchedule).hasSize(7);
@@ -33,7 +33,7 @@ class GoalScheduleServiceTest {
         List<LocalDate> checkedDates = List.of(todayMinusDays(1), today());
 
         //when
-        String checkedSchedule = GoalScheduleService.createCheckedSchedule(period, checkDays,
+        String checkedSchedule = GoalScheduler.getCheckedSchedule(period, checkDays,
             checkedDates);
 
         //then

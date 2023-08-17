@@ -31,12 +31,16 @@ public class GoalBatchService {
         List<Long> goalIds = goalQueryDao.findYesterdayOveredGoals();
         goalRepository.updateStatusToOver(goalIds);
         publishCompleteGoalEvent(goalIds);
-        goalQueryDao.findOngoingUserIds(goalIds).forEach(keyValueStorage::deleteAll);
+        clearCompletedGoalCache(goalIds);
     }
 
     private void publishCompleteGoalEvent(List<Long> overedGoalIds) {
         eventPublisher.publishEvent(
             new NotPushNotificationCreatedEvent(COMPLETE_GOAL,
                 goalQueryDao.findCompleteNotificationDto(overedGoalIds)));
+    }
+
+    private void clearCompletedGoalCache(List<Long> goalIds) {
+        goalQueryDao.findOngoingUserIds(goalIds).forEach(keyValueStorage::deleteAll);
     }
 }

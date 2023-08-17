@@ -3,7 +3,7 @@ package checkmate.mate.application.dto.response;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.Goal.GoalStatus;
-import checkmate.goal.domain.GoalScheduleService;
+import checkmate.goal.domain.GoalScheduler;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Uploadable;
 import java.time.LocalDate;
@@ -43,9 +43,9 @@ public class SpecifiedGoalDetailInfo {
         this.weekDays = goal.getCheckDays().toKorean();
         this.status = goal.getStatus();
         this.inviteable = goal.isInviteableProgress();
-        this.goalSchedule = GoalScheduleService.createGoalSchedule(goal.getPeriod(),
+        this.goalSchedule = GoalScheduler.getTotalSchedule(goal.getPeriod(),
             goal.getCheckDays());
-        this.mateSchedule = GoalScheduleService.createCheckedSchedule(goal.getPeriod(),
+        this.mateSchedule = GoalScheduler.getCheckedSchedule(goal.getPeriod(),
             goal.getCheckDays(), uploadedDates);
         this.uploadable = new Uploadable(mate);
         this.achievementPercent = mate.getAchievementPercent();
