@@ -69,9 +69,7 @@ public class Mate extends BaseTimeEntity {
 
     void acceptInvite() {
         if (goal.isInviteableProgress()) {
-            // TODO: 2023/08/15 status 메소드로 캡슐화
-            status.checkStartable();
-            status = MateStatus.ONGOING;
+            status = status.toOngoing();
             attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
             return;
         }
@@ -80,16 +78,14 @@ public class Mate extends BaseTimeEntity {
 
     public void receiveInvite() {
         if (goal.isInviteableProgress()) {
-            status.checkInviteable();
-            status = MateStatus.WAITING;
+            status = status.toWaiting();
             return;
         }
         throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
     }
 
     public void rejectInvite() {
-        status.checkRejectable();
-        status = MateStatus.REJECT;
+        status = status.toReject();
     }
 
     public double getAchievementPercent() {
@@ -125,24 +121,27 @@ public class Mate extends BaseTimeEntity {
         OUT,
         SUCCESS;
 
-        void checkInviteable() {
+        MateStatus toOngoing() {
+            if (this == WAITING) {
+                return ONGOING;
+            }
+            throw new BusinessException(INVALID_MATE_STATUS);
+        }
+
+        MateStatus toWaiting() {
             if (this == ONGOING || this == SUCCESS) {
                 throw NotInviteableGoalException.ALREADY_IN_GOAL;
             } else if (this == WAITING) {
                 throw NotInviteableGoalException.DUPLICATED_INVITE;
             }
+            return WAITING;
         }
 
-        void checkStartable() {
-            if (this != WAITING) {
-                throw new BusinessException(INVALID_MATE_STATUS);
+        public MateStatus toReject() {
+            if (this == WAITING) {
+                return REJECT;
             }
-        }
-
-        public void checkRejectable() {
-            if (this != WAITING) {
-                throw new BusinessException(INVALID_MATE_STATUS);
-            }
+            throw new BusinessException(INVALID_MATE_STATUS);
         }
     }
 
