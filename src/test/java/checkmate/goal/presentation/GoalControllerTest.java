@@ -48,7 +48,7 @@ import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.PathParametersSnippet;
 import org.springframework.test.util.ReflectionTestUtils;
 
-public class GoalControllerTest extends ControllerTest {
+class GoalControllerTest extends ControllerTest {
 
     @WithMockAuthUser
     @Test
@@ -228,7 +228,7 @@ public class GoalControllerTest extends ControllerTest {
 
     private ResponseFieldsSnippet todayInfoResponseFieldsSnippet() {
         return responseFields(
-            fieldWithPath("goals[].id").type(JsonFieldType.NUMBER).description("목표 ID"),
+            fieldWithPath("goals[].goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
             fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
             fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
             fieldWithPath("goals[].checkDays").type(JsonFieldType.STRING).description("목표 인증 요일"),
@@ -246,7 +246,7 @@ public class GoalControllerTest extends ControllerTest {
     private TodayGoalInfo getTodayGoalInfo(Goal goal) {
         return TodayGoalInfo
             .builder()
-            .id(goal.getId())
+            .goalId(goal.getId())
             .category(goal.getCategory())
             .title(goal.getTitle())
             .checkDays(goal.getCheckDays())
@@ -256,7 +256,7 @@ public class GoalControllerTest extends ControllerTest {
 
     private ResponseFieldsSnippet ongoingInfoResponseFieldsSnippet() {
         return responseFields(
-            fieldWithPath("goals[].id").type(JsonFieldType.NUMBER).description("목표 ID"),
+            fieldWithPath("goals[].goalId").type(JsonFieldType.NUMBER).description("목표 ID"),
             fieldWithPath("goals[].title").type(JsonFieldType.STRING).description("목표 이름"),
             fieldWithPath("goals[].category").type(JsonFieldType.STRING).description("목표 카테고리"),
             fieldWithPath("goals[].weekDays").type(JsonFieldType.STRING).description("목표 인증 요일")
@@ -345,7 +345,7 @@ public class GoalControllerTest extends ControllerTest {
 
     private OngoingGoalInfo simpleGoalInfo(Goal goal) {
         return OngoingGoalInfo.builder()
-            .id(goal.getId())
+            .goalId(goal.getId())
             .category(goal.getCategory())
             .title(goal.getTitle())
             .weekDays(goal.getCheckDays().toInt())

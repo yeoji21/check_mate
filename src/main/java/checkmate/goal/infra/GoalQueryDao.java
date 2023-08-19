@@ -27,7 +27,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -43,7 +42,8 @@ public class GoalQueryDao {
                     mate.lastUploadDate))
             .from(mate)
             .join(goal).on(goal.id.eq(mate.goal.id))
-            .where(mate.userId.eq(userId),
+            .where(
+                mate.userId.eq(userId),
                 mate.status.eq(MateStatus.ONGOING),
                 goal.status.eq(GoalStatus.ONGOING),
                 goal.checkDays.checkDays.in(
@@ -75,23 +75,12 @@ public class GoalQueryDao {
         );
     }
 
-    public List<OngoingGoalInfo> findOngoingSimpleInfo(long userId) {
+    public List<OngoingGoalInfo> findOngoingGoalInfo(long userId) {
         return queryFactory.select(
                 new QOngoingGoalInfo(goal.id, goal.category, goal.title, goal.checkDays.checkDays))
             .from(mate)
             .join(mate.goal, goal)
             .where(mate.userId.eq(userId),
-                mate.status.eq(MateStatus.ONGOING))
-            .fetch();
-    }
-
-    private List<GoalDetailInfo.MateInfo> findMateInfo(long goalId) {
-        return queryFactory
-            .select(
-                new QGoalDetailInfo_MateInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
-            .from(mate)
-            .join(user).on(mate.userId.eq(user.id))
-            .where(mate.goal.id.eq(goalId),
                 mate.status.eq(MateStatus.ONGOING))
             .fetch();
     }
@@ -116,14 +105,24 @@ public class GoalQueryDao {
     }
 
     public List<GoalHistoryInfo> findGoalHistoryInfo(long userId) {
-        List<GoalHistoryInfo> historyInfo = queryFactory.select(new QGoalHistoryInfo(mate))
+        List<GoalHistoryInfo> goalHistoryInfo = queryFactory.select(new QGoalHistoryInfo(mate))
             .from(mate)
             .join(mate.goal, goal).fetchJoin()
             .where(mate.userId.eq(userId))
             .fetch();
-        Map<Long, List<String>> mateNicknames = findMateNicknames(mapToGoalId(historyInfo));
-        historyInfo.forEach(setNicknamesToHistoryInfo(mateNicknames));
-        return historyInfo;
+        setNicknamesToEachGoalInfo(goalHistoryInfo);
+        return goalHistoryInfo;
+    }
+
+    private List<GoalDetailInfo.MateInfo> findMateInfo(long goalId) {
+        return queryFactory
+            .select(
+                new QGoalDetailInfo_MateInfo(mate.id, user.id, mate.lastUploadDate, user.nickname))
+            .from(mate)
+            .join(user).on(mate.userId.eq(user.id))
+            .where(mate.goal.id.eq(goalId),
+                mate.status.eq(MateStatus.ONGOING))
+            .fetch();
     }
 
     private List<Long> mapToGoalId(List<GoalHistoryInfo> historyInfo) {
@@ -139,10 +138,10 @@ public class GoalQueryDao {
             .transform(groupBy(goal.id).as(list(user.nickname)));
     }
 
-    private Consumer<GoalHistoryInfo> setNicknamesToHistoryInfo(
-        Map<Long, List<String>> mateNicknames) {
-        return historyInfo -> historyInfo.setMateNicknames(
-            mateNicknames.get(historyInfo.getGoalId()));
+    private void setNicknamesToEachGoalInfo(List<GoalHistoryInfo> goalHistoryInfo) {
+        Map<Long, List<String>> mateNicknames = findMateNicknames(mapToGoalId(goalHistoryInfo));
+        goalHistoryInfo.forEach(historyInfo -> historyInfo.setMateNicknames(
+            mateNicknames.get(historyInfo.getGoalId())));
     }
 
     public List<Long> findOngoingUserIds(List<Long> goalIds) {

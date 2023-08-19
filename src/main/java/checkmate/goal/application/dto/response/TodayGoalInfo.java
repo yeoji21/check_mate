@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class TodayGoalInfo implements Serializable {
 
-    private long id;
+    private long goalId;
     private GoalCategory category;
     private String title;
     private String checkDays;
@@ -20,12 +20,13 @@ public class TodayGoalInfo implements Serializable {
 
     @QueryProjection
     @Builder
-    public TodayGoalInfo(long id,
+    public TodayGoalInfo(
+        long goalId,
         GoalCategory category,
         String title,
         GoalCheckDays checkDays,
         LocalDate lastUploadDate) {
-        this.id = id;
+        this.goalId = goalId;
         this.category = category;
         this.title = title;
         this.checkDays = checkDays.toKorean();

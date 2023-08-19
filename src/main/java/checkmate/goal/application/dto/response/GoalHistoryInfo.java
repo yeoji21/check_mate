@@ -24,8 +24,8 @@ public class GoalHistoryInfo implements Serializable {
     private List<String> mateNicknames;
 
     @QueryProjection
-    public GoalHistoryInfo(Mate finder) {
-        Goal goal = finder.getGoal();
+    public GoalHistoryInfo(Mate mate) {
+        Goal goal = mate.getGoal();
         this.goalId = goal.getId();
         this.category = goal.getCategory();
         this.title = goal.getTitle();
@@ -33,7 +33,7 @@ public class GoalHistoryInfo implements Serializable {
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
         this.checkDays = goal.getCheckDays().toKorean();
-        this.achievementPercent = finder.getAchievementPercent();
+        this.achievementPercent = mate.getAchievementPercent();
     }
 
     public void setMateNicknames(List<String> mateNicknames) {

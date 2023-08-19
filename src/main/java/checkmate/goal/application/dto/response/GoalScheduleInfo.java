@@ -24,10 +24,10 @@ public class GoalScheduleInfo implements Serializable {
         int weekDays) {
         this.startDate = startDate;
         this.endDate = endDate;
-        this.schedule = getGoalSchedule(startDate, endDate, weekDays);
+        this.schedule = getTotalSchedule(startDate, endDate, weekDays);
     }
 
-    private String getGoalSchedule(LocalDate startDate, LocalDate endDate, int weekDays) {
+    private String getTotalSchedule(LocalDate startDate, LocalDate endDate, int weekDays) {
         return GoalScheduler.getTotalSchedule(new GoalPeriod(startDate, endDate),
             GoalCheckDays.ofValue(weekDays));
     }

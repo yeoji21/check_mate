@@ -93,12 +93,12 @@ class GoalQueryDaoTest extends RepositoryTest {
         createOngoingMate(createGoal(), user);
 
         //when
-        List<OngoingGoalInfo> ongoingGoals = goalQueryDao.findOngoingSimpleInfo(user.getId());
+        List<OngoingGoalInfo> ongoingGoals = goalQueryDao.findOngoingGoalInfo(user.getId());
 
         //then
         assertThat(ongoingGoals)
             .hasSize(3)
-            .allMatch(info -> info.getId() > 0L)
+            .allMatch(info -> info.getGoalId() > 0L)
             .allMatch(info -> info.getTitle() != null)
             .allMatch(info -> info.getCategory() != null)
             .allMatch(info -> info.getWeekDays() != null);

@@ -36,7 +36,7 @@ public class GoalQueryService {
     )
     @Transactional(readOnly = true)
     public OngoingGoalInfoResult findOngoingGoalInfo(long userId) {
-        return new OngoingGoalInfoResult(goalQueryDao.findOngoingSimpleInfo(userId));
+        return new OngoingGoalInfoResult(goalQueryDao.findOngoingGoalInfo(userId));
     }
 
     @Cacheable(value = CacheKeyUtil.GOAL_PERIOD, key = "{#goalId}")

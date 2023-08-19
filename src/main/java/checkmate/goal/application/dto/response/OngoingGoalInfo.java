@@ -10,15 +10,19 @@ import lombok.Getter;
 @Getter
 public class OngoingGoalInfo implements Serializable {
 
-    private long id;
+    private long goalId;
     private GoalCategory category;
     private String title;
     private String weekDays;
 
     @Builder
     @QueryProjection
-    public OngoingGoalInfo(long id, GoalCategory category, String title, int weekDays) {
-        this.id = id;
+    public OngoingGoalInfo(
+        long goalId,
+        GoalCategory category,
+        String title,
+        int weekDays) {
+        this.goalId = goalId;
         this.category = category;
         this.title = title;
         this.weekDays = GoalCheckDays.ofValue(weekDays).toKorean();
