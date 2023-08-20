@@ -4,13 +4,11 @@ import checkmate.common.cache.CacheKeyUtil;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.application.dto.response.GoalDetailInfo;
-import checkmate.goal.application.dto.response.GoalHistoryInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfoResult;
 import checkmate.goal.application.dto.response.TodayGoalInfoResult;
 import checkmate.goal.infra.GoalQueryDao;
 import checkmate.mate.application.dto.response.GoalHistoryInfoResult;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
@@ -58,7 +56,6 @@ public class GoalQueryService {
     @Cacheable(value = CacheKeyUtil.HISTORY_GOALS, key = "{#userId}")
     @Transactional(readOnly = true)
     public GoalHistoryInfoResult findGoalHistoryResult(long userId) {
-        List<GoalHistoryInfo> historyInfo = goalQueryDao.findGoalHistoryInfo(userId);
-        return new GoalHistoryInfoResult(historyInfo);
+        return new GoalHistoryInfoResult(goalQueryDao.findGoalHistoryInfo(userId));
     }
 }

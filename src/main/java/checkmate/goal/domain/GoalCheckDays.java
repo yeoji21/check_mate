@@ -2,7 +2,6 @@ package checkmate.goal.domain;
 
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
-import com.mysema.commons.lang.Assert;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,7 +15,6 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -29,7 +27,9 @@ public class GoalCheckDays {
     private int checkDays;
 
     private GoalCheckDays(String korWeekDays) {
-        validateKorWeekDayFormat(korWeekDays);
+        if (isContainsInvalidKorWeekDay(korWeekDays) || isContainsDuplicatedWeekDay(korWeekDays)) {
+            throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
+        }
         this.checkDays = CheckDaysConverter.toValue(korWeekDays);
     }
 
@@ -47,32 +47,23 @@ public class GoalCheckDays {
             .collect(Collectors.joining()));
     }
 
-    public static List<Integer> getAllMatchingWeekDayValues(LocalDate date) {
+    public static List<Integer> getAllMatchingValues(LocalDate date) {
         return IntStream.rangeClosed(1, 128)
             .filter(weekDays -> CheckDaysConverter.isCheckDay(weekDays, date))
             .boxed()
             .toList();
     }
 
-    private static void validateKorWeekDayFormat(String korWeekDays) {
-        if (Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find()) {
-            throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
-        }
-        checkDuplicateWeekDay(korWeekDays);
+    private static boolean isContainsInvalidKorWeekDay(String korWeekDays) {
+        return Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find();
     }
 
-    private static void checkDuplicateWeekDay(String korWeekDays) {
-        Assert.isTrue(
-            korWeekDays.length() == new HashSet<>(List.of(korWeekDays.split(""))).size(),
-            "중복 요일");
+    private static boolean isContainsDuplicatedWeekDay(String korWeekDays) {
+        return korWeekDays.length() != new HashSet<>(List.of(korWeekDays.split(""))).size();
     }
 
     public boolean isCheckDay(LocalDate date) {
         return CheckDaysConverter.isCheckDay(checkDays, date);
-    }
-
-    public int toInt() {
-        return checkDays;
     }
 
     public String toKorean() {
@@ -89,9 +80,8 @@ public class GoalCheckDays {
         SATURDAY(5, "토"),
         SUNDAY(6, "일");
         private static final Map<String, CheckDaysConverter> KOR_MAP =
-            Stream.of(values()).collect(Collectors.toMap(CheckDaysConverter::getKor, e -> e));
+            Stream.of(values()).collect(Collectors.toMap(v -> v.kor, e -> e));
         private final int shift;
-        @Getter(AccessLevel.PRIVATE)
         private final String kor;
 
         static String toKorean(LocalDate... dates) {

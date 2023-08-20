@@ -19,7 +19,7 @@ class GoalCheckDaysTest {
         //given
 
         //when
-        List<Integer> matchingValues = GoalCheckDays.getAllMatchingWeekDayValues(getMonday());
+        List<Integer> matchingValues = GoalCheckDays.getAllMatchingValues(getMonday());
 
         //then
         assertThat(matchingValues).hasSize(64);
@@ -92,11 +92,11 @@ class GoalCheckDaysTest {
     }
 
     private void isEqualTo(LocalDate localDate, int value) {
-        assertThat(GoalCheckDays.ofLocalDates(localDate).toInt()).isEqualTo(value);
+        assertThat(GoalCheckDays.ofLocalDates(localDate)).isEqualTo(GoalCheckDays.ofValue(value));
     }
 
     private void duplicateDayThrowException(String weekDays) {
-        assertThrows(IllegalArgumentException.class, () -> GoalCheckDays.ofKorean(weekDays));
+        assertThrows(BusinessException.class, () -> GoalCheckDays.ofKorean(weekDays));
     }
 
     private LocalDate getSunday() {

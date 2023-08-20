@@ -66,12 +66,12 @@ public class MateJpaRepository implements MateRepository {
     @Override
     public List<Mate> findYesterdaySkippedMates() {
         LocalDate yesterDay = LocalDate.now().minusDays(1);
-        List<Integer> checkDays = GoalCheckDays.getAllMatchingWeekDayValues(yesterDay);
         List<Mate> mates = queryFactory.select(mate)
             .from(mate)
-            .where(goal.checkDays.checkDays.in(checkDays),
+            .where(
+                mate.status.eq(MateStatus.ONGOING),
                 goal.status.eq(GoalStatus.ONGOING),
-                mate.status.eq(MateStatus.ONGOING)
+                goal.checkDays.checkDays.in(GoalCheckDays.getAllMatchingValues(yesterDay))
             )
             .fetch();
 
@@ -108,8 +108,6 @@ public class MateJpaRepository implements MateRepository {
         entityManager.flush();
         entityManager.clear();
     }
-
-    // TODO: 2022/08/25 TM의 skippedCount를 초기에 max로 해놓고 점점 줄이는 방식 고려
 
     @Override
     public void updateLimitOveredMates(List<Mate> limitOveredMates) {

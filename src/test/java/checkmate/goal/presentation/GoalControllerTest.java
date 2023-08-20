@@ -282,7 +282,7 @@ class GoalControllerTest extends ControllerTest {
     private GoalScheduleInfo getGoalScheduleInfo() {
         Goal goal = TestEntityFactory.goal(1L, "goal");
         return GoalScheduleInfo.builder()
-            .weekDays(goal.getCheckDays().toInt())
+            .weekDays(getCheckDaysValue(goal))
             .startDate(goal.getStartDate())
             .endDate(goal.getEndDate())
             .build();
@@ -348,8 +348,12 @@ class GoalControllerTest extends ControllerTest {
             .goalId(goal.getId())
             .category(goal.getCategory())
             .title(goal.getTitle())
-            .weekDays(goal.getCheckDays().toInt())
+            .weekDays(getCheckDaysValue(goal))
             .build();
+    }
+
+    private int getCheckDaysValue(Goal goal) {
+        return (int) ReflectionTestUtils.getField(goal.getCheckDays(), "checkDays");
     }
 
     private RequestFieldsSnippet createRequestFieldsSnippet() {
