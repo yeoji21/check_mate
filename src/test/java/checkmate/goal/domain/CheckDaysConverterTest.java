@@ -62,22 +62,22 @@ class CheckDaysConverterTest {
         LocalDate saturday = LocalDate.of(2022, 11, 5);
         LocalDate sunday = LocalDate.of(2022, 11, 6);
 
-        isWorkingDay(1, monday);
-        isNotWorkingDay(1, tuesday);
-        isWorkingDay(2, tuesday);
-        isWorkingDay(4, wednesday);
-        isWorkingDay(8, thursday);
-        isWorkingDay(16, friday);
-        isWorkingDay(32, saturday);
-        isWorkingDay(64, sunday);
-        isNotWorkingDay(16, sunday);
+        isCheckDay(1, monday);
+        isNotCheckDay(1, tuesday);
+        isCheckDay(2, tuesday);
+        isCheckDay(4, wednesday);
+        isCheckDay(8, thursday);
+        isCheckDay(16, friday);
+        isCheckDay(32, saturday);
+        isCheckDay(64, sunday);
+        isNotCheckDay(16, sunday);
     }
 
-    private void isNotWorkingDay(int value, LocalDate date) {
+    private void isNotCheckDay(int value, LocalDate date) {
         assertThat(CheckDaysConverter.isCheckDay(value, date)).isFalse();
     }
 
-    private void isWorkingDay(int value, LocalDate date) {
+    private void isCheckDay(int value, LocalDate date) {
         assertThat(CheckDaysConverter.isCheckDay(value, date)).isTrue();
     }
 

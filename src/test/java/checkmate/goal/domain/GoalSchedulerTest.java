@@ -2,6 +2,7 @@ package checkmate.goal.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -26,10 +27,8 @@ class GoalSchedulerTest {
     void createCheckedSchedule() throws Exception {
         //given
         GoalPeriod period = new GoalPeriod(todayMinusDays(6), today());
-        GoalCheckDays checkDays = GoalCheckDays.ofLocalDates(
-            todayMinusDays(2),
-            todayMinusDays(1),
-            today());
+        GoalCheckDays checkDays = GoalCheckDays.ofKorean(
+            CheckDaysConverter.toKorean(todayMinusDays(2), todayMinusDays(1), today()));
         List<LocalDate> checkedDates = List.of(todayMinusDays(1), today());
 
         //when

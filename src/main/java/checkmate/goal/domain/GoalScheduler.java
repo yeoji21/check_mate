@@ -14,7 +14,9 @@ public class GoalScheduler {
         return convertToSchedule(period, date -> checkDays.isCheckDay(date) ? "1" : "0");
     }
 
-    public static String getCheckedSchedule(GoalPeriod period, GoalCheckDays checkDays,
+    public static String getCheckedSchedule(
+        GoalPeriod period,
+        GoalCheckDays checkDays,
         List<LocalDate> checkedDates) {
         return convertToSchedule(period,
             date -> checkDays.isCheckDay(date) && isUploaded(checkedDates, date) ? "1" : "0");

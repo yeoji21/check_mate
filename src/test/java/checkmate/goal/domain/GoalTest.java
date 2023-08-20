@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -210,14 +211,18 @@ class GoalTest {
     void isTodayCheckDayFalse() throws Exception {
         //given
         Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "checkDays",
-            GoalCheckDays.ofLocalDates(LocalDate.now().minusDays(1)));
+        GoalCheckDays checkDays = GoalCheckDays.ofKorean(getYesterDayKorWeekDays());
+        ReflectionTestUtils.setField(goal, "checkDays", checkDays);
 
         //when
         boolean isCheckDay = goal.isTodayCheckDay();
 
         //then
         assertThat(isCheckDay).isFalse();
+    }
+
+    private String getYesterDayKorWeekDays() {
+        return CheckDaysConverter.toKorean(LocalDate.now().minusDays(1));
     }
 
     private Goal createGoal() {

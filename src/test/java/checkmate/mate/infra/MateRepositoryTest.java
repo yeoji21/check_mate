@@ -10,6 +10,7 @@ import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.UninitiatedMate;
@@ -161,7 +162,7 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     private GoalCheckDays tomorrowCheckDay() {
-        return GoalCheckDays.ofLocalDates(LocalDate.now().plusDays(1));
+        return GoalCheckDays.ofKorean(CheckDaysConverter.toKorean(LocalDate.now().plusDays(1)));
     }
 
     private Mate createMate(Goal goal) {

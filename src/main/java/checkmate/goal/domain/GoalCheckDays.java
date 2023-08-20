@@ -18,6 +18,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
+// TODO: 2023/08/20 KorWeekDay -> WeekOfDay로 변경 고려
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
@@ -39,12 +40,6 @@ public class GoalCheckDays {
 
     public static GoalCheckDays ofValue(int value) {
         return new GoalCheckDays(CheckDaysConverter.toKorean(value));
-    }
-
-    public static GoalCheckDays ofLocalDates(LocalDate... dates) {
-        return new GoalCheckDays(Arrays.stream(dates)
-            .map(CheckDaysConverter::toKorean)
-            .collect(Collectors.joining()));
     }
 
     public static List<Integer> getAllMatchingValues(LocalDate date) {
@@ -70,8 +65,9 @@ public class GoalCheckDays {
         return CheckDaysConverter.toKorean(checkDays);
     }
 
+    // TODO: 2023/08/20 접근제한자 수정해서 캡슐화해야 함
     @RequiredArgsConstructor
-    enum CheckDaysConverter {
+    public enum CheckDaysConverter {
         MONDAY(0, "월"),
         TUESDAY(1, "화"),
         WEDNESDAY(2, "수"),
@@ -84,7 +80,7 @@ public class GoalCheckDays {
         private final int shift;
         private final String kor;
 
-        static String toKorean(LocalDate... dates) {
+        public static String toKorean(LocalDate... dates) {
             return Arrays.stream(dates)
                 .map(date -> valueOf(date).kor)
                 .collect(Collectors.joining());
@@ -105,12 +101,12 @@ public class GoalCheckDays {
             return weekDays;
         }
 
-        static boolean isCheckDay(int weekDays, LocalDate date) {
-            return isCheckDay(weekDays, valueOf(date).shift);
-        }
-
         static CheckDaysConverter valueOf(LocalDate date) {
             return CheckDaysConverter.valueOf(date.getDayOfWeek().toString());
+        }
+
+        static boolean isCheckDay(int weekDays, LocalDate date) {
+            return isCheckDay(weekDays, valueOf(date).shift);
         }
 
         private static boolean isCheckDay(int weekDays, int date) {

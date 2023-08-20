@@ -1,7 +1,6 @@
 package checkmate.goal.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,18 +39,6 @@ class GoalCheckDaysTest {
     }
 
     @Test
-    void isCheckDayFalse() throws Exception {
-        //given
-        GoalCheckDays checkDays = GoalCheckDays.ofLocalDates(today().minusDays(1));
-
-        //when
-        boolean isCheckDay = checkDays.isCheckDay(today());
-
-        //then
-        assertFalse(isCheckDay);
-    }
-
-    @Test
     @DisplayName("중복 요일 검사")
     void validateDuplicateKorWeekDays() throws Exception {
         duplicateDayThrowException("월월");
@@ -69,58 +56,14 @@ class GoalCheckDaysTest {
         invalidKorWeekDay("금요일입니다");
     }
 
-    @Test
-    @DisplayName("LocalDate 사용하는 생성자")
-    void convertWeekDayToCheckDayValue() throws Exception {
-        isEqualTo(getMonday(), 1);
-        isEqualTo(getTuesday(), 2);
-        isEqualTo(getWednesday(), 4);
-        isEqualTo(getThursday(), 8);
-        isEqualTo(getFriday(), 16);
-        isEqualTo(getSaturday(), 32);
-        isEqualTo(getSunday(), 64);
-    }
-
-    private LocalDate today() {
-        return LocalDate.now();
-    }
-
     private void invalidKorWeekDay(String weekDay) {
         BusinessException exception = assertThrows(BusinessException.class,
             () -> GoalCheckDays.ofKorean(weekDay));
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_WEEK_DAYS);
     }
 
-    private void isEqualTo(LocalDate localDate, int value) {
-        assertThat(GoalCheckDays.ofLocalDates(localDate)).isEqualTo(GoalCheckDays.ofValue(value));
-    }
-
     private void duplicateDayThrowException(String weekDays) {
         assertThrows(BusinessException.class, () -> GoalCheckDays.ofKorean(weekDays));
-    }
-
-    private LocalDate getSunday() {
-        return LocalDate.of(2022, 11, 6);
-    }
-
-    private LocalDate getSaturday() {
-        return LocalDate.of(2022, 11, 5);
-    }
-
-    private LocalDate getFriday() {
-        return LocalDate.of(2022, 11, 4);
-    }
-
-    private LocalDate getThursday() {
-        return LocalDate.of(2022, 11, 3);
-    }
-
-    private LocalDate getWednesday() {
-        return LocalDate.of(2022, 11, 2);
-    }
-
-    private LocalDate getTuesday() {
-        return LocalDate.of(2022, 11, 1);
     }
 
     private LocalDate getMonday() {

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import checkmate.TestEntityFactory;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
@@ -87,7 +88,7 @@ class UploadableTest {
     }
 
     private GoalCheckDays tomorrowCheckDay() {
-        return GoalCheckDays.ofLocalDates(LocalDate.now().plusDays(1));
+        return GoalCheckDays.ofKorean(CheckDaysConverter.toKorean(LocalDate.now().plusDays(1)));
     }
 
     private Mate createMate(GoalCheckDays checkDays, LocalTime appointmentTime) {
