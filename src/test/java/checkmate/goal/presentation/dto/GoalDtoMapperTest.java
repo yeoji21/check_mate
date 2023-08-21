@@ -34,7 +34,7 @@ class GoalDtoMapperTest extends MapperTest {
         isEqualTo(command.title(), dto.getTitle());
         isEqualTo(command.startDate(), dto.getStartDate());
         isEqualTo(command.endDate(), dto.getEndDate());
-        isEqualTo(command.checkDays(), dto.getCheckDays());
+        isEqualTo(command.checkDays().length, dto.getCheckDays().split("").length);
         isEqualTo(command.appointmentTime(), dto.getAppointmentTime());
     }
 

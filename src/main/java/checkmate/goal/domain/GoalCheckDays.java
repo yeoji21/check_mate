@@ -16,6 +16,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
@@ -86,6 +87,7 @@ public class GoalCheckDays {
         private static final Map<String, CheckDaysConverter> KOR_MAP =
             Stream.of(values()).collect(Collectors.toMap(v -> v.kor, e -> e));
         private final int shift;
+        @Getter
         private final String kor;
 
         public static String toKorean(LocalDate... dates) {

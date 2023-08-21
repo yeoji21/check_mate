@@ -15,6 +15,7 @@ import checkmate.mate.infra.FakeMateRepository;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.FakeUserRepository;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
@@ -74,7 +75,7 @@ class GoalCommandServiceTest {
             .title("goal")
             .startDate(LocalDate.now().minusDays(10L))
             .endDate(LocalDate.now().plusDays(30L))
-            .checkDays("월수금")
+            .checkDays(new DayOfWeek[]{DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY})
             .build();
     }
 

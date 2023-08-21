@@ -1,6 +1,7 @@
 package checkmate.goal.application.dto.request;
 
 import checkmate.goal.domain.Goal.GoalCategory;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.Builder;
@@ -12,7 +13,7 @@ public record GoalCreateCommand(
     String title,
     LocalDate startDate,
     LocalDate endDate,
-    String checkDays,
+    DayOfWeek[] checkDays,
     LocalTime appointmentTime) {
 
 }

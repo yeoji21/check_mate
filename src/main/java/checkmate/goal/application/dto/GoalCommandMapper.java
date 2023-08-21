@@ -6,6 +6,7 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalModifyEvent;
 import checkmate.goal.domain.GoalPeriod;
+import java.time.DayOfWeek;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -24,8 +25,8 @@ public interface GoalCommandMapper {
     Goal toEntity(GoalCreateCommand command);
 
     @Named("checkDays")
-    default GoalCheckDays checkDays(String checkDays) {
-        return GoalCheckDays.ofKorean(checkDays);
+    default GoalCheckDays checkDays(DayOfWeek[] checkDays) {
+        return GoalCheckDays.ofDayOfWeek(checkDays);
     }
 
     @Named("goalPeriod")

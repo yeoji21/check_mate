@@ -42,7 +42,8 @@ public class GoalController {
     public GoalCreateResponse create(
         @RequestBody @Valid GoalCreateDto dto,
         @AuthenticationPrincipal JwtUserDetails details) {
-        return new GoalCreateResponse(goalCommandService.create(toCreateCommand(dto, details)));
+        return new GoalCreateResponse(
+            goalCommandService.create(toCreateCommand(dto, details.getUserId())));
     }
 
     @GoalMember(GoalId.PATH_VARIABLE)
@@ -94,8 +95,8 @@ public class GoalController {
         return mapper.toCommand(dto, goalId, details.getUserId());
     }
 
-    private GoalCreateCommand toCreateCommand(GoalCreateDto dto, JwtUserDetails details) {
-        return mapper.toCommand(dto, details.getUserId());
+    private GoalCreateCommand toCreateCommand(GoalCreateDto dto, long userId) {
+        return mapper.toCommand(dto, userId);
     }
 
     private LikeCountCreateCommand toConditionCreateCommand(
