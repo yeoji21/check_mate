@@ -1,17 +1,33 @@
 package checkmate.goal.domain;
 
+import static java.time.DayOfWeek.FRIDAY;
+import static java.time.DayOfWeek.MONDAY;
+import static java.time.DayOfWeek.SATURDAY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class GoalCheckDaysTest {
+
+    @Test
+    void create_by_dayOfWeek() throws Exception {
+        //given
+        DayOfWeek[] dayOfWeeks = new DayOfWeek[]{MONDAY, SATURDAY, FRIDAY};
+        
+        //when
+        GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(dayOfWeeks);
+
+        //then
+        assertThat(checkDays).isNotNull();
+    }
 
     @Test
     void getAllMatchingWeekDayValues() throws Exception {

@@ -2,6 +2,7 @@ package checkmate.goal.domain;
 
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -18,7 +19,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
-// TODO: 2023/08/20 KorWeekDay -> WeekOfDay로 변경 고려
+// TODO: 2023/08/20 KorWeekDay -> DayOfWeek로 변경 고려
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
@@ -35,6 +36,13 @@ public class GoalCheckDays {
     }
 
     public static GoalCheckDays ofKorean(String korWeekDays) {
+        return new GoalCheckDays(korWeekDays);
+    }
+
+    public static GoalCheckDays ofDayOfWeek(DayOfWeek... dayOfWeeks) {
+        String korWeekDays = Arrays.stream(dayOfWeeks)
+            .map(day -> CheckDaysConverter.valueOf(day.toString()).kor)
+            .collect(Collectors.joining());
         return new GoalCheckDays(korWeekDays);
     }
 
