@@ -110,7 +110,8 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(mates).hasSize(2);
         assertThat(mates)
-            .allMatch(m -> GoalCheckDays.ofKorean(m.getGoal().getCheckDays().toKorean())
+            .allMatch(m -> GoalCheckDays.ofDayOfWeek(
+                    CheckDaysConverter.toDayOfWeeks(m.getGoal().getCheckDays().toKorean()))
                 .isCheckDay(LocalDate.now().minusDays(1)))
             .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
             .allMatch(m -> m.getStatus() == MateStatus.ONGOING)
@@ -162,7 +163,7 @@ class MateRepositoryTest extends RepositoryTest {
     }
 
     private GoalCheckDays tomorrowCheckDay() {
-        return GoalCheckDays.ofKorean(CheckDaysConverter.toKorean(LocalDate.now().plusDays(1)));
+        return GoalCheckDays.ofDayOfWeek(LocalDate.now().plusDays(1).getDayOfWeek());
     }
 
     private Mate createMate(Goal goal) {

@@ -5,8 +5,6 @@ import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.DayOfWeek;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
@@ -26,15 +24,7 @@ public interface GoalDtoMapper {
 
     @Named("korToDayOfWeek")
     default DayOfWeek[] checkDays(String checkDays) {
-        return Arrays.stream(checkDays.split(""))
-            .map(day ->
-                Arrays.stream(CheckDaysConverter.values())
-                    .filter(v -> day.equals(v.getKor()))
-                    .map(Enum::name)
-                    .collect(Collectors.joining())
-            )
-            .map(DayOfWeek::valueOf)
-            .toArray(DayOfWeek[]::new);
+        return CheckDaysConverter.toDayOfWeeks(checkDays);
     }
 
     @Mappings({

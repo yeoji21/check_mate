@@ -11,11 +11,13 @@ import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalCheckDays;
+import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.goal.domain.GoalPeriod;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -161,7 +163,9 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     private boolean isToday(TodayGoalInfo goal) {
-        return GoalCheckDays.ofKorean(goal.getCheckDays()).isCheckDay(LocalDate.now());
+        String korWeekDays = goal.getCheckDays();
+        return GoalCheckDays.ofDayOfWeek(CheckDaysConverter.toDayOfWeeks(korWeekDays))
+            .isCheckDay(LocalDate.now());
     }
 
     private Goal createTodayStartGoal() {
@@ -175,7 +179,7 @@ class GoalQueryDaoTest extends RepositoryTest {
             .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
             .category(GoalCategory.ETC)
             .title("futureGoal")
-            .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
+            .checkDays(GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
             .build();
         em.persist(goal);
         return goal;

@@ -36,10 +36,6 @@ public class GoalCheckDays {
         this.checkDays = CheckDaysConverter.toValue(korWeekDays);
     }
 
-    public static GoalCheckDays ofKorean(String korWeekDays) {
-        return new GoalCheckDays(korWeekDays);
-    }
-
     public static GoalCheckDays ofDayOfWeek(DayOfWeek... dayOfWeeks) {
         String korWeekDays = Arrays.stream(dayOfWeeks)
             .map(day -> CheckDaysConverter.valueOf(day.toString()).kor)
@@ -90,10 +86,16 @@ public class GoalCheckDays {
         @Getter
         private final String kor;
 
-        public static String toKorean(LocalDate... dates) {
-            return Arrays.stream(dates)
-                .map(date -> valueOf(date).kor)
-                .collect(Collectors.joining());
+        public static DayOfWeek[] toDayOfWeeks(String korWeekDays) {
+            return Arrays.stream(korWeekDays.split(""))
+                .map(day ->
+                    Arrays.stream(CheckDaysConverter.values())
+                        .filter(v -> day.equals(v.getKor()))
+                        .map(Enum::name)
+                        .collect(Collectors.joining())
+                )
+                .map(DayOfWeek::valueOf)
+                .toArray(DayOfWeek[]::new);
         }
 
         static String toKorean(int weekDays) {

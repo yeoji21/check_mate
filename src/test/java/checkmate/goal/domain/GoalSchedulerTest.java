@@ -1,8 +1,10 @@
 package checkmate.goal.domain;
 
+import static java.time.DayOfWeek.FRIDAY;
+import static java.time.DayOfWeek.MONDAY;
+import static java.time.DayOfWeek.WEDNESDAY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -13,7 +15,7 @@ class GoalSchedulerTest {
     void createGoalSchedule() throws Exception {
         //given
         GoalPeriod period = new GoalPeriod(todayMinusDays(6), today());
-        GoalCheckDays checkDays = GoalCheckDays.ofKorean("월수금");
+        GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(MONDAY, WEDNESDAY, FRIDAY);
 
         //when
         String goalSchedule = GoalScheduler.getTotalSchedule(period, checkDays);
@@ -27,8 +29,11 @@ class GoalSchedulerTest {
     void createCheckedSchedule() throws Exception {
         //given
         GoalPeriod period = new GoalPeriod(todayMinusDays(6), today());
-        GoalCheckDays checkDays = GoalCheckDays.ofKorean(
-            CheckDaysConverter.toKorean(todayMinusDays(2), todayMinusDays(1), today()));
+        GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(
+            todayMinusDays(2).getDayOfWeek(),
+            todayMinusDays(1).getDayOfWeek(),
+            today().getDayOfWeek()
+        );
         List<LocalDate> checkedDates = List.of(todayMinusDays(1), today());
 
         //when

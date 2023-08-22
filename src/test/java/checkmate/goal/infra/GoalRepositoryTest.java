@@ -11,6 +11,7 @@ import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalPeriod;
 import checkmate.goal.domain.LikeCountCondition;
 import checkmate.goal.domain.VerificationCondition;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -109,7 +110,7 @@ class GoalRepositoryTest extends RepositoryTest {
     private Goal createGoal(LocalDate startDate, LocalDate endDate) {
         Goal goal = Goal.builder()
             .title("title")
-            .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
+            .checkDays(GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
             .category(GoalCategory.ETC)
             .period(new GoalPeriod(startDate, endDate))
             .build();

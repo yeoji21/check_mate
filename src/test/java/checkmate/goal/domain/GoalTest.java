@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
-import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -185,7 +185,8 @@ class GoalTest {
         //given
         Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
-        ReflectionTestUtils.setField(goal, "checkDays", GoalCheckDays.ofKorean("월화수목금토일"));
+        ReflectionTestUtils.setField(goal, "checkDays",
+            GoalCheckDays.ofDayOfWeek(DayOfWeek.values()));
 
         //when
         int progressedCheckDayCount = goal.getProgressedCheckDayCount();
@@ -198,7 +199,8 @@ class GoalTest {
     void isTodayCheckDayTrue() throws Exception {
         //given
         Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "checkDays", GoalCheckDays.ofKorean("월화수목금토일"));
+        ReflectionTestUtils.setField(goal, "checkDays",
+            GoalCheckDays.ofDayOfWeek(DayOfWeek.values()));
 
         //when
         boolean isCheckDay = goal.isTodayCheckDay();
@@ -211,7 +213,7 @@ class GoalTest {
     void isTodayCheckDayFalse() throws Exception {
         //given
         Goal goal = createGoal();
-        GoalCheckDays checkDays = GoalCheckDays.ofKorean(getYesterDayKorWeekDays());
+        GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(getYesterdayDayOfWeek());
         ReflectionTestUtils.setField(goal, "checkDays", checkDays);
 
         //when
@@ -221,8 +223,8 @@ class GoalTest {
         assertThat(isCheckDay).isFalse();
     }
 
-    private String getYesterDayKorWeekDays() {
-        return CheckDaysConverter.toKorean(LocalDate.now().minusDays(1));
+    private DayOfWeek getYesterdayDayOfWeek() {
+        return LocalDate.now().minusDays(1).getDayOfWeek();
     }
 
     private Goal createGoal() {

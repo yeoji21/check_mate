@@ -9,6 +9,7 @@ import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationType;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Collections;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -20,7 +21,7 @@ public class TestEntityFactory {
             .category(GoalCategory.ETC)
             .title(title)
             .period(new GoalPeriod(LocalDate.now(), LocalDate.now().plusDays(30L)))
-            .checkDays(GoalCheckDays.ofKorean("월화수목금토일"))
+            .checkDays(GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
             .build();
         ReflectionTestUtils.setField(goal, "id", id);
         return goal;
