@@ -74,7 +74,8 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTodayCheckDay() {
-        return period.isBelongToPeriod(LocalDate.now()) && checkDays.isCheckDay(LocalDate.now());
+        return period.isBelongToPeriod(LocalDate.now()) && checkDays.isDateCheckDayOfWeek(
+            LocalDate.now());
     }
 
     public boolean isTimeOver() {
@@ -95,12 +96,12 @@ public class Goal extends BaseTimeEntity {
 
     public int getTotalCheckDayCount() {
         return (int) period.getFullPeriodStream()
-            .filter(date -> checkDays.isCheckDay(date)).count();
+            .filter(date -> checkDays.isDateCheckDayOfWeek(date)).count();
     }
 
     public int getProgressedCheckDayCount() {
         return (int) period.getUntilTodayPeriodStream()
-            .filter(date -> checkDays.isCheckDay(date)).count();
+            .filter(date -> checkDays.isDateCheckDayOfWeek(date)).count();
     }
 
     public LocalDate getStartDate() {

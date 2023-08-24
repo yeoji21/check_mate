@@ -64,7 +64,8 @@ public class FakeMateRepository implements MateRepository {
     @Override
     public List<Mate> findYesterdaySkippedMates() {
         return map.values().stream()
-            .filter(mate -> mate.getGoal().getCheckDays().isCheckDay(LocalDate.now().minusDays(1)))
+            .filter(mate -> mate.getGoal().getCheckDays()
+                .isDateCheckDayOfWeek(LocalDate.now().minusDays(1)))
             .filter(mate -> mate.getLastUploadDate() == null || mate.getLastUploadDate()
                 .isBefore(LocalDate.now().minusDays(1)))
             .collect(Collectors.toList());

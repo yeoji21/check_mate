@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -29,48 +28,41 @@ public class GoalCheckDays {
     @Column(name = "check_days", nullable = false)
     private int checkDays;
 
-    private GoalCheckDays(String korWeekDays) {
-        if (isContainsInvalidKorWeekDay(korWeekDays) || isContainsDuplicatedWeekDay(korWeekDays)) {
+    private GoalCheckDays(DayOfWeek[] dayOfWeeks) {
+        if (isContainsDuplicatedWeekDay(dayOfWeeks)) {
             throw new BusinessException(ErrorCode.INVALID_WEEK_DAYS);
         }
-        this.checkDays = CheckDaysConverter.toValue(korWeekDays);
+        this.checkDays = CheckDaysConverter.toValue(dayOfWeeks);
     }
 
     public static GoalCheckDays ofDayOfWeek(DayOfWeek... dayOfWeeks) {
-        String korWeekDays = Arrays.stream(dayOfWeeks)
-            .map(day -> CheckDaysConverter.valueOf(day.toString()).kor)
-            .collect(Collectors.joining());
-        return new GoalCheckDays(korWeekDays);
+        return new GoalCheckDays(dayOfWeeks);
     }
 
     public static GoalCheckDays ofValue(int value) {
-        return new GoalCheckDays(CheckDaysConverter.toKorean(value));
+        return new GoalCheckDays(CheckDaysConverter.toDayOfWeeks(value));
     }
 
-    public static List<Integer> getAllMatchingValues(LocalDate date) {
+    public static List<Integer> getAllMatchingValues(DayOfWeek dayOfWeek) {
         return IntStream.rangeClosed(1, 128)
-            .filter(weekDays -> CheckDaysConverter.isCheckDay(weekDays, date))
+            .filter(weekDays -> CheckDaysConverter.isCheckDayOfWeek(weekDays, dayOfWeek))
             .boxed()
             .toList();
     }
 
-    private static boolean isContainsInvalidKorWeekDay(String korWeekDays) {
-        return Pattern.compile("[^월화수목금토일]").matcher(korWeekDays).find();
+    private static boolean isContainsDuplicatedWeekDay(DayOfWeek[] dayOfWeeks) {
+        return dayOfWeeks.length != new HashSet<>(List.of(dayOfWeeks)).size();
     }
 
-    private static boolean isContainsDuplicatedWeekDay(String korWeekDays) {
-        return korWeekDays.length() != new HashSet<>(List.of(korWeekDays.split(""))).size();
-    }
-
-    public boolean isCheckDay(LocalDate date) {
-        return CheckDaysConverter.isCheckDay(checkDays, date);
+    public boolean isDateCheckDayOfWeek(LocalDate date) {
+        return CheckDaysConverter.isCheckDayOfWeek(checkDays, date.getDayOfWeek());
     }
 
     public String toKorean() {
         return CheckDaysConverter.toKorean(checkDays);
     }
 
-    // TODO: 2023/08/20 접근제한자 수정해서 캡슐화해야 함
+    // TODO: 2023/08/20 접근제한자 수정해서 캡슐화해야 하거나 외부로 분리
     @RequiredArgsConstructor
     public enum CheckDaysConverter {
         MONDAY(0, "월"),
@@ -100,28 +92,31 @@ public class GoalCheckDays {
 
         static String toKorean(int weekDays) {
             return Arrays.stream(values())
-                .filter(day -> isCheckDay(weekDays, day.shift))
+                .filter(day -> isValueContainsDayOfWeek(weekDays, day.shift))
                 .map(day -> day.kor)
                 .collect(Collectors.joining());
         }
 
-        static int toValue(String korWeekDays) {
-            int weekDays = 0;
-            for (String weekDay : korWeekDays.split("")) {
-                weekDays |= (1 << KOR_MAP.get(weekDay).shift);
+        static DayOfWeek[] toDayOfWeeks(int weekDays) {
+            return Arrays.stream(values())
+                .filter(day -> isValueContainsDayOfWeek(weekDays, day.shift))
+                .map(day -> DayOfWeek.valueOf(day.name()))
+                .toArray(DayOfWeek[]::new);
+        }
+
+        static int toValue(DayOfWeek[] dayOfWeeks) {
+            int value = 0;
+            for (DayOfWeek dayOfWeek : dayOfWeeks) {
+                value |= (1 << CheckDaysConverter.valueOf(dayOfWeek.toString()).shift);
             }
-            return weekDays;
+            return value;
         }
 
-        static CheckDaysConverter valueOf(LocalDate date) {
-            return CheckDaysConverter.valueOf(date.getDayOfWeek().toString());
+        static boolean isCheckDayOfWeek(int weekDays, DayOfWeek dayOfWeek) {
+            return isValueContainsDayOfWeek(weekDays, valueOf(dayOfWeek.toString()).shift);
         }
 
-        static boolean isCheckDay(int weekDays, LocalDate date) {
-            return isCheckDay(weekDays, valueOf(date).shift);
-        }
-
-        private static boolean isCheckDay(int weekDays, int date) {
+        private static boolean isValueContainsDayOfWeek(int weekDays, int date) {
             return (weekDays & (1 << date)) != 0;
         }
     }

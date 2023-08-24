@@ -165,7 +165,7 @@ class GoalQueryDaoTest extends RepositoryTest {
     private boolean isToday(TodayGoalInfo goal) {
         String korWeekDays = goal.getCheckDays();
         return GoalCheckDays.ofDayOfWeek(CheckDaysConverter.toDayOfWeeks(korWeekDays))
-            .isCheckDay(LocalDate.now());
+            .isDateCheckDayOfWeek(LocalDate.now());
     }
 
     private Goal createTodayStartGoal() {

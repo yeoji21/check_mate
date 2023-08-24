@@ -1,9 +1,16 @@
 package checkmate.goal.domain;
 
+import static java.time.DayOfWeek.FRIDAY;
+import static java.time.DayOfWeek.MONDAY;
+import static java.time.DayOfWeek.SATURDAY;
+import static java.time.DayOfWeek.SUNDAY;
+import static java.time.DayOfWeek.THURSDAY;
+import static java.time.DayOfWeek.TUESDAY;
+import static java.time.DayOfWeek.WEDNESDAY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
-import java.time.LocalDate;
+import java.time.DayOfWeek;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,80 +19,62 @@ class CheckDaysConverterTest {
     @Test
     @DisplayName("단일 요일 변환 테스트")
     void test_v1() throws Exception {
-        isEqualTo("월", 1);
-        isEqualTo("화", 2);
-        isEqualTo("수", 4);
-        isEqualTo("목", 8);
-        isEqualTo("금", 16);
-        isEqualTo("토", 32);
-        isEqualTo("일", 64);
+        dayOfWeeksToValue(1, MONDAY);
+        dayOfWeeksToValue(2, TUESDAY);
+        dayOfWeeksToValue(4, WEDNESDAY);
+        dayOfWeeksToValue(8, THURSDAY);
+        dayOfWeeksToValue(16, FRIDAY);
+        dayOfWeeksToValue(32, SATURDAY);
+        dayOfWeeksToValue(64, SUNDAY);
     }
 
     @Test
     @DisplayName("여러 요일 변환 테스트")
     void test_v2() throws Exception {
-        isEqualTo("월화", 3);
-        isEqualTo("월화수", 7);
-        isEqualTo("월화수목금", 1 + 2 + 4 + 8 + 16);
-        isEqualTo("월수금", 1 + 4 + 16);
-        isEqualTo("화목토", 2 + 8 + 32);
-        isEqualTo("토일", 32 + 64);
+        dayOfWeeksToValue(3, MONDAY, TUESDAY);
+        dayOfWeeksToValue(7, MONDAY, TUESDAY, WEDNESDAY);
+        dayOfWeeksToValue(1 + 2 + 4 + 8 + 16, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        dayOfWeeksToValue(1 + 4 + 16, MONDAY, WEDNESDAY, FRIDAY);
+        dayOfWeeksToValue(32 + 64, SATURDAY, SUNDAY);
     }
 
     @Test
     @DisplayName("값에서 요일로 변환 테스트")
     void test_v3() throws Exception {
-        isEqualTo(1, "월");
-        isEqualTo(2, "화");
-        isEqualTo(4, "수");
-        isEqualTo(8, "목");
-        isEqualTo(16, "금");
-        isEqualTo(32, "토");
-        isEqualTo(64, "일");
-
-        isEqualTo(3, "월화");
-        isEqualTo(7, "월화수");
-        isEqualTo(1 + 2 + 4 + 8 + 16, "월화수목금");
-        isEqualTo(1 + 4 + 16, "월수금");
-        isEqualTo(2 + 8 + 32, "화목토");
-        isEqualTo(32 + 64, "토일");
+        valueToDayOfWeeks(3, MONDAY, TUESDAY);
+        valueToDayOfWeeks(7, MONDAY, TUESDAY, WEDNESDAY);
+        valueToDayOfWeeks(1 + 2 + 4 + 8 + 16, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY);
+        valueToDayOfWeeks(1 + 4 + 16, MONDAY, WEDNESDAY, FRIDAY);
+        valueToDayOfWeeks(32 + 64, SATURDAY, SUNDAY);
     }
 
     @Test
     @DisplayName("인증 요일 확인")
     void test_V4() throws Exception {
-        LocalDate monday = LocalDate.of(2022, 10, 31);
-        LocalDate tuesday = LocalDate.of(2022, 11, 1);
-        LocalDate wednesday = LocalDate.of(2022, 11, 2);
-        LocalDate thursday = LocalDate.of(2022, 11, 3);
-        LocalDate friday = LocalDate.of(2022, 11, 4);
-        LocalDate saturday = LocalDate.of(2022, 11, 5);
-        LocalDate sunday = LocalDate.of(2022, 11, 6);
-
-        isCheckDay(1, monday);
-        isNotCheckDay(1, tuesday);
-        isCheckDay(2, tuesday);
-        isCheckDay(4, wednesday);
-        isCheckDay(8, thursday);
-        isCheckDay(16, friday);
-        isCheckDay(32, saturday);
-        isCheckDay(64, sunday);
-        isNotCheckDay(16, sunday);
+        isCheckDay(1, MONDAY);
+        isNotCheckDay(1, TUESDAY);
+        isCheckDay(2, TUESDAY);
+        isCheckDay(4, WEDNESDAY);
+        isCheckDay(8, THURSDAY);
+        isCheckDay(16, FRIDAY);
+        isCheckDay(32, SATURDAY);
+        isCheckDay(64, SUNDAY);
+        isNotCheckDay(16, SUNDAY);
     }
 
-    private void isNotCheckDay(int value, LocalDate date) {
-        assertThat(CheckDaysConverter.isCheckDay(value, date)).isFalse();
+    private void isNotCheckDay(int value, DayOfWeek dayOfWeek) {
+        assertThat(CheckDaysConverter.isCheckDayOfWeek(value, dayOfWeek)).isFalse();
     }
 
-    private void isCheckDay(int value, LocalDate date) {
-        assertThat(CheckDaysConverter.isCheckDay(value, date)).isTrue();
+    private void isCheckDay(int value, DayOfWeek dayOfWeek) {
+        assertThat(CheckDaysConverter.isCheckDayOfWeek(value, dayOfWeek)).isTrue();
     }
 
-    private void isEqualTo(String weekDay, int value) {
-        assertThat(CheckDaysConverter.toValue(weekDay)).isEqualTo(value);
+    private void dayOfWeeksToValue(int value, DayOfWeek... dayOfWeeks) {
+        assertThat(CheckDaysConverter.toValue(dayOfWeeks)).isEqualTo(value);
     }
 
-    private void isEqualTo(int value, String weekDays) {
-        assertThat(CheckDaysConverter.toKorean(value)).isEqualTo(weekDays);
+    private void valueToDayOfWeeks(int value, DayOfWeek... dayOfWeeks) {
+        assertThat(CheckDaysConverter.toDayOfWeeks(value)).isEqualTo(dayOfWeeks);
     }
 }

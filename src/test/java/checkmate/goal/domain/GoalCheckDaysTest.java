@@ -30,12 +30,13 @@ class GoalCheckDaysTest {
         //given
 
         //when
-        List<Integer> matchingValues = GoalCheckDays.getAllMatchingValues(getMonday());
+        List<Integer> matchingValues = GoalCheckDays.getAllMatchingValues(
+            getMonday().getDayOfWeek());
 
         //then
         assertThat(matchingValues).hasSize(64);
         assertTrue(matchingValues.stream()
-            .allMatch(value -> GoalCheckDays.ofValue(value).isCheckDay(getMonday())));
+            .allMatch(value -> GoalCheckDays.ofValue(value).isDateCheckDayOfWeek(getMonday())));
     }
 
     // TODO: 2023/08/23 중복요일 검증 테스트
@@ -46,7 +47,7 @@ class GoalCheckDaysTest {
         GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(MONDAY);
 
         //when
-        boolean isCheckDay = checkDays.isCheckDay(getMonday());
+        boolean isCheckDay = checkDays.isDateCheckDayOfWeek(getMonday());
 
         //then
         assertTrue(isCheckDay);
