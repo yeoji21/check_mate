@@ -7,10 +7,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -19,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
-// TODO: 2023/08/20 KorWeekDay -> DayOfWeek로 변경 고려
+// TODO: 2023/08/24 요일별 boolean 필드 두는 방식 고려
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
@@ -72,8 +70,6 @@ public class GoalCheckDays {
         FRIDAY(4, "금"),
         SATURDAY(5, "토"),
         SUNDAY(6, "일");
-        private static final Map<String, CheckDaysConverter> KOR_MAP =
-            Stream.of(values()).collect(Collectors.toMap(v -> v.kor, e -> e));
         private final int shift;
         @Getter
         private final String kor;

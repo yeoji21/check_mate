@@ -22,11 +22,11 @@ public class GoalPeriod {
     private LocalDate endDate;
 
     public GoalPeriod(LocalDate startDate, LocalDate endDate) {
-        this.startDate = startDate;
-        this.endDate = endDate;
-        if (isIncorrectPeriod()) {
+        if (startDate.isAfter(endDate)) {
             throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
         }
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     double getProgressedPercent() {
@@ -57,7 +57,4 @@ public class GoalPeriod {
         return (int) (startDate.datesUntil(endDate.plusDays(1)).count());
     }
 
-    private boolean isIncorrectPeriod() {
-        return startDate.isAfter(endDate);
-    }
 }

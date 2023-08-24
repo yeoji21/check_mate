@@ -4,8 +4,11 @@ import static java.time.DayOfWeek.FRIDAY;
 import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SATURDAY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import checkmate.exception.BusinessException;
+import checkmate.exception.code.ErrorCode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
@@ -26,20 +29,30 @@ class GoalCheckDaysTest {
     }
 
     @Test
+    void duplicated_dayOfWeek_throws_exception() throws Exception {
+        //given
+        DayOfWeek[] dayOfWeeks = new DayOfWeek[]{MONDAY, SATURDAY, FRIDAY, MONDAY};
+
+        //when
+        BusinessException exception = assertThrows(BusinessException.class,
+            () -> GoalCheckDays.ofDayOfWeek(dayOfWeeks));
+
+        //then
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.INVALID_WEEK_DAYS);
+    }
+
+    @Test
     void getAllMatchingWeekDayValues() throws Exception {
         //given
 
         //when
-        List<Integer> matchingValues = GoalCheckDays.getAllMatchingValues(
-            getMonday().getDayOfWeek());
+        List<Integer> matchingValues = GoalCheckDays.getAllMatchingValues(MONDAY);
 
         //then
         assertThat(matchingValues).hasSize(64);
         assertTrue(matchingValues.stream()
             .allMatch(value -> GoalCheckDays.ofValue(value).isDateCheckDayOfWeek(getMonday())));
     }
-
-    // TODO: 2023/08/23 중복요일 검증 테스트
 
     @Test
     void isCheckDayTrue() throws Exception {

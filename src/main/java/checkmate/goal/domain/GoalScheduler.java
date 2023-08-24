@@ -14,6 +14,7 @@ public class GoalScheduler {
         return convertToSchedule(period, date -> checkDays.isDateCheckDayOfWeek(date) ? "1" : "0");
     }
 
+    // TODO: 2023/08/25 파라미터 묶어서 타입 생성 고려
     public static String getCheckedSchedule(
         GoalPeriod period,
         GoalCheckDays checkDays,
