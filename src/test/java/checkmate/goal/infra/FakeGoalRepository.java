@@ -4,7 +4,6 @@ package checkmate.goal.infra;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.VerificationCondition;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,23 +37,6 @@ public class FakeGoalRepository implements GoalRepository {
     @Override
     public Optional<Goal> findForUpdate(long goalId) {
         return Optional.ofNullable(goalMap.get(goalId));
-    }
-
-    @Override
-    public void updateStatusToOver(List<Long> goalIds) {
-        goalIds.forEach(id -> {
-            Goal goal = goalMap.get(id);
-            ReflectionTestUtils.setField(goal, "status",
-                Goal.GoalStatus.OVER);
-        });
-    }
-
-    @Override
-    public void updateTodayStartGoalsToOngoing() {
-        goalMap.values().stream()
-            .filter(goal -> goal.getStartDate() == LocalDate.now().minusDays(1))
-            .forEach(goal -> ReflectionTestUtils.setField(goal, "status",
-                Goal.GoalStatus.ONGOING));
     }
 
     @Override

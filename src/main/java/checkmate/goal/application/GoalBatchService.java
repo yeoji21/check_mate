@@ -3,7 +3,6 @@ package checkmate.goal.application;
 import static checkmate.notification.domain.NotificationType.COMPLETE_GOAL;
 
 import checkmate.common.cache.KeyValueStorage;
-import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.GoalQueryDao;
 import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import java.util.List;
@@ -16,20 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class GoalBatchService {
 
-    private final GoalRepository goalRepository;
     private final GoalQueryDao goalQueryDao;
     private final ApplicationEventPublisher eventPublisher;
     private final KeyValueStorage keyValueStorage;
 
     @Transactional
     public void updateTodayStartGoals() {
-        goalRepository.updateTodayStartGoalsToOngoing();
+        goalQueryDao.updateTodayStartGoalsToOngoing();
     }
 
     @Transactional
     public void updateYesterdayOveredGoals() {
         List<Long> goalIds = goalQueryDao.findYesterdayOveredGoals();
-        goalRepository.updateStatusToOver(goalIds);
+        goalQueryDao.updateStatusToOver(goalIds);
         publishCompleteGoalEvent(goalIds);
         clearCompletedGoalCache(goalIds);
     }

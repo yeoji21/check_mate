@@ -4,11 +4,9 @@ import static checkmate.goal.domain.QGoal.goal;
 import static checkmate.goal.domain.QVerificationCondition.verificationCondition;
 
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.VerificationCondition;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
@@ -52,37 +50,11 @@ public class GoalJpaRepository implements GoalRepository {
         );
     }
 
-    // TODO: 2023/08/15 batch insert로 업데이트
-    @Override
-    public void updateTodayStartGoalsToOngoing() {
-        queryFactory.update(goal)
-            .where(goal.period.startDate.eq(LocalDate.now()),
-                goal.status.eq(GoalStatus.WAITING))
-            .set(goal.status, GoalStatus.ONGOING)
-            .execute();
-
-        entityManager.flush();
-        entityManager.clear();
-    }
-
     @Override
     public List<VerificationCondition> findConditions(long goalId) {
         return queryFactory.select(verificationCondition)
             .from(verificationCondition)
             .where(verificationCondition.goal.id.eq(goalId))
             .fetch();
-    }
-
-    public void updateStatusToOver(List<Long> goalIds) {
-        jdbcTemplate.batchUpdate("UPDATE goal SET status = ? WHERE id = ?",
-            goalIds,
-            goalIds.size(),
-            (ps, id) -> {
-                ps.setString(1, GoalStatus.OVER.name());
-                ps.setLong(2, id);
-            });
-
-        entityManager.flush();
-        entityManager.clear();
     }
 }

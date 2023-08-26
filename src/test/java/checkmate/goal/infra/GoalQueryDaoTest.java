@@ -10,6 +10,7 @@ import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
+import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.goal.domain.GoalPeriod;
@@ -29,6 +30,47 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
 class GoalQueryDaoTest extends RepositoryTest {
+
+    @Test
+    @DisplayName("종료된 목표 status 업데이트")
+    void updateYesterdayOveredGoals() throws Exception {
+        //given
+        Goal goal1 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        Goal goal2 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        Goal goal3 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
+        List<Long> goalIds = List.of(goal1.getId(), goal2.getId(), goal3.getId());
+        em.flush();
+        em.clear();
+
+        //when
+        goalQueryDao.updateStatusToOver(goalIds);
+
+        List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
+            .setParameter("ids", goalIds)
+            .getResultList();
+        assertThat(goals).allMatch(goal -> goal.getStatus() == GoalStatus.OVER);
+    }
+
+    @Test
+    @DisplayName("오늘 시작일인 목표의 status 업데이트")
+    void updateTodayStartGoal() throws Exception {
+        //given
+        Goal todayStart1 = createTodayStartGoal();
+        Goal todayStart2 = createTodayStartGoal();
+        Goal notToday = createGoal(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10));
+        em.flush();
+        em.clear();
+
+        //when
+        goalQueryDao.updateTodayStartGoalsToOngoing();
+
+        //then
+        assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(
+            GoalStatus.ONGOING);
+        assertThat(em.find(Goal.class, todayStart2.getId()).getStatus()).isEqualTo(
+            GoalStatus.ONGOING);
+        assertThat(em.find(Goal.class, notToday.getId()).getStatus()).isEqualTo(GoalStatus.WAITING);
+    }
 
     @Test
     void findOngoingUserIds() throws Exception {
@@ -160,6 +202,17 @@ class GoalQueryDaoTest extends RepositoryTest {
             .allMatch(mate -> !mate.isUploaded())
             .allMatch(mate -> mate.getMateId() > 0)
             .allMatch(mate -> mate.getUserId() > 0);
+    }
+
+    private Goal createGoal(LocalDate startDate, LocalDate endDate) {
+        Goal goal = Goal.builder()
+            .title("title")
+            .checkDays(GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
+            .category(GoalCategory.ETC)
+            .period(new GoalPeriod(startDate, endDate))
+            .build();
+        em.persist(goal);
+        return goal;
     }
 
     private boolean isToday(TodayGoalInfo goal) {

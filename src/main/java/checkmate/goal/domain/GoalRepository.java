@@ -14,8 +14,4 @@ public interface GoalRepository {
     Optional<Goal> findForUpdate(long goalId);
 
     List<VerificationCondition> findConditions(long goalId);
-
-    void updateStatusToOver(List<Long> goalIds);
-
-    void updateTodayStartGoalsToOngoing();
 }

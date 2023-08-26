@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -35,6 +36,27 @@ import org.springframework.stereotype.Repository;
 public class GoalQueryDao {
 
     private final JPAQueryFactory queryFactory;
+    private final JdbcTemplate jdbcTemplate;
+
+    // TODO: 2023/08/26 batch update로 동작하는지 테스트
+    // ?&rewriteBatchedStatements=true
+    public void updateStatusToOver(List<Long> goalIds) {
+        jdbcTemplate.batchUpdate("UPDATE goal SET status = ? WHERE id = ?",
+            goalIds,
+            goalIds.size(),
+            (ps, id) -> {
+                ps.setString(1, GoalStatus.OVER.name());
+                ps.setLong(2, id);
+            });
+    }
+
+    public void updateTodayStartGoalsToOngoing() {
+        queryFactory.update(goal)
+            .where(goal.period.startDate.eq(LocalDate.now()),
+                goal.status.eq(GoalStatus.WAITING))
+            .set(goal.status, GoalStatus.ONGOING)
+            .execute();
+    }
 
     public List<TodayGoalInfo> findTodayGoalInfo(long userId) {
         return queryFactory.select(
