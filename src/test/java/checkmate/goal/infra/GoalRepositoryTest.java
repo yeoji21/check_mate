@@ -25,7 +25,7 @@ class GoalRepositoryTest extends RepositoryTest {
         List<VerificationCondition> conditions = goalRepository.findConditions(goal.getId());
 
         //then
-        assertThat(conditions.size()).isEqualTo(1);
+        assertThat(conditions).hasSize(1);
     }
 
     @Test

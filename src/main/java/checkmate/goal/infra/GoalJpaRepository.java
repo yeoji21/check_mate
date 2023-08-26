@@ -12,7 +12,6 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 import javax.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 
@@ -22,7 +21,6 @@ public class GoalJpaRepository implements GoalRepository {
 
     private final EntityManager entityManager;
     private final JPAQueryFactory queryFactory;
-    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Goal save(Goal goal) {

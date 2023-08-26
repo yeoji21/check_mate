@@ -9,7 +9,6 @@ import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
 import checkmate.goal.domain.Goal;
-import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
@@ -18,7 +17,6 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.user.domain.User;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -35,20 +33,16 @@ class GoalQueryDaoTest extends RepositoryTest {
     @DisplayName("종료된 목표 status 업데이트")
     void updateYesterdayOveredGoals() throws Exception {
         //given
-        Goal goal1 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
-        Goal goal2 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
-        Goal goal3 = createGoal(LocalDate.now().minusDays(6), LocalDate.now().minusDays(1));
-        List<Long> goalIds = List.of(goal1.getId(), goal2.getId(), goal3.getId());
+        List<Goal> goals = createYesterDayOveredGoals();
         em.flush();
         em.clear();
+        List<Long> goalIds = goals.stream().map(Goal::getId).toList();
 
         //when
         goalQueryDao.updateStatusToOver(goalIds);
 
-        List<Goal> goals = em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
-            .setParameter("ids", goalIds)
-            .getResultList();
-        assertThat(goals).allMatch(goal -> goal.getStatus() == GoalStatus.OVER);
+        assertThat(findGoals(goalIds))
+            .allMatch(goal -> goal.getStatus().equals(GoalStatus.OVER));
     }
 
     @Test
@@ -57,7 +51,7 @@ class GoalQueryDaoTest extends RepositoryTest {
         //given
         Goal todayStart1 = createTodayStartGoal();
         Goal todayStart2 = createTodayStartGoal();
-        Goal notToday = createGoal(LocalDate.now().plusDays(1), LocalDate.now().plusDays(10));
+        Goal notTodayStart = createFutureStartGoal();
         em.flush();
         em.clear();
 
@@ -65,11 +59,12 @@ class GoalQueryDaoTest extends RepositoryTest {
         goalQueryDao.updateTodayStartGoalsToOngoing();
 
         //then
-        assertThat(em.find(Goal.class, todayStart1.getId()).getStatus()).isEqualTo(
-            GoalStatus.ONGOING);
-        assertThat(em.find(Goal.class, todayStart2.getId()).getStatus()).isEqualTo(
-            GoalStatus.ONGOING);
-        assertThat(em.find(Goal.class, notToday.getId()).getStatus()).isEqualTo(GoalStatus.WAITING);
+        assertThat(findGoal(todayStart1.getId()).getStatus())
+            .isEqualTo(GoalStatus.ONGOING);
+        assertThat(findGoal(todayStart2.getId()).getStatus())
+            .isEqualTo(GoalStatus.ONGOING);
+        assertThat(findGoal(notTodayStart.getId()).getStatus())
+            .isNotEqualTo(GoalStatus.ONGOING);
     }
 
     @Test
@@ -170,14 +165,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         User user = createUser();
         createOngoingMate(createFutureStartGoal(), user);
         createOngoingMate(createTodayStartGoal(), user);
+        createOngoingMate(createTodayStartGoal(), user);
 
         //when
         List<TodayGoalInfo> todayGoals = goalQueryDao.findTodayGoalInfo(user.getId());
 
         //then
         assertThat(todayGoals)
-            .hasSize(1)
-            .allMatch(this::isToday);
+            .hasSize(2)
+            .allMatch(info -> isTodayCheckDayOfWeek(info.getCheckDays()));
     }
 
     @Test
@@ -204,19 +200,7 @@ class GoalQueryDaoTest extends RepositoryTest {
             .allMatch(mate -> mate.getUserId() > 0);
     }
 
-    private Goal createGoal(LocalDate startDate, LocalDate endDate) {
-        Goal goal = Goal.builder()
-            .title("title")
-            .checkDays(GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
-            .category(GoalCategory.ETC)
-            .period(new GoalPeriod(startDate, endDate))
-            .build();
-        em.persist(goal);
-        return goal;
-    }
-
-    private boolean isToday(TodayGoalInfo goal) {
-        String korWeekDays = goal.getCheckDays();
+    private boolean isTodayCheckDayOfWeek(String korWeekDays) {
         return GoalCheckDays.ofDayOfWeek(CheckDaysConverter.toDayOfWeeks(korWeekDays))
             .isDateCheckDayOfWeek(LocalDate.now());
     }
@@ -228,12 +212,12 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     private Goal createFutureStartGoal() {
-        Goal goal = Goal.builder()
-            .period(new GoalPeriod(LocalDate.now().plusDays(10), LocalDate.now().plusDays(20)))
-            .category(GoalCategory.ETC)
-            .title("futureGoal")
-            .checkDays(GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
-            .build();
+        Goal goal = createGoal();
+        GoalPeriod goalPeriod = new GoalPeriod(
+            LocalDate.now().plusDays(10),
+            LocalDate.now().plusDays(20));
+        ReflectionTestUtils.setField(goal, "period", goalPeriod);
+        ReflectionTestUtils.setField(goal, "status", GoalStatus.WAITING);
         em.persist(goal);
         return goal;
     }
@@ -245,16 +229,15 @@ class GoalQueryDaoTest extends RepositoryTest {
         return mate;
     }
 
-    private void createOutMate(Goal goal2) {
-        Mate out = createOngoingMate(goal2);
-        ReflectionTestUtils.setField(out, "status", MateStatus.OUT);
-    }
-
-    private Mate createOngoingMate(Goal goal, User user) {
+    private void createOngoingMate(Goal goal, User user) {
         Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
-        return mate;
+    }
+
+    private void createOutMate(Goal goal) {
+        Mate out = createOngoingMate(goal);
+        ReflectionTestUtils.setField(out, "status", MateStatus.OUT);
     }
 
     private User createUser() {
@@ -269,9 +252,24 @@ class GoalQueryDaoTest extends RepositoryTest {
         return goal;
     }
 
+    private Goal findGoal(long goalId) {
+        return em.find(Goal.class, goalId);
+    }
+
     private Goal createYesterDayOveredGoal() {
         Goal goal = createGoal();
         ReflectionTestUtils.setField(goal.getPeriod(), "endDate", LocalDate.now().minusDays(1L));
         return goal;
+    }
+
+    private List<Goal> createYesterDayOveredGoals() {
+        return List.of(createYesterDayOveredGoal(), createYesterDayOveredGoal(),
+            createYesterDayOveredGoal());
+    }
+
+    private List<Goal> findGoals(List<Long> goalIds) {
+        return em.createQuery("select g from Goal g where g.id in :ids", Goal.class)
+            .setParameter("ids", goalIds)
+            .getResultList();
     }
 }
