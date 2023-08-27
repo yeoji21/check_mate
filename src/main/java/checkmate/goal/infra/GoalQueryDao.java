@@ -24,6 +24,7 @@ import checkmate.notification.domain.factory.dto.CompleteGoalNotificationDto;
 import checkmate.notification.domain.factory.dto.QCompleteGoalNotificationDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,8 +39,6 @@ public class GoalQueryDao {
     private final JPAQueryFactory queryFactory;
     private final JdbcTemplate jdbcTemplate;
 
-    // TODO: 2023/08/26 batch update로 동작하는지 테스트
-    // ?&rewriteBatchedStatements=true
     public void updateStatusToOver(List<Long> goalIds) {
         jdbcTemplate.batchUpdate("UPDATE goal SET status = ? WHERE id = ?",
             goalIds,
@@ -51,11 +50,10 @@ public class GoalQueryDao {
     }
 
     public void updateTodayStartGoalsToOngoing() {
-        queryFactory.update(goal)
-            .where(goal.period.startDate.eq(LocalDate.now()),
-                goal.status.eq(GoalStatus.WAITING))
-            .set(goal.status, GoalStatus.ONGOING)
-            .execute();
+        jdbcTemplate.batchUpdate(
+            "UPDATE goal SET status = 'ONGOING' WHERE start_date = ? AND status = 'WAITING'",
+            Collections.singletonList(new Object[]{LocalDate.now()})
+        );
     }
 
     public List<TodayGoalInfo> findTodayGoalInfo(long userId) {

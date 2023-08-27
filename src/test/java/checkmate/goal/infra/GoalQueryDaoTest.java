@@ -29,6 +29,28 @@ import org.springframework.test.util.ReflectionTestUtils;
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)
 class GoalQueryDaoTest extends RepositoryTest {
 
+//    @Transactional
+//    @Test
+//    void test() throws Exception {
+//        //given
+//
+//        StopWatch stopWatch = new StopWatch();
+//        List<Long> goalIds = new ArrayList<>();
+//        for (int i = 0; i < 10000; i++) {
+//            goalIds.add(createGoal().getId());
+//        }
+//
+//        stopWatch.start();
+//        goalQueryDao.updateStatusToOver(goalIds);
+//        stopWatch.stop();
+//
+//        //when
+//        System.out.println("TIME : " + stopWatch.getTotalTimeMillis());
+//
+//        //then
+//        assertThat(goalIds).hasSize(10000);
+//    }
+
     @Test
     @DisplayName("종료된 목표 status 업데이트")
     void updateYesterdayOveredGoals() throws Exception {
@@ -57,6 +79,8 @@ class GoalQueryDaoTest extends RepositoryTest {
 
         //when
         goalQueryDao.updateTodayStartGoalsToOngoing();
+        em.flush();
+        em.clear();
 
         //then
         assertThat(findGoal(todayStart1.getId()).getStatus())

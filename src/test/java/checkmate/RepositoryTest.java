@@ -19,6 +19,7 @@ import checkmate.post.infrastructure.PostQueryDao;
 import checkmate.user.infrastructure.UserJpaRepository;
 import checkmate.user.infrastructure.UserQueryDao;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import javax.persistence.EntityManager;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -26,27 +27,26 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-
 //@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 @Import({ApplicationAuditingConfig.class, JpaQueryFactoryConfig.class,
-        GoalQueryDao.class,
-        MateJpaRepository.class,
-        MateQueryDao.class,
-        NotificationJpaRepository.class,
-        ImageJpaRepository.class,
-        PostJpaRepository.class,
-        GoalJpaRepository.class,
-        PostJpaRepository.class,
-        PostQueryDao.class,
-        NotificationQueryDao.class,
-        UserJpaRepository.class,
-        UserQueryDao.class
+    GoalQueryDao.class,
+    MateJpaRepository.class,
+    MateQueryDao.class,
+    NotificationJpaRepository.class,
+    ImageJpaRepository.class,
+    PostJpaRepository.class,
+    GoalJpaRepository.class,
+    PostJpaRepository.class,
+    PostQueryDao.class,
+    NotificationQueryDao.class,
+    UserJpaRepository.class,
+    UserQueryDao.class
 })
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
 public abstract class RepositoryTest {
+
     @Autowired
     protected EntityManager em;
     @Autowired
