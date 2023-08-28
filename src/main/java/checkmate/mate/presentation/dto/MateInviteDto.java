@@ -1,17 +1,15 @@
 package checkmate.mate.presentation.dto;
 
+import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 public class MateInviteDto {
+
     @NotBlank(message = "inviteeNickname is null")
     private String inviteeNickname;
-
-    public MateInviteDto(String inviteeNickname) {
-        this.inviteeNickname = inviteeNickname;
-    }
 }

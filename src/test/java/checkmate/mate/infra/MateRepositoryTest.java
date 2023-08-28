@@ -36,7 +36,7 @@ class MateRepositoryTest extends RepositoryTest {
         UninitiatedMate uninitiatedMate = mateRepository.findUninitiateMate(mate.getId()).get();
 
         //then
-        assertThat(uninitiatedMate.getOngoingGoalCount()).isEqualTo(2);
+        assertThat(getOngoingGoalCount(uninitiatedMate)).isEqualTo(2);
     }
 
     @Test
@@ -160,6 +160,11 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(mates.size()).isEqualTo(2);
         assertThat(mates).contains(mate1, mate2);
+    }
+
+    private int getOngoingGoalCount(UninitiatedMate uninitiatedMate) {
+        return (int) ReflectionTestUtils.getField(uninitiatedMate,
+            "ongoingGoalCount");
     }
 
     private GoalCheckDays tomorrowCheckDay() {

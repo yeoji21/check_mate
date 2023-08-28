@@ -8,9 +8,10 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface MateDtoMapper {
+
     MateDtoMapper INSTANCE = Mappers.getMapper(MateDtoMapper.class);
 
-    MateInviteCommand toCommand(long goalId, MateInviteDto inviteDto, long inviterUserId);
+    MateInviteCommand toCommand(long goalId, long inviterUserId, MateInviteDto inviteDto);
 
     @Mapping(target = "notificationId", source = "dto.notificationId")
     MateInviteReplyCommand toCommand(MateInviteReplyDto dto, long userId);

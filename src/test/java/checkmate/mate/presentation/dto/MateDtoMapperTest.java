@@ -17,7 +17,7 @@ class MateDtoMapperTest extends MapperTest {
         long inviterUserId = 2L;
 
         //when
-        MateInviteCommand command = mapper.toCommand(goalId, dto, inviterUserId);
+        MateInviteCommand command = mapper.toCommand(goalId, inviterUserId, dto);
 
         //then
         isEqualTo(command.goalId(), goalId);

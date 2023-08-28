@@ -43,7 +43,7 @@ public class MateController {
     public void inviteToGoal(@PathVariable long goalId,
         @RequestBody @Valid MateInviteDto inviteDto,
         @AuthenticationPrincipal JwtUserDetails principal) {
-        mateCommandService.sendInvite(mapper.toCommand(goalId, inviteDto, principal.getUserId()));
+        mateCommandService.sendInvite(mapper.toCommand(goalId, principal.getUserId(), inviteDto));
     }
 
     @PatchMapping("/mates/accept")
