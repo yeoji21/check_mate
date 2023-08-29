@@ -1,7 +1,7 @@
 package checkmate.common.scheduler;
 
 import checkmate.goal.application.GoalBatchService;
-import checkmate.mate.application.MateCommandService;
+import checkmate.mate.application.MateBatchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class DailyScheduler {
 
     private final GoalBatchService goalBatchService;
-    private final MateCommandService mateCommandService;
+    private final MateBatchService mateBatchService;
 
     @Scheduled(cron = "0 0 0 1/1 * ?")
     public void updateInitiateGoal() {
@@ -22,7 +22,7 @@ public class DailyScheduler {
 
     @Scheduled(cron = "0 5 0 1/1 * ?")
     public void updateHookyDay() {
-        mateCommandService.updateUploadSkippedMates();
+        mateBatchService.updateUploadSkippedMates();
     }
 
     @Scheduled(cron = "0 10 0 1/1 * ?")

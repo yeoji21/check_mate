@@ -1,20 +1,32 @@
 package checkmate.notification.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
-import lombok.*;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Notification extends BaseTimeEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -39,10 +51,10 @@ public class Notification extends BaseTimeEntity {
 
     @Builder
     protected Notification(long userId,
-                           NotificationType type,
-                           String title,
-                           String content,
-                           List<NotificationReceiver> receivers) {
+        NotificationType type,
+        String title,
+        String content,
+        List<NotificationReceiver> receivers) {
         this.userId = userId;
         this.type = type;
         this.title = title;
@@ -58,10 +70,7 @@ public class Notification extends BaseTimeEntity {
         return attributes.getLongValue(key);
     }
 
-    public String getStringAttribute(NotificationAttributeKey key) {
-        return attributes.getStringValue(key);
-    }
-
+    // TODO: 2023/08/29 테스트에서만 사용하는 메소드
     public List<NotificationReceiver> getReceivers() {
         return receivers.getReceivers();
     }

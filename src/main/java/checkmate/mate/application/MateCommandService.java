@@ -1,12 +1,10 @@
 package checkmate.mate.application;
 
-import static checkmate.notification.domain.NotificationType.EXPULSION_GOAL;
 import static checkmate.notification.domain.NotificationType.INVITE_ACCEPT;
 import static checkmate.notification.domain.NotificationType.INVITE_REJECT;
 import static checkmate.notification.domain.NotificationType.INVITE_SEND;
 
 import checkmate.common.cache.CacheKeyUtil;
-import checkmate.common.cache.KeyValueStorage;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.Goal;
@@ -21,14 +19,12 @@ import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
-import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.domain.factory.dto.InviteAcceptNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteRejectNotificationDto;
 import checkmate.notification.domain.factory.dto.InviteSendNotificationDto;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -46,7 +42,6 @@ public class MateCommandService {
     private final GoalRepository goalRepository;
     private final MateRepository mateRepository;
     private final NotificationRepository notificationRepository;
-    private final KeyValueStorage keyValueStorage;
     private final ApplicationEventPublisher eventPublisher;
     private final MateCommandMapper mapper;
 
@@ -67,8 +62,11 @@ public class MateCommandService {
     })
     @Transactional
     public MateAcceptResult acceptInvite(MateInviteReplyCommand command) {
+        // TODO: 2023/08/29 초대 수락 외에도 알림 읽음 처리를 하고 있음
+        // 읽음 처리 어떻게 할지? attribute 꺼낼 때?
         Notification notification = findAndReadNotification(command.notificationId(),
             command.userId());
+        // TODO: 2023/08/29 mate 두 번 조회 중
         Mate mate = findMate(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
         initiateToGoal(mate);
         publishInviteAcceptEvent(notification, mate);
@@ -82,16 +80,6 @@ public class MateCommandService {
         Mate mate = findMate(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
         mate.rejectInvite();
         publishInviteRejectEvent(notification, mate);
-    }
-
-    @Transactional
-    public void updateUploadSkippedMates() {
-        List<Mate> skippedMates = updateYesterdaySkippedMates();
-        List<Mate> limitOveredMates = filterLimitOveredMates(skippedMates);
-        mateRepository.updateLimitOveredMates(limitOveredMates);
-        publishExpulsionNotifications(limitOveredMates);
-        limitOveredMates.stream().map(Mate::getUserId)
-            .forEach(keyValueStorage::deleteAll);
     }
 
     private void initiateToGoal(Mate mate) {
@@ -137,25 +125,6 @@ public class MateCommandService {
     private void publishInviteSendEvent(MateInviteCommand command, Mate invitee) {
         eventPublisher.publishEvent(new PushNotificationCreatedEvent(INVITE_SEND,
             createInviteSendNotificationDto(invitee, command)));
-    }
-
-    private List<Mate> updateYesterdaySkippedMates() {
-        List<Mate> skippedMates = mateRepository.findYesterdaySkippedMates();
-        mateRepository.increaseSkippedDayCount(skippedMates);
-        List<Long> mateIds = skippedMates.stream().map(Mate::getId).toList();
-        skippedMates = mateRepository.findAllWithGoal(mateIds);
-        return skippedMates;
-    }
-
-    private void publishExpulsionNotifications(List<Mate> limitOveredMates) {
-        eventPublisher.publishEvent(new NotPushNotificationCreatedEvent(EXPULSION_GOAL,
-            limitOveredMates.stream().map(mapper::toNotificationDto).toList()));
-    }
-
-    private List<Mate> filterLimitOveredMates(List<Mate> hookyMates) {
-        return hookyMates.stream()
-            .filter(tm -> tm.getSkippedDayCount() >= tm.getGoal().getSkippedDayLimit())
-            .toList();
     }
 
     private InviteSendNotificationDto createInviteSendNotificationDto(Mate invitee,

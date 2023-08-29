@@ -18,12 +18,9 @@ class NotificationTest {
 
         //when
         notification.addAttribute(NotificationAttributeKey.GOAL_ID, 123);
-        notification.addAttribute(NotificationAttributeKey.MATE_ID, "value");
 
         //then
         assertThat(notification.getLongAttribute(NotificationAttributeKey.GOAL_ID)).isEqualTo(123);
-        assertThat(notification.getStringAttribute(NotificationAttributeKey.MATE_ID)).isEqualTo(
-            "value");
     }
 
     @Test

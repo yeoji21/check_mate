@@ -2,11 +2,9 @@ package checkmate.mate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
-import checkmate.common.cache.KeyValueStorage;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.FakeGoalRepository;
@@ -23,13 +21,11 @@ import checkmate.notification.domain.NotificationAttributeKey;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
-import checkmate.notification.domain.event.NotPushNotificationCreatedEvent;
 import checkmate.notification.domain.event.PushNotificationCreatedEvent;
 import checkmate.notification.infrastructure.FakeNotificationRepository;
 import checkmate.user.domain.User;
 import checkmate.user.domain.UserRepository;
 import checkmate.user.infrastructure.FakeUserRepository;
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -52,8 +48,6 @@ class MateCommandServiceTest {
     private MateRepository mateRepository = new FakeMateRepository();
     @Spy
     private NotificationRepository notificationRepository = new FakeNotificationRepository();
-    @Mock
-    private KeyValueStorage keyValueStorage;
     @Mock
     private ApplicationEventPublisher eventPublisher;
     @Spy
@@ -137,20 +131,6 @@ class MateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
-    @Test
-    @DisplayName("인증일에 인증하지 않은 팀원 업데이트")
-    void updateUploadSkippedMate() throws Exception {
-        //given
-        createUploadSkippedMates();
-
-        //when
-        mateCommandService.updateUploadSkippedMates();
-
-        //then
-        verify(eventPublisher).publishEvent(any(NotPushNotificationCreatedEvent.class));
-        verify(keyValueStorage).deleteAll(anyLong());
-    }
-
     private Notification createAndSaveInviteNotification(Mate mate) {
         User inviter = createAndSaveUser();
         NotificationReceiver receiver = new NotificationReceiver(mate.getUserId());
@@ -181,15 +161,6 @@ class MateCommandServiceTest {
 
     private Mate createAndSaveMate(Goal goal, User user) {
         return mateRepository.save(goal.createMate(user));
-    }
-
-    private void createUploadSkippedMates() {
-        Goal goal = createAndSaveGoal();
-        List<Mate> skippedMates = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            skippedMates.add(createAndSaveMate(goal, createAndSaveUser()));
-        }
-        ReflectionTestUtils.setField(skippedMates.get(0).getAttendance(), "skippedDayCount", 100);
     }
 
     private Mate createRejectStatusMate(User user) {
