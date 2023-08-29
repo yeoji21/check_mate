@@ -22,6 +22,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -36,6 +37,11 @@ import lombok.NoArgsConstructor;
     @Index(name = "goalId_userId_status_idx", columnList = "goal_id, user_id, status"),
     @Index(name = "userId_idx", columnList = "user_id"),
     @Index(name = "goalId_idx", columnList = "goal_id")
+}, uniqueConstraints = {
+    @UniqueConstraint(
+        name = "unique_goalId_userId",
+        columnNames = {"goal_id", "user_id"}
+    )
 })
 @Entity
 public class Mate extends BaseTimeEntity {
