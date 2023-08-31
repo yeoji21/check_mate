@@ -60,7 +60,7 @@ class NotificationQueryServiceTest {
             HashMap.class);
 
         //then
-        assertThat(receiver.isChecked()).isTrue();
+        assertThat(receiver.isRead()).isTrue();
         assertThat(attributes.containsKey(NotificationAttributeKey.GOAL_ID.getKey())).isTrue();
         assertThat(info.getTitle()).isEqualTo(notification.getTitle());
         assertThat(info.getContent()).isEqualTo(notification.getContent());
@@ -80,7 +80,7 @@ class NotificationQueryServiceTest {
             receiver.getUserId());
 
         //then
-        assertThat(receiver.isChecked()).isFalse();
+        assertThat(receiver.isRead()).isFalse();
         assertThat(info.getTitle()).isEqualTo(notification.getTitle());
         assertThat(info.getContent()).isEqualTo(notification.getContent());
     }
@@ -97,7 +97,7 @@ class NotificationQueryServiceTest {
 
         //then
         assertThat(result.getNotifications().size()).isEqualTo(receivers.size());
-        assertThat(receivers).allMatch(receiver -> receiver.isChecked());
+        assertThat(receivers).allMatch(receiver -> receiver.isRead());
         assertThat(result.getNotifications()).allMatch(
             noti -> noti.getType().equals(NotificationType.COMPLETE_GOAL.name()));
     }

@@ -126,7 +126,7 @@ class MateCommandServiceTest {
 
         //then
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.REJECT);
-        assertThat(receiver.isChecked()).isTrue();
+        assertThat(receiver.isRead()).isTrue();
 
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }

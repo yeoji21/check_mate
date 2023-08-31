@@ -41,7 +41,7 @@ public class FakeNotificationRepository implements NotificationRepository {
         return map.values().stream()
             .filter(notification -> notification.getType() == notificationType)
             .map(notification -> notification.getReceivers().stream().filter(
-                    receiver -> !receiver.isChecked() && receiver.getUserId() == receiverUserId)
+                    receiver -> !receiver.isRead() && receiver.getUserId() == receiverUserId)
                 .findAny().orElse(null)
             ).toList();
     }

@@ -49,7 +49,7 @@ class NotificationRepositoryTest extends RepositoryTest {
         createNotification(sender, COMPLETE_GOAL,
             List.of(new NotificationReceiver(receiver.getId())));
         NotificationReceiver checkedReceiver = new NotificationReceiver(receiver.getId());
-        ReflectionTestUtils.setField(checkedReceiver, "checked", true);
+        ReflectionTestUtils.setField(checkedReceiver, "isRead", true);
         createNotification(sender, COMPLETE_GOAL, List.of(checkedReceiver));
 
         em.flush();

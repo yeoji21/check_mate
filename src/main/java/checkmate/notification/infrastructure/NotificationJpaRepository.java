@@ -1,24 +1,24 @@
 package checkmate.notification.infrastructure;
 
+import static checkmate.notification.domain.QNotification.notification;
+import static checkmate.notification.domain.QNotificationReceiver.notificationReceiver;
+
 import checkmate.notification.domain.Notification;
 import checkmate.notification.domain.NotificationReceiver;
 import checkmate.notification.domain.NotificationRepository;
 import checkmate.notification.domain.NotificationType;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
-
-import static checkmate.notification.domain.QNotification.notification;
-import static checkmate.notification.domain.QNotificationReceiver.notificationReceiver;
+import javax.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 
 @RequiredArgsConstructor
 @Repository
 public class NotificationJpaRepository implements NotificationRepository {
+
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
 
@@ -35,22 +35,23 @@ public class NotificationJpaRepository implements NotificationRepository {
     @Override
     public Optional<NotificationReceiver> findReceiver(long notificationId, long receiverUserId) {
         return Optional.ofNullable(
-                queryFactory.selectFrom(notificationReceiver)
-                        .join(notificationReceiver.notification, notification).fetchJoin()
-                        .where(notification.id.eq(notificationId),
-                                notificationReceiver.userId.eq(receiverUserId))
-                        .fetchOne()
+            queryFactory.selectFrom(notificationReceiver)
+                .join(notificationReceiver.notification, notification).fetchJoin()
+                .where(notification.id.eq(notificationId),
+                    notificationReceiver.userId.eq(receiverUserId))
+                .fetchOne()
         );
     }
 
     @Override
-    public List<NotificationReceiver> findUncheckedReceivers(long userId, NotificationType notificationType) {
+    public List<NotificationReceiver> findUncheckedReceivers(long userId,
+        NotificationType notificationType) {
         return queryFactory
-                .select(notificationReceiver)
-                .from(notificationReceiver)
-                .where(notificationReceiver.userId.eq(userId),
-                        notificationReceiver.checked.isFalse(),
-                        notification.type.eq(notificationType))
-                .fetch();
+            .select(notificationReceiver)
+            .from(notificationReceiver)
+            .where(notificationReceiver.userId.eq(userId),
+                notificationReceiver.isRead.isFalse(),
+                notification.type.eq(notificationType))
+            .fetch();
     }
 }
