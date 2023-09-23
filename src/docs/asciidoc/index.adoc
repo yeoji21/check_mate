@@ -418,15 +418,15 @@ include::{snippets}/logout/http-response.adoc[]
 
 === Request Field
 
-include::{snippets}/user-nickname-update/request-fields.adoc[]
+include::{snippets}/user-nickname-modify/request-fields.adoc[]
 
 === HTTP Request
 
-include::{snippets}/user-nickname-update/http-request.adoc[]
+include::{snippets}/user-nickname-modify/http-request.adoc[]
 
 === HTTP Response
 
-include::{snippets}/user-nickname-update/http-response.adoc[]
+include::{snippets}/user-nickname-modify/http-response.adoc[]
 
 // =============================================================
 
