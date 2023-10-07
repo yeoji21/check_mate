@@ -1,7 +1,5 @@
 package checkmate.goal.application;
 
-import static checkmate.exception.code.ErrorCode.USER_NOT_FOUND;
-
 import checkmate.common.cache.CacheKeyUtil;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
@@ -12,10 +10,9 @@ import checkmate.goal.application.dto.request.LikeCountCreateCommand;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.domain.LikeCountCondition;
+import checkmate.mate.application.MateCommandService;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
-import checkmate.user.domain.User;
-import checkmate.user.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -29,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class GoalCommandService {
 
     private final GoalRepository goalRepository;
-    private final UserRepository userRepository;
     private final MateRepository mateRepository;
+    private final MateCommandService mateCommandService;
     private final GoalCommandMapper mapper;
 
     @Caching(evict = {
@@ -44,7 +41,8 @@ public class GoalCommandService {
     @Transactional
     public long create(GoalCreateCommand command) {
         Goal goal = createAndSaveGoal(command);
-        initateToGoal(createAndSaveMate(goal, command.userId()));
+        Mate mate = createAndSaveMate(goal, command.userId());
+        initateToGoal(mate);
         return goal.getId();
     }
 
@@ -60,6 +58,12 @@ public class GoalCommandService {
         goalRepository.saveCondition(createLikeCountCondition(command));
     }
 
+    private Mate createAndSaveMate(Goal goal, long userId) {
+        Mate mate = mateCommandService.createAndSaveMate(goal.getId(), userId);
+        mate.receiveInvite();
+        return mate;
+    }
+
     private Goal createAndSaveGoal(GoalCreateCommand command) {
         return goalRepository.save(createGoal(command));
     }
@@ -68,27 +72,10 @@ public class GoalCommandService {
         return mapper.toEntity(command);
     }
 
-    private Mate createAndSaveMate(Goal goal, long userId) {
-        Mate mate = createMate(goal, userId);
-        mateRepository.save(mate);
-        return mate;
-    }
-
     private void initateToGoal(Mate mate) {
         mateRepository.findUninitiateMate(mate.getId())
             .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()))
             .initiate();
-    }
-
-    private Mate createMate(Goal goal, long userId) {
-        Mate mate = goal.createMate(findUser(userId));
-        mate.receiveInvite();
-        return mate;
-    }
-
-    private User findUser(long userId) {
-        return userRepository.findById(userId)
-            .orElseThrow(() -> new NotFoundException(USER_NOT_FOUND, userId));
     }
 
     private Goal findGoalForUpdate(long goalId) {

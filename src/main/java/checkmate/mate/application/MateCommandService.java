@@ -104,6 +104,15 @@ public class MateCommandService {
         return mateRepository.save(goal.createMate(invitee));
     }
 
+    @Transactional
+    public Mate createAndSaveMate(long goalId, long userId) {
+        Goal goal = goalRepository.find(goalId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        return mateRepository.save(goal.createMate(user));
+    }
+
     private Notification findAndReadNotification(long notificationId, long userId) {
         NotificationReceiver receiver = notificationRepository.findReceiver(notificationId, userId)
             .orElseThrow(

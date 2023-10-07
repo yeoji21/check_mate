@@ -90,6 +90,7 @@ public class Goal extends BaseTimeEntity {
         return new Mate(this, user);
     }
 
+    // TODO: 2023/10/07 메소드명
     public boolean isInviteable() {
         return period.getProgressedPercent() <= GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT;
     }

@@ -1,6 +1,8 @@
 package checkmate.goal.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 
 import checkmate.TestEntityFactory;
 import checkmate.goal.application.dto.GoalCommandMapper;
@@ -10,6 +12,8 @@ import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.GoalRepository;
 import checkmate.goal.infra.FakeGoalRepository;
+import checkmate.mate.application.MateCommandService;
+import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.infra.FakeMateRepository;
 import checkmate.user.domain.User;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -34,6 +39,8 @@ class GoalCommandServiceTest {
     private UserRepository userRepository = new FakeUserRepository();
     @Spy
     private MateRepository mateRepository = new FakeMateRepository();
+    @Mock
+    private MateCommandService mateCommandService;
     @Spy
     private GoalCommandMapper commandMapper = GoalCommandMapper.INSTANCE;
     @InjectMocks
@@ -59,12 +66,21 @@ class GoalCommandServiceTest {
     void create() {
         //given
         GoalCreateCommand command = createGoalCreateCommand();
+        Mate mate = createMate();
+        given(mateCommandService.createAndSaveMate(anyLong(), anyLong())).willReturn(mate);
 
         //when
         long goalId = goalCommandService.create(command);
 
         //then
         assertThat(goalId).isGreaterThan(0L);
+    }
+
+    private Mate createMate() {
+        Goal goal = TestEntityFactory.goal(1L, "test");
+        Mate mate = goal.createMate(TestEntityFactory.user(1L, "user"));
+        mateRepository.save(mate);
+        return mate;
     }
 
     private GoalCreateCommand createGoalCreateCommand() {
