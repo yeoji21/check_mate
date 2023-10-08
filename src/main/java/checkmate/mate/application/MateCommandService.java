@@ -47,7 +47,8 @@ public class MateCommandService {
 
     @Transactional
     public void sendInvite(MateInviteCommand command) {
-        Mate invitee = findOrCreateMateToInvite(command.goalId(), command.inviteeNickname());
+        // TODO: 2023/10/08 초대한 유저가 goal에 속해있는지 검증하지 않음
+        Mate invitee = findOrCreateMate(command.goalId(), command.inviteeNickname());
         invitee.receiveInvite();
         publishInviteSendEvent(command, invitee);
     }
@@ -88,20 +89,11 @@ public class MateCommandService {
             .initiate();
     }
 
-    // TODO: 2023/08/28 Service layer 내 분기 로직
-    // 로직을 어떻게 옮길지
-    private Mate findOrCreateMateToInvite(long goalId, String inviteeNickname) {
+    private Mate findOrCreateMate(long goalId, String inviteeNickname) {
         User invitee = userRepository.findByNickname(inviteeNickname)
             .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
         return mateRepository.findWithGoal(goalId, invitee.getId())
-            .orElseGet(() -> createAndSaveMate(goalId, invitee));
-    }
-
-    // TODO: 2023/08/28 테스트되고 있지 않은 영역
-    private Mate createAndSaveMate(long goalId, User invitee) {
-        Goal goal = goalRepository.find(goalId)
-            .orElseThrow(() -> new NotFoundException(ErrorCode.GOAL_NOT_FOUND, goalId));
-        return mateRepository.save(goal.createMate(invitee));
+            .orElseGet(() -> createAndSaveMate(goalId, invitee.getId()));
     }
 
     @Transactional

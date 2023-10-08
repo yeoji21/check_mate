@@ -2,6 +2,8 @@ package checkmate.mate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import checkmate.TestEntityFactory;
@@ -56,36 +58,36 @@ class MateCommandServiceTest {
     private MateCommandService mateCommandService;
 
     @Test
-    @DisplayName("유저 초대")
-    void inviteTeamMate() throws Exception {
+    void invite_to_new_mate() throws Exception {
         //given
+        Goal goal = createAndSaveGoal();
         User invitee = createAndSaveUser();
-        User inviter = createAndSaveUser();
-        Mate inviteeMate = createAndSaveMate(createAndSaveGoal(), invitee);
-
-        MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, inviter);
+        MateInviteCommand command = createMateInviteCommand(goal, invitee);
 
         //when
         mateCommandService.sendInvite(command);
 
         //then
-        assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.WAITING);
+        verify(mateRepository).save(any());
+        assertThat(findMate(command.goalId(), invitee.getId()).getStatus()).isEqualTo(
+            MateStatus.WAITING);
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
     @Test
     @DisplayName("초대를 거절한 적이 있는 유저 초대")
-    void inviteTeamMate_rejected_status() throws Exception {
+    void invite_to_rejected_status_mate() throws Exception {
         //given
+        Goal goal = createAndSaveGoal();
         User invitee = createAndSaveUser();
-        User inviter = createAndSaveUser();
-        Mate inviteeMate = createRejectStatusMate(invitee);
-        MateInviteCommand command = createMateInviteCommand(invitee, inviteeMate, inviter);
+        Mate inviteeMate = createRejectedMate(goal, invitee);
+        MateInviteCommand command = createMateInviteCommand(goal, invitee);
 
         //when
         mateCommandService.sendInvite(command);
 
         //then
+        verify(goalRepository, never()).find(anyLong());
         assertThat(inviteeMate.getStatus()).isEqualTo(MateStatus.WAITING);
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
@@ -94,8 +96,7 @@ class MateCommandServiceTest {
     @DisplayName("팀원 초대 수락")
     void inviteAccpet() throws Exception {
         //given
-        Mate inviteeMate = createAndSaveMate();
-        inviteeMate.receiveInvite();
+        Mate inviteeMate = createInvitedMate();
         Notification notification = createAndSaveInviteNotification(inviteeMate);
 
         MateInviteReplyCommand command = new MateInviteReplyCommand(inviteeMate.getUserId(),
@@ -131,6 +132,12 @@ class MateCommandServiceTest {
         verify(eventPublisher).publishEvent(any(PushNotificationCreatedEvent.class));
     }
 
+    private Mate createInvitedMate() {
+        Mate inviteeMate = createAndSaveMate();
+        inviteeMate.receiveInvite();
+        return inviteeMate;
+    }
+
     private Notification createAndSaveInviteNotification(Mate mate) {
         User inviter = createAndSaveUser();
         NotificationReceiver receiver = new NotificationReceiver(mate.getUserId());
@@ -145,6 +152,10 @@ class MateCommandServiceTest {
         ReflectionTestUtils.setField(notification, "id", 1L);
         notificationRepository.save(notification);
         return notification;
+    }
+
+    private Mate findMate(long goalId, long userId) {
+        return mateRepository.findWithGoal(goalId, userId).orElseThrow();
     }
 
     private Mate createAndSaveMate() {
@@ -163,18 +174,16 @@ class MateCommandServiceTest {
         return mateRepository.save(goal.createMate(user));
     }
 
-    private Mate createRejectStatusMate(User user) {
-        Goal goal = TestEntityFactory.goal(1L, "goal");
+    private Mate createRejectedMate(Goal goal, User user) {
         Mate inviteeMate = createAndSaveMate(goal, user);
         ReflectionTestUtils.setField(inviteeMate, "status", MateStatus.REJECT);
         return inviteeMate;
     }
 
-    private MateInviteCommand createMateInviteCommand(User invitee, Mate inviteeMate,
-        User inviter) {
+    private MateInviteCommand createMateInviteCommand(Goal goal, User invitee) {
         return MateInviteCommand.builder()
-            .goalId(inviteeMate.getGoal().getId())
-            .inviterUserId(inviter.getId())
+            .goalId(goal.getId())
+            .inviterUserId(createAndSaveUser().getId())
             .inviteeNickname(invitee.getNickname())
             .build();
     }
