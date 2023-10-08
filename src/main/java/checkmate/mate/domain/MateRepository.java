@@ -7,8 +7,6 @@ public interface MateRepository {
 
     Optional<Mate> findById(long mateId);
 
-    Optional<UninitiatedMate> findUninitiateMate(long mateId);
-
     Optional<Mate> findWithGoal(long mateId);
 
     Optional<Mate> findWithGoal(long goalId, long userId);

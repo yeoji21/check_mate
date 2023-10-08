@@ -69,7 +69,7 @@ public class MateCommandService {
             command.userId());
         // TODO: 2023/08/29 mate 두 번 조회 중
         Mate mate = findMate(notification.getLongAttribute(NotificationAttributeKey.MATE_ID));
-        initiateToGoal(mate);
+        acceptInviteToGoal(mate);
         publishInviteAcceptEvent(notification, mate);
         return mapper.toResult(mate);
     }
@@ -83,10 +83,8 @@ public class MateCommandService {
         publishInviteRejectEvent(notification, mate);
     }
 
-    private void initiateToGoal(Mate mate) {
-        mateRepository.findUninitiateMate(mate.getId())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()))
-            .initiate();
+    private void acceptInviteToGoal(Mate mate) {
+        mate.acceptInvite(mateRepository.findOngoingCount(mate.getUserId()));
     }
 
     private Mate findOrCreateMate(long goalId, String inviteeNickname) {

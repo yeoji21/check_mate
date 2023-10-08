@@ -74,15 +74,6 @@ public class Mate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    void acceptInvite() {
-        if (goal.isInviteable()) {
-            status = status.toOngoing();
-            attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
-            return;
-        }
-        throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
-    }
-
     public void acceptInvite(OngoingGoalCount count) {
         Assert.notNull(count, "ongoing goal count is required");
         if (goal.isInviteable()) {

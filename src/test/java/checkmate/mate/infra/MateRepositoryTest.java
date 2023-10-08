@@ -14,7 +14,6 @@ import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.OngoingGoalCount;
-import checkmate.mate.domain.UninitiatedMate;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
@@ -24,21 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class MateRepositoryTest extends RepositoryTest {
-
-    @Test
-    void select_mate_with_ongoing_goal_count() throws Exception {
-        //given
-        User user = createUser();
-        Mate mate = createMate(user, MateStatus.ONGOING);
-        createMate(user, MateStatus.ONGOING);
-        createMate(user, MateStatus.OUT);
-
-        //when
-        UninitiatedMate uninitiatedMate = mateRepository.findUninitiateMate(mate.getId()).get();
-
-        //then
-        assertThat(getOngoingGoalCount(uninitiatedMate)).isEqualTo(2);
-    }
 
     @Test
     void find() throws Exception {
@@ -180,11 +164,6 @@ class MateRepositoryTest extends RepositoryTest {
         //then
         assertThat(ongoingCount).isNotNull();
         assertThat(ongoingCount.toInt()).isEqualTo(3);
-    }
-
-    private int getOngoingGoalCount(UninitiatedMate uninitiatedMate) {
-        return (int) ReflectionTestUtils.getField(uninitiatedMate,
-            "ongoingGoalCount");
     }
 
     private GoalCheckDays tomorrowCheckDay() {

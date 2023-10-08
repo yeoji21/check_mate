@@ -73,9 +73,7 @@ public class GoalCommandService {
     }
 
     private void initateToGoal(Mate mate) {
-        mateRepository.findUninitiateMate(mate.getId())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.MATE_NOT_FOUND, mate.getId()))
-            .initiate();
+        mate.acceptInvite(mateRepository.findOngoingCount(mate.getUserId()));
     }
 
     private Goal findGoalForUpdate(long goalId) {

@@ -11,7 +11,6 @@ import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
 import checkmate.mate.domain.OngoingGoalCount;
-import checkmate.mate.domain.UninitiatedMate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.util.List;
@@ -32,13 +31,6 @@ public class MateJpaRepository implements MateRepository {
     @Override
     public Optional<Mate> findById(long mateId) {
         return Optional.ofNullable(entityManager.find(Mate.class, mateId));
-    }
-
-    @Override
-    public Optional<UninitiatedMate> findUninitiateMate(long mateId) {
-        Optional<Mate> optionalMate = Optional.ofNullable(entityManager.find(Mate.class, mateId));
-        return optionalMate.map(
-            findMate -> new UninitiatedMate(optionalMate.get(), selectOngoingGoalCount(findMate)));
     }
 
     @Override

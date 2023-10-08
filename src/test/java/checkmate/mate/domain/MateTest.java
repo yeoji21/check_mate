@@ -129,7 +129,7 @@ class MateTest {
     void accept_invite_required_ongoing_goal_count() throws Exception {
         //given
         Mate mate = createMate(createGoal(), MateStatus.WAITING);
-        
+
         //when //then
         assertThrows(Exception.class, () -> mate.acceptInvite(null));
     }
@@ -140,7 +140,7 @@ class MateTest {
         Mate mate = createMate(createGoal(), MateStatus.WAITING);
 
         //when
-        mate.acceptInvite();
+        mate.acceptInvite(new OngoingGoalCount(5));
 
         //then
         assertThat(mate.getStatus()).isEqualTo(MateStatus.ONGOING);
@@ -149,11 +149,11 @@ class MateTest {
     @Test
     void acceptInviteFailBecauseStatus() throws Exception {
         //given
-        Mate created = createMate(createGoal(), MateStatus.CREATED);
+        Mate mate = createMate(createGoal(), MateStatus.CREATED);
 
         //when //then
         assertThat(assertThrows(BusinessException.class,
-            created::acceptInvite).getErrorCode())
+            () -> mate.acceptInvite(new OngoingGoalCount(5))).getErrorCode())
             .isEqualTo(ErrorCode.INVALID_MATE_STATUS);
     }
 
@@ -164,7 +164,7 @@ class MateTest {
 
         //when //then
         assertThat(assertThrows(NotInviteableGoalException.class,
-            mate::acceptInvite).getErrorCode())
+            () -> mate.acceptInvite(new OngoingGoalCount(5))).getErrorCode())
             .isEqualTo(ErrorCode.EXCEED_INVITEABLE_DATE);
     }
 
