@@ -22,4 +22,6 @@ public interface MateRepository {
     List<Mate> findYesterdaySkippedMates();
 
     List<Mate> findAllWithGoal(List<Long> mateIds);
+
+    OngoingGoalCount findOngoingCount(long userId);
 }

@@ -13,7 +13,7 @@ public class UninitiatedMate {
 
     public void initiate() {
         if (this.ongoingGoalCount >= GoalPolicyConstants.ONGOING_GOAL_COUNT_LIMIT) {
-            throw new BusinessException(ErrorCode.EXCEED_GOAL_LIMIT);
+            throw new BusinessException(ErrorCode.EXCEED_GOAL_COUNT_LIMIT);
         }
         mate.acceptInvite();
     }

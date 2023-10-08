@@ -36,7 +36,7 @@ class UninitiatedMateTest {
 
         //when //then
         BusinessException exception = assertThrows(BusinessException.class, sut::initiate);
-        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_LIMIT);
+        assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.EXCEED_GOAL_COUNT_LIMIT);
     }
 
     private UninitiatedMate createUninitiateMate(Mate mate, int ongoingGoalCount) {

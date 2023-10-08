@@ -28,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.Assert;
 
 
 @Getter
@@ -74,6 +75,16 @@ public class Mate extends BaseTimeEntity {
     }
 
     void acceptInvite() {
+        if (goal.isInviteable()) {
+            status = status.toOngoing();
+            attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
+            return;
+        }
+        throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
+    }
+
+    public void acceptInvite(OngoingGoalCount count) {
+        Assert.notNull(count, "ongoing goal count is required");
         if (goal.isInviteable()) {
             status = status.toOngoing();
             attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);

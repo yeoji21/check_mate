@@ -126,6 +126,15 @@ class MateTest {
     }
 
     @Test
+    void accept_invite_required_ongoing_goal_count() throws Exception {
+        //given
+        Mate mate = createMate(createGoal(), MateStatus.WAITING);
+        
+        //when //then
+        assertThrows(Exception.class, () -> mate.acceptInvite(null));
+    }
+
+    @Test
     void changeToOngoingStatus() throws Exception {
         //given
         Mate mate = createMate(createGoal(), MateStatus.WAITING);

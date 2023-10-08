@@ -3,6 +3,7 @@ package checkmate.mate.infra;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.OngoingGoalCount;
 import checkmate.mate.domain.UninitiatedMate;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -76,6 +77,11 @@ public class FakeMateRepository implements MateRepository {
         return mateIds.stream()
             .map(map::get)
             .toList();
+    }
+
+    @Override
+    public OngoingGoalCount findOngoingCount(long userId) {
+        throw new UnsupportedOperationException("findOngoingCount");
     }
 
     private int getOngoingCount(Mate m) {

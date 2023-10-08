@@ -10,6 +10,7 @@ import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
+import checkmate.mate.domain.OngoingGoalCount;
 import checkmate.mate.domain.UninitiatedMate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
@@ -95,6 +96,11 @@ public class MateJpaRepository implements MateRepository {
             .join(mate.goal, goal).fetchJoin()
             .where(mate.id.in(mateIds))
             .fetch();
+    }
+
+    @Override
+    public OngoingGoalCount findOngoingCount(long userId) {
+        throw new UnsupportedOperationException("findOngoingCount");
     }
 
     @Override
