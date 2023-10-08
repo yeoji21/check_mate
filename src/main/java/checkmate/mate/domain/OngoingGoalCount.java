@@ -3,9 +3,7 @@ package checkmate.mate.domain;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.goal.domain.GoalPolicyConstants;
-import lombok.Getter;
 
-@Getter
 public class OngoingGoalCount {
 
     private final int count;
@@ -15,5 +13,9 @@ public class OngoingGoalCount {
             throw new BusinessException(ErrorCode.EXCEED_GOAL_COUNT_LIMIT);
         }
         this.count = count;
+    }
+
+    public int toInt() {
+        return count;
     }
 }

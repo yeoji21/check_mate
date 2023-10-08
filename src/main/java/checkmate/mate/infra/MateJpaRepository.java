@@ -100,7 +100,13 @@ public class MateJpaRepository implements MateRepository {
 
     @Override
     public OngoingGoalCount findOngoingCount(long userId) {
-        throw new UnsupportedOperationException("findOngoingCount");
+        int count = queryFactory.select(mate.id)
+            .from(mate)
+            .where(mate.userId.eq(userId),
+                mate.status.eq(MateStatus.ONGOING))
+            .fetch()
+            .size();
+        return new OngoingGoalCount(count);
     }
 
     @Override

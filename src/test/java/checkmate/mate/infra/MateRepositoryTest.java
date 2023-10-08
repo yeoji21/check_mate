@@ -13,6 +13,7 @@ import checkmate.goal.domain.GoalCheckDays;
 import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
+import checkmate.mate.domain.OngoingGoalCount;
 import checkmate.mate.domain.UninitiatedMate;
 import checkmate.post.domain.Post;
 import checkmate.user.domain.User;
@@ -162,6 +163,25 @@ class MateRepositoryTest extends RepositoryTest {
         assertThat(mates).contains(mate1, mate2);
     }
 
+    @Test
+    void find_ongoing_goal_count_by_userId() throws Exception {
+        //given
+        User user = createUser();
+        createOngoingMate(createGoal(), user);
+        createOngoingMate(createGoal(), user);
+        createOngoingMate(createGoal(), user);
+        createMate(user, MateStatus.CREATED);
+        createMate(user, MateStatus.WAITING);
+        createMate(user, MateStatus.OUT);
+
+        //when
+        OngoingGoalCount ongoingCount = mateRepository.findOngoingCount(user.getId());
+
+        //then
+        assertThat(ongoingCount).isNotNull();
+        assertThat(ongoingCount.toInt()).isEqualTo(3);
+    }
+
     private int getOngoingGoalCount(UninitiatedMate uninitiatedMate) {
         return (int) ReflectionTestUtils.getField(uninitiatedMate,
             "ongoingGoalCount");
@@ -192,6 +212,13 @@ class MateRepositoryTest extends RepositoryTest {
 
     private Mate createOngoingMate(Goal goal) {
         Mate mate = goal.createMate(createUser());
+        ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
+        em.persist(mate);
+        return mate;
+    }
+
+    private Mate createOngoingMate(Goal goal, User user) {
+        Mate mate = goal.createMate(user);
         ReflectionTestUtils.setField(mate, "status", MateStatus.ONGOING);
         em.persist(mate);
         return mate;

@@ -81,7 +81,12 @@ public class FakeMateRepository implements MateRepository {
 
     @Override
     public OngoingGoalCount findOngoingCount(long userId) {
-        throw new UnsupportedOperationException("findOngoingCount");
+        int count = (int) map.values()
+            .stream()
+            .filter(mate -> mate.getUserId().equals(userId))
+            .filter(mate -> mate.getStatus().equals(MateStatus.ONGOING))
+            .count();
+        return new OngoingGoalCount(count);
     }
 
     private int getOngoingCount(Mate m) {
