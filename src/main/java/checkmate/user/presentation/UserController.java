@@ -4,19 +4,27 @@ import checkmate.config.auth.JwtUserDetails;
 import checkmate.user.application.UserCommandService;
 import checkmate.user.application.UserQueryService;
 import checkmate.user.presentation.dto.UserDtoMapper;
+import checkmate.user.presentation.dto.UserScheduleResponse;
 import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
 import checkmate.user.presentation.dto.request.UserSignUpDto;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 public class UserController {
+
     private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
     private final UserDtoMapper userDtoMapper;
@@ -28,8 +36,9 @@ public class UserController {
 
     @PatchMapping("/users/nickname")
     public void updateNickname(@RequestBody @Valid UserNicknameModifyDto userNicknameModifyDto,
-                               @AuthenticationPrincipal JwtUserDetails userDetails) {
-        userCommandService.nicknameUpdate(userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
+        @AuthenticationPrincipal JwtUserDetails userDetails) {
+        userCommandService.nicknameUpdate(
+            userDtoMapper.toCommand(userDetails.getUserId(), userNicknameModifyDto));
     }
 
     /**
@@ -45,5 +54,10 @@ public class UserController {
     @GetMapping("/users/exists")
     public void nicknameDuplicateCheck(@RequestParam String nickname) {
         userQueryService.existsNicknameCheck(nickname);
+    }
+
+    @GetMapping("/users/weekly-schedule")
+    public UserScheduleResponse getWeeklySchedule() {
+        return userQueryService.getWeeklySchdules();
     }
 }

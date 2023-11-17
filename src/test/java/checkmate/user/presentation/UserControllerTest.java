@@ -3,6 +3,7 @@ package checkmate.user.presentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -10,21 +11,28 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.requestParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
+import checkmate.user.application.dto.DailySchedule;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
+import checkmate.user.presentation.dto.UserScheduleResponse;
 import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
 import checkmate.user.presentation.dto.request.UserSignUpDto;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
 import org.springframework.restdocs.request.RequestParametersSnippet;
 
 class UserControllerTest extends ControllerTest {
@@ -86,6 +94,47 @@ class UserControllerTest extends ControllerTest {
         verify(userCommandService).signUp(any(UserSignUpCommand.class));
     }
 
+    @WithMockAuthUser
+    @Test
+    @DisplayName("유저의 주차별 목표 개수 조회 API")
+    void findUserWeeklyGoalSchedule() throws Exception {
+        LocalDate requestDate = LocalDate.now();
+        when(userQueryService.getWeeklySchdules()).thenReturn(userScheduleResponse(requestDate));
+
+        mockMvc.perform(get("/users/weekly-schedule")
+                .param("date", requestDate.toString())
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                objectMapper.writeValueAsString(userScheduleResponse(requestDate))))
+            .andDo(document("user-weekly-schedule",
+                requestParameters(parameterWithName("date").description("요청일")),
+                userScheduleResponseFieldsSnippet()));
+    }
+
+    private UserScheduleResponse userScheduleResponse(LocalDate requestDate) {
+        DailySchedule today = DailySchedule.builder()
+            .date(requestDate)
+            .goalId(1L)
+            .checked(true)
+            .build();
+        DailySchedule yesterday = DailySchedule.builder()
+            .date(requestDate.minusDays(1))
+            .goalId(2L)
+            .checked(true)
+            .build();
+        DailySchedule tomorrow = DailySchedule.builder()
+            .date(requestDate.plusDays(1))
+            .goalId(3L)
+            .checked(true)
+            .build();
+
+        return UserScheduleResponse.builder()
+            .requestDate(requestDate)
+            .schedule(List.of(yesterday, today, tomorrow))
+            .build();
+    }
+
     private UserSignUpDto createUserSignUpDto() {
         return UserSignUpDto.builder()
             .identifier("identifier")
@@ -93,6 +142,15 @@ class UserControllerTest extends ControllerTest {
             .nickname("yeoz1")
             .emailAddress("test@naverLogin.com")
             .build();
+    }
+
+    private ResponseFieldsSnippet userScheduleResponseFieldsSnippet() {
+        return responseFields(
+            fieldWithPath("requestDate").type(JsonFieldType.STRING).description("요청일"),
+            fieldWithPath("schedule").type(JsonFieldType.ARRAY).description("목표 스케줄 목록"),
+            fieldWithPath("schedule[].date").type(JsonFieldType.STRING).description("날짜"),
+            fieldWithPath("schedule[].checked").type(JsonFieldType.BOOLEAN).description("인증 여부"),
+            fieldWithPath("schedule[].goalId").type(JsonFieldType.NUMBER).description("해당 goalId"));
     }
 
     private RequestFieldsSnippet signUpRequestFieldsSnippet() {

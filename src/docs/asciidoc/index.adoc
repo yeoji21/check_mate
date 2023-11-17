@@ -138,6 +138,26 @@ include::{snippets}/goal-today-info/http-response.adoc[]
 
 // =============================================================
 
+== 조회를 요청한 유저 주간 목표 스케줄
+
+=== Path Parameter
+
+include::{snippets}/user-weekly-schedule/request-parameters.adoc[]
+
+=== HTTP Request
+
+include::{snippets}/user-weekly-schedule/http-request.adoc[]
+
+=== Response Fields
+
+include::{snippets}/user-weekly-schedule/response-fields.adoc[]
+
+=== HTTP Response
+
+include::{snippets}/user-weekly-schedule/http-response.adoc[]
+
+// =============================================================
+
 == 조회를 요청한 유저 특화 목표 상세 정보 조회
 
 === Path Parameter
