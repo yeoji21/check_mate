@@ -70,13 +70,15 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.24'
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
 
     //mock S3
     implementation('io.findify:s3mock_2.13:0.2.6')
+
+    // test
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.0.2")
 }
 
 ext {
