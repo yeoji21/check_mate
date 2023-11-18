@@ -41,7 +41,7 @@ public class GoalPeriod {
         return isInitiated() ? startDate.datesUntil(LocalDate.now()) : Stream.empty();
     }
 
-    boolean isBelongToPeriod(LocalDate date) {
+    public boolean isBelongToPeriod(LocalDate date) {
         return !startDate.isAfter(date) && !endDate.isBefore(date);
     }
 
