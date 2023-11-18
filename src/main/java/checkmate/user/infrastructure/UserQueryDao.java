@@ -42,10 +42,14 @@ public class UserQueryDao {
             .fetchOne() != null;
     }
 
+    // TODO: 2023/11/18 MateStatus 조건 추가
+    // 진행 중이거나, 성공했거나, 실패한 경우 -> 목표 수행을 진행한 기록이 있는 케이스들
+    // 현재 구조에서는 MateStauts가 OUT인 경우, 언제 퇴출된지 알 수 없어서 해당 목표에 대해 과거/현재 노출 여부 구분할 수 없음
     public List<DailySchedule> findSchedule(long userId, List<LocalDate> dates) {
         List<Goal> goals = queryFactory.select(mate.goal)
             .from(mate)
-            .where(mate.userId.eq(userId))
+            .where(mate.userId.eq(userId),
+                mate.status.in(MateStatus.ONGOING, MateStatus.SUCCESS, MateStatus.OUT))
             .fetch();
 
         List<Post> posts = queryFactory.select(post)
