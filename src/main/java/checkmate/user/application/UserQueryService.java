@@ -4,6 +4,9 @@ import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.user.infrastructure.UserQueryDao;
 import checkmate.user.presentation.dto.UserScheduleResponse;
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +24,17 @@ public class UserQueryService {
         }
     }
 
-    public UserScheduleResponse getWeeklySchdules() {
-        throw new UnsupportedOperationException("Unsupported getWeeklySchdules");
+    public UserScheduleResponse getWeeklySchdule(long userId, LocalDate date) {
+        return UserScheduleResponse.builder()
+            .requestDate(date)
+            .schedule(userQueryDao.findSchedule(userId, getDatesOfWeek(date)))
+            .build();
+    }
+
+    private List<LocalDate> getDatesOfWeek(LocalDate date) {
+        int week = date.get(ChronoField.ALIGNED_WEEK_OF_YEAR);
+        return date.minusDays(8).datesUntil(date.plusDays(8))
+            .filter(localDate -> localDate.get(ChronoField.ALIGNED_WEEK_OF_YEAR) == week)
+            .toList();
     }
 }

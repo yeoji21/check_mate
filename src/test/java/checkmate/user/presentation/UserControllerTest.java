@@ -99,7 +99,8 @@ class UserControllerTest extends ControllerTest {
     @DisplayName("유저의 주차별 목표 개수 조회 API")
     void findUserWeeklyGoalSchedule() throws Exception {
         LocalDate requestDate = LocalDate.now();
-        when(userQueryService.getWeeklySchdules()).thenReturn(userScheduleResponse(requestDate));
+        when(userQueryService.getWeeklySchdule(1L, requestDate)).thenReturn(
+            userScheduleResponse(requestDate));
 
         mockMvc.perform(get("/users/weekly-schedule")
                 .param("date", requestDate.toString())

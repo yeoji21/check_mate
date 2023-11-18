@@ -7,6 +7,7 @@ import checkmate.user.presentation.dto.UserDtoMapper;
 import checkmate.user.presentation.dto.UserScheduleResponse;
 import checkmate.user.presentation.dto.request.UserNicknameModifyDto;
 import checkmate.user.presentation.dto.request.UserSignUpDto;
+import java.time.LocalDate;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +58,9 @@ public class UserController {
     }
 
     @GetMapping("/users/weekly-schedule")
-    public UserScheduleResponse getWeeklySchedule() {
-        return userQueryService.getWeeklySchdules();
+    public UserScheduleResponse getWeeklySchedule(
+        @RequestParam String date,
+        @AuthenticationPrincipal JwtUserDetails details) {
+        return userQueryService.getWeeklySchdule(details.getUserId(), LocalDate.parse(date));
     }
 }

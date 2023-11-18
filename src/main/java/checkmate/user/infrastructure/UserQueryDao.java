@@ -7,7 +7,10 @@ import static com.querydsl.core.types.ExpressionUtils.count;
 
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.mate.domain.Mate.MateStatus;
+import checkmate.user.application.dto.DailySchedule;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -33,5 +36,9 @@ public class UserQueryDao {
             .from(user)
             .where(user.nickname.eq(nickname))
             .fetchOne() != null;
+    }
+
+    public List<DailySchedule> findSchedule(long userId, List<LocalDate> dates) {
+        throw new UnsupportedOperationException("Unsupported findSchedule");
     }
 }
