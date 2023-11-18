@@ -20,6 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import checkmate.ControllerTest;
 import checkmate.config.WithMockAuthUser;
+import checkmate.user.application.dto.CheckedGoalInfo;
 import checkmate.user.application.dto.DailySchedule;
 import checkmate.user.application.dto.request.UserNicknameModifyCommand;
 import checkmate.user.application.dto.request.UserSignUpCommand;
@@ -116,18 +117,43 @@ class UserControllerTest extends ControllerTest {
     private UserScheduleResponse userScheduleResponse(LocalDate requestDate) {
         DailySchedule today = DailySchedule.builder()
             .date(requestDate)
-            .goalId(1L)
-            .checked(true)
+            .goals(List.of(
+                CheckedGoalInfo.builder()
+                    .goalId(1L)
+                    .checked(true)
+                    .build(),
+                CheckedGoalInfo.builder()
+                    .goalId(2L)
+                    .checked(true)
+                    .build(),
+                CheckedGoalInfo.builder()
+                    .goalId(3L)
+                    .checked(true)
+                    .build()))
             .build();
         DailySchedule yesterday = DailySchedule.builder()
             .date(requestDate.minusDays(1))
-            .goalId(2L)
-            .checked(true)
+            .goals(List.of(
+                CheckedGoalInfo.builder()
+                    .goalId(1L)
+                    .checked(false)
+                    .build(),
+                CheckedGoalInfo.builder()
+                    .goalId(2L)
+                    .checked(true)
+                    .build(),
+                CheckedGoalInfo.builder()
+                    .goalId(3L)
+                    .checked(true)
+                    .build()))
             .build();
         DailySchedule tomorrow = DailySchedule.builder()
             .date(requestDate.plusDays(1))
-            .goalId(3L)
-            .checked(true)
+            .goals(List.of(
+                CheckedGoalInfo.builder()
+                    .goalId(3L)
+                    .checked(false)
+                    .build()))
             .build();
 
         return UserScheduleResponse.builder()
@@ -150,8 +176,12 @@ class UserControllerTest extends ControllerTest {
             fieldWithPath("requestDate").type(JsonFieldType.STRING).description("요청일"),
             fieldWithPath("schedule").type(JsonFieldType.ARRAY).description("목표 스케줄 목록"),
             fieldWithPath("schedule[].date").type(JsonFieldType.STRING).description("날짜"),
-            fieldWithPath("schedule[].checked").type(JsonFieldType.BOOLEAN).description("인증 여부"),
-            fieldWithPath("schedule[].goalId").type(JsonFieldType.NUMBER).description("해당 goalId"));
+            fieldWithPath("schedule[].goals").type(JsonFieldType.ARRAY).description("목표 목록"),
+            fieldWithPath("schedule[].goals[].goalId").type(JsonFieldType.NUMBER)
+                .description("goalId"),
+            fieldWithPath("schedule[].goals[].checked").type(JsonFieldType.BOOLEAN)
+                .description("인증 여부")
+        );
     }
 
     private RequestFieldsSnippet signUpRequestFieldsSnippet() {
