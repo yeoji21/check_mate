@@ -11,6 +11,7 @@ import checkmate.post.domain.Post;
 import checkmate.user.application.dto.DailySchedule;
 import checkmate.user.domain.User;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -53,31 +54,46 @@ class UserQueryDaoTest extends RepositoryTest {
     @Test
     void find_schdule_by_userId_and_dates() throws Exception {
         //given
-        List<LocalDate> dates = LocalDate.now().datesUntil(LocalDate.now().plusDays(5)).toList();
+        List<LocalDate> dates = LocalDate.now().datesUntil(LocalDate.now().plusDays(3))
+            .toList();
 
         User user = createUser();
         createCheckedPost(createMate(user, createGoal()), dates.get(0));
-        createCheckedPost(createMate(user, createGoal()), dates.get(1));
-        createCheckedPost(createMate(user, createGoal()), dates.get(2));
+
+        Mate successedMate = createMate(user, createGoal());
+        ReflectionTestUtils.setField(successedMate, "status", MateStatus.SUCCESS);
+        createCheckedPost(successedMate, dates.get(1));
+
+        Mate mate = createMate(user, createGoal());
+        createCheckedPost(mate, dates.get(0));
+        em.createQuery(
+                "update Mate m set m.modifiedDateTime = :date, m.status = :status where m.id = :id")
+            .setParameter("date", LocalDateTime.now().plusDays(1))
+            .setParameter("status", MateStatus.OUT)
+            .setParameter("id", mate.getId())
+            .executeUpdate();
+
+        em.flush();
+        em.clear();
 
         //when
         List<DailySchedule> schedule = userQueryDao.findSchedule(user.getId(), dates);
 
         //then
         assertThat(schedule).hasSize(dates.size());
-        assertThat(schedule).allMatch(daily -> daily.getGoals().size() == 3);
-        
+
+        assertThat(schedule.get(0).getGoals()).hasSize(3);
         assertThat(schedule.get(0).getGoals().get(0).isChecked()).isTrue();
         assertThat(schedule.get(0).getGoals().get(1).isChecked()).isFalse();
-        assertThat(schedule.get(0).getGoals().get(2).isChecked()).isFalse();
+        assertThat(schedule.get(0).getGoals().get(2).isChecked()).isTrue();
 
+        assertThat(schedule.get(1).getGoals()).hasSize(2);
         assertThat(schedule.get(1).getGoals().get(0).isChecked()).isFalse();
         assertThat(schedule.get(1).getGoals().get(1).isChecked()).isTrue();
-        assertThat(schedule.get(1).getGoals().get(2).isChecked()).isFalse();
 
+        assertThat(schedule.get(2).getGoals()).hasSize(2);
         assertThat(schedule.get(2).getGoals().get(0).isChecked()).isFalse();
         assertThat(schedule.get(2).getGoals().get(1).isChecked()).isFalse();
-        assertThat(schedule.get(2).getGoals().get(2).isChecked()).isTrue();
     }
 
     private void createCheckedPost(Mate mate, LocalDate date) {
