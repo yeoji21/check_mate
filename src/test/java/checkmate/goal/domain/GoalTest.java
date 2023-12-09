@@ -1,98 +1,145 @@
 package checkmate.goal.domain;
 
+import static com.navercorp.fixturemonkey.api.experimental.JavaGetterMethodPropertySelector.javaGetter;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
+import com.navercorp.fixturemonkey.FixtureMonkey;
+import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class GoalTest {
 
+    private static final FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
+        .objectIntrospector(FieldReflectionArbitraryIntrospector.INSTANCE)
+        .build();
+
     @Test
-    @DisplayName("목표 종료일 업데이트")
-    void modifyEndDateSuccess() throws Exception {
+    void modified_within_7_days_throw_exception() throws Exception {
         //given
-        Goal goal = createGoal();
-        GoalModifyEvent modifyEvent = GoalModifyEvent.builder()
-            .endDate(goal.getEndDate().plusDays(10))
-            .build();
+        Goal sut = fixtureMonkey
+            .giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getModifiedDateTime), Arbitraries.randomValue(random -> {
+                int daysToMinus = random.nextInt() % 7;
+                return LocalDateTime.now().minusDays(daysToMinus);
+            }))
+            .sample();
 
         //when
-        goal.modify(modifyEvent);
+        Executable executable = () -> sut.modify(fixtureMonkey.giveMeOne(GoalModifyEvent.class));
 
         //then
-        assertThat(goal.getEndDate()).isEqualTo(modifyEvent.getEndDate());
+        ErrorCode errorCode = assertThrows(BusinessException.class, executable).getErrorCode();
+        assertThat(errorCode).isEqualTo(ErrorCode.UPDATE_DURATION);
     }
 
     @Test
-    @DisplayName("목표 종료일 업데이트 실패 - 기존 종료일 이전으로 변경할 수 없음")
-    void modifyEndDateWhenEarlyEndDate() throws Exception {
+    void modified_after_7_days_later() throws Exception {
         //given
-        Goal goal = createGoal();
-
-        //when //then
-        assertThat(assertThrows(BusinessException.class,
-            () -> goal.modify(GoalModifyEvent.builder()
-                .endDate(goal.getEndDate().minusDays(1))
-                .build())
-        ).getErrorCode()).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
-    }
-
-    @Test
-    @DisplayName("목표 수행 제한시간 제거 업데이트 성공")
-    void modifyRemoveAppointmentTime() throws Exception {
-        //given
-        Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
-
-        GoalModifyEvent modifyEvent = GoalModifyEvent.builder()
-            .timeReset(true)
-            .build();
+        Goal sut = fixtureMonkey
+            .giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getModifiedDateTime), Arbitraries.randomValue(random -> {
+                int daysToMinus = random.nextInt() % 7;
+                return LocalDateTime.now().minusDays(Math.abs(daysToMinus) + 7);
+            }))
+            .sample();
 
         //when
-        goal.modify(modifyEvent);
+        Executable executable = () -> sut.modify(new GoalModifyEvent());
 
         //then
-        assertThat(goal.getAppointmentTime()).isNull();
+        assertDoesNotThrow(executable);
     }
 
     @Test
-    @DisplayName("목표 수행 제한시간 업데이트 성공")
-    void modifyAppointmentTime() throws Exception {
+    void modify_endDate_to_later() throws Exception {
         //given
-        Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
-
-        GoalModifyEvent modifyEvent = GoalModifyEvent.builder()
-            .appointmentTime(LocalTime.MAX)
-            .build();
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(LocalDate.now(), LocalDate.now()))
+            .setNull(javaGetter(Goal::getModifiedDateTime))
+            .sample();
+        GoalModifyEvent event = fixtureMonkey
+            .giveMeBuilder(GoalModifyEvent.class)
+            .set(javaGetter(GoalModifyEvent::getEndDate), sut.getEndDate().plusDays(1))
+            .sample();
 
         //when
-        goal.modify(modifyEvent);
+        sut.modify(event);
 
         //then
-        assertThat(goal.getAppointmentTime()).isEqualTo(modifyEvent.getAppointmentTime());
+        assertThat(sut.getEndDate()).isEqualTo(event.getEndDate());
     }
 
     @Test
-    @DisplayName("목표 업데이트 실패 - 업데이트 가능한 기간이 아닌 경우")
-    void modifyFailBecauseModifyDeadline() throws Exception {
+    void modify_endDate_to_earlier() throws Exception {
         //given
-        Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "modifiedDateTime", LocalDateTime.now().minusDays(1));
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(LocalDate.now(), LocalDate.now()))
+            .setNull(javaGetter(Goal::getModifiedDateTime))
+            .sample();
+        GoalModifyEvent event = fixtureMonkey
+            .giveMeBuilder(GoalModifyEvent.class)
+            .set(javaGetter(GoalModifyEvent::getEndDate), sut.getEndDate().minusDays(1))
+            .sample();
 
-        //when //then
-        assertThat(assertThrows(BusinessException.class,
-            () -> goal.modify(GoalModifyEvent.builder()
-                .appointmentTime(LocalTime.MAX)
-                .build())).getErrorCode())
-            .isEqualTo(ErrorCode.UPDATE_DURATION);
+        //when
+        Executable executable = () -> sut.modify(event);
+
+        //then
+        ErrorCode errorCode = assertThrows(BusinessException.class, executable).getErrorCode();
+        assertThat(errorCode).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
+    }
+
+    @Test
+    void remove_appointmentTime() throws Exception {
+        //given
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .setNull(javaGetter(Goal::getModifiedDateTime))
+            .setNotNull(javaGetter(Goal::getAppointmentTime))
+            .sample();
+        GoalModifyEvent event = fixtureMonkey.giveMeBuilder(GoalModifyEvent.class)
+            .setNull(javaGetter(GoalModifyEvent::getEndDate))
+            .set(javaGetter(GoalModifyEvent::isTimeReset), true)
+            .sample();
+
+        //when
+        sut.modify(event);
+
+        //then
+        assertThat(sut.getAppointmentTime()).isNull();
+    }
+
+    @Test
+    void modify_appointmentTime() throws Exception {
+        //given
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .setNull(javaGetter(Goal::getModifiedDateTime))
+            .setNotNull(javaGetter(Goal::getAppointmentTime))
+            .sample();
+
+        GoalModifyEvent event = fixtureMonkey.giveMeBuilder(GoalModifyEvent.class)
+            .setNull(javaGetter(GoalModifyEvent::getEndDate))
+            .set(javaGetter(GoalModifyEvent::isTimeReset), false)
+            .setNotNull(javaGetter(GoalModifyEvent::getAppointmentTime))
+            .sample();
+
+        //when
+        sut.modify(event);
+
+        //then
+        assertThat(sut.getAppointmentTime()).isEqualTo(event.getAppointmentTime());
     }
 
     @Test

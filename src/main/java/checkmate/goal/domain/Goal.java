@@ -90,7 +90,6 @@ public class Goal extends BaseTimeEntity {
         return new Mate(this, user);
     }
 
-    // TODO: 2023/10/07 메소드명
     public boolean isInviteable() {
         return period.getProgressedPercent() <= GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT;
     }
@@ -114,42 +113,40 @@ public class Goal extends BaseTimeEntity {
     }
 
     public void modify(GoalModifyEvent event) {
-        checkModifyDeadline();
+        if (isModifiedWithin7Days()) {
+            throw new BusinessException(ErrorCode.UPDATE_DURATION);
+        }
         modifyEndDate(event);
         modifyAppointmentTime(event);
     }
 
-    private void checkModifyDeadline() {
-        if (getModifiedDateTime() != null && isTodayModifyable()) {
-            throw new BusinessException(ErrorCode.UPDATE_DURATION);
+    private void modifyEndDate(GoalModifyEvent event) {
+        if (event.getEndDate() == null) {
+            return;
         }
+        if (isEarlierThanEndDate(event.getEndDate())) {
+            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
+        }
+        period = new GoalPeriod(period.getStartDate(), event.getEndDate());
     }
 
     private void modifyAppointmentTime(GoalModifyEvent event) {
         if (event.isTimeReset()) {
             appointmentTime = null;
-        } else {
-            if (event.getAppointmentTime() != null) {
-                appointmentTime = event.getAppointmentTime();
-            }
+            return;
+        }
+        if (event.getAppointmentTime() != null) {
+            appointmentTime = event.getAppointmentTime();
         }
     }
 
-    private void modifyEndDate(GoalModifyEvent event) {
-        if (event.getEndDate() != null) {
-            validateEndDate(event.getEndDate());
-            period = new GoalPeriod(period.getStartDate(), event.getEndDate());
-        }
+    private boolean isEarlierThanEndDate(LocalDate endDateToModify) {
+        return endDateToModify != null && endDateToModify.isBefore(getEndDate());
     }
 
-    private boolean isTodayModifyable() {
-        return getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now());
-    }
-
-    private void validateEndDate(LocalDate newEndDate) {
-        if (newEndDate != null && getEndDate().isAfter(newEndDate)) {
-            throw new BusinessException(ErrorCode.INVALID_GOAL_DATE);
-        }
+    private boolean isModifiedWithin7Days() {
+        return getModifiedDateTime() != null &&
+            getModifiedDateTime().plusDays(7).toLocalDate().isAfter(LocalDate.now());
     }
 
     public enum GoalCategory {
