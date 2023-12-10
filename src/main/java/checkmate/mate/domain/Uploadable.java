@@ -14,7 +14,7 @@ public class Uploadable {
 
     public Uploadable(Mate mate) {
         this.uploaded = isTodayUploaded(mate);
-        this.timeOver = mate.getGoal().isTimeOver();
+        this.timeOver = mate.getGoal().isAppointmentTimeOver();
         this.checkDay = mate.getGoal().isTodayCheckDay();
         this.uploadable = !uploaded && checkDay && !timeOver;
     }

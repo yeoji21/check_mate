@@ -47,7 +47,7 @@ public class MateBatchService {
 
     private List<Mate> filterLimitOveredMates(List<Mate> hookyMates) {
         return hookyMates.stream()
-            .filter(tm -> tm.getSkippedDayCount() >= tm.getGoal().getSkippedDayLimit())
+            .filter(tm -> tm.getSkippedDayCount() >= tm.getGoal().getLimitOfSkippedDay())
             .toList();
     }
 }

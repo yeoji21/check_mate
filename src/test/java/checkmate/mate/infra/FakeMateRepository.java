@@ -44,7 +44,7 @@ public class FakeMateRepository implements MateRepository {
     @Override
     public void updateLimitOveredMates(List<Mate> limitOveredMates) {
         limitOveredMates.stream()
-            .filter(mate -> mate.getGoal().getSkippedDayLimit() >= mate.getSkippedDayCount())
+            .filter(mate -> mate.getGoal().getLimitOfSkippedDay() >= mate.getSkippedDayCount())
             .forEach(mate -> ReflectionTestUtils.setField(mate, "status", MateStatus.OUT));
     }
 

@@ -143,57 +143,67 @@ class GoalTest {
     }
 
     @Test
-    void isTimeOverTrue() throws Exception {
+    void is_appointmentTime_over() throws Exception {
         //given
-        Goal goal = createGoalWithAppointmentTime(LocalTime.MIN);
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getAppointmentTime), LocalTime.MIN)
+            .sample();
 
         //when
-        boolean timeOver = goal.isTimeOver();
+        boolean result = sut.isAppointmentTimeOver();
 
         //then
-        assertThat(timeOver).isTrue();
-        assertThat(goal.getAppointmentTime().isBefore(LocalTime.now())).isTrue();
+        assertThat(result).isTrue();
     }
 
     @Test
-    void isTimeOverFalse() throws Exception {
+    void is_not_appointmentTime_over() throws Exception {
         //given
-        Goal goal = createGoalWithAppointmentTime(LocalTime.MAX);
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getAppointmentTime), LocalTime.MAX)
+            .sample();
 
         //when
-        boolean timeOver = goal.isTimeOver();
+        boolean result = sut.isAppointmentTimeOver();
 
         //then
-        assertThat(timeOver).isFalse();
-        assertThat(goal.getAppointmentTime().isAfter(LocalTime.now())).isTrue();
+        assertThat(result).isFalse();
     }
 
     @Test
-    void isTimeOverWhenEmptyAppointmentTime() throws Exception {
+    void period_of_20_days_with_every_checkDays_has_limit_3() throws Exception {
         //given
-        Goal goal = createGoal();
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod),
+                new GoalPeriod(
+                    LocalDate.now().minusDays(10),
+                    LocalDate.now().plusDays(9)))
+            .set(javaGetter(Goal::getCheckDays), GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
+            .sample();
 
         //when
-        boolean timeOver = goal.isTimeOver();
+        int result = sut.getLimitOfSkippedDay();
 
         //then
-        assertThat(timeOver).isFalse();
+        assertThat(result).isEqualTo(3);
     }
 
     @Test
-    @DisplayName("땡땡이 최대치 조회")
-    void getSkippedDayLimit() throws Exception {
+    void period_of_20_days_with_one_checkDays_has_limit_1() throws Exception {
         //given
-        Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "period", new GoalPeriod(
-            LocalDate.now().minusDays(10),
-            LocalDate.now().plusDays(10)));
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod),
+                new GoalPeriod(
+                    LocalDate.now().minusDays(10),
+                    LocalDate.now().plusDays(10)))
+            .set(javaGetter(Goal::getCheckDays), GoalCheckDays.ofDayOfWeek(DayOfWeek.MONDAY))
+            .sample();
 
         //when
-        int skippedDayLimit = goal.getSkippedDayLimit();
+        int result = sut.getLimitOfSkippedDay();
 
         //then
-        assertThat(skippedDayLimit).isEqualTo(3);
+        assertThat(result).isEqualTo(1);
     }
 
     @Test
@@ -276,12 +286,6 @@ class GoalTest {
 
     private Goal createGoal() {
         return TestEntityFactory.goal(1L, "goal");
-    }
-
-    private Goal createGoalWithAppointmentTime(LocalTime appointmentTime) {
-        Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "appointmentTime", appointmentTime);
-        return goal;
     }
 
 }

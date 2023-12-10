@@ -69,7 +69,7 @@ public class Goal extends BaseTimeEntity {
         this.status = period.isInitiated() ? GoalStatus.ONGOING : GoalStatus.WAITING;
     }
 
-    public int getSkippedDayLimit() {
+    public int getLimitOfSkippedDay() {
         return getTotalCheckDayCount() / GoalPolicyConstants.GOAL_SKIP_LIMIT_PERCENT + 1;
     }
 
@@ -78,12 +78,11 @@ public class Goal extends BaseTimeEntity {
             LocalDate.now());
     }
 
-    public boolean isTimeOver() {
+    public boolean isAppointmentTimeOver() {
         if (this.appointmentTime == null) {
             return false;
-        } else {
-            return appointmentTime.isBefore(LocalTime.now());
         }
+        return appointmentTime.isBefore(LocalTime.now());
     }
 
     public Mate createMate(User user) {
