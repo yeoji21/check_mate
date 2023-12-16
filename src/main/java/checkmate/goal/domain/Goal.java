@@ -74,8 +74,8 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTodayCheckDay() {
-        return period.isBelongToPeriod(LocalDate.now()) && checkDays.isDateCheckDayOfWeek(
-            LocalDate.now());
+        return period.isBelongToPeriod(LocalDate.now()) &&
+            checkDays.isDateCheckDayOfWeek(LocalDate.now());
     }
 
     public boolean isAppointmentTimeOver() {
@@ -89,8 +89,10 @@ public class Goal extends BaseTimeEntity {
         return new Mate(this, user);
     }
 
+    // TODO: 2023/12/16 호출 위치가 흠..
     public boolean isInviteable() {
-        return period.getProgressedPercent() <= GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT;
+        return period.getProgressedPercent()
+            <= GoalPolicyConstants.INVITE_ACCEPTABLE_PROGRESSED_PERCENT_LIMIT;
     }
 
     public int getTotalCheckDayCount() {
@@ -98,6 +100,7 @@ public class Goal extends BaseTimeEntity {
             .filter(date -> checkDays.isDateCheckDayOfWeek(date)).count();
     }
 
+    // TODO: 2023/12/16 public으로 제공하기보다 호출 방식을 변경?
     public int getProgressedCheckDayCount() {
         return (int) period.getUntilTodayPeriodStream()
             .filter(date -> checkDays.isDateCheckDayOfWeek(date)).count();

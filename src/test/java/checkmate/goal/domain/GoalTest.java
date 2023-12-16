@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
 import com.navercorp.fixturemonkey.FixtureMonkey;
@@ -18,7 +17,6 @@ import net.jqwik.api.Arbitraries;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
-import org.springframework.test.util.ReflectionTestUtils;
 
 class GoalTest {
 
@@ -26,8 +24,9 @@ class GoalTest {
         .objectIntrospector(FieldReflectionArbitraryIntrospector.INSTANCE)
         .build();
 
+    @DisplayName("7일 이내에 목표를 수정했을 경우, 목표를 수정할 수 없음")
     @Test
-    void modified_within_7_days_throw_exception() throws Exception {
+    void should_throw_exception_when_modified_within_7_days() throws Exception {
         //given
         Goal sut = fixtureMonkey
             .giveMeBuilder(Goal.class)
@@ -45,8 +44,9 @@ class GoalTest {
         assertThat(errorCode).isEqualTo(ErrorCode.UPDATE_DURATION);
     }
 
+    @DisplayName("목표를 수정한지 7일 이상이면, 목표 수정 가능")
     @Test
-    void modified_after_7_days_later() throws Exception {
+    void should_not_throw_exception_modified_after_7_days() throws Exception {
         //given
         Goal sut = fixtureMonkey
             .giveMeBuilder(Goal.class)
@@ -63,27 +63,9 @@ class GoalTest {
         assertDoesNotThrow(executable);
     }
 
+    @DisplayName("목표 종료일을 기존보다 이전 날짜로 수정할 수 없음")
     @Test
-    void modify_endDate_to_later() throws Exception {
-        //given
-        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
-            .set(javaGetter(Goal::getPeriod), new GoalPeriod(LocalDate.now(), LocalDate.now()))
-            .setNull(javaGetter(Goal::getModifiedDateTime))
-            .sample();
-        GoalModifyEvent event = fixtureMonkey
-            .giveMeBuilder(GoalModifyEvent.class)
-            .set(javaGetter(GoalModifyEvent::getEndDate), sut.getEndDate().plusDays(1))
-            .sample();
-
-        //when
-        sut.modify(event);
-
-        //then
-        assertThat(sut.getEndDate()).isEqualTo(event.getEndDate());
-    }
-
-    @Test
-    void modify_endDate_to_earlier() throws Exception {
+    void should_throw_exception_when_modify_to_earlier_endDate() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
             .set(javaGetter(Goal::getPeriod), new GoalPeriod(LocalDate.now(), LocalDate.now()))
@@ -102,8 +84,29 @@ class GoalTest {
         assertThat(errorCode).isEqualTo(ErrorCode.INVALID_GOAL_DATE);
     }
 
+    @DisplayName("목표 종료일을 기존보다 이후 날짜로 수정")
     @Test
-    void remove_appointmentTime() throws Exception {
+    void should_modify_endDate_when_modify_to_after_endDate() throws Exception {
+        //given
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(LocalDate.now(), LocalDate.now()))
+            .setNull(javaGetter(Goal::getModifiedDateTime))
+            .sample();
+        GoalModifyEvent event = fixtureMonkey
+            .giveMeBuilder(GoalModifyEvent.class)
+            .set(javaGetter(GoalModifyEvent::getEndDate), sut.getEndDate().plusDays(1))
+            .sample();
+
+        //when
+        sut.modify(event);
+
+        //then
+        assertThat(sut.getEndDate()).isEqualTo(event.getEndDate());
+    }
+
+    @DisplayName("설정된 목표 인증 시간을 제거")
+    @Test
+    void should_remove_appointmentTime_when_timeReset_true() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
             .setNull(javaGetter(Goal::getModifiedDateTime))
@@ -121,8 +124,9 @@ class GoalTest {
         assertThat(sut.getAppointmentTime()).isNull();
     }
 
+    @DisplayName("설정된 목표 인증 시간을 변경")
     @Test
-    void modify_appointmentTime() throws Exception {
+    void should_modify_appointmentTime_when_modify_appointmentTime() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
             .setNull(javaGetter(Goal::getModifiedDateTime))
@@ -142,8 +146,9 @@ class GoalTest {
         assertThat(sut.getAppointmentTime()).isEqualTo(event.getAppointmentTime());
     }
 
+    @DisplayName("현재 시간이 목표 인증 시간보다 이후")
     @Test
-    void is_appointmentTime_over() throws Exception {
+    void should_true_when_appointmentTime_is_before_than_now() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
             .set(javaGetter(Goal::getAppointmentTime), LocalTime.MIN)
@@ -156,8 +161,9 @@ class GoalTest {
         assertThat(result).isTrue();
     }
 
+    @DisplayName("현재 시간이 목표 인증 시간보다 이전")
     @Test
-    void is_not_appointmentTime_over() throws Exception {
+    void should_false_when_appointmentTime_is_after_than_now() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
             .set(javaGetter(Goal::getAppointmentTime), LocalTime.MAX)
@@ -170,14 +176,14 @@ class GoalTest {
         assertThat(result).isFalse();
     }
 
+    @DisplayName("매일, 20일간 진행하는 목표의 경우, skippedDay 제한은 3")
     @Test
-    void period_of_20_days_with_every_checkDays_has_limit_3() throws Exception {
+    void should_3_when_20_days_period_and_everyday_checkday() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
-            .set(javaGetter(Goal::getPeriod),
-                new GoalPeriod(
-                    LocalDate.now().minusDays(10),
-                    LocalDate.now().plusDays(9)))
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(10),
+                LocalDate.now().plusDays(9)))
             .set(javaGetter(Goal::getCheckDays), GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
             .sample();
 
@@ -188,14 +194,14 @@ class GoalTest {
         assertThat(result).isEqualTo(3);
     }
 
+    @DisplayName("주 1회, 20일간 진행하는 목표의 경우, skippedDay 제한은 1")
     @Test
-    void period_of_20_days_with_one_checkDays_has_limit_1() throws Exception {
+    void should_1_when_20_days_period_and_one_checkday() throws Exception {
         //given
         Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
-            .set(javaGetter(Goal::getPeriod),
-                new GoalPeriod(
-                    LocalDate.now().minusDays(10),
-                    LocalDate.now().plusDays(10)))
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(10),
+                LocalDate.now().plusDays(9)))
             .set(javaGetter(Goal::getCheckDays), GoalCheckDays.ofDayOfWeek(DayOfWeek.MONDAY))
             .sample();
 
@@ -206,86 +212,134 @@ class GoalTest {
         assertThat(result).isEqualTo(1);
     }
 
+    @DisplayName("초대 가능 진행률을 초과하지 않으면, 목표로 초대 가능함")
     @Test
-    @DisplayName("목표 초대 가능 여부 - 초대 가능")
-    void isInviteableTrue() throws Exception {
+    void should_true_when_not_exceed_acceptable_progressed_percent() throws Exception {
         //given
-        Goal goal = createGoal();
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(3),
+                LocalDate.now().plusDays(10)))
+            .sample();
 
         //when
-        boolean inviteable = goal.isInviteable();
+        boolean result = sut.isInviteable();
 
         // then
-        assertThat(inviteable).isTrue();
-        assertThat(goal.getPeriod().getProgressedPercent()).isLessThan(
-            GoalPolicyConstants.INVITE_MAX_ACCEPTABLE_PERCENT);
+        assertThat(result).isTrue();
+        assertThat(sut.getPeriod().getProgressedPercent())
+            .isLessThanOrEqualTo(GoalPolicyConstants.INVITE_ACCEPTABLE_PROGRESSED_PERCENT_LIMIT);
     }
 
+    @DisplayName("초대 가능 진행률을 초과한 경우, 목표로 초대 불가")
     @Test
-    @DisplayName("목표 초대 가능 여부 - 초대 불가능")
-    void isInviteableFalseBecauseProgressPercent() throws Exception {
+    void should_false_when_exceed_acceptable_progressed_percent() throws Exception {
         //given
-        Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate",
-            LocalDate.now().minusDays(200L));
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(4),
+                LocalDate.now().plusDays(10)))
+            .sample();
 
         //when
-        boolean inviteable = goal.isInviteable();
+        boolean result = sut.isInviteable();
 
         // then
-        assertThat(inviteable).isFalse();
+        assertThat(result).isFalse();
+        assertThat(sut.getPeriod().getProgressedPercent())
+            .isGreaterThan(GoalPolicyConstants.INVITE_ACCEPTABLE_PROGRESSED_PERCENT_LIMIT);
     }
 
+    @DisplayName("주7회, 10일 전에 시작한 목표의 진행된 목표 인증일은 10")
     @Test
-    @DisplayName("목표 진행 일 수")
-    void getProgressedCheckDayCount() throws Exception {
+    void should_10_when_10_days_ago_started_everyday_checkday() throws Exception {
         //given
-        Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal.getPeriod(), "startDate", LocalDate.now().minusDays(10));
-        ReflectionTestUtils.setField(goal, "checkDays",
-            GoalCheckDays.ofDayOfWeek(DayOfWeek.values()));
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(10),
+                LocalDate.now().plusDays(9)))
+            .set(javaGetter(Goal::getCheckDays), GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
+            .sample();
 
         //when
-        int progressedCheckDayCount = goal.getProgressedCheckDayCount();
+        int result = sut.getProgressedCheckDayCount();
 
         //then
-        assertThat(progressedCheckDayCount).isEqualTo(10);
+        assertThat(result).isEqualTo(10);
     }
 
+    @DisplayName("주1회, 10일 전에 시작한 목표의 진행된 목표 인증일은 1 혹은 2")
     @Test
-    void isTodayCheckDayTrue() throws Exception {
+    void should_1_or_2_when_10_days_ago_started_one_checkday() throws Exception {
         //given
-        Goal goal = createGoal();
-        ReflectionTestUtils.setField(goal, "checkDays",
-            GoalCheckDays.ofDayOfWeek(DayOfWeek.values()));
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(10),
+                LocalDate.now().plusDays(9)))
+            .set(javaGetter(Goal::getCheckDays), GoalCheckDays.ofDayOfWeek(DayOfWeek.MONDAY))
+            .sample();
 
         //when
-        boolean isCheckDay = goal.isTodayCheckDay();
+        int result = sut.getProgressedCheckDayCount();
 
         //then
-        assertThat(isCheckDay).isTrue();
+        assertThat(result).isIn(1, 2);
     }
 
+    @DisplayName("오늘이 목표 진행 기간에 속하고 인증 요일이면 목표 인증일임")
     @Test
-    void isTodayCheckDayFalse() throws Exception {
+    void should_true_when_today_checkday_and_today_in_period() throws Exception {
         //given
-        Goal goal = createGoal();
-        GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(getYesterdayDayOfWeek());
-        ReflectionTestUtils.setField(goal, "checkDays", checkDays);
+        DayOfWeek today = LocalDate.now().getDayOfWeek();
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now(), LocalDate.now()))
+            .set(javaGetter(Goal::getCheckDays),
+                GoalCheckDays.ofDayOfWeek(today))
+            .sample();
 
         //when
-        boolean isCheckDay = goal.isTodayCheckDay();
+        boolean result = sut.isTodayCheckDay();
 
         //then
-        assertThat(isCheckDay).isFalse();
+        assertThat(result).isTrue();
     }
 
-    private DayOfWeek getYesterdayDayOfWeek() {
-        return LocalDate.now().minusDays(1).getDayOfWeek();
+    @DisplayName("오늘이 목표 진행 기간에 속하지만 인증 요일이 아니면 목표 인증일이 아님")
+    @Test
+    void should_false_when_today_in_period_but_yesterday_checkday() throws Exception {
+        //given
+        DayOfWeek yesterday = LocalDate.now().minusDays(1).getDayOfWeek();
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now(), LocalDate.now()))
+            .set(javaGetter(Goal::getCheckDays),
+                GoalCheckDays.ofDayOfWeek(yesterday))
+            .sample();
+
+        //when
+        boolean result = sut.isTodayCheckDay();
+
+        //then
+        assertThat(result).isFalse();
     }
 
-    private Goal createGoal() {
-        return TestEntityFactory.goal(1L, "goal");
+    @DisplayName("오늘이 목표 진행 기간에 속하지 않으면 인증 요일이여도 목표 인증일이 아님")
+    @Test
+    void should_false_when_everyday_checkday_but_today_not_in_goal_period() throws Exception {
+        //given
+        Goal sut = fixtureMonkey.giveMeBuilder(Goal.class)
+            .set(javaGetter(Goal::getPeriod), new GoalPeriod(
+                LocalDate.now().minusDays(1), LocalDate.now().minusDays(1)))
+            .set(javaGetter(Goal::getCheckDays),
+                GoalCheckDays.ofDayOfWeek(DayOfWeek.values()))
+            .sample();
+
+        //when
+        boolean result = sut.isTodayCheckDay();
+
+        //then
+        assertThat(result).isFalse();
     }
 
 }
