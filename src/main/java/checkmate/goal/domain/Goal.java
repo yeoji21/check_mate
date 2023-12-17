@@ -2,6 +2,7 @@ package checkmate.goal.domain;
 
 import checkmate.common.domain.BaseTimeEntity;
 import checkmate.exception.BusinessException;
+import checkmate.exception.NotInviteableGoalException;
 import checkmate.exception.code.ErrorCode;
 import checkmate.mate.domain.Mate;
 import checkmate.user.domain.User;
@@ -89,21 +90,27 @@ public class Goal extends BaseTimeEntity {
         return new Mate(this, user);
     }
 
-    // TODO: 2023/12/16 호출 위치가 흠..
     public boolean isInviteable() {
         return period.getProgressedPercent()
             <= GoalPolicyConstants.INVITE_ACCEPTABLE_PROGRESSED_PERCENT_LIMIT;
     }
 
-    public int getTotalCheckDayCount() {
-        return (int) period.getFullPeriodStream()
-            .filter(date -> checkDays.isDateCheckDayOfWeek(date)).count();
+    public void checkJoinable() {
+        if (!isInviteable()) {
+            throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
+        }
     }
 
-    // TODO: 2023/12/16 public으로 제공하기보다 호출 방식을 변경?
     public int getProgressedCheckDayCount() {
         return (int) period.getUntilTodayPeriodStream()
-            .filter(date -> checkDays.isDateCheckDayOfWeek(date)).count();
+            .filter(date -> checkDays.isDateCheckDayOfWeek(date))
+            .count();
+    }
+
+    public int getTotalCheckDayCount() {
+        return (int) period.getFullPeriodStream()
+            .filter(date -> checkDays.isDateCheckDayOfWeek(date))
+            .count();
     }
 
     public LocalDate getStartDate() {

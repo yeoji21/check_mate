@@ -74,22 +74,16 @@ public class Mate extends BaseTimeEntity {
         this.goal = goal;
     }
 
-    public void acceptInvite(OngoingGoalCount count) {
-        Assert.notNull(count, "ongoing goal count is required");
-        if (goal.isInviteable()) {
-            status = status.toOngoing();
-            attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
-            return;
-        }
-        throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
+    public void receiveInvite() {
+        goal.checkJoinable();
+        status = status.toWaiting();
     }
 
-    public void receiveInvite() {
-        if (goal.isInviteable()) {
-            status = status.toWaiting();
-            return;
-        }
-        throw NotInviteableGoalException.EXCEED_INVITEABLE_DATE;
+    public void acceptInvite(OngoingGoalCount count) throws NotInviteableGoalException {
+        Assert.notNull(count, "ongoing goal count is required");
+        goal.checkJoinable();
+        status = status.toOngoing();
+        attendance = new MateAttendance(goal.getProgressedCheckDayCount(), 0);
     }
 
     public void rejectInvite() {
@@ -97,7 +91,8 @@ public class Mate extends BaseTimeEntity {
     }
 
     public double getAchievementPercent() {
-        return ProgressCalculator.calculate(attendance.getCheckDayCount(),
+        return ProgressCalculator.calculate(
+            attendance.getCheckDayCount(),
             goal.getTotalCheckDayCount());
     }
 

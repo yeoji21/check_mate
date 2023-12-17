@@ -10,7 +10,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 
-
+// TODO: 2023/12/17 네이밍 변경 필요
 @Getter
 public class GoalDetailInfo {
 

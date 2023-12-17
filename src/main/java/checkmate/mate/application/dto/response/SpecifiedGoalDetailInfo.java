@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.Getter;
 
+// TODO: 2023/12/17 GoalDetailInfo 클래스랑 뭐가 다른건지..
 @Getter
 public class SpecifiedGoalDetailInfo {
 
