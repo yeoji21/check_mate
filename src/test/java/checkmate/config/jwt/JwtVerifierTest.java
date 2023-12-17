@@ -1,5 +1,11 @@
 package checkmate.config.jwt;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import checkmate.TestEntityFactory;
 import checkmate.exception.BusinessException;
 import checkmate.exception.code.ErrorCode;
@@ -16,14 +22,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 class JwtVerifierTest {
+
     @InjectMocks
     private JwtVerifier jwtVerifier;
     @Mock
@@ -58,7 +59,7 @@ class JwtVerifierTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> jwtVerifier.verify(token));
+            () -> jwtVerifier.verify(token));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.TOKEN_VERIFY_FAIL);
@@ -89,7 +90,7 @@ class JwtVerifierTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> jwtVerifier.verifyRefeshToken("providerId", refreshToken));
+            () -> jwtVerifier.verifyRefeshToken("providerId", refreshToken));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
@@ -105,7 +106,7 @@ class JwtVerifierTest {
 
         //when
         BusinessException exception = assertThrows(BusinessException.class,
-                () -> jwtVerifier.verifyRefeshToken("providerId", refreshToken));
+            () -> jwtVerifier.verifyRefeshToken("providerId", refreshToken));
 
         //then
         assertThat(exception.getErrorCode()).isEqualTo(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
