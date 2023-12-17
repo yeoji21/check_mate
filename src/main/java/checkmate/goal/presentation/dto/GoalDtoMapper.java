@@ -3,7 +3,7 @@ package checkmate.goal.presentation.dto;
 import checkmate.goal.application.dto.request.GoalCreateCommand;
 import checkmate.goal.application.dto.request.GoalModifyCommand;
 import checkmate.goal.application.dto.request.LikeCountCreateCommand;
-import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
+import checkmate.goal.domain.CheckDaysConverter;
 import java.time.DayOfWeek;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

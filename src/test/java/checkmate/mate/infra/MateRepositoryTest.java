@@ -7,10 +7,10 @@ import checkmate.RepositoryTest;
 import checkmate.TestEntityFactory;
 import checkmate.exception.NotFoundException;
 import checkmate.exception.code.ErrorCode;
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
-import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.OngoingGoalCount;
@@ -96,8 +96,9 @@ class MateRepositoryTest extends RepositoryTest {
         assertThat(mates).hasSize(2);
         assertThat(mates)
             .allMatch(m -> GoalCheckDays.ofDayOfWeek(
-                    CheckDaysConverter.toDayOfWeeks(m.getGoal().getCheckDays().toKorean()))
-                .isDateCheckDayOfWeek(LocalDate.now().minusDays(1)))
+                    CheckDaysConverter.toDayOfWeeks(
+                        CheckDaysConverter.toKorean(m.getGoal().getCheckDays())))
+                .isCheckDay(LocalDate.now().minusDays(1)))
             .allMatch(m -> m.getLastUploadDate() != LocalDate.now().minusDays(1))
             .allMatch(m -> m.getStatus() == MateStatus.ONGOING)
             .allMatch(m -> m.getGoal().getStatus() == GoalStatus.ONGOING);

@@ -65,7 +65,7 @@ public class MateJpaRepository implements MateRepository {
                 mate.status.eq(MateStatus.ONGOING),
                 goal.status.eq(GoalStatus.ONGOING),
                 goal.checkDays.checkDays.in(
-                    GoalCheckDays.getAllMatchingValues(yesterDay.getDayOfWeek()))
+                    GoalCheckDays.getAllPossibleValues(yesterDay.getDayOfWeek()))
             )
             .fetch();
 

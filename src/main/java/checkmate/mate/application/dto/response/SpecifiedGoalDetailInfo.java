@@ -1,5 +1,6 @@
 package checkmate.mate.application.dto.response;
 
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalCategory;
 import checkmate.goal.domain.Goal.GoalStatus;
@@ -41,7 +42,7 @@ public class SpecifiedGoalDetailInfo {
         this.startDate = goal.getStartDate();
         this.endDate = goal.getEndDate();
         this.appointmentTime = goal.getAppointmentTime();
-        this.weekDays = goal.getCheckDays().toKorean();
+        this.weekDays = CheckDaysConverter.toKorean(goal.getCheckDays());
         this.status = goal.getStatus();
         this.inviteable = goal.isInviteable();
         this.goalSchedule = GoalScheduler.getTotalSchedule(goal.getPeriod(),

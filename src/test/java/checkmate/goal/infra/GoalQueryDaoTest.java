@@ -8,10 +8,10 @@ import checkmate.goal.application.dto.response.GoalDetailInfo;
 import checkmate.goal.application.dto.response.GoalScheduleInfo;
 import checkmate.goal.application.dto.response.OngoingGoalInfo;
 import checkmate.goal.application.dto.response.TodayGoalInfo;
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal;
 import checkmate.goal.domain.Goal.GoalStatus;
 import checkmate.goal.domain.GoalCheckDays;
-import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import checkmate.goal.domain.GoalPeriod;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
@@ -225,8 +225,9 @@ class GoalQueryDaoTest extends RepositoryTest {
     }
 
     private boolean isTodayCheckDayOfWeek(String korWeekDays) {
+
         return GoalCheckDays.ofDayOfWeek(CheckDaysConverter.toDayOfWeeks(korWeekDays))
-            .isDateCheckDayOfWeek(LocalDate.now());
+            .isCheckDay(LocalDate.now());
     }
 
     private Goal createTodayStartGoal() {

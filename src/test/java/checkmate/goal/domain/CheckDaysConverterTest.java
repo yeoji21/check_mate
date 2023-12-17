@@ -9,7 +9,6 @@ import static java.time.DayOfWeek.TUESDAY;
 import static java.time.DayOfWeek.WEDNESDAY;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import checkmate.goal.domain.GoalCheckDays.CheckDaysConverter;
 import java.time.DayOfWeek;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -63,11 +62,11 @@ class CheckDaysConverterTest {
     }
 
     private void isNotCheckDay(int value, DayOfWeek dayOfWeek) {
-        assertThat(CheckDaysConverter.isCheckDayOfWeek(value, dayOfWeek)).isFalse();
+        assertThat(CheckDaysConverter.isCheckDay(value, dayOfWeek)).isFalse();
     }
 
     private void isCheckDay(int value, DayOfWeek dayOfWeek) {
-        assertThat(CheckDaysConverter.isCheckDayOfWeek(value, dayOfWeek)).isTrue();
+        assertThat(CheckDaysConverter.isCheckDay(value, dayOfWeek)).isTrue();
     }
 
     private void dayOfWeeksToValue(int value, DayOfWeek... dayOfWeeks) {

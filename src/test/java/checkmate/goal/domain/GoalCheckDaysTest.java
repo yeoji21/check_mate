@@ -46,12 +46,12 @@ class GoalCheckDaysTest {
         //given
 
         //when
-        List<Integer> matchingValues = GoalCheckDays.getAllMatchingValues(MONDAY);
+        List<Integer> matchingValues = GoalCheckDays.getAllPossibleValues(MONDAY);
 
         //then
         assertThat(matchingValues).hasSize(64);
         assertTrue(matchingValues.stream()
-            .allMatch(value -> GoalCheckDays.ofValue(value).isDateCheckDayOfWeek(getMonday())));
+            .allMatch(value -> GoalCheckDays.ofValue(value).isCheckDay(getMonday())));
     }
 
     @Test
@@ -60,7 +60,7 @@ class GoalCheckDaysTest {
         GoalCheckDays checkDays = GoalCheckDays.ofDayOfWeek(MONDAY);
 
         //when
-        boolean isCheckDay = checkDays.isDateCheckDayOfWeek(getMonday());
+        boolean isCheckDay = checkDays.isCheckDay(getMonday());
 
         //then
         assertTrue(isCheckDay);

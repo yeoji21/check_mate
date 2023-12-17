@@ -67,7 +67,7 @@ public class GoalQueryDao {
                 mate.status.eq(MateStatus.ONGOING),
                 goal.status.eq(GoalStatus.ONGOING),
                 goal.checkDays.checkDays.in(
-                    GoalCheckDays.getAllMatchingValues(LocalDate.now().getDayOfWeek())))
+                    GoalCheckDays.getAllPossibleValues(LocalDate.now().getDayOfWeek())))
             .fetch();
     }
 

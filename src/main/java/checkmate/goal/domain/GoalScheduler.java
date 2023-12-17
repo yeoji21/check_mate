@@ -11,7 +11,7 @@ import lombok.experimental.UtilityClass;
 public class GoalScheduler {
 
     public static String getTotalSchedule(GoalPeriod period, GoalCheckDays checkDays) {
-        return convertToSchedule(period, date -> checkDays.isDateCheckDayOfWeek(date) ? "1" : "0");
+        return convertToSchedule(period, date -> checkDays.isCheckDay(date) ? "1" : "0");
     }
 
     public static String getCheckedSchedule(
@@ -19,7 +19,7 @@ public class GoalScheduler {
         GoalCheckDays checkDays,
         List<LocalDate> checkedDates) {
         return convertToSchedule(period,
-            date -> checkDays.isDateCheckDayOfWeek(date) && isUploaded(checkedDates, date) ? "1"
+            date -> checkDays.isCheckDay(date) && isUploaded(checkedDates, date) ? "1"
                 : "0");
     }
 
