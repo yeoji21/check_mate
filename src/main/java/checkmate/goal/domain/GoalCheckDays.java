@@ -39,7 +39,7 @@ public class GoalCheckDays {
 
     public static List<Integer> getAllPossibleValues(DayOfWeek dayOfWeek) {
         return IntStream.rangeClosed(1, 128)
-            .filter(weekDays -> CheckDaysConverter.isCheckDay(weekDays, dayOfWeek))
+            .filter(checkDays -> CheckDaysConverter.isValueContainsDayOfWeek(checkDays, dayOfWeek))
             .boxed()
             .toList();
     }
@@ -49,7 +49,7 @@ public class GoalCheckDays {
     }
 
     public boolean isCheckDay(LocalDate date) {
-        return CheckDaysConverter.isCheckDay(checkDays, date.getDayOfWeek());
+        return CheckDaysConverter.isValueContainsDayOfWeek(checkDays, date.getDayOfWeek());
     }
 
     int getValue() {

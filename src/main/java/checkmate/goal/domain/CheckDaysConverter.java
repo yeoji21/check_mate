@@ -24,14 +24,14 @@ public class CheckDaysConverter {
 
     public static String toKorean(GoalCheckDays checkDays) {
         return Arrays.stream(CheckDayOfWeek.values())
-            .filter(day -> isCheckDay(checkDays.getValue(), day.shift))
+            .filter(day -> containsValue(checkDays.getValue(), day.shift))
             .map(day -> day.kor)
             .collect(Collectors.joining());
     }
 
-    static DayOfWeek[] toDayOfWeeks(int weekDays) {
+    static DayOfWeek[] toDayOfWeeks(int value) {
         return Arrays.stream(CheckDayOfWeek.values())
-            .filter(day -> isCheckDay(weekDays, day.shift))
+            .filter(day -> containsValue(value, day.shift))
             .map(day -> DayOfWeek.valueOf(day.name()))
             .toArray(DayOfWeek[]::new);
     }
@@ -44,12 +44,12 @@ public class CheckDaysConverter {
         return value;
     }
 
-    static boolean isCheckDay(int weekDays, DayOfWeek dayOfWeek) {
-        return isCheckDay(weekDays, CheckDayOfWeek.valueOf(dayOfWeek.toString()).shift);
+    static boolean isValueContainsDayOfWeek(int value, DayOfWeek dayOfWeek) {
+        return containsValue(value, CheckDayOfWeek.valueOf(dayOfWeek.toString()).shift);
     }
 
-    private static boolean isCheckDay(int weekDays, int date) {
-        return (weekDays & (1 << date)) != 0;
+    private static boolean containsValue(int operand, int operator) {
+        return (operand & (1 << operator)) != 0;
     }
 
     @RequiredArgsConstructor
