@@ -6,7 +6,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.IntStream;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import lombok.AccessLevel;
@@ -35,13 +34,6 @@ public class GoalCheckDays {
 
     public static GoalCheckDays ofValue(int value) {
         return new GoalCheckDays(CheckDaysConverter.toDayOfWeeks(value));
-    }
-
-    public static List<Integer> getAllPossibleValues(DayOfWeek dayOfWeek) {
-        return IntStream.rangeClosed(1, 128)
-            .filter(checkDays -> CheckDaysConverter.isValueContainsDayOfWeek(checkDays, dayOfWeek))
-            .boxed()
-            .toList();
     }
 
     private static boolean containsDuplicatedWeekDay(DayOfWeek[] dayOfWeeks) {

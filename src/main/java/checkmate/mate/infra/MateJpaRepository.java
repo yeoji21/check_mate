@@ -5,8 +5,8 @@ import static checkmate.mate.domain.QMate.mate;
 import static checkmate.post.domain.QPost.post;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
+import checkmate.goal.domain.CheckDaysConverter;
 import checkmate.goal.domain.Goal.GoalStatus;
-import checkmate.goal.domain.GoalCheckDays;
 import checkmate.mate.domain.Mate;
 import checkmate.mate.domain.Mate.MateStatus;
 import checkmate.mate.domain.MateRepository;
@@ -65,7 +65,7 @@ public class MateJpaRepository implements MateRepository {
                 mate.status.eq(MateStatus.ONGOING),
                 goal.status.eq(GoalStatus.ONGOING),
                 goal.checkDays.checkDays.in(
-                    GoalCheckDays.getAllPossibleValues(yesterDay.getDayOfWeek()))
+                    CheckDaysConverter.getAllPossibleValues(yesterDay.getDayOfWeek()))
             )
             .fetch();
 

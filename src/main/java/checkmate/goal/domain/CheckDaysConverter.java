@@ -2,7 +2,9 @@ package checkmate.goal.domain;
 
 import java.time.DayOfWeek;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.UtilityClass;
@@ -27,6 +29,13 @@ public class CheckDaysConverter {
             .filter(day -> containsValue(checkDays.getValue(), day.shift))
             .map(day -> day.kor)
             .collect(Collectors.joining());
+    }
+
+    public static List<Integer> getAllPossibleValues(DayOfWeek dayOfWeek) {
+        return IntStream.rangeClosed(1, 128)
+            .filter(checkDays -> CheckDaysConverter.isValueContainsDayOfWeek(checkDays, dayOfWeek))
+            .boxed()
+            .toList();
     }
 
     static DayOfWeek[] toDayOfWeeks(int value) {
