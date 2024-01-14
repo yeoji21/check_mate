@@ -91,7 +91,7 @@ public class UserQueryDao {
                     mate.getModifiedDateTime().toLocalDate().isAfter(date)
                 ))
             .map(mate -> mate.getGoal())
-            .filter(goal -> goal.getPeriod().isBelongToPeriod(date))
+            .filter(goal -> goal.getPeriod().contains(date))
             .toList();
     }
 }

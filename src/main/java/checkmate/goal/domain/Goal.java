@@ -67,7 +67,7 @@ public class Goal extends BaseTimeEntity {
         this.checkDays = checkDays;
         this.period = period;
         this.appointmentTime = appointmentTime;
-        this.status = period.isInitiated() ? GoalStatus.ONGOING : GoalStatus.WAITING;
+        this.status = period.isStarted() ? GoalStatus.ONGOING : GoalStatus.WAITING;
     }
 
     public int getLimitOfSkippedDay() {
@@ -75,7 +75,7 @@ public class Goal extends BaseTimeEntity {
     }
 
     public boolean isTodayCheckDay() {
-        return period.isBelongToPeriod(LocalDate.now()) &&
+        return period.contains(LocalDate.now()) &&
             checkDays.isCheckDay(LocalDate.now());
     }
 

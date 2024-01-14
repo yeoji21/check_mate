@@ -29,6 +29,15 @@ public class GoalPeriod {
         this.endDate = endDate;
     }
 
+    // TODO: 2024/01/14 contains today로 대체 가능?
+    boolean isStarted() {
+        return !startDate.isAfter(LocalDate.now());
+    }
+
+    public boolean contains(LocalDate date) {
+        return !startDate.isAfter(date) && !endDate.isBefore(date);
+    }
+
     double getProgressedPercent() {
         return ProgressCalculator.calculate(getPastDaysCount(), getTotalCount());
     }
@@ -38,19 +47,11 @@ public class GoalPeriod {
     }
 
     Stream<LocalDate> getUntilTodayPeriodStream() {
-        return isInitiated() ? startDate.datesUntil(LocalDate.now()) : Stream.empty();
-    }
-
-    public boolean isBelongToPeriod(LocalDate date) {
-        return !startDate.isAfter(date) && !endDate.isBefore(date);
-    }
-
-    boolean isInitiated() {
-        return !startDate.isAfter(LocalDate.now());
+        return isStarted() ? startDate.datesUntil(LocalDate.now()) : Stream.empty();
     }
 
     private int getPastDaysCount() {
-        return isInitiated() ? (int) (startDate.datesUntil(LocalDate.now()).count()) : 0;
+        return isStarted() ? (int) (startDate.datesUntil(LocalDate.now()).count()) : 0;
     }
 
     private int getTotalCount() {
