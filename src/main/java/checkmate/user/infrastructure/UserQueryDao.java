@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Repository
@@ -43,6 +44,7 @@ public class UserQueryDao {
             .fetchOne() != null;
     }
 
+    @Transactional
     public List<DailySchedule> findSchedule(long userId, List<LocalDate> dates) {
         List<Mate> mates = queryFactory.select(mate)
             .from(mate)
